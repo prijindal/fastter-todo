@@ -4,22 +4,36 @@ import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'package:redux_logging/redux_logging.dart';
 
+import '../models/user.model.dart';
+import 'currentuser.dart';
+import 'bearer.dart';
+
 class AppState {
   AppState({
+    this.user,
+    this.bearer,
     this.rehydrated = false,
   });
 
   bool rehydrated;
+  User user;
+  String bearer;
 
   static AppState fromJson(dynamic json) {
-    if (json != null && json['login'] != null) {
-      return AppState();
+    if (json != null && json['user'] != null) {
+      return AppState(
+        user: User.fromJson(json['user']),
+        bearer: json['bearer'],
+      );
     } else {
       return AppState();
     }
   }
 
-  Map<String, dynamic> toJson() => <String, dynamic>{};
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'user': user != null ? user.toJson() : <String, dynamic>{},
+        'bearer': bearer,
+      };
 
   @override
   String toString() {
@@ -32,17 +46,23 @@ class AppState {
 }
 
 class InitStateReset {
-  InitStateReset();
+  InitStateReset(this.user, this.bearer);
+  final User user;
+  final String bearer;
 }
 
 AppState appStateReducer(AppState state, dynamic action) {
   if (action is InitStateReset) {
     return AppState(
+      user: action.user,
+      bearer: action.bearer,
       rehydrated: true,
     );
   }
   return AppState(
     rehydrated: state.rehydrated,
+    user: userReducer(state.user, action),
+    bearer: bearerReducer(state.bearer, action),
   );
 }
 
@@ -73,7 +93,7 @@ Future<void> initState() async {
   );
 
   _persistor.load().then((AppState state) {
-    _store.dispatch(InitStateReset());
+    _store.dispatch(InitStateReset(state.user, state.bearer));
   });
 
   store = _store;

@@ -4,6 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../screens//loading.dart';
 import '../store/store.dart';
+import './app.dart';
 
 ThemeData primaryTheme = ThemeData(primarySwatch: Colors.orange);
 
@@ -14,19 +15,12 @@ class RootContainer extends StatelessWidget {
       converter: (Store<AppState> store) => store.state,
       builder: (BuildContext context, AppState state) {
         return MaterialApp(
-          title: 'News App',
+          title: 'Todo App',
           theme: primaryTheme,
           home: (state == null || state.rehydrated == false)
               ? LoadingScreen()
               : Scaffold(
-                  body: AnimatedCrossFade(
-                    crossFadeState: (state == null)
-                        ? CrossFadeState.showFirst
-                        : CrossFadeState.showSecond,
-                    firstChild: LoadingScreen(),
-                    secondChild: LoadingScreen(),
-                    duration: const Duration(milliseconds: 500),
-                  ),
+                  body: AppContainer(),
                 ),
         );
       },
