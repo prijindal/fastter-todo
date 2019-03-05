@@ -3,13 +3,9 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../models/base.model.dart';
 import '../models/todo.model.dart';
-import '../store/fastter_store_creators.dart';
-import '../store/store.dart';
-import '../store/todos.dart';
-import '../components/homeappbar.dart';
-import '../components/homeappdrawer.dart';
+import '../store/fastter_action.dart';
+import '../store/state.dart';
 
 class TodoInput extends StatelessWidget {
   TodoInput({Key key}) : super(key: key);
@@ -20,7 +16,7 @@ class TodoInput extends StatelessWidget {
       converter: (Store<AppState> store) => store,
       builder: (BuildContext context, Store<AppState> store) {
         return _TodoInput(
-          onAddTodo: (todo) => store.dispatch(AddAction<Todo>(todo)),
+          onAddTodo: (todo) => store.dispatch(AddCompletedAction<Todo>(todo)),
         );
       },
     );

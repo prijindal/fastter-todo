@@ -10,14 +10,14 @@ abstract class BaseModel extends Object {
 class ListState<T extends BaseModel> {
   ListState({
     this.fetching = false,
-    this.datas = const [],
+    this.items = const [],
   });
 
   Map<String, dynamic> toJson() => ({
         'fetching': false,
-        'datas': datas.map((t) => t.toJson()).toList(),
+        'datas': items.map((t) => t.toJson()).toList(),
       });
 
   final bool fetching;
-  final List<T> datas;
+  final List<T> items;
 }

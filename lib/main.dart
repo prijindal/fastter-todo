@@ -11,6 +11,7 @@ import 'helpers/theme.dart';
 import 'routes/root.dart';
 import 'screens/loading.dart';
 import 'store/store.dart';
+import 'store/state.dart';
 
 /// If the current platform is desktop, override the default platform to
 /// a supported platform (iOS for macOS, Android for Linux and Windows).

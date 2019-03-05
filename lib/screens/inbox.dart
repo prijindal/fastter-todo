@@ -4,9 +4,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/base.model.dart';
 import '../models/todo.model.dart';
-import '../store/fastter_store_creators.dart';
-import '../store/store.dart';
-import '../store/todos.dart';
+import '../store/fastter_action.dart';
+import '../store/state.dart';
 import '../components/homeappbar.dart';
 import '../components/todoinput.dart';
 import '../components/homeappdrawer.dart';
@@ -19,9 +18,7 @@ class InboxScreen extends StatelessWidget {
       builder: (BuildContext context, Store<AppState> store) {
         return _InboxScreen(
           todos: store.state.todos,
-          syncStart: () => store.dispatch(SyncStartAction<Todo>()),
-          syncCompleted: (List<Todo> datas) =>
-              store.dispatch(SyncCompletedAction<Todo>(datas)),
+          syncStart: () => store.dispatch(StartSync<Todo>()),
         );
       },
     );
@@ -31,12 +28,10 @@ class InboxScreen extends StatelessWidget {
 class _InboxScreen extends StatefulWidget {
   final ListState<Todo> todos;
   final VoidCallback syncStart;
-  final void Function(List<Todo> datas) syncCompleted;
 
   _InboxScreen({
     Key key,
     @required this.todos,
-    @required this.syncCompleted,
     @required this.syncStart,
   }) : super(key: key);
 
@@ -48,13 +43,10 @@ class __InboxScreenState extends State<_InboxScreen> {
   void initState() {
     widget.syncStart();
     super.initState();
-    todosQueries.syncQuery().then((response) {
-      widget.syncCompleted(response);
-    });
   }
 
   Widget buildBody() {
-    if (widget.todos.fetching) {
+    if (widget.todos.fetching || widget.todos.items.isEmpty) {
       return Center(
         child: CircularProgressIndicator(),
       );
@@ -65,7 +57,7 @@ class __InboxScreenState extends State<_InboxScreen> {
       children: <Widget>[
         ListView(
           shrinkWrap: true,
-          children: widget.todos.datas
+          children: widget.todos.items
               .map(
                 (todo) => ListTile(
                       key: new Key(todo.id),

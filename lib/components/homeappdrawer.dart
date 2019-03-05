@@ -5,9 +5,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import '../models/base.model.dart';
 import '../models/user.model.dart';
 import '../models/project.model.dart';
-import '../store/fastter_store_creators.dart';
-import '../store/store.dart';
-import '../store/projects.dart';
+import '../store/fastter_action.dart';
+import '../store/state.dart';
 
 class HomeAppDrawer extends StatelessWidget {
   HomeAppDrawer({Key key}) : super(key: key);
@@ -20,9 +19,7 @@ class HomeAppDrawer extends StatelessWidget {
         return _HomeAppDrawer(
           user: store.state.user,
           projects: store.state.projects,
-          syncStart: () => store.dispatch(SyncStartAction<Project>()),
-          syncCompleted: (List<Project> datas) =>
-              store.dispatch(SyncCompletedAction<Project>(datas)),
+          syncStart: () => store.dispatch(StartSync<Project>()),
         );
       },
     );
@@ -33,13 +30,11 @@ class _HomeAppDrawer extends StatefulWidget {
   final User user;
   final ListState<Project> projects;
   final VoidCallback syncStart;
-  final void Function(List<Project> datas) syncCompleted;
 
   _HomeAppDrawer({
     Key key,
     @required this.user,
     @required this.projects,
-    @required this.syncCompleted,
     @required this.syncStart,
   }) : super(key: key);
 
@@ -51,9 +46,6 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
   void initState() {
     widget.syncStart();
     super.initState();
-    projectsQueries.syncQuery().then((response) {
-      widget.syncCompleted(response);
-    });
   }
 
   @override
@@ -82,7 +74,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             title: Text("7 Days"),
           ),
           Column(
-            children: widget.projects.datas
+            children: widget.projects.items
                 .map<Widget>(
                   (project) => ListTile(
                         leading: Icon(

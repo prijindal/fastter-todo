@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/user.model.dart';
-import '../store/store.dart';
+import '../store/state.dart';
 import '../store/bearer.dart';
 import '../store/currentuser.dart';
 import '../helpers/fastter.dart' show fastter, Request;
