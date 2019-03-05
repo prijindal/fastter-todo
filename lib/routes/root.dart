@@ -4,9 +4,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../screens//loading.dart';
 import '../store/store.dart';
+import '../helpers/theme.dart';
 import './app.dart';
-
-ThemeData primaryTheme = ThemeData(primarySwatch: Colors.orange);
 
 class RootContainer extends StatelessWidget {
   @override
@@ -14,15 +13,12 @@ class RootContainer extends StatelessWidget {
     return StoreConnector<AppState, AppState>(
       converter: (Store<AppState> store) => store.state,
       builder: (BuildContext context, AppState state) {
-        return MaterialApp(
-          title: 'Todo App',
-          theme: primaryTheme,
-          home: (state == null || state.rehydrated == false)
-              ? LoadingScreen()
-              : Scaffold(
-                  body: AppContainer(),
-                ),
-        );
+        return ((state == null || state.rehydrated == false)
+            ? MaterialApp(
+                theme: primaryTheme,
+                home: LoadingScreen(),
+              )
+            : AppContainer());
       },
     );
   }

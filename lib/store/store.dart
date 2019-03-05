@@ -8,8 +8,10 @@ import '../models/user.model.dart';
 import 'currentuser.dart';
 import 'bearer.dart';
 import 'todos.dart';
+import 'projects.dart';
 import '../models/base.model.dart';
 import '../models/todo.model.dart';
+import '../models/project.model.dart';
 
 class AppState {
   AppState({
@@ -17,18 +19,36 @@ class AppState {
     this.bearer,
     this.rehydrated = false,
     this.todos,
+    this.projects,
   });
 
   bool rehydrated;
   User user;
   String bearer;
   ListState<Todo> todos;
+  ListState<Project> projects;
 
   static AppState fromJson(dynamic json) {
     if (json != null && json['user'] != null) {
       return AppState(
         user: User.fromJson(json['user']),
         bearer: json['bearer'],
+        todos: ListState<Todo>(
+          fetching: false,
+          datas: json['todos'] != null && json['todos']['datas'] != null
+              ? (json['todos']['datas'] as List<dynamic>)
+                  .map<Todo>((t) => Todo.fromJson(t))
+                  .toList()
+              : [],
+        ),
+        projects: ListState<Project>(
+          fetching: false,
+          datas: json['projects'] != null && json['projects']['datas'] != null
+              ? (json['projects']['datas'] as List<dynamic>)
+                  .map<Project>((t) => Project.fromJson(t))
+                  .toList()
+              : [],
+        ),
       );
     } else {
       return AppState();
@@ -38,6 +58,8 @@ class AppState {
   Map<String, dynamic> toJson() => <String, dynamic>{
         'user': user != null ? user.toJson() : <String, dynamic>{},
         'bearer': bearer,
+        'todos': todos.toJson(),
+        'projects': projects.toJson(),
       };
 
   @override
@@ -63,6 +85,7 @@ AppState appStateReducer(AppState state, dynamic action) {
       bearer: action.bearer,
       rehydrated: true,
       todos: ListState<Todo>(),
+      projects: ListState<Project>(),
     );
   }
   return AppState(
@@ -70,6 +93,7 @@ AppState appStateReducer(AppState state, dynamic action) {
     user: userReducer(state.user, action),
     bearer: bearerReducer(state.bearer, action),
     todos: todosReducer(state.todos, action),
+    projects: projectsReducer(state.projects, action),
   );
 }
 

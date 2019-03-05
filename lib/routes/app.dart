@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import '../screens/loading.dart';
 import '../models/user.model.dart';
 import '../screens/login.dart';
+import '../helpers/theme.dart';
 import 'home.dart';
 import '../store/store.dart';
 import '../store/bearer.dart';
@@ -95,10 +96,16 @@ class _AppContainerState extends State<_AppContainer> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return LoadingScreen();
+      return MaterialApp(
+        theme: primaryTheme,
+        home: LoadingScreen(),
+      );
     }
     if (widget.user == null || widget.user.id == null) {
-      return LoginScreen();
+      return MaterialApp(
+        theme: primaryTheme,
+        home: LoginScreen(),
+      );
     }
     return HomeContainer();
   }

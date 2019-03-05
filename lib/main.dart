@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+import 'helpers/theme.dart';
 import 'routes/root.dart';
 import 'screens/loading.dart';
 import 'store/store.dart';

@@ -12,6 +12,12 @@ class ListState<T extends BaseModel> {
     this.fetching = false,
     this.datas = const [],
   });
+
+  Map<String, dynamic> toJson() => ({
+        'fetching': false,
+        'datas': datas.map((t) => t.toJson()).toList(),
+      });
+
   final bool fetching;
   final List<T> datas;
 }

@@ -44,6 +44,7 @@ class _LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<_LoginScreen> {
+  bool isLoading = false;
   TextEditingController emailController =
       new TextEditingController(text: "priyanshujindal1995@gmail.com");
   TextEditingController passwordController =
@@ -59,13 +60,30 @@ class _LoginScreenState extends State<_LoginScreen> {
   }
 
   login() {
+    setState(() {
+      errorMessage = null;
+      isLoading = true;
+    });
     fastter
         .login(emailController.text, passwordController.text)
         .then((response) {
       if (response != null && response.login != null) {
         widget.setBearer(response.login.bearer);
         widget.onLogin(response.login.user);
+        if (response.login.user == null) {
+          setState(() {
+            errorMessage = "Wrong username password";
+          });
+        }
       }
+      setState(() {
+        isLoading = false;
+      });
+    }).catchError((error) {
+      setState(() {
+        errorMessage = error.toString();
+        isLoading = false;
+      });
     });
   }
 
@@ -106,8 +124,9 @@ class _LoginScreenState extends State<_LoginScreen> {
                   ),
                   FlatButton(
                     child: Text("Login"),
-                    onPressed: login,
+                    onPressed: isLoading ? null : login,
                   ),
+                  Text(errorMessage == null ? "" : errorMessage),
                 ],
               ),
             ),

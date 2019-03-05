@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -39,14 +40,12 @@ class Fastter {
   User user;
 
   Fastter(this.url, String apiToken) {
-    try {
-      // socket = SocketIOManager().createSocketIO(url, "/graphql");
-    } catch (e) {
-      socket = null;
-    }
+    // if (Platform.isAndroid || Platform.isIOS) {
+    //   socket = SocketIOManager().createSocketIO(url, "/");
+    // }
     requests = {};
     subscriptions = {};
-    apiToken = apiToken;
+    this.apiToken = apiToken;
     if (socket != null) {
       socket.subscribe('connect', (_) {
         socket.sendMessage('msg', 'test');
@@ -76,9 +75,10 @@ class Fastter {
         requests.remove(data.requestId);
       }
     });
+    Uuid uuidGenerator = new Uuid();
+    String uuid = uuidGenerator.v1();
+    this.requests[uuid] = ee;
     if (socket != null) {
-      Uuid uuidGenerator = new Uuid();
-      String uuid = uuidGenerator.v1();
       data.requestId = uuid;
       if (bearer != null) {
         data.jwtToken = bearer;
@@ -86,7 +86,11 @@ class Fastter {
       if (apiToken != null) {
         data.apiToken = apiToken;
       }
-      socket.sendMessage('graphql', data);
+      try {
+        socket.sendMessage('graphql', data);
+      } catch (error) {
+        throw FastterError(error);
+      }
     } else {
       Map<String, String> headers = {
         'Content-Type': 'application/json',
@@ -97,15 +101,19 @@ class Fastter {
       if (apiToken != null) {
         headers['API_TOKEN'] = apiToken;
       }
-      http
-          .post(
-        url + "/graphql",
-        body: json.encode(data.toJson()),
-        headers: headers,
-      )
-          .then((response) {
-        ee.fire(json.decode(response.body));
-      });
+      try {
+        http
+            .post(
+          url + "/graphql",
+          body: json.encode(data.toJson()),
+          headers: headers,
+        )
+            .then((response) {
+          ee.fire(json.decode(response.body));
+        }).catchError(completer.completeError);
+      } catch (error) {
+        completer.completeError(error);
+      }
     }
     return completer.future;
   }
@@ -164,5 +172,6 @@ class FastterError {
 }
 
 const API_TOKEN = "MlwjS+Qwco5Sd2qq+4oU7LKBCyUh2aaTbow7SrKW/GI=";
+const URL = "https://apifastter.easycode.club";
 
-Fastter fastter = new Fastter("http://localhost:4000", API_TOKEN);
+Fastter fastter = new Fastter(URL, API_TOKEN);

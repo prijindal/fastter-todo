@@ -5,12 +5,13 @@ class LoadingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todo app'),
+        title: const Text('Todo App'),
       ),
       body: Container(
-          child: Center(
-        child: Text("Loading..."),
-      )),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
     );
   }
 }
