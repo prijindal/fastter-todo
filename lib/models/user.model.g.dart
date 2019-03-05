@@ -38,7 +38,7 @@ CurrentData _$CurrentDataFromJson(Map<String, dynamic> json) {
   return CurrentData(
       current: json['current'] == null
           ? null
-          : LoginField.fromJson(json['current'] as Map<String, dynamic>));
+          : User.fromJson(json['current'] as Map<String, dynamic>));
 }
 
 Map<String, dynamic> _$CurrentDataToJson(CurrentData instance) =>

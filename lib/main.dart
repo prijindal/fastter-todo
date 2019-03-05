@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
+import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter/material.dart';
 
 import 'routes/root.dart';
 import 'screens/loading.dart';
@@ -40,20 +40,20 @@ Future<void> main() async {
       Zone.current.handleUncaughtError(details.exception, details.stack);
     }
   };
-  initState();
+  final store = await initState();
 
   runZoned<Future<void>>(() async {
-    runApp(const FlutterReduxApp());
+    runApp(FlutterReduxApp(store));
   }, onError: (Object error, StackTrace stackTrace) async {
     debugPrint(error.toString());
   });
 }
 
 class FlutterReduxApp extends StatelessWidget {
-  const FlutterReduxApp({Key key}) : super(key: key);
+  const FlutterReduxApp(this.store, {Key key}) : super(key: key);
 
-  // @required
-  // final Store<AppState> store;
+  @required
+  final Store<AppState> store;
   // @required
   // final Persistor<AppState> persistor;
 

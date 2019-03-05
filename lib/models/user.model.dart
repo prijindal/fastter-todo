@@ -1,9 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'base.model.dart';
 part 'user.model.g.dart';
 
 @JsonSerializable()
-class User extends Object {
+class User extends BaseModel {
   User({
     this.id,
     this.email,
@@ -51,7 +52,7 @@ class CurrentData extends Object {
   CurrentData({
     this.current,
   });
-  LoginField current;
+  User current;
   factory CurrentData.fromJson(Map<String, dynamic> json) =>
       _$CurrentDataFromJson(json);
 

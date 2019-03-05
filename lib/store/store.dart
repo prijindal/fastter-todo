@@ -7,17 +7,22 @@ import 'package:redux_logging/redux_logging.dart';
 import '../models/user.model.dart';
 import 'currentuser.dart';
 import 'bearer.dart';
+import 'todos.dart';
+import '../models/base.model.dart';
+import '../models/todo.model.dart';
 
 class AppState {
   AppState({
     this.user,
     this.bearer,
     this.rehydrated = false,
+    this.todos,
   });
 
   bool rehydrated;
   User user;
   String bearer;
+  ListState<Todo> todos;
 
   static AppState fromJson(dynamic json) {
     if (json != null && json['user'] != null) {
@@ -57,19 +62,18 @@ AppState appStateReducer(AppState state, dynamic action) {
       user: action.user,
       bearer: action.bearer,
       rehydrated: true,
+      todos: ListState<Todo>(),
     );
   }
   return AppState(
     rehydrated: state.rehydrated,
     user: userReducer(state.user, action),
     bearer: bearerReducer(state.bearer, action),
+    todos: todosReducer(state.todos, action),
   );
 }
 
-Store<AppState> store;
-Persistor<AppState> persistor;
-
-Future<void> initState() async {
+Future<Store<AppState>> initState() async {
   dynamic storage;
   if (Platform.isAndroid || Platform.isIOS) {
     storage = FlutterStorage();
@@ -87,7 +91,7 @@ Future<void> initState() async {
       rehydrated: false,
     ),
     middleware: <Middleware<AppState>>[
-      LoggingMiddleware<AppState>.printer(),
+      // LoggingMiddleware<AppState>.printer(),
       _persistor.createMiddleware(),
     ],
   );
@@ -96,6 +100,5 @@ Future<void> initState() async {
     _store.dispatch(InitStateReset(state.user, state.bearer));
   });
 
-  store = _store;
-  persistor = _persistor;
+  return _store;
 }

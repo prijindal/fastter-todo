@@ -9,7 +9,7 @@ class LoginUserAction {
 class LogoutUserAction {}
 
 User userReducer(User state, dynamic action) {
-  if (action is LogoutUserAction || state == null) {
+  if (action is LogoutUserAction) {
     return User();
   } else if (action is LoginUserAction) {
     return action.user;

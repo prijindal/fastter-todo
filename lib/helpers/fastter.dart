@@ -58,17 +58,8 @@ class Fastter {
     }
   }
 
-  Future<dynamic> request(Request data) {
-    var completer = new Completer<dynamic>();
-    Uuid uuidGenerator = new Uuid();
-    String uuid = uuidGenerator.v1();
-    data.requestId = uuid;
-    if (bearer != null) {
-      data.jwtToken = bearer;
-    }
-    if (apiToken != null) {
-      data.apiToken = apiToken;
-    }
+  Future<Map<String, dynamic>> request(Request data) {
+    var completer = new Completer<Map<String, dynamic>>();
     EventBus ee = new EventBus(sync: true);
     ee.on().listen((resp) {
       // response.data = (response.type).fromJson(resp['data']);
@@ -80,19 +71,39 @@ class Fastter {
       } else {
         throw new FastterError(resp);
       }
-      requests[data.requestId].destroy();
-      requests.remove(data.requestId);
+      if (requests.containsKey(data.requestId)) {
+        requests[data.requestId].destroy();
+        requests.remove(data.requestId);
+      }
     });
     if (socket != null) {
+      Uuid uuidGenerator = new Uuid();
+      String uuid = uuidGenerator.v1();
+      data.requestId = uuid;
+      if (bearer != null) {
+        data.jwtToken = bearer;
+      }
+      if (apiToken != null) {
+        data.apiToken = apiToken;
+      }
       socket.sendMessage('graphql', data);
     } else {
-      http.post(
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+      };
+      if (bearer != null) {
+        headers['Authorization'] = bearer;
+      }
+      if (apiToken != null) {
+        headers['API_TOKEN'] = apiToken;
+      }
+      http
+          .post(
         url + "/graphql",
         body: json.encode(data.toJson()),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      ).then((response) {
+        headers: headers,
+      )
+          .then((response) {
         ee.fire(json.decode(response.body));
       });
     }
@@ -145,6 +156,11 @@ class FastterError {
   FastterError(this.error);
 
   final dynamic error;
+
+  @override
+  String toString() {
+    return error.toString();
+  }
 }
 
 const API_TOKEN = "MlwjS+Qwco5Sd2qq+4oU7LKBCyUh2aaTbow7SrKW/GI=";

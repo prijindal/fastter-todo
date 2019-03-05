@@ -4,7 +4,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../screens/loading.dart';
 import '../models/user.model.dart';
+import '../screens/login.dart';
+import 'home.dart';
 import '../store/store.dart';
+import '../store/bearer.dart';
 import '../store/currentuser.dart';
 import '../helpers/fastter.dart' show fastter, Request;
 
@@ -13,12 +16,12 @@ class AppContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return StoreConnector<AppState, Store<AppState>>(
       converter: (Store<AppState> store) => store,
-      builder: (BuildContext context, Store<AppState> state) {
+      builder: (BuildContext context, Store<AppState> store) {
         return _AppContainer(
           user: store.state.user,
-          onLogin: (User user, bool isNew) =>
-              store.dispatch(LoginUserAction(user)),
-          bearer: state.state.bearer,
+          onLogin: (User user) => store.dispatch(LoginUserAction(user)),
+          setBearer: (String bearer) => store.dispatch(InitAuthAction(bearer)),
+          bearer: store.state.bearer,
           clearAuth: () => store.dispatch(LogoutUserAction()),
           rehydrated: store.state.rehydrated,
         );
@@ -31,13 +34,15 @@ class _AppContainer extends StatefulWidget {
   _AppContainer({
     @required this.user,
     @required this.onLogin,
+    @required this.setBearer,
     @required this.bearer,
     @required this.clearAuth,
     @required this.rehydrated,
   });
 
   final User user;
-  final void Function(User user, bool isNew) onLogin;
+  final void Function(User) onLogin;
+  final void Function(String) setBearer;
   final void Function() clearAuth;
   final String bearer;
   final bool rehydrated;
@@ -46,18 +51,18 @@ class _AppContainer extends StatefulWidget {
 }
 
 class _AppContainerState extends State<_AppContainer> {
-  bool isLoading = false;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fastter;
     tryLogin();
   }
 
   void tryLogin() {
     String bearer = widget.bearer;
     if (bearer != null) {
+      fastter.bearer = bearer;
       setState(() {
         isLoading = true;
       });
@@ -68,27 +73,23 @@ class _AppContainerState extends State<_AppContainer> {
       ))
           .then((resp) {
         CurrentData response = CurrentData.fromJson(resp);
-        this.setState(() {
-          isLoading = false;
-        });
-        if (response != null &&
-            response.current != null &&
-            response.current.user != null) {
-          widget.onLogin(response.current.user, false);
+        if (response != null && response.current != null) {
+          widget.setBearer(bearer);
+          widget.onLogin(response.current);
         } else {
           widget.clearAuth();
           fastter.bearer = null;
         }
+        this.setState(() {
+          isLoading = false;
+        });
+      });
+    } else {
+      widget.clearAuth();
+      setState(() {
+        isLoading = false;
       });
     }
-  }
-
-  login() {
-    fastter.login('priyanshujindal1995@gmail.com', 'admin').then((response) {
-      if (response != null && response.login != null) {
-        widget.onLogin(response.login.user, true);
-      }
-    });
   }
 
   @override
@@ -97,14 +98,8 @@ class _AppContainerState extends State<_AppContainer> {
       return LoadingScreen();
     }
     if (widget.user == null || widget.user.id == null) {
-      return FlatButton(
-        child: Text("Login"),
-        onPressed: login,
-      );
+      return LoginScreen();
     }
-    return MaterialApp(
-      title: 'Todo App',
-      home: Text("Hello"),
-    );
+    return HomeContainer();
   }
 }
