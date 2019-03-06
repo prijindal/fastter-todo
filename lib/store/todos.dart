@@ -52,14 +52,21 @@ bool _filterTodo(Todo todo, Map<String, dynamic> filter) {
       if (todo.dueDate == null) {
         matched = matched && false;
       }
+      print(todo.id + ' ' + todo.title);
       if (filter["_operators"]["dueDate"].containsKey("gte")) {
         DateTime gte = filter["_operators"]["dueDate"]["gte"];
+        print('gte:\t' + gte.toIso8601String());
+        print(todo.dueDate.compareTo(gte));
         matched = matched && todo.dueDate.compareTo(gte) >= 0;
       }
       if (filter["_operators"]["dueDate"].containsKey("lte")) {
         DateTime lte = filter["_operators"]["dueDate"]["lte"];
+        print('lte:\t' + lte.toIso8601String());
+        print(todo.dueDate.compareTo(lte));
         matched = matched && todo.dueDate.compareTo(lte) <= 0;
       }
+      print('current:\t' + todo.dueDate.toIso8601String());
+      print(matched);
     }
   }
   return matched;

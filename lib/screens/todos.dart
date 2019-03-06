@@ -15,18 +15,20 @@ class InboxScreen extends StatelessWidget {
     return TodoList(
       filter: {'project': null},
       title: "Inbox",
+      showProject: false,
     );
   }
 }
 
 DateTime now = DateTime.now();
-DateTime startOfToday = new DateTime(now.year, now.month, now.day);
+DateTime startOfToday = new DateTime(now.year, now.month, now.day, 0, 0, 0, 0);
 
 class TodayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TodoList(
       title: "Today",
+      showDueDate: false,
       filter: {
         '_operators': {
           'dueDate': {

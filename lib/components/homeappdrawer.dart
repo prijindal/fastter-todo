@@ -51,6 +51,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final RouteSettings currentRoute = ModalRoute.of(context).settings;
     return Drawer(
       child: ListView(
         children: <Widget>[
@@ -63,44 +64,49 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             accountEmail: Text(widget.user.email),
           ),
           ListTile(
+            selected: currentRoute.name == "/",
             leading: Icon(Icons.inbox),
-            title: Text("All Todos"),
+            title: Text("Inbox"),
             onTap: () {
               Navigator.of(context).pushReplacementNamed("/");
             },
           ),
           ListTile(
-            leading: Icon(Icons.inbox),
-            title: Text("Inbox"),
+            selected: currentRoute.name == "/all",
+            leading: Icon(Icons.select_all),
+            title: Text("All Todos"),
             onTap: () {
-              Navigator.of(context).pushReplacementNamed("/inbox");
+              Navigator.of(context).pushNamed("/all");
             },
           ),
           ListTile(
+            selected: currentRoute.name == "/today",
             leading: Icon(Icons.calendar_today),
             title: Text("Today"),
             onTap: () {
-              Navigator.of(context).pushReplacementNamed("/today");
+              Navigator.of(context).pushNamed("/today");
             },
           ),
           ListTile(
+            selected: currentRoute.name == "/7days",
             leading: Icon(Icons.calendar_view_day),
             title: Text("7 Days"),
             onTap: () {
-              Navigator.of(context).pushReplacementNamed("/7days");
+              Navigator.of(context).pushNamed("/7days");
             },
           ),
           Column(
             children: widget.projects.items
                 .map<Widget>(
                   (project) => ListTile(
+                        selected: currentRoute.name == "/todos",
                         leading: Icon(
                           Icons.group_work,
                           color: HexColor(project.color),
                         ),
                         title: new Text(project.title),
                         onTap: () {
-                          Navigator.of(context).pushReplacementNamed("/todos",
+                          Navigator.of(context).pushNamed("/todos",
                               arguments: {'project': project});
                         },
                       ),

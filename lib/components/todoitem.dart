@@ -11,8 +11,15 @@ import '../components/hexcolor.dart';
 
 class TodoItem extends StatelessWidget {
   final Todo todo;
+  final bool showProject;
+  final bool showDueDate;
 
-  TodoItem({Key key, @required this.todo}) : super(key: key);
+  TodoItem({
+    Key key,
+    @required this.todo,
+    this.showProject = true,
+    this.showDueDate = true,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +27,13 @@ class TodoItem extends StatelessWidget {
       converter: (Store<AppState> store) => store,
       builder: (BuildContext context, Store<AppState> store) {
         return _TodoItem(
-            todo: todo,
-            deleteTodo: () => store.dispatch(DeleteItem<Todo>(todo.id)),
-            updateTodo: (Todo updated) =>
-                store.dispatch(UpdateItem<Todo>(todo.id, updated)));
+          todo: todo,
+          deleteTodo: () => store.dispatch(DeleteItem<Todo>(todo.id)),
+          updateTodo: (Todo updated) =>
+              store.dispatch(UpdateItem<Todo>(todo.id, updated)),
+          showProject: showProject,
+          showDueDate: showDueDate,
+        );
       },
     );
   }
@@ -33,16 +43,20 @@ class _TodoItem extends StatelessWidget {
   final Todo todo;
   final VoidCallback deleteTodo;
   final void Function(Todo) updateTodo;
+  final bool showProject;
+  final bool showDueDate;
 
   _TodoItem({
     Key key,
     @required this.todo,
     @required this.deleteTodo,
     @required this.updateTodo,
+    this.showProject = true,
+    this.showDueDate = true,
   }) : super(key: key);
 
   _selectDate(BuildContext context) {
-    Future<DateTime> selectedDate = todoSelectDate(context);
+    Future<DateTime> selectedDate = todoSelectDate(context, todo.dueDate);
     selectedDate.then((dueDate) {
       // Update
       todo.dueDate = dueDate;
@@ -78,9 +92,16 @@ class _TodoItem extends StatelessWidget {
   String dueDateFormatter(DateTime dueDate) {
     DateTime now = DateTime.now();
     Duration diff = dueDate.difference(now);
-    if (diff.inDays == 0) {
-      return diff.inSeconds > 0 ? "Tomorrow" : "Today";
-    } else if (diff.inDays < 7 && diff.inDays > 0) {
+    if (diff.inDays > -2 && diff.inDays < 2) {
+      if (dueDate.day == now.day) {
+        return "Today";
+      } else if (dueDate.day == now.day + 1) {
+        return "Tomorrow";
+      } else if (dueDate.day == now.day - 1) {
+        return "Yesterday";
+      }
+    }
+    if (diff.inDays < 7 && diff.inDays > 0) {
       return DateFormat.EEEE().format(dueDate);
     } else if (now.year == dueDate.year) {
       return DateFormat.MMMd().format(dueDate);
@@ -88,14 +109,14 @@ class _TodoItem extends StatelessWidget {
     return DateFormat.yMMMd().format(dueDate);
   }
 
-  void _toggleCompleted(bool oldvalue) {
-    todo.completed = !oldvalue;
+  void _toggleCompleted(bool newvalue) {
+    todo.completed = newvalue;
     updateTodo(todo);
   }
 
   Widget _buildSubtitle() {
     List<Widget> children = [];
-    if (todo.project != null) {
+    if (todo.project != null && showProject) {
       children.add(Flex(
         direction: Axis.horizontal,
         children: <Widget>[
@@ -110,8 +131,11 @@ class _TodoItem extends StatelessWidget {
         ],
       ));
     }
-    if (todo.dueDate != null) {
+    if (todo.dueDate != null && showDueDate) {
       children.add(Text(dueDateFormatter(todo.dueDate)));
+    }
+    if (children.isEmpty) {
+      return null;
     }
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -164,11 +188,10 @@ class _TodoItem extends StatelessWidget {
           ),
         ],
       ),
-      child: RadioListTile<bool>(
+      child: CheckboxListTile(
         isThreeLine: false,
         onChanged: _toggleCompleted,
         value: todo.completed == true,
-        groupValue: true,
         title: Text(todo.title),
         subtitle: _buildSubtitle(),
       ),

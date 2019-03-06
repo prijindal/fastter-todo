@@ -13,13 +13,13 @@ Todo _$TodoFromJson(Map<String, dynamic> json) {
       completed: json['completed'] as bool,
       dueDate: json['dueDate'] == null
           ? null
-          : DateTime.parse(json['dueDate'] as String),
+          : dateFromJson(json['dueDate'] as String),
       createdAt: json['createdAt'] == null
           ? null
-          : DateTime.parse(json['createdAt'] as String),
+          : dateFromJson(json['createdAt'] as String),
       updatedAt: json['updatedAt'] == null
           ? null
-          : DateTime.parse(json['updatedAt'] as String),
+          : dateFromJson(json['updatedAt'] as String),
       project: json['project'] == null
           ? null
           : Project.fromJson(json['project'] as Map<String, dynamic>));

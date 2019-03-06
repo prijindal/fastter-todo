@@ -9,11 +9,11 @@ class HomeContainer extends StatelessWidget {
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     if (settings.isInitialRoute || settings.name == "/") {
       return MaterialPageRoute(
-        builder: (BuildContext context) => AllTodosScreen(),
-      );
-    } else if (settings.name == "/inbox") {
-      return MaterialPageRoute(
         builder: (BuildContext context) => InboxScreen(),
+      );
+    } else if (settings.name == "/all") {
+      return MaterialPageRoute(
+        builder: (BuildContext context) => AllTodosScreen(),
       );
     } else if (settings.name == "/today") {
       return MaterialPageRoute(
@@ -30,6 +30,7 @@ class HomeContainer extends StatelessWidget {
         builder: (BuildContext context) => TodoList(
               filter: {'project': project.id},
               title: project.title,
+              showProject: false,
             ),
       );
     }
@@ -44,7 +45,7 @@ class HomeContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: primaryTheme,
-      home: AllTodosScreen(),
+      home: InboxScreen(),
       initialRoute: '/',
       onGenerateRoute: _onGenerateRoute,
     );

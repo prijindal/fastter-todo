@@ -30,3 +30,5 @@ class ListState<T extends BaseModel> {
         'items': items.map((t) => t.toJson()).toList(),
       });
 }
+
+DateTime dateFromJson(String date) => DateTime.parse(date).toLocal();
