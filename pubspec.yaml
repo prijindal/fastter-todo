@@ -22,6 +22,7 @@ dependencies:
   event_bus: any
   flutter_redux: any
   flutter_socket_io: any
+  intl: any
   json_annotation: any
   redux_persist: any
   redux_persist_flutter: any

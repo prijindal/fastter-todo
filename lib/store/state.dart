@@ -24,7 +24,6 @@ class AppState {
         user: User.fromJson(json['user']),
         bearer: json['bearer'],
         todos: ListState<Todo>(
-          fetching: false,
           items: json['todos'] != null && json['todos']['items'] != null
               ? (json['todos']['items'] as List<dynamic>)
                   .map<Todo>((t) => Todo.fromJson(t))
@@ -32,7 +31,6 @@ class AppState {
               : [],
         ),
         projects: ListState<Project>(
-          fetching: false,
           items: json['projects'] != null && json['projects']['items'] != null
               ? (json['projects']['items'] as List<dynamic>)
                   .map<Project>((t) => Project.fromJson(t))

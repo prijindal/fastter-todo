@@ -21,6 +21,14 @@ class ListDataMiddleware<T extends BaseModel, S> extends MiddlewareClass<S> {
       queries.addMutation(action.item).then((item) {
         store.dispatch(AddCompletedAction<T>(item));
       });
+    } else if (action is DeleteItem<T>) {
+      queries.deleteMutation(action.itemid).then((item) {
+        store.dispatch(DeleteCompletedAction<T>(item.id));
+      });
+    } else if (action is UpdateItem<T>) {
+      queries.updateMutation(action.itemid, action.item).then((item) {
+        store.dispatch(UpdateCompletedAction<T>(item.id, item));
+      });
     }
     next(action);
   }

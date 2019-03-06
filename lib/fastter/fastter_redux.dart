@@ -41,6 +41,7 @@ class FastterListRedux<T extends BaseModel, S> {
               .where((T obj) => filterObject(obj, action.filter))
               .toList(),
           fetching: true,
+          adding: state.adding,
         );
       } else if (action is SyncCompletedAction<T>) {
         return ListState<T>(
@@ -51,7 +52,8 @@ class FastterListRedux<T extends BaseModel, S> {
         state.items.add(action.item);
         return ListState<T>(
           items: state.items,
-          fetching: true,
+          fetching: state.fetching,
+          adding: true,
         );
       } else if (action is AddCompletedAction<T>) {
         if (state.items.singleWhere((item) => item.id != action.item.id) !=
@@ -64,23 +66,30 @@ class FastterListRedux<T extends BaseModel, S> {
         }
         return ListState<T>(
           items: state.items,
-          fetching: false,
+          fetching: state.fetching,
+          adding: false,
         );
       } else if (action is DeleteItem<T>) {
         return ListState<T>(
           items:
               state.items.where((T item) => item.id != action.itemid).toList(),
-          fetching: true,
+          fetching: state.fetching,
+          adding: state.adding,
+          deleting: true,
         );
       } else if (action is DeleteCompletedAction<T>) {
         return ListState<T>(
           items:
               state.items.where((T item) => item.id != action.itemid).toList(),
-          fetching: false,
+          fetching: state.fetching,
+          adding: state.adding,
+          deleting: false,
         );
       } else if (action is UpdateItem<T>) {
         return ListState<T>(
-          fetching: true,
+          fetching: state.fetching,
+          updating: true,
+          adding: state.adding,
           items: state.items
               .map<T>(
                 (T item) => item.id == action.itemid ? action.item : item,
@@ -89,7 +98,9 @@ class FastterListRedux<T extends BaseModel, S> {
         );
       } else if (action is UpdateCompletedAction<T>) {
         return ListState<T>(
-          fetching: false,
+          fetching: state.fetching,
+          updating: false,
+          adding: state.adding,
           items: state.items
               .map<T>(
                 (T item) => item.id == action.itemid ? action.item : item,

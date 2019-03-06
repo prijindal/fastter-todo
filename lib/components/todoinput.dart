@@ -8,6 +8,7 @@ import '../models/project.model.dart';
 import './projectdropdown.dart';
 import '../fastter/fastter_action.dart';
 import '../store/state.dart';
+import '../helpers/todouihelpers.dart';
 
 class TodoInput extends StatelessWidget {
   TodoInput({Key key}) : super(key: key);
@@ -52,13 +53,7 @@ class _TodoInputState extends State<_TodoInput> {
   }
 
   _showDatePicker() {
-    DateTime now = DateTime.now();
-    Future<DateTime> selectedDate = showDatePicker(
-      context: context,
-      initialDate: now,
-      firstDate: now.subtract(const Duration(days: 365)),
-      lastDate: now.add(const Duration(days: 365)),
-    );
+    Future<DateTime> selectedDate = todoSelectDate(context);
     selectedDate.then((dueDate) {
       setState(() {
         dueDate = dueDate;

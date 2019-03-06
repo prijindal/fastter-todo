@@ -20,12 +20,12 @@ class Todo extends BaseModel {
 
   @JsonKey(name: '_id', nullable: false)
   final String id;
-  final String title;
-  final bool completed;
-  final DateTime dueDate;
+  String title;
+  bool completed;
+  DateTime dueDate;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final Project project;
+  Project project;
 
   Map<String, dynamic> toJson() => _$TodoToJson(this);
 }

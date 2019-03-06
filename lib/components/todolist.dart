@@ -56,7 +56,7 @@ class _TodoListState extends State<_TodoList> {
   }
 
   Widget buildBody() {
-    if (widget.todos.fetching && widget.todos.items.isEmpty) {
+    if (widget.todos.fetching) {
       return Center(
         child: CircularProgressIndicator(),
       );
