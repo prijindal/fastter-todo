@@ -4,42 +4,52 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/base.model.dart';
 import '../models/todo.model.dart';
-import '../store/fastter/fastter_action.dart';
-import '../store/state.dart';
 import '../components/homeappbar.dart';
 import '../components/todoinput.dart';
 import '../components/homeappdrawer.dart';
 import '../components/todoitem.dart';
+import '../fastter/fastter_action.dart';
+import '../store/state.dart';
+import '../store/todos.dart';
 
-class InboxScreen extends StatelessWidget {
+class TodoList extends StatelessWidget {
+  final Map<String, dynamic> filter;
+
+  TodoList({Key key, this.filter = const {}}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, Store<AppState>>(
       converter: (Store<AppState> store) => store,
       builder: (BuildContext context, Store<AppState> store) {
-        return _InboxScreen(
-          todos: store.state.todos,
-          syncStart: () => store.dispatch(StartSync<Todo>()),
+        return _TodoList(
+          todos: ListState(
+            fetching: store.state.todos.fetching,
+            items: store.state.todos.items
+                .where((t) => filterTodo(t, filter))
+                .toList(),
+          ),
+          syncStart: () => store.dispatch(StartSync<Todo>(filter)),
         );
       },
     );
   }
 }
 
-class _InboxScreen extends StatefulWidget {
+class _TodoList extends StatefulWidget {
   final ListState<Todo> todos;
   final VoidCallback syncStart;
 
-  _InboxScreen({
+  _TodoList({
     Key key,
     @required this.todos,
     @required this.syncStart,
   }) : super(key: key);
 
-  __InboxScreenState createState() => __InboxScreenState();
+  _TodoListState createState() => _TodoListState();
 }
 
-class __InboxScreenState extends State<_InboxScreen> {
+class _TodoListState extends State<_TodoList> {
   @override
   void initState() {
     widget.syncStart();
@@ -47,7 +57,7 @@ class __InboxScreenState extends State<_InboxScreen> {
   }
 
   Widget buildBody() {
-    if (widget.todos.fetching || widget.todos.items.isEmpty) {
+    if (widget.todos.fetching && widget.todos.items.isEmpty) {
       return Center(
         child: CircularProgressIndicator(),
       );
@@ -56,15 +66,16 @@ class __InboxScreenState extends State<_InboxScreen> {
       direction: Axis.vertical,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        ListView(
-          shrinkWrap: true,
-          children: widget.todos.items
-              .map(
-                (todo) => TodoItem(
-                      todo: todo,
-                    ),
-              )
-              .toList(),
+        Flexible(
+          child: ListView(
+            children: widget.todos.items
+                .map(
+                  (todo) => TodoItem(
+                        todo: todo,
+                      ),
+                )
+                .toList(),
+          ),
         ),
         TodoInput(),
       ],

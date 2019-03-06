@@ -1,8 +1,9 @@
-import 'fastter/fastter_redux.dart';
-import 'fastter/fastter_queries.dart';
-import 'fastter/fastter_middleware.dart';
+import '../fastter/fastter_redux.dart';
+import '../fastter/fastter_queries.dart';
+import '../fastter/fastter_middleware.dart';
 
 import '../models/project.model.dart';
+import './state.dart';
 
 const projectFragment = '''
     fragment project on Project {
@@ -16,7 +17,7 @@ const projectFragment = '''
 
 final projectsReducer = createListDataRedux<Project>();
 
-final projectsMiddleware = ListDataMiddleware<Project>(
+final projectsMiddleware = ListDataMiddleware<Project, AppState>(
   queries: graphqlQueryCreator<Project>(
     'project',
     projectFragment,

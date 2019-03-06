@@ -14,14 +14,14 @@ class TodoItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, Project>(
-      converter: (Store<AppState> store) => store.state.projects.items.isEmpty
-          ? null
-          : store.state.projects.items
-              .singleWhere((project) => project.id == todo.project.id),
+      converter: (Store<AppState> store) =>
+          store.state.projects.items.isEmpty || todo.project == null
+              ? null
+              : store.state.projects.items
+                  .singleWhere((project) => project.id == todo.project.id),
       builder: (BuildContext context, Project project) {
         return _TodoItem(
           todo: todo,
-          project: project,
         );
       },
     );
@@ -30,18 +30,17 @@ class TodoItem extends StatelessWidget {
 
 class _TodoItem extends StatelessWidget {
   final Todo todo;
-  final Project project;
 
   _TodoItem({
     Key key,
     @required this.todo,
-    @required this.project,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(todo.title),
+      subtitle: todo.project == null ? null : Text(todo.project.title),
     );
   }
 }

@@ -1,4 +1,4 @@
-import '../../models/base.model.dart';
+import '../models/base.model.dart';
 import 'fastter_action.dart';
 
 ListState<T> Function(ListState<T> state, dynamic action)

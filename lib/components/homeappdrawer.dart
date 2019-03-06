@@ -5,7 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import '../models/base.model.dart';
 import '../models/user.model.dart';
 import '../models/project.model.dart';
-import '../store/fastter/fastter_action.dart';
+import '../fastter/fastter_action.dart';
 import '../store/state.dart';
 
 class HomeAppDrawer extends StatelessWidget {
@@ -63,15 +63,31 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
           ),
           ListTile(
             leading: Icon(Icons.inbox),
+            title: Text("All Todos"),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed("/");
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.inbox),
             title: Text("Inbox"),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed("/inbox");
+            },
           ),
           ListTile(
             leading: Icon(Icons.calendar_today),
             title: Text("Today"),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed("/today");
+            },
           ),
           ListTile(
             leading: Icon(Icons.calendar_view_day),
             title: Text("7 Days"),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed("/7days");
+            },
           ),
           Column(
             children: widget.projects.items

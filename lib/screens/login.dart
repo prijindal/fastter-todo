@@ -7,7 +7,7 @@ import '../models/user.model.dart';
 import '../store/state.dart';
 import '../store/bearer.dart';
 import '../store/currentuser.dart';
-import '../helpers/fastter.dart' show fastter, Request;
+import '../fastter/fastter.dart' show fastter, Request;
 
 class LoginScreen extends StatelessWidget {
   @override

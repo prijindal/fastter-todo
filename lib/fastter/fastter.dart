@@ -40,9 +40,9 @@ class Fastter {
   User user;
 
   Fastter(this.url, String apiToken) {
-    // if (Platform.isAndroid || Platform.isIOS) {
-    //   socket = SocketIOManager().createSocketIO(url, "/");
-    // }
+    if (Platform.isAndroid || Platform.isIOS) {
+      // socket = SocketIOManager().createSocketIO(url, "/");
+    }
     requests = {};
     subscriptions = {};
     this.apiToken = apiToken;
@@ -105,7 +105,15 @@ class Fastter {
         http
             .post(
           url + "/graphql",
-          body: json.encode(data.toJson()),
+          body: json.encode(
+            data.toJson(),
+            toEncodable: (dynamic item) {
+              if (item is DateTime) {
+                return item.toIso8601String();
+              }
+              return item;
+            },
+          ),
           headers: headers,
         )
             .then((response) {
