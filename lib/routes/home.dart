@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/project.model.dart';
 import '../components/todolist.dart';
 import '../screens/todos.dart';
 import '../helpers/theme.dart';
@@ -23,13 +24,20 @@ class HomeContainer extends StatelessWidget {
         builder: (BuildContext context) => SevenDayScreen(),
       );
     } else if (settings.name == "/todos") {
-      var arguments = settings.arguments;
+      Map<String, dynamic> arguments = settings.arguments;
+      final Project project = arguments['project'];
       return MaterialPageRoute(
         builder: (BuildContext context) => TodoList(
-              filter: arguments,
+              filter: {'project': project.id},
+              title: project.title,
             ),
       );
     }
+    return MaterialPageRoute(
+      builder: (BuildContext context) => Scaffold(
+            body: Text("404"),
+          ),
+    );
   }
 
   @override

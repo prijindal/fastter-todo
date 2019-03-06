@@ -1,6 +1,4 @@
 import '../fastter/fastter_redux.dart';
-import '../fastter/fastter_queries.dart';
-import '../fastter/fastter_middleware.dart';
 
 import '../models/project.model.dart';
 import './state.dart';

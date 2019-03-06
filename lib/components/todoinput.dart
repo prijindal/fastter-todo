@@ -87,6 +87,7 @@ class _TodoInputState extends State<_TodoInput> {
                   onPressed: _showDatePicker,
                 ),
                 ProjectDropdown(
+                  selectedProject: project,
                   onSelected: (selectedproject) {
                     setState(() {
                       project = selectedproject;

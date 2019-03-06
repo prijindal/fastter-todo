@@ -86,13 +86,13 @@ class GraphQLQueries<T extends BaseModel> {
       new Request(
         query: '''
           mutation(\$_id:MongoID!){
-            delete${capitalized}(_id: \$_id) {
+            delete$capitalized(_id: \$_id) {
               record {
-                ...${name}
+                ...$name
               }
             }
           }
-          ${fragment}
+          $fragment
         ''',
         variables: {
           '_id': id,
@@ -118,13 +118,13 @@ class GraphQLQueries<T extends BaseModel> {
       new Request(
         query: '''
           mutation(\$object:UpdateById${capitalized}Input!){
-            update${capitalized}(record: \$object) {
+            update$capitalized(record: \$object) {
                 record {
-                  ...${name}
+                  ...$name
                 }
               }
             }
-            ${fragment}
+            $fragment
           ''',
         variables: {
           'object': input,

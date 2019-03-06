@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
-import 'package:redux_logging/redux_logging.dart';
 
 import 'todos.dart';
 import 'projects.dart';
@@ -27,7 +26,6 @@ Future<Store<AppState>> initState() async {
       rehydrated: false,
     ),
     middleware: <Middleware<AppState>>[
-      // LoggingMiddleware<AppState>.printer(),
       _persistor.createMiddleware(),
       fastterProjects.middleware,
       fastterTodos.middleware,

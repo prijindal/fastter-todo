@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/todo.model.dart';
-import '../models/project.model.dart';
 import '../store/state.dart';
 import '../fastter/fastter_action.dart';
 import '../helpers/todouihelpers.dart';
+import '../components/hexcolor.dart';
 
 class TodoItem extends StatelessWidget {
   final Todo todo;
@@ -88,15 +88,36 @@ class _TodoItem extends StatelessWidget {
     return DateFormat.yMMMd().format(dueDate);
   }
 
-  String _subtitleText() {
-    String subtitle = "";
+  void _toggleCompleted(bool oldvalue) {
+    todo.completed = !oldvalue;
+    updateTodo(todo);
+  }
+
+  Widget _buildSubtitle() {
+    List<Widget> children = [];
     if (todo.project != null) {
-      subtitle += todo.project.title + '\n';
+      children.add(Flex(
+        direction: Axis.horizontal,
+        children: <Widget>[
+          Flexible(
+            child: Text(todo.project.title),
+          ),
+          Icon(
+            Icons.group_work,
+            color: HexColor(todo.project.color),
+            size: 16.0,
+          ),
+        ],
+      ));
     }
     if (todo.dueDate != null) {
-      subtitle += dueDateFormatter(todo.dueDate);
+      children.add(Text(dueDateFormatter(todo.dueDate)));
     }
-    return subtitle;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    );
   }
 
   @override
@@ -143,9 +164,13 @@ class _TodoItem extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
+      child: RadioListTile<bool>(
+        isThreeLine: false,
+        onChanged: _toggleCompleted,
+        value: todo.completed == true,
+        groupValue: true,
         title: Text(todo.title),
-        subtitle: Text(_subtitleText()),
+        subtitle: _buildSubtitle(),
       ),
     );
   }

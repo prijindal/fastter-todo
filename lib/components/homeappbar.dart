@@ -8,8 +8,11 @@ import '../store/currentuser.dart';
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
+  final String title;
 
-  HomeAppBar() : preferredSize = Size.fromHeight(kToolbarHeight);
+  HomeAppBar({
+    this.title = "Todo App",
+  }) : preferredSize = Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +21,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       builder: (BuildContext context, Store<AppState> store) {
         return _HomeAppBar(
           onLogout: () => store.dispatch(LogoutUserAction()),
+          title: title,
         );
       },
     );
@@ -26,12 +30,18 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 class _HomeAppBar extends StatelessWidget {
   final void Function() onLogout;
-  _HomeAppBar({Key key, this.onLogout}) : super(key: key);
+  final String title;
+
+  _HomeAppBar({
+    Key key,
+    this.onLogout,
+    this.title = "Todo App",
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: new Text("Todo App"),
+      title: new Text(title),
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.exit_to_app),

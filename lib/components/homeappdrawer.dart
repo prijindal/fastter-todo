@@ -101,7 +101,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
                         title: new Text(project.title),
                         onTap: () {
                           Navigator.of(context).pushReplacementNamed("/todos",
-                              arguments: {'project': project.id});
+                              arguments: {'project': project});
                         },
                       ),
                 )

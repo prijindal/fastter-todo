@@ -11,12 +11,13 @@ import '../components/homeappdrawer.dart';
 import '../components/todoitem.dart';
 import '../fastter/fastter_action.dart';
 import '../store/state.dart';
-import '../store/todos.dart';
 
 class TodoList extends StatelessWidget {
   final Map<String, dynamic> filter;
+  final String title;
 
-  TodoList({Key key, this.filter = const {}}) : super(key: key);
+  TodoList({Key key, this.filter = const {}, this.title = "Todos"})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +26,7 @@ class TodoList extends StatelessWidget {
       builder: (BuildContext context, Store<AppState> store) {
         return _TodoList(
             todos: store.state.todos,
+            title: title,
             syncStart: () {
               var action = StartSync<Todo>(filter);
               store.dispatch(action);
@@ -38,11 +40,13 @@ class TodoList extends StatelessWidget {
 class _TodoList extends StatefulWidget {
   final ListState<Todo> todos;
   final Completer Function() syncStart;
+  final String title;
 
   _TodoList({
     Key key,
     @required this.todos,
     @required this.syncStart,
+    this.title = "Todos",
   }) : super(key: key);
 
   _TodoListState createState() => _TodoListState();
@@ -89,7 +93,9 @@ class _TodoListState extends State<_TodoList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: HomeAppBar(),
+      appBar: HomeAppBar(
+        title: widget.title,
+      ),
       drawer: HomeAppDrawer(),
       body: RefreshIndicator(
         child: buildBody(),

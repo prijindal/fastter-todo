@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:event_bus/event_bus.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
-import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:uuid/uuid.dart';
 import '../models/user.model.dart';
 
