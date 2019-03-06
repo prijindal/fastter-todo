@@ -15,6 +15,7 @@ class ListDataMiddleware<T extends BaseModel, S> extends MiddlewareClass<S> {
     if (action is StartSync<T>) {
       queries.syncQuery(action.filter).then((items) {
         store.dispatch(SyncCompletedAction<T>(items));
+        action.completer.complete(items);
       });
     } else if (action is AddItem<T>) {
       queries.addMutation(action.item).then((item) {

@@ -7,6 +7,7 @@ import '../models/user.model.dart';
 import '../models/project.model.dart';
 import '../fastter/fastter_action.dart';
 import '../store/state.dart';
+import '../components/hexcolor.dart';
 
 class HomeAppDrawer extends StatelessWidget {
   HomeAppDrawer({Key key}) : super(key: key);
@@ -94,10 +95,14 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
                 .map<Widget>(
                   (project) => ListTile(
                         leading: Icon(
-                          Icons.tonality,
-                          color: Colors.red,
+                          Icons.group_work,
+                          color: HexColor(project.color),
                         ),
                         title: new Text(project.title),
+                        onTap: () {
+                          Navigator.of(context).pushReplacementNamed("/todos",
+                              arguments: {'project': project.id});
+                        },
                       ),
                 )
                 .toList(),

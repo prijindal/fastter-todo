@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -23,14 +24,12 @@ class TodoList extends StatelessWidget {
       converter: (Store<AppState> store) => store,
       builder: (BuildContext context, Store<AppState> store) {
         return _TodoList(
-          todos: ListState(
-            fetching: store.state.todos.fetching,
-            items: store.state.todos.items
-                .where((t) => filterTodo(t, filter))
-                .toList(),
-          ),
-          syncStart: () => store.dispatch(StartSync<Todo>(filter)),
-        );
+            todos: store.state.todos,
+            syncStart: () {
+              var action = StartSync<Todo>(filter);
+              store.dispatch(action);
+              return action.completer;
+            });
       },
     );
   }
@@ -38,7 +37,7 @@ class TodoList extends StatelessWidget {
 
 class _TodoList extends StatefulWidget {
   final ListState<Todo> todos;
-  final VoidCallback syncStart;
+  final Completer Function() syncStart;
 
   _TodoList({
     Key key,
@@ -82,13 +81,19 @@ class _TodoListState extends State<_TodoList> {
     );
   }
 
+  Future<void> _onRefresh() {
+    Completer completer = widget.syncStart();
+    return completer.future;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: HomeAppBar(),
       drawer: HomeAppDrawer(),
-      body: Container(
+      body: RefreshIndicator(
         child: buildBody(),
+        onRefresh: _onRefresh,
       ),
     );
   }

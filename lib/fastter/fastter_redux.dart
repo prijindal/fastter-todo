@@ -1,69 +1,105 @@
+import 'package:meta/meta.dart';
 import '../models/base.model.dart';
 import 'fastter_action.dart';
+import 'fastter_queries.dart';
+import 'fastter_middleware.dart';
 
-ListState<T> Function(ListState<T> state, dynamic action)
-    createListDataRedux<T extends BaseModel>() {
-  return (ListState<T> state, dynamic action) {
-    if (action is StartSync<T>) {
-      return ListState<T>(
-        items: state.items,
-        fetching: true,
-      );
-    } else if (action is SyncCompletedAction<T>) {
-      return ListState<T>(
-        items: action.items,
-        fetching: false,
-      );
-    } else if (action is AddItem<T>) {
-      state.items.add(action.item);
-      return ListState<T>(
-        items: state.items,
-        fetching: true,
-      );
-    } else if (action is AddCompletedAction<T>) {
-      if (state.items.singleWhere((item) => item.id != action.item.id) !=
-          null) {
+class FastterListRedux<T extends BaseModel, S> {
+  GraphQLQueries queries;
+  ListDataMiddleware<T, S> middleware;
+  final String name;
+  final String fragment;
+  final T Function(Map<String, dynamic>) fromJson;
+  final Map<String, dynamic> Function(T) toInput;
+  final bool Function(T object, Map<String, dynamic> filter) filterObject;
+
+  FastterListRedux({
+    @required this.name,
+    @required this.fragment,
+    @required this.fromJson,
+    @required this.toInput,
+    @required this.filterObject,
+  }) {
+    queries = GraphQLQueries<T>(
+      name: name,
+      fragment: fragment,
+      fromJson: fromJson,
+      toInput: toInput,
+    );
+    middleware = ListDataMiddleware<T, S>(queries: queries);
+  }
+
+  ListState<T> Function(ListState<T> state, dynamic action) get reducer =>
+      _createListDataRedux();
+
+  ListState<T> Function(ListState<T> state, dynamic action)
+      _createListDataRedux() {
+    return (ListState<T> state, dynamic action) {
+      if (action is StartSync<T>) {
+        return ListState<T>(
+          items: state.items
+              .where((T obj) => filterObject(obj, action.filter))
+              .toList(),
+          fetching: true,
+        );
+      } else if (action is SyncCompletedAction<T>) {
+        return ListState<T>(
+          items: action.items,
+          fetching: false,
+        );
+      } else if (action is AddItem<T>) {
         state.items.add(action.item);
-      } else {
-        final itemindex =
-            state.items.indexWhere((item) => item.id == action.item.id);
-        state.items[itemindex] = action.item;
+        return ListState<T>(
+          items: state.items,
+          fetching: true,
+        );
+      } else if (action is AddCompletedAction<T>) {
+        if (state.items.singleWhere((item) => item.id != action.item.id) !=
+            null) {
+          state.items.add(action.item);
+        } else {
+          final itemindex =
+              state.items.indexWhere((item) => item.id == action.item.id);
+          state.items[itemindex] = action.item;
+        }
+        return ListState<T>(
+          items: state.items,
+          fetching: false,
+        );
+      } else if (action is DeleteItem<T>) {
+        return ListState<T>(
+          items:
+              state.items.where((T item) => item.id != action.itemid).toList(),
+          fetching: true,
+        );
+      } else if (action is DeleteCompletedAction<T>) {
+        return ListState<T>(
+          items:
+              state.items.where((T item) => item.id != action.itemid).toList(),
+          fetching: false,
+        );
+      } else if (action is UpdateItem<T>) {
+        return ListState<T>(
+          fetching: true,
+          items: state.items
+              .map<T>(
+                (T item) => item.id == action.itemid ? action.item : item,
+              )
+              .toList(),
+        );
+      } else if (action is UpdateCompletedAction<T>) {
+        return ListState<T>(
+          fetching: false,
+          items: state.items
+              .map<T>(
+                (T item) => item.id == action.itemid ? action.item : item,
+              )
+              .toList(),
+        );
+      } else if (action is ClearAll<T>) {
+        return ListState();
       }
-      return ListState<T>(
-        items: state.items,
-        fetching: false,
-      );
-    } else if (action is DeleteItem<T>) {
-      return ListState<T>(
-        items: state.items.where((T item) => item.id != action.itemid).toList(),
-        fetching: true,
-      );
-    } else if (action is DeleteCompletedAction<T>) {
-      return ListState<T>(
-        items: state.items.where((T item) => item.id != action.itemid).toList(),
-        fetching: false,
-      );
-    } else if (action is UpdateItem<T>) {
-      return ListState<T>(
-        fetching: true,
-        items: state.items
-            .map<T>(
-              (T item) => item.id == action.itemid ? action.item : item,
-            )
-            .toList(),
-      );
-    } else if (action is UpdateCompletedAction<T>) {
-      return ListState<T>(
-        fetching: false,
-        items: state.items
-            .map<T>(
-              (T item) => item.id == action.itemid ? action.item : item,
-            )
-            .toList(),
-      );
-    } else if (action is ClearAll<T>) {
-      return ListState();
-    }
-    return state;
-  };
+      return state;
+    };
+  }
 }

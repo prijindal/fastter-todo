@@ -1,11 +1,15 @@
+import 'dart:async';
 import '../models/base.model.dart';
 
 class Action<T extends BaseModel> {}
 
 // To be checked by thunk
 class StartSync<T extends BaseModel> extends Action<T> {
-  StartSync([this.filter = const <String, dynamic>{}]);
+  StartSync([this.filter = const <String, dynamic>{}]) {
+    completer = Completer();
+  }
 
+  Completer completer;
   final Map<String, dynamic> filter;
 }
 

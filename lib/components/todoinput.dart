@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/todo.model.dart';
+import '../models/project.model.dart';
+import './projectdropdown.dart';
 import '../fastter/fastter_action.dart';
 import '../store/state.dart';
 
@@ -37,11 +39,13 @@ class _TodoInput extends StatefulWidget {
 class _TodoInputState extends State<_TodoInput> {
   TextEditingController titleInputController = TextEditingController(text: "");
   DateTime dueDate = DateTime.now();
+  Project project;
 
-  onSave() {
+  _onSave() {
     Todo todo = Todo(
       title: titleInputController.text,
       dueDate: dueDate,
+      project: project,
     );
     titleInputController.clear();
     widget.addTodo(todo);
@@ -56,7 +60,9 @@ class _TodoInputState extends State<_TodoInput> {
       lastDate: now.add(const Duration(days: 365)),
     );
     selectedDate.then((dueDate) {
-      dueDate = dueDate;
+      setState(() {
+        dueDate = dueDate;
+      });
     });
   }
 
@@ -74,7 +80,7 @@ class _TodoInputState extends State<_TodoInput> {
                 labelText: "Add Todo",
               ),
               onFieldSubmitted: (title) {
-                onSave();
+                _onSave();
               },
             ),
             Flex(
@@ -85,12 +91,19 @@ class _TodoInputState extends State<_TodoInput> {
                   icon: Icon(Icons.calendar_today),
                   onPressed: _showDatePicker,
                 ),
+                ProjectDropdown(
+                  onSelected: (selectedproject) {
+                    setState(() {
+                      project = selectedproject;
+                    });
+                  },
+                ),
                 Flexible(
                   child: Container(),
                 ),
                 IconButton(
                   icon: Icon(Icons.add),
-                  onPressed: onSave,
+                  onPressed: _onSave,
                 )
               ],
             ),

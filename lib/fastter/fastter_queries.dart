@@ -3,28 +3,27 @@ import '../models/base.model.dart';
 import './fastter.dart';
 
 class GraphQLQueries<T extends BaseModel> {
+  final String name;
+  final String fragment;
+  final T Function(Map<String, dynamic>) fromJson;
+  final Map<String, dynamic> Function(T) toInput;
+
   GraphQLQueries({
-    @required this.syncQuery,
-    @required this.addMutation,
+    @required this.name,
+    @required this.fragment,
+    @required this.fromJson,
+    @required this.toInput,
   });
 
-  Future<List<T>> Function([Map<String, dynamic> filter, String extraFields])
-      syncQuery;
-  Future<T> Function(dynamic object) addMutation;
-}
-
-GraphQLQueries<T> graphqlQueryCreator<T extends BaseModel>(
-    String name, String fragment, T Function(Map<String, dynamic>) fromJson) {
-  String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
-  return GraphQLQueries<T>(
-    syncQuery: ([
-      Map<String, dynamic> filter = const {},
-      String extraFields = '',
-    ]) {
-      return fastter
-          .request(
-        new Request(
-          query: '''
+  Future<List<T>> syncQuery([
+    Map<String, dynamic> filter = const <String, dynamic>{},
+    String extraFields = "",
+  ]) {
+    String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
+    return fastter
+        .request(
+      new Request(
+        query: '''
             query(\$filter:FilterFindMany${capitalized}Input){
               ${name}s(filter:\$filter) {
                 ...$name
@@ -33,27 +32,29 @@ GraphQLQueries<T> graphqlQueryCreator<T extends BaseModel>(
             }
             $fragment
           ''',
-          variables: {
-            'filter': filter,
-          },
-        ),
-      )
-          .then((response) {
-        if (response.containsKey('${name}s')) {
-          return (response['${name}s'] as List<dynamic>)
-              .map<T>((todo) => fromJson(todo))
-              .toList();
-        }
-        return null;
-      });
-    },
-    addMutation: (dynamic object) {
-      Map<String, dynamic> inputJson = (object as T).toJson();
-      inputJson.remove('_id');
-      return fastter
-          .request(
-        new Request(
-          query: '''
+        variables: {
+          'filter': filter,
+        },
+      ),
+    )
+        .then((response) {
+      if (response.containsKey('${name}s')) {
+        return (response['${name}s'] as List<dynamic>)
+            .map<T>((todo) => fromJson(todo))
+            .toList();
+      }
+      return null;
+    });
+  }
+
+  Future<T> addMutation(dynamic object) {
+    String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
+    // Map<String, dynamic> inputJson = (object as T).toJson();
+    // inputJson.remove('_id');
+    return fastter
+        .request(
+      new Request(
+        query: '''
             mutation(\$object:CreateOne${capitalized}Input!){
                   create$capitalized(record: \$object) {
                     record {
@@ -63,20 +64,19 @@ GraphQLQueries<T> graphqlQueryCreator<T extends BaseModel>(
               }
               $fragment
           ''',
-          variables: {
-            'object': inputJson,
-          },
-        ),
-      )
-          .then(
-        (response) {
-          if (response.containsKey('create$capitalized')) {
-            if (response['create$capitalized'].containsKey('record')) {
-              return fromJson(response['create$capitalized']['record']);
-            }
-          }
+        variables: {
+          'object': toInput(object),
         },
-      );
-    },
-  );
+      ),
+    )
+        .then(
+      (response) {
+        if (response.containsKey('create$capitalized')) {
+          if (response['create$capitalized'].containsKey('record')) {
+            return fromJson(response['create$capitalized']['record']);
+          }
+        }
+      },
+    );
+  }
 }

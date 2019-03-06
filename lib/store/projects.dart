@@ -15,12 +15,10 @@ const projectFragment = '''
     }
 ''';
 
-final projectsReducer = createListDataRedux<Project>();
-
-final projectsMiddleware = ListDataMiddleware<Project, AppState>(
-  queries: graphqlQueryCreator<Project>(
-    'project',
-    projectFragment,
-    (t) => Project.fromJson(t),
-  ),
+final fastterProjects = FastterListRedux<Project, AppState>(
+  name: 'project',
+  fragment: projectFragment,
+  fromJson: (json) => Project.fromJson(json),
+  toInput: (Project obj) => obj.toJson(),
+  filterObject: (Project project, Map<String, dynamic> filter) => true,
 );

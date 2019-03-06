@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../components/todolist.dart';
 import '../screens/todos.dart';
 import '../helpers/theme.dart';
 
@@ -20,6 +21,13 @@ class HomeContainer extends StatelessWidget {
     } else if (settings.name == "/7days") {
       return MaterialPageRoute(
         builder: (BuildContext context) => SevenDayScreen(),
+      );
+    } else if (settings.name == "/todos") {
+      var arguments = settings.arguments;
+      return MaterialPageRoute(
+        builder: (BuildContext context) => TodoList(
+              filter: arguments,
+            ),
       );
     }
   }

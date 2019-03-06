@@ -25,21 +25,26 @@ const todoFragment = '''
     }
 ''';
 
-final todosReducer = createListDataRedux<Todo>();
-
-final todosMiddleware = ListDataMiddleware<Todo, AppState>(
-  queries: graphqlQueryCreator<Todo>(
-    'todo',
-    todoFragment,
-    (t) => Todo.fromJson(t),
-  ),
+final fastterTodos = FastterListRedux<Todo, AppState>(
+  name: 'todo',
+  fragment: todoFragment,
+  fromJson: (t) => Todo.fromJson(t),
+  toInput: (Todo obj) {
+    Map<String, dynamic> json = obj.toJson();
+    json.remove('_id');
+    json['project'] = obj.project == null ? null : obj.project.id;
+    return json;
+  },
+  filterObject: _filterTodo,
 );
 
-bool filterTodo(Todo todo, Map<String, dynamic> filter) {
+bool _filterTodo(Todo todo, Map<String, dynamic> filter) {
   bool matched = true;
   if (filter.containsKey('project')) {
     if (filter['project'] == null) {
       matched = matched && todo.project == null;
+    } else if (todo.project == null) {
+      matched = matched && false;
     } else {
       matched = matched && todo.project.id == filter['project'];
     }

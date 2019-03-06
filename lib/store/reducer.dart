@@ -28,7 +28,7 @@ AppState appStateReducer(AppState state, dynamic action) {
     rehydrated: state.rehydrated,
     user: userReducer(state.user, action),
     bearer: bearerReducer(state.bearer, action),
-    todos: todosReducer(state.todos, action),
-    projects: projectsReducer(state.projects, action),
+    todos: fastterTodos.reducer(state.todos, action),
+    projects: fastterProjects.reducer(state.projects, action),
   );
 }

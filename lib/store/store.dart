@@ -29,8 +29,8 @@ Future<Store<AppState>> initState() async {
     middleware: <Middleware<AppState>>[
       // LoggingMiddleware<AppState>.printer(),
       _persistor.createMiddleware(),
-      projectsMiddleware,
-      todosMiddleware,
+      fastterProjects.middleware,
+      fastterTodos.middleware,
     ],
   );
 
