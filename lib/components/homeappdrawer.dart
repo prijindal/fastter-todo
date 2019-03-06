@@ -5,7 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import '../models/base.model.dart';
 import '../models/user.model.dart';
 import '../models/project.model.dart';
-import '../store/fastter_action.dart';
+import '../store/fastter/fastter_action.dart';
 import '../store/state.dart';
 
 class HomeAppDrawer extends StatelessWidget {

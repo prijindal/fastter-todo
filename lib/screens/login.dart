@@ -54,11 +54,6 @@ class _LoginScreenState extends State<_LoginScreen> {
   FocusNode emailFocusNode = new FocusNode();
   FocusNode passwordFocusNode = new FocusNode();
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   login() {
     setState(() {
       errorMessage = null;

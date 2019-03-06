@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../models/base.model.dart';
-import '../helpers/fastter.dart';
+import '../../models/base.model.dart';
+import '../../helpers/fastter.dart';
 
 class GraphQLQueries<T extends BaseModel> {
   GraphQLQueries({@required this.syncQuery});
@@ -21,14 +21,14 @@ GraphQLQueries<T> graphqlQueryCreator<T extends BaseModel>(
           .request(
         new Request(
           query: '''
-                query(\$filter:FilterFindMany${capitalized}Input){
-                  ${name}s(filter:\$filter) {
-                    ...$name
-                    $extraFields
-                  }
-                }
-                $fragment
-              ''',
+            query(\$filter:FilterFindMany${capitalized}Input){
+              ${name}s(filter:\$filter) {
+                ...$name
+                $extraFields
+              }
+            }
+            $fragment
+          ''',
         ),
       )
           .then((response) {

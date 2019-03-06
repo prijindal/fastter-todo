@@ -4,11 +4,12 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/base.model.dart';
 import '../models/todo.model.dart';
-import '../store/fastter_action.dart';
+import '../store/fastter/fastter_action.dart';
 import '../store/state.dart';
 import '../components/homeappbar.dart';
 import '../components/todoinput.dart';
 import '../components/homeappdrawer.dart';
+import '../components/todoitem.dart';
 
 class InboxScreen extends StatelessWidget {
   @override
@@ -59,9 +60,8 @@ class __InboxScreenState extends State<_InboxScreen> {
           shrinkWrap: true,
           children: widget.todos.items
               .map(
-                (todo) => ListTile(
-                      key: new Key(todo.id),
-                      title: Text(todo.title),
+                (todo) => TodoItem(
+                      todo: todo,
                     ),
               )
               .toList(),

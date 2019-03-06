@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/todo.model.dart';
-import '../store/fastter_action.dart';
+import '../store/fastter/fastter_action.dart';
 import '../store/state.dart';
 
 class TodoInput extends StatelessWidget {
@@ -23,15 +23,11 @@ class TodoInput extends StatelessWidget {
   }
 }
 
-class _TodoInput extends StatefulWidget {
+class _TodoInput extends StatelessWidget {
   final void Function(Todo todo) onAddTodo;
 
   _TodoInput({Key key, this.onAddTodo}) : super(key: key);
 
-  __TodoInputState createState() => __TodoInputState();
-}
-
-class __TodoInputState extends State<_TodoInput> {
   @override
   Widget build(BuildContext context) {
     return Container(

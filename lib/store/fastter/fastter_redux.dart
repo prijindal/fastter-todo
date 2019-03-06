@@ -1,4 +1,4 @@
-import '../models/base.model.dart';
+import '../../models/base.model.dart';
 import 'fastter_action.dart';
 
 ListState<T> Function(ListState<T> state, dynamic action)
@@ -14,10 +14,13 @@ ListState<T> Function(ListState<T> state, dynamic action)
         items: action.items,
         fetching: false,
       );
-    } else if (action is AddCompletedAction<T> || action is AddItem<T>) {
-      if (action.item.id == null) {
-        state.items.add(action.item);
-      }
+    } else if (action is AddItem<T>) {
+      state.items.add(action.item);
+      return ListState<T>(
+        items: state.items,
+        fetching: true,
+      );
+    } else if (action is AddCompletedAction<T>) {
       if (state.items.singleWhere((item) => item.id != action.item.id) !=
           null) {
         state.items.add(action.item);
@@ -30,18 +33,34 @@ ListState<T> Function(ListState<T> state, dynamic action)
         items: state.items,
         fetching: false,
       );
+    } else if (action is DeleteItem<T>) {
+      return ListState<T>(
+        items: state.items.where((T item) => item.id != action.itemid).toList(),
+        fetching: true,
+      );
     } else if (action is DeleteCompletedAction<T>) {
       return ListState<T>(
         items: state.items.where((T item) => item.id != action.itemid).toList(),
         fetching: false,
       );
+    } else if (action is UpdateItem<T>) {
+      return ListState<T>(
+        fetching: true,
+        items: state.items
+            .map<T>(
+              (T item) => item.id == action.itemid ? action.item : item,
+            )
+            .toList(),
+      );
     } else if (action is UpdateCompletedAction<T>) {
       return ListState<T>(
-          items: state.items
-              .map<T>(
-                (T item) => item.id == action.itemid ? action.item : item,
-              )
-              .toList());
+        fetching: false,
+        items: state.items
+            .map<T>(
+              (T item) => item.id == action.itemid ? action.item : item,
+            )
+            .toList(),
+      );
     } else if (action is ClearAll<T>) {
       return ListState();
     }

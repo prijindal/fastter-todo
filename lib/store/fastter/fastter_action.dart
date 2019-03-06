@@ -1,4 +1,4 @@
-import '../models/base.model.dart';
+import '../../models/base.model.dart';
 
 class Action<T extends BaseModel> {}
 
@@ -10,12 +10,23 @@ class AddItem<T extends BaseModel> extends Action<T> {
   final T item;
 }
 
+class DeleteItem<T extends BaseModel> extends Action<T> {
+  DeleteItem(this.itemid);
+  final String itemid;
+}
+
+class UpdateItem<T extends BaseModel> extends Action<T> {
+  UpdateItem(this.itemid, this.item);
+  final String itemid;
+  final T item;
+}
+
+// To be checked by just the reducer
 class SyncCompletedAction<T extends BaseModel> extends Action<T> {
   SyncCompletedAction(this.items);
   final List<T> items;
 }
 
-// To be checked by just the reducer
 class AddCompletedAction<T extends BaseModel> extends Action<T> {
   AddCompletedAction(this.item);
   final T item;

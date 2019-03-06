@@ -25,16 +25,16 @@ class AppState {
         bearer: json['bearer'],
         todos: ListState<Todo>(
           fetching: false,
-          items: json['todos'] != null && json['todos']['datas'] != null
-              ? (json['todos']['datas'] as List<dynamic>)
+          items: json['todos'] != null && json['todos']['items'] != null
+              ? (json['todos']['items'] as List<dynamic>)
                   .map<Todo>((t) => Todo.fromJson(t))
                   .toList()
               : [],
         ),
         projects: ListState<Project>(
           fetching: false,
-          items: json['projects'] != null && json['projects']['datas'] != null
-              ? (json['projects']['datas'] as List<dynamic>)
+          items: json['projects'] != null && json['projects']['items'] != null
+              ? (json['projects']['items'] as List<dynamic>)
                   .map<Project>((t) => Project.fromJson(t))
                   .toList()
               : [],

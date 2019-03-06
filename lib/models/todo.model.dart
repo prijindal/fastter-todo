@@ -1,6 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import 'base.model.dart';
+import 'project.model.dart';
 part 'todo.model.g.dart';
 
 @JsonSerializable()
@@ -12,6 +13,7 @@ class Todo extends BaseModel {
     this.dueDate,
     this.createdAt,
     this.updatedAt,
+    this.project,
   });
 
   factory Todo.fromJson(Map<String, dynamic> json) => _$TodoFromJson(json);
@@ -23,6 +25,7 @@ class Todo extends BaseModel {
   final DateTime dueDate;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final Project project;
 
   Map<String, dynamic> toJson() => _$TodoToJson(this);
 }

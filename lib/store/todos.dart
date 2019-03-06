@@ -1,6 +1,6 @@
-import 'fastter_redux.dart';
-import 'fastter_queries.dart';
-import 'fastter_middleware.dart';
+import 'fastter/fastter_redux.dart';
+import 'fastter/fastter_queries.dart';
+import 'fastter/fastter_middleware.dart';
 
 import '../models/todo.model.dart';
 
@@ -24,7 +24,10 @@ const todoFragment = '''
 
 final todosReducer = createListDataRedux<Todo>();
 
-final _todosQueries =
-    graphqlQueryCreator<Todo>('todo', todoFragment, (t) => Todo.fromJson(t));
-
-final todosMiddleware = ListDataMiddleware<Todo>(queries: _todosQueries);
+final todosMiddleware = ListDataMiddleware<Todo>(
+  queries: graphqlQueryCreator<Todo>(
+    'todo',
+    todoFragment,
+    (t) => Todo.fromJson(t),
+  ),
+);

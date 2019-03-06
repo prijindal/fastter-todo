@@ -24,14 +24,10 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-class _HomeAppBar extends StatefulWidget {
+class _HomeAppBar extends StatelessWidget {
   final void Function() onLogout;
   _HomeAppBar({Key key, this.onLogout}) : super(key: key);
 
-  __HomeAppBarState createState() => __HomeAppBarState();
-}
-
-class __HomeAppBarState extends State<_HomeAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -39,7 +35,7 @@ class __HomeAppBarState extends State<_HomeAppBar> {
       actions: <Widget>[
         IconButton(
           icon: Icon(Icons.exit_to_app),
-          onPressed: widget.onLogout,
+          onPressed: onLogout,
         )
       ],
     );
