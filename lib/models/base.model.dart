@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 abstract class BaseModel extends Object {
@@ -30,5 +31,3 @@ class ListState<T extends BaseModel> {
         'items': items.map((t) => t.toJson()).toList(),
       });
 }
-
-DateTime dateFromJson(String date) => DateTime.parse(date).toLocal();

@@ -43,6 +43,7 @@ class _TodoInputState extends State<_TodoInput> {
   Project project;
 
   _onSave() {
+    dueDate = new DateTime(dueDate.year, dueDate.month, dueDate.day, 0, 0, 0);
     Todo todo = Todo(
       title: titleInputController.text,
       dueDate: dueDate,

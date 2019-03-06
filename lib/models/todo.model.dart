@@ -23,13 +23,10 @@ class Todo extends BaseModel {
   String title;
   bool completed;
 
-  @JsonKey(fromJson: dateFromJson)
   DateTime dueDate;
 
-  @JsonKey(fromJson: dateFromJson)
   final DateTime createdAt;
 
-  @JsonKey(fromJson: dateFromJson)
   final DateTime updatedAt;
 
   Project project;
