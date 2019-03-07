@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:event_bus/event_bus.dart';
-import 'package:flutter_socket_io/flutter_socket_io.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:uuid/uuid.dart';
 import '../models/user.model.dart';
 
@@ -30,7 +29,7 @@ class Request {
 
 class Fastter {
   final String url;
-  SocketIO socket;
+  IO.Socket socket;
   Map<String, EventBus> requests;
   Map<String, EventBus> subscriptions;
   String apiToken;
@@ -39,21 +38,24 @@ class Fastter {
   User user;
 
   Fastter(this.url, String apiToken) {
-    if (Platform.isAndroid || Platform.isIOS) {
-      // socket = SocketIOManager().createSocketIO(url, "/");
-    }
     requests = {};
     subscriptions = {};
     this.apiToken = apiToken;
-    if (socket != null) {
-      socket.subscribe('connect', (_) {
-        socket.sendMessage('msg', 'test');
-      });
-      socket.subscribe('graphqlResponse', (dynamic data) {
-        this.requests[data.requestId].fire(data);
-      });
-      socket.subscribe('disconnect', (_) => print('disconnect'));
-    }
+  }
+
+  connect() async {
+    socket = IO.io(url, <dynamic, dynamic>{
+      'forceNew': true,
+      'transports': ['websocket']
+    });
+    socket.on('connect', (_) {
+      print('connected');
+    });
+    socket.on('graphqlResponse', (dynamic data) {
+      this.requests[data['requestId']].fire(data);
+    });
+    socket.on('disconnect', (_) => print('disconnect'));
+    socket.connect();
   }
 
   Future<Map<String, dynamic>> request(Request data) {
@@ -86,7 +88,7 @@ class Fastter {
         data.apiToken = apiToken;
       }
       try {
-        socket.sendMessage('graphql', data);
+        socket.emit('graphql', data.toJson());
       } catch (error) {
         throw FastterError(error);
       }

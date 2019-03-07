@@ -5,9 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/base.model.dart';
 import '../models/todo.model.dart';
-import '../components/homeappbar.dart';
 import '../components/todoinput.dart';
-import '../components/homeappdrawer.dart';
 import '../components/todoitem.dart';
 import '../fastter/fastter_action.dart';
 import '../store/state.dart';
@@ -117,15 +115,9 @@ class _TodoListState extends State<_TodoList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: HomeAppBar(
-        title: widget.title,
-      ),
-      drawer: HomeAppDrawer(),
-      body: RefreshIndicator(
-        child: buildBody(),
-        onRefresh: _onRefresh,
-      ),
+    return RefreshIndicator(
+      child: buildBody(),
+      onRefresh: _onRefresh,
     );
   }
 }

@@ -60,8 +60,9 @@ class _AppContainerState extends State<_AppContainer> {
     tryLogin();
   }
 
-  void tryLogin() {
+  void tryLogin() async {
     String bearer = widget.bearer;
+    fastter.connect();
     if (bearer != null) {
       fastter.bearer = bearer;
       setState(() {

@@ -6,8 +6,10 @@ import '../models/base.model.dart';
 import '../models/user.model.dart';
 import '../models/project.model.dart';
 import '../fastter/fastter_action.dart';
+import '../screens/loading.dart';
 import '../store/state.dart';
 import '../components/hexcolor.dart';
+import '../helpers/navigator.dart';
 
 class HomeAppDrawer extends StatelessWidget {
   HomeAppDrawer({Key key}) : super(key: key);
@@ -51,7 +53,11 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    final RouteSettings currentRoute = ModalRoute.of(context).settings;
+    if (navigatorKey == null) {
+      return LoadingScreen();
+    }
+    final RouteSettings currentRoute =
+        ModalRoute.of(navigatorKey.currentContext).settings;
     return Drawer(
       child: ListView(
         children: <Widget>[
@@ -68,7 +74,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.inbox),
             title: Text("Inbox"),
             onTap: () {
-              Navigator.of(context).pushReplacementNamed("/");
+              navigatorKey.currentState.pushReplacementNamed("/");
             },
           ),
           ListTile(
@@ -76,7 +82,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.select_all),
             title: Text("All Todos"),
             onTap: () {
-              Navigator.of(context).pushNamed("/all");
+              navigatorKey.currentState.pushNamed("/all");
             },
           ),
           ListTile(
@@ -84,7 +90,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.calendar_today),
             title: Text("Today"),
             onTap: () {
-              Navigator.of(context).pushNamed("/today");
+              navigatorKey.currentState.pushNamed("/today");
             },
           ),
           ListTile(
@@ -92,7 +98,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.calendar_view_day),
             title: Text("7 Days"),
             onTap: () {
-              Navigator.of(context).pushNamed("/7days");
+              navigatorKey.currentState.pushNamed("/7days");
             },
           ),
           Column(
@@ -106,7 +112,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
                         ),
                         title: new Text(project.title),
                         onTap: () {
-                          Navigator.of(context).pushNamed("/todos",
+                          navigatorKey.currentState.pushNamed("/todos",
                               arguments: {'project': project});
                         },
                       ),

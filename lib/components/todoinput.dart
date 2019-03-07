@@ -39,10 +39,13 @@ class _TodoInput extends StatefulWidget {
 
 class _TodoInputState extends State<_TodoInput> {
   TextEditingController titleInputController = TextEditingController(text: "");
-  DateTime dueDate = DateTime.now();
+  DateTime dueDate;
   Project project;
 
   _onSave() {
+    if (dueDate == null) {
+      dueDate = DateTime.now();
+    }
     dueDate = new DateTime(dueDate.year, dueDate.month, dueDate.day, 0, 0, 0);
     Todo todo = Todo(
       title: titleInputController.text,
@@ -57,7 +60,7 @@ class _TodoInputState extends State<_TodoInput> {
     Future<DateTime> selectedDate = todoSelectDate(context);
     selectedDate.then((dueDate) {
       setState(() {
-        dueDate = dueDate;
+        this.dueDate = dueDate;
       });
     });
   }
@@ -84,7 +87,10 @@ class _TodoInputState extends State<_TodoInput> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 IconButton(
-                  icon: Icon(Icons.calendar_today),
+                  icon: Icon(
+                    Icons.calendar_today,
+                    color: dueDate == null ? null : Colors.redAccent,
+                  ),
                   onPressed: _showDatePicker,
                 ),
                 ProjectDropdown(
