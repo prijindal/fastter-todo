@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import '../models/user.model.dart';
 import 'currentuser.dart';
 import 'bearer.dart';
@@ -9,9 +10,16 @@ import '../models/project.model.dart';
 import './state.dart';
 
 class InitStateReset {
-  InitStateReset(this.user, this.bearer);
+  InitStateReset({
+    @required this.user,
+    @required this.bearer,
+    this.todos = const ListState<Todo>(),
+    this.projects = const ListState<Project>(),
+  });
   final User user;
   final String bearer;
+  final ListState<Todo> todos;
+  final ListState<Project> projects;
 }
 
 AppState appStateReducer(AppState state, dynamic action) {
@@ -20,8 +28,8 @@ AppState appStateReducer(AppState state, dynamic action) {
       user: action.user,
       bearer: action.bearer,
       rehydrated: true,
-      todos: ListState<Todo>(),
-      projects: ListState<Project>(),
+      todos: action.todos,
+      projects: action.projects,
     );
   }
   return AppState(

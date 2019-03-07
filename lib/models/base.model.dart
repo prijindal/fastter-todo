@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 abstract class BaseModel extends Object {
@@ -9,7 +8,7 @@ abstract class BaseModel extends Object {
 }
 
 class ListState<T extends BaseModel> {
-  ListState({
+  const ListState({
     this.fetching = false,
     this.adding = false,
     this.deleting = false,

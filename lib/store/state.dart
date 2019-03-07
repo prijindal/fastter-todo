@@ -8,9 +8,18 @@ class AppState {
     this.user,
     this.bearer,
     this.rehydrated = false,
-    this.todos,
-    this.projects,
-  });
+    ListState<Todo> todos,
+    ListState<Project> projects,
+  }) {
+    if (todos == null) {
+      todos = ListState<Todo>();
+    }
+    if (projects == null) {
+      projects = ListState<Project>();
+    }
+    this.todos = todos;
+    this.projects = projects;
+  }
 
   bool rehydrated;
   User user;

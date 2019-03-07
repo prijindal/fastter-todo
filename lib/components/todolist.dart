@@ -74,6 +74,8 @@ class _TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<_TodoList> {
+  bool showInput = false;
+
   @override
   void initState() {
     widget.syncStart();
@@ -81,29 +83,59 @@ class _TodoListState extends State<_TodoList> {
   }
 
   Widget buildBody() {
-    if (widget.todos.fetching) {
+    if (widget.todos.fetching && widget.todos.items.length == 0) {
       return Center(
         child: CircularProgressIndicator(),
       );
     }
-    return Flex(
-      direction: Axis.vertical,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Flexible(
-          child: ListView(
-            children: widget.todos.items
-                .map(
-                  (todo) => TodoItem(
-                        todo: todo,
-                        showProject: widget.showProject,
-                        showDueDate: widget.showDueDate,
-                      ),
-                )
-                .toList(),
-          ),
+    return Stack(
+      children: [
+        Flex(
+          direction: Axis.vertical,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Flexible(
+              child: ListView(
+                children: widget.todos.items
+                    .map(
+                      (todo) => TodoItem(
+                            todo: todo,
+                            showProject: widget.showProject,
+                            showDueDate: widget.showDueDate,
+                          ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ],
         ),
-        TodoInput(),
+        showInput
+            ? Container()
+            : Positioned(
+                bottom: 64.0,
+                right: 48.0,
+                child: FloatingActionButton(
+                  child: Icon(Icons.add),
+                  onPressed: () {
+                    setState(() {
+                      showInput = true;
+                    });
+                  },
+                ),
+              ),
+        showInput
+            ? Positioned(
+                bottom: 0,
+                right: 0,
+                child: TodoInput(
+                  onBackButton: () {
+                    setState(() {
+                      showInput = false;
+                    });
+                  },
+                ),
+              )
+            : Container(),
       ],
     );
   }
