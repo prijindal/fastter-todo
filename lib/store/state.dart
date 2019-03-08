@@ -9,6 +9,7 @@ class AppState {
     this.rehydrated = false,
     ListState<Todo> todos,
     ListState<Project> projects,
+    this.selectedTodos = const [],
   }) {
     if (todos == null) {
       todos = ListState<Todo>();
@@ -24,6 +25,9 @@ class AppState {
   UserState user;
   ListState<Todo> todos;
   ListState<Project> projects;
+
+  // Temporary state of the app
+  List<String> selectedTodos = [];
 
   static AppState fromJson(dynamic json) {
     if (json != null && json['user'] != null) {

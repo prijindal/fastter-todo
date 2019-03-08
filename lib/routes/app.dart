@@ -52,11 +52,10 @@ class _AppContainerState extends State<_AppContainer> {
   }
 
   void tryLogin() async {
-    String bearer = widget.user.bearer;
-    if (bearer != null) {
-      widget.confirmUser(bearer);
-    } else {
+    if (widget.user == null || widget.user.bearer == null) {
       widget.clearAuth();
+    } else {
+      widget.confirmUser(widget.user.bearer);
     }
   }
 

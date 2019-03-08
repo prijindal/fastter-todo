@@ -8,6 +8,7 @@ import '../store/state.dart';
 import '../fastter/fastter_action.dart';
 import '../helpers/todouihelpers.dart';
 import '../components/hexcolor.dart';
+import '../store/selectedtodos.dart';
 
 class TodoItem extends StatelessWidget {
   final Todo todo;
@@ -33,6 +34,8 @@ class TodoItem extends StatelessWidget {
               store.dispatch(UpdateItem<Todo>(todo.id, updated)),
           showProject: showProject,
           showDueDate: showDueDate,
+          selected: store.state.selectedTodos.contains(todo.id),
+          toggleSelected: () => store.dispatch(ToggleSelectTodo(todo.id)),
         );
       },
     );
@@ -43,6 +46,10 @@ class _TodoItem extends StatelessWidget {
   final Todo todo;
   final VoidCallback deleteTodo;
   final void Function(Todo) updateTodo;
+
+  final bool selected;
+  final VoidCallback toggleSelected;
+
   final bool showProject;
   final bool showDueDate;
 
@@ -51,6 +58,8 @@ class _TodoItem extends StatelessWidget {
     @required this.todo,
     @required this.deleteTodo,
     @required this.updateTodo,
+    @required this.selected,
+    @required this.toggleSelected,
     this.showProject = true,
     this.showDueDate = true,
   }) : super(key: key);
@@ -188,10 +197,35 @@ class _TodoItem extends StatelessWidget {
           ),
         ],
       ),
-      child: CheckboxListTile(
+      child: ListTile(
+        leading: GestureDetector(
+          onTap: () {
+            _toggleCompleted(!(todo.completed == true));
+          },
+          child: Container(
+            width: 36.0,
+            height: 36.0,
+            child: Center(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: 16.0,
+                height: 16.0,
+                decoration: BoxDecoration(
+                  color: (todo.completed == true)
+                      ? Theme.of(context).accentColor
+                      : Colors.transparent,
+                  border: Border.all(color: Colors.black),
+                  borderRadius: BorderRadius.all(Radius.circular(18.0)),
+                ),
+              ),
+            ),
+          ),
+        ),
         isThreeLine: false,
-        onChanged: _toggleCompleted,
-        value: todo.completed == true,
+        selected: selected,
+        onTap: () {
+          toggleSelected();
+        },
         title: Text(todo.title),
         subtitle: _buildSubtitle(),
       ),

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:io';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -55,20 +56,24 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     this._focusKeyboard();
-    subscribingId = KeyboardVisibilityNotification().addNewListener(
-        onChange: (bool visible) {
-      if (visible == false) {
-        _unFocusKeyboard();
-      } else {
-        _focusKeyboard();
-      }
-    });
+    if (Platform.isAndroid || Platform.isIOS) {
+      subscribingId = KeyboardVisibilityNotification().addNewListener(
+          onChange: (bool visible) {
+        if (visible == false) {
+          _unFocusKeyboard();
+        } else {
+          _focusKeyboard();
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    KeyboardVisibilityNotification().removeListener(subscribingId);
+    if (subscribingId != null) {
+      KeyboardVisibilityNotification().removeListener(subscribingId);
+    }
     super.dispose();
   }
 

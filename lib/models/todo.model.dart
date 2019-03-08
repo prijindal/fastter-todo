@@ -21,7 +21,7 @@ class Todo extends BaseModel {
   @JsonKey(name: '_id', nullable: false)
   final String id;
   String title;
-  bool completed;
+  bool completed = false;
 
   DateTime dueDate;
 

@@ -3,6 +3,7 @@ import '../models/user.model.dart';
 import 'user.dart';
 import 'todos.dart';
 import 'projects.dart';
+import 'selectedtodos.dart';
 import '../models/base.model.dart';
 import '../models/todo.model.dart';
 import '../models/project.model.dart';
@@ -33,5 +34,6 @@ AppState appStateReducer(AppState state, dynamic action) {
     user: userReducer(state.user, action),
     todos: fastterTodos.reducer(state.todos, action),
     projects: fastterProjects.reducer(state.projects, action),
+    selectedTodos: selectedTodos(state.selectedTodos, action),
   );
 }

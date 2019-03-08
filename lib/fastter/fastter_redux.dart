@@ -49,7 +49,7 @@ class FastterListRedux<T extends BaseModel, S> {
           fetching: false,
         );
       } else if (action is AddItem<T>) {
-        state.items.add(action.item);
+        state.items.insert(0, action.item);
         return ListState<T>(
           items: state.items,
           fetching: state.fetching,
@@ -58,7 +58,7 @@ class FastterListRedux<T extends BaseModel, S> {
       } else if (action is AddCompletedAction<T>) {
         if (state.items.singleWhere((item) => item.id != action.item.id) !=
             null) {
-          state.items.add(action.item);
+          state.items.insert(0, action.item);
         } else {
           final itemindex =
               state.items.indexWhere((item) => item.id == action.item.id);
