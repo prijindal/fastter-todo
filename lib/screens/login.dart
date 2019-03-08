@@ -5,27 +5,23 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/user.model.dart';
 import '../store/state.dart';
-import '../store/bearer.dart';
-import '../store/currentuser.dart';
-import '../fastter/fastter.dart' show fastter;
+import '../store/user.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, void Function(User user)>(
-      converter: (Store<AppState> store) =>
-          (User user) => store.dispatch(LoginUserAction(user)),
+    return StoreConnector<AppState, void Function(String, String)>(
+      converter: (Store<AppState> store) => (String email, String password) =>
+          store.dispatch(LoginUserAction(email, password)),
       builder: (BuildContext context, fn) {
-        return StoreConnector<AppState, void Function(String)>(
-          converter: (Store<AppState> store) =>
-              (String bearer) => store.dispatch(InitAuthAction(bearer)),
-          builder: (BuildContext context, fnbearer) {
-            return _LoginScreen(
-              onLogin: (User user) => fn(user),
-              setBearer: (String bearer) => fnbearer(bearer),
-            );
-          },
-        );
+        return StoreConnector<AppState, UserState>(
+            converter: (Store<AppState> store) => store.state.user,
+            builder: (BuildContext context, userState) {
+              return _LoginScreen(
+                login: (String email, String password) => fn(email, password),
+                user: userState,
+              );
+            });
       },
     );
   }
@@ -33,53 +29,27 @@ class LoginScreen extends StatelessWidget {
 
 class _LoginScreen extends StatefulWidget {
   _LoginScreen({
-    @required this.onLogin,
-    @required this.setBearer,
+    @required this.login,
+    @required this.user,
   });
 
-  final void Function(User user) onLogin;
-  final void Function(String) setBearer;
+  final UserState user;
+  final void Function(String email, String password) login;
 
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<_LoginScreen> {
-  bool isLoading = false;
   TextEditingController emailController =
       new TextEditingController(text: "priyanshujindal1995@gmail.com");
   TextEditingController passwordController =
       new TextEditingController(text: "admin");
-  String errorMessage;
 
   FocusNode emailFocusNode = new FocusNode();
   FocusNode passwordFocusNode = new FocusNode();
 
   login() {
-    setState(() {
-      errorMessage = null;
-      isLoading = true;
-    });
-    fastter
-        .login(emailController.text, passwordController.text)
-        .then((response) {
-      if (response != null && response.login != null) {
-        widget.setBearer(response.login.bearer);
-        widget.onLogin(response.login.user);
-        if (response.login.user == null) {
-          setState(() {
-            errorMessage = "Wrong username password";
-          });
-        }
-      }
-      setState(() {
-        isLoading = false;
-      });
-    }).catchError((error) {
-      setState(() {
-        errorMessage = error.toString();
-        isLoading = false;
-      });
-    });
+    widget.login(emailController.text, passwordController.text);
   }
 
   @override
@@ -119,9 +89,11 @@ class _LoginScreenState extends State<_LoginScreen> {
                   ),
                   FlatButton(
                     child: Text("Login"),
-                    onPressed: isLoading ? null : login,
+                    onPressed: widget.user.isLoading ? null : login,
                   ),
-                  Text(errorMessage == null ? "" : errorMessage),
+                  Text(widget.user.errorMessage == null
+                      ? ""
+                      : widget.user.errorMessage),
                 ],
               ),
             ),

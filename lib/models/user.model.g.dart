@@ -43,3 +43,20 @@ CurrentData _$CurrentDataFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$CurrentDataToJson(CurrentData instance) =>
     <String, dynamic>{'current': instance.current};
+
+UserState _$UserStateFromJson(Map<String, dynamic> json) {
+  return UserState(
+      user: json['user'] == null
+          ? null
+          : User.fromJson(json['user'] as Map<String, dynamic>),
+      bearer: json['bearer'] as String,
+      isLoading: json['isLoading'] as bool,
+      errorMessage: json['errorMessage'] as String);
+}
+
+Map<String, dynamic> _$UserStateToJson(UserState instance) => <String, dynamic>{
+      'user': instance.user,
+      'bearer': instance.bearer,
+      'isLoading': instance.isLoading,
+      'errorMessage': instance.errorMessage
+    };

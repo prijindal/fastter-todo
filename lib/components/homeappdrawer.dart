@@ -12,7 +12,8 @@ import '../components/hexcolor.dart';
 import '../helpers/navigator.dart';
 
 class HomeAppDrawer extends StatelessWidget {
-  HomeAppDrawer({Key key}) : super(key: key);
+  final bool disablePop;
+  HomeAppDrawer({Key key, this.disablePop = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,7 @@ class HomeAppDrawer extends StatelessWidget {
           user: store.state.user,
           projects: store.state.projects,
           syncStart: () => store.dispatch(StartSync<Project>()),
+          disablePop: disablePop,
         );
       },
     );
@@ -30,15 +32,17 @@ class HomeAppDrawer extends StatelessWidget {
 }
 
 class _HomeAppDrawer extends StatefulWidget {
-  final User user;
+  final UserState user;
   final ListState<Project> projects;
   final VoidCallback syncStart;
+  final bool disablePop;
 
   _HomeAppDrawer({
     Key key,
     @required this.user,
     @required this.projects,
     @required this.syncStart,
+    this.disablePop = false,
   }) : super(key: key);
 
   __HomeAppDrawerState createState() => __HomeAppDrawerState();
@@ -51,6 +55,18 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
     super.initState();
   }
 
+  void _pushRouteNamed(
+    String routeName, {
+    Object arguments,
+  }) {
+    navigatorKey.currentState
+        .pushReplacementNamed(routeName, arguments: arguments);
+    print(navigatorKey.currentContext);
+    if (!widget.disablePop) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (navigatorKey == null) {
@@ -61,20 +77,22 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
     return Drawer(
       child: ListView(
         children: <Widget>[
-          UserAccountsDrawerHeader(
-            currentAccountPicture: Icon(
-              Icons.person,
-              color: Colors.white,
-            ),
-            accountName: Text(widget.user.email),
-            accountEmail: Text(widget.user.email),
-          ),
+          widget.user != null && widget.user.user != null
+              ? UserAccountsDrawerHeader(
+                  currentAccountPicture: Icon(
+                    Icons.person,
+                    color: Colors.white,
+                  ),
+                  accountName: Text(widget.user.user.email),
+                  accountEmail: Text(widget.user.user.email),
+                )
+              : Container(),
           ListTile(
             selected: currentRoute.name == "/",
             leading: Icon(Icons.inbox),
             title: Text("Inbox"),
             onTap: () {
-              navigatorKey.currentState.pushReplacementNamed("/");
+              _pushRouteNamed("/");
             },
           ),
           ListTile(
@@ -82,7 +100,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.select_all),
             title: Text("All Todos"),
             onTap: () {
-              navigatorKey.currentState.pushNamed("/all");
+              _pushRouteNamed("/all");
             },
           ),
           ListTile(
@@ -90,7 +108,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.calendar_today),
             title: Text("Today"),
             onTap: () {
-              navigatorKey.currentState.pushNamed("/today");
+              _pushRouteNamed("/today");
             },
           ),
           ListTile(
@@ -98,7 +116,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.calendar_view_day),
             title: Text("7 Days"),
             onTap: () {
-              navigatorKey.currentState.pushNamed("/7days");
+              _pushRouteNamed("/7days");
             },
           ),
           Column(
@@ -112,7 +130,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
                         ),
                         title: new Text(project.title),
                         onTap: () {
-                          navigatorKey.currentState.pushNamed("/todos",
+                          _pushRouteNamed("/todos",
                               arguments: {'project': project});
                         },
                       ),

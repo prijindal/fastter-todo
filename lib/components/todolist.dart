@@ -112,7 +112,7 @@ class _TodoListState extends State<_TodoList> {
         showInput
             ? Container()
             : Positioned(
-                bottom: 64.0,
+                bottom: 48.0,
                 right: 48.0,
                 child: FloatingActionButton(
                   child: Icon(Icons.add),

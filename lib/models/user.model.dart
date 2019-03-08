@@ -1,3 +1,4 @@
+import 'package:meta/meta.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'base.model.dart';
@@ -57,4 +58,23 @@ class CurrentData extends Object {
       _$CurrentDataFromJson(json);
 
   Map<String, dynamic> toJson() => _$CurrentDataToJson(this);
+}
+
+@JsonSerializable()
+class UserState {
+  final User user;
+  final String bearer;
+  final bool isLoading;
+  final String errorMessage;
+
+  UserState({
+    @required this.user,
+    @required this.bearer,
+    this.isLoading = false,
+    this.errorMessage,
+  });
+  factory UserState.fromJson(Map<String, dynamic> json) =>
+      _$UserStateFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserStateToJson(this);
 }

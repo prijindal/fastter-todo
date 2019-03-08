@@ -83,7 +83,9 @@ class _HomeContainer extends StatelessWidget {
               direction: Axis.horizontal,
               children: <Widget>[
                 Flexible(
-                  child: HomeAppDrawer(),
+                  child: HomeAppDrawer(
+                    disablePop: true,
+                  ),
                 ),
                 Flexible(child: _buildHomeApp()),
               ],

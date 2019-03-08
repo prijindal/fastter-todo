@@ -23,6 +23,7 @@ dependencies:
   flutter_redux: any
   intl: any
   json_annotation: any
+  keyboard_visibility: any
   redux_persist: any
   redux_persist_flutter: any
   socket_io_client: any

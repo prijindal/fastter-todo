@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 
 import '../models/todo.model.dart';
 import '../models/project.model.dart';
@@ -44,32 +45,31 @@ class _TodoInput extends StatefulWidget {
 class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   TextEditingController titleInputController = TextEditingController(text: "");
   FocusNode _titleFocusNode = FocusNode();
-  bool _isKeyboardClosed = true;
+  bool _isPreventClose = false;
   DateTime dueDate;
   Project project;
+  int subscribingId;
 
   @override
   initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     this._focusKeyboard();
+    subscribingId = KeyboardVisibilityNotification().addNewListener(
+        onChange: (bool visible) {
+      if (visible == false) {
+        _unFocusKeyboard();
+      } else {
+        _focusKeyboard();
+      }
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    KeyboardVisibilityNotification().removeListener(subscribingId);
     super.dispose();
-  }
-
-  @override
-  didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isKeyboardClosed) {
-      this._unFocusKeyboard();
-      // isKeyboardClosed = true;
-    } else {
-      _isKeyboardClosed = false;
-    }
   }
 
   _focusKeyboard() async {
@@ -78,7 +78,43 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
 
   _unFocusKeyboard() async {
     _titleFocusNode.unfocus();
-    if (widget.onBackButton != null) {
+    if (_isPreventClose) {
+      return;
+    }
+    if (titleInputController.text.isNotEmpty) {
+      setState(() {
+        _isPreventClose = true;
+      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              title: Text("Do you want to save before cancelling?"),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("No"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    setState(() {
+                      _isPreventClose = false;
+                    });
+                    widget.onBackButton();
+                  },
+                ),
+                FlatButton(
+                  child: Text("Yes"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _onSave();
+                    setState(() {
+                      _isPreventClose = false;
+                    });
+                    widget.onBackButton();
+                  },
+                ),
+              ],
+            ),
+      );
+    } else if (widget.onBackButton != null) {
       widget.onBackButton();
     }
   }
@@ -93,17 +129,32 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
       dueDate: dueDate,
       project: project,
     );
-    titleInputController.clear();
     widget.addTodo(todo);
-    _unFocusKeyboard();
+    if (mounted) {
+      titleInputController.clear();
+      _unFocusKeyboard();
+    }
   }
 
   _showDatePicker() {
+    setState(() {
+      _isPreventClose = true;
+    });
     Future<DateTime> selectedDate = todoSelectDate(context);
     selectedDate.then((dueDate) {
       setState(() {
         this.dueDate = dueDate;
+        _isPreventClose = false;
+        _focusKeyboard();
       });
+    });
+  }
+
+  _onSelectProject(Project selectedproject) {
+    setState(() {
+      project = selectedproject;
+      _isPreventClose = false;
+      _focusKeyboard();
     });
   }
 
@@ -144,9 +195,10 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
                       ),
                       ProjectDropdown(
                         selectedProject: project,
-                        onSelected: (selectedproject) {
+                        onSelected: _onSelectProject,
+                        onOpening: () {
                           setState(() {
-                            project = selectedproject;
+                            _isPreventClose = true;
                           });
                         },
                       ),

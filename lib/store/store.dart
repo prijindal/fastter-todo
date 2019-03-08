@@ -5,6 +5,7 @@ import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
 import 'todos.dart';
 import 'projects.dart';
+import 'user.dart';
 import './state.dart';
 import './reducer.dart';
 
@@ -29,6 +30,7 @@ Future<Store<AppState>> initState() async {
       _persistor.createMiddleware(),
       fastterProjects.middleware,
       fastterTodos.middleware,
+      UserMiddleware(),
     ],
   );
 
@@ -36,7 +38,6 @@ Future<Store<AppState>> initState() async {
     _store.dispatch(
       InitStateReset(
         user: state.user,
-        bearer: state.bearer,
         projects: state.projects,
         todos: state.todos,
       ),

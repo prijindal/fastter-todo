@@ -6,7 +6,6 @@ import '../models/project.model.dart';
 class AppState {
   AppState({
     this.user,
-    this.bearer,
     this.rehydrated = false,
     ListState<Todo> todos,
     ListState<Project> projects,
@@ -22,16 +21,14 @@ class AppState {
   }
 
   bool rehydrated;
-  User user;
-  String bearer;
+  UserState user;
   ListState<Todo> todos;
   ListState<Project> projects;
 
   static AppState fromJson(dynamic json) {
     if (json != null && json['user'] != null) {
       return AppState(
-        user: User.fromJson(json['user']),
-        bearer: json['bearer'],
+        user: UserState.fromJson(json['user']),
         todos: ListState<Todo>(
           items: json['todos'] != null && json['todos']['items'] != null
               ? (json['todos']['items'] as List<dynamic>)
@@ -54,7 +51,6 @@ class AppState {
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'user': user != null ? user.toJson() : <String, dynamic>{},
-        'bearer': bearer,
         'todos': todos.toJson(),
         'projects': projects.toJson(),
       };

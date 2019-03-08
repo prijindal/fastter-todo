@@ -8,9 +8,7 @@ import '../screens/login.dart';
 import '../helpers/theme.dart';
 import 'home.dart';
 import '../store/state.dart';
-import '../store/bearer.dart';
-import '../store/currentuser.dart';
-import '../fastter/fastter.dart' show fastter, Request;
+import '../store/user.dart';
 
 class AppContainer extends StatelessWidget {
   @override
@@ -20,9 +18,8 @@ class AppContainer extends StatelessWidget {
       builder: (BuildContext context, Store<AppState> store) {
         return _AppContainer(
           user: store.state.user,
-          onLogin: (User user) => store.dispatch(LoginUserAction(user)),
-          setBearer: (String bearer) => store.dispatch(InitAuthAction(bearer)),
-          bearer: store.state.bearer,
+          confirmUser: (String bearer) =>
+              store.dispatch(ConfirmUserAction(bearer)),
           clearAuth: () => store.dispatch(LogoutUserAction()),
           rehydrated: store.state.rehydrated,
         );
@@ -34,26 +31,20 @@ class AppContainer extends StatelessWidget {
 class _AppContainer extends StatefulWidget {
   _AppContainer({
     @required this.user,
-    @required this.onLogin,
-    @required this.setBearer,
-    @required this.bearer,
+    @required this.confirmUser,
     @required this.clearAuth,
     @required this.rehydrated,
   });
 
-  final User user;
-  final void Function(User) onLogin;
-  final void Function(String) setBearer;
+  final UserState user;
+  final void Function(String) confirmUser;
   final void Function() clearAuth;
-  final String bearer;
   final bool rehydrated;
 
   _AppContainerState createState() => _AppContainerState();
 }
 
 class _AppContainerState extends State<_AppContainer> {
-  bool isLoading = true;
-
   @override
   void initState() {
     super.initState();
@@ -61,48 +52,25 @@ class _AppContainerState extends State<_AppContainer> {
   }
 
   void tryLogin() async {
-    String bearer = widget.bearer;
-    fastter.connect();
+    String bearer = widget.user.bearer;
     if (bearer != null) {
-      fastter.bearer = bearer;
-      setState(() {
-        isLoading = true;
-      });
-      // Request
-      fastter
-          .request(new Request(
-        query: '{current {_id, email}}',
-      ))
-          .then((resp) {
-        CurrentData response = CurrentData.fromJson(resp);
-        if (response != null && response.current != null) {
-          widget.setBearer(bearer);
-          widget.onLogin(response.current);
-        } else {
-          widget.clearAuth();
-          fastter.bearer = null;
-        }
-        this.setState(() {
-          isLoading = false;
-        });
-      });
+      widget.confirmUser(bearer);
     } else {
       widget.clearAuth();
-      setState(() {
-        isLoading = false;
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (!widget.rehydrated || widget.user == null) {
       return MaterialApp(
         theme: primaryTheme,
         home: LoadingScreen(),
       );
     }
-    if (widget.user == null || widget.user.id == null) {
+    if (widget.user == null ||
+        widget.user.user == null ||
+        widget.user.user.id == null) {
       return MaterialApp(
         theme: primaryTheme,
         home: LoginScreen(),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../store/state.dart';
-import '../store/currentuser.dart';
+import '../store/user.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
