@@ -7,6 +7,7 @@ import '../fastter/fastter_action.dart';
 import '../store/state.dart';
 import '../store/user.dart';
 import '../store/selectedtodos.dart';
+import '../helpers/theme.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -62,41 +63,45 @@ class _HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (selectedtodos.length > 0) {
-      return AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            unSelectAll();
-          },
-        ),
-        title: new Text(title),
-        actions: <Widget>[
-          PopupMenuButton<PopupAction>(
-            onSelected: (PopupAction value) {
-              if (value == PopupAction.delete) {
-                deleteSelected();
-              }
-            },
-            icon: Icon(Icons.more_vert),
-            itemBuilder: (context) => [
-                  PopupMenuItem<PopupAction>(
-                    child: Text("Delete"),
-                    value: PopupAction.delete,
-                  )
-                ],
-          )
-        ],
-      );
-    }
-    return AppBar(
-      title: new Text(title),
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.exit_to_app),
-          onPressed: onLogout,
-        )
-      ],
+    return AnimatedTheme(
+      data: selectedtodos.length > 0 ? whiteTheme : primaryTheme,
+      child: AppBar(
+        leading: selectedtodos.length > 0
+            ? IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  unSelectAll();
+                },
+              )
+            : null,
+        title: selectedtodos.length > 0
+            ? new Text(
+                "${selectedtodos.length.toString()} Todo${selectedtodos.length > 1 ? 's' : ''} selected")
+            : new Text(title),
+        actions: selectedtodos.length > 0
+            ? <Widget>[
+                PopupMenuButton<PopupAction>(
+                  onSelected: (PopupAction value) {
+                    if (value == PopupAction.delete) {
+                      deleteSelected();
+                    }
+                  },
+                  icon: Icon(Icons.more_vert),
+                  itemBuilder: (context) => [
+                        PopupMenuItem<PopupAction>(
+                          child: Text("Delete"),
+                          value: PopupAction.delete,
+                        )
+                      ],
+                )
+              ]
+            : [
+                IconButton(
+                  icon: Icon(Icons.exit_to_app),
+                  onPressed: onLogout,
+                ),
+              ],
+      ),
     );
   }
 }

@@ -133,6 +133,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
       title: titleInputController.text,
       dueDate: dueDate,
       project: project,
+      loading: true,
     );
     widget.addTodo(todo);
     if (mounted) {
@@ -181,7 +182,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
                     controller: titleInputController,
                     focusNode: _titleFocusNode,
                     decoration: InputDecoration(
-                      labelText: "Add Todo",
+                      labelText: "Add a task",
                     ),
                     onFieldSubmitted: (title) {
                       _onSave();

@@ -30,8 +30,10 @@ class TodoItem extends StatelessWidget {
         return _TodoItem(
           todo: todo,
           deleteTodo: () => store.dispatch(DeleteItem<Todo>(todo.id)),
-          updateTodo: (Todo updated) =>
-              store.dispatch(UpdateItem<Todo>(todo.id, updated)),
+          updateTodo: (Todo updated) {
+            updated.loading = true;
+            store.dispatch(UpdateItem<Todo>(todo.id, updated));
+          },
           showProject: showProject,
           showDueDate: showDueDate,
           selected: store.state.selectedTodos.contains(todo.id),
@@ -197,37 +199,40 @@ class _TodoItem extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
-        leading: GestureDetector(
-          onTap: () {
-            _toggleCompleted(!(todo.completed == true));
-          },
-          child: Container(
-            width: 36.0,
-            height: 36.0,
-            child: Center(
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: 16.0,
-                height: 16.0,
-                decoration: BoxDecoration(
-                  color: (todo.completed == true)
-                      ? Theme.of(context).accentColor
-                      : Colors.transparent,
-                  border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.all(Radius.circular(18.0)),
+      child: Material(
+        elevation: todo.loading == true ? 10.0 : 0.0,
+        child: ListTile(
+          leading: GestureDetector(
+            onTap: () {
+              _toggleCompleted(!(todo.completed == true));
+            },
+            child: Container(
+              width: 48.0,
+              height: 48.0,
+              child: Center(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 16.0,
+                  height: 16.0,
+                  decoration: BoxDecoration(
+                    color: (todo.completed == true)
+                        ? Theme.of(context).accentColor
+                        : Colors.transparent,
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.all(Radius.circular(18.0)),
+                  ),
                 ),
               ),
             ),
           ),
+          isThreeLine: false,
+          selected: selected,
+          onTap: () {
+            toggleSelected();
+          },
+          title: Text(todo.title),
+          subtitle: _buildSubtitle(),
         ),
-        isThreeLine: false,
-        selected: selected,
-        onTap: () {
-          toggleSelected();
-        },
-        title: Text(todo.title),
-        subtitle: _buildSubtitle(),
       ),
     );
   }
