@@ -8,8 +8,8 @@ import '../models/project.model.dart';
 import '../fastter/fastter_action.dart';
 import '../screens/loading.dart';
 import '../store/state.dart';
-import '../components/hexcolor.dart';
 import '../helpers/navigator.dart';
+import 'projectexpansiontile.dart';
 
 class HomeAppDrawer extends StatelessWidget {
   final bool disablePop;
@@ -61,7 +61,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
   }) {
     navigatorKey.currentState
         .pushReplacementNamed(routeName, arguments: arguments);
-    print(navigatorKey.currentContext);
+    history.add(RouteInfo(routeName, arguments: arguments));
     if (!widget.disablePop) {
       Navigator.pop(context);
     }
@@ -72,8 +72,12 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
     if (navigatorKey == null) {
       return LoadingScreen();
     }
-    final RouteSettings currentRoute =
-        ModalRoute.of(navigatorKey.currentContext).settings;
+    String routeName;
+    if (history.isNotEmpty) {
+      routeName = history.last.routeName;
+    } else {
+      routeName = "/";
+    }
     return Drawer(
       child: ListView(
         children: <Widget>[
@@ -88,7 +92,8 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
                 )
               : Container(),
           ListTile(
-            selected: currentRoute.name == "/",
+            dense: true,
+            selected: routeName == "/",
             leading: Icon(Icons.inbox),
             title: Text("Inbox"),
             onTap: () {
@@ -96,7 +101,8 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             },
           ),
           ListTile(
-            selected: currentRoute.name == "/all",
+            dense: true,
+            selected: routeName == "/all",
             leading: Icon(Icons.select_all),
             title: Text("All Todos"),
             onTap: () {
@@ -104,7 +110,8 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             },
           ),
           ListTile(
-            selected: currentRoute.name == "/today",
+            dense: true,
+            selected: routeName == "/today",
             leading: Icon(Icons.calendar_today),
             title: Text("Today"),
             onTap: () {
@@ -112,30 +119,21 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             },
           ),
           ListTile(
-            selected: currentRoute.name == "/7days",
+            dense: true,
+            selected: routeName == "/7days",
             leading: Icon(Icons.calendar_view_day),
             title: Text("7 Days"),
             onTap: () {
               _pushRouteNamed("/7days");
             },
           ),
-          Column(
-            children: widget.projects.items
-                .map<Widget>(
-                  (project) => ListTile(
-                        selected: currentRoute.name == "/todos",
-                        leading: Icon(
-                          Icons.group_work,
-                          color: HexColor(project.color),
-                        ),
-                        title: new Text(project.title),
-                        onTap: () {
-                          _pushRouteNamed("/todos",
-                              arguments: {'project': project});
-                        },
-                      ),
-                )
-                .toList(),
+          ProjectExpansionTile(
+            selectedProject: routeName == "/todos"
+                ? ((history.last.arguments as Map)['project'] as Project)
+                : null,
+            onChildSelected: (project) {
+              _pushRouteNamed("/todos", arguments: {'project': project});
+            },
           ),
           AboutListTile(
             icon: const Icon(Icons.info),

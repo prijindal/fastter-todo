@@ -3,20 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/todo.model.dart';
+import '../models/project.model.dart';
 import '../fastter/fastter_action.dart';
 import '../store/state.dart';
 import '../store/user.dart';
 import '../store/selectedtodos.dart';
 import '../helpers/theme.dart';
+import '../helpers/navigator.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
-  final String title;
 
-  HomeAppBar({
-    this.title = "Todo App",
-  }) : preferredSize = Size.fromHeight(kToolbarHeight);
+  HomeAppBar() : preferredSize = Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,6 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       builder: (BuildContext context, Store<AppState> store) {
         return _HomeAppBar(
             onLogout: () => store.dispatch(LogoutUserAction()),
-            title: title,
             selectedtodos: store.state.selectedTodos,
             unSelectAll: () {
               store.state.selectedTodos.forEach((todoid) {
@@ -47,7 +45,6 @@ enum _PopupAction { delete }
 
 class _HomeAppBar extends StatelessWidget {
   final void Function() onLogout;
-  final String title;
   final List<String> selectedtodos;
   final VoidCallback deleteSelected;
   final VoidCallback unSelectAll;
@@ -58,8 +55,41 @@ class _HomeAppBar extends StatelessWidget {
     @required this.selectedtodos,
     @required this.deleteSelected,
     @required this.unSelectAll,
-    this.title = "Todo App",
   }) : super(key: key);
+
+  Widget _buildTitle() {
+    if (selectedtodos.length > 0) {
+      return new Text(
+          "${selectedtodos.length.toString()} Todo${selectedtodos.length > 1 ? 's' : ''} selected");
+    }
+    String routeName;
+    if (history.isNotEmpty) {
+      routeName = history.last.routeName;
+    } else {
+      routeName = "/";
+    }
+    String title;
+    switch (routeName) {
+      case "/":
+        title = "Inbox";
+        break;
+      case "/all":
+        title = "All Todos";
+        break;
+      case "/today":
+        title = "Today";
+        break;
+      case "/7days":
+        title = "7 Days";
+        break;
+      case "/todos":
+        title = ((history.last.arguments as Map)['project'] as Project).title;
+        break;
+      default:
+        title = "Todo App";
+    }
+    return Text(title);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,10 +104,7 @@ class _HomeAppBar extends StatelessWidget {
                 },
               )
             : null,
-        title: selectedtodos.length > 0
-            ? new Text(
-                "${selectedtodos.length.toString()} Todo${selectedtodos.length > 1 ? 's' : ''} selected")
-            : new Text(title),
+        title: _buildTitle(),
         actions: selectedtodos.length > 0
             ? <Widget>[
                 PopupMenuButton<_PopupAction>(

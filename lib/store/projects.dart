@@ -17,6 +17,10 @@ final fastterProjects = FastterListRedux<Project, AppState>(
   name: 'project',
   fragment: projectFragment,
   fromJson: (json) => Project.fromJson(json),
-  toInput: (Project obj) => obj.toJson(),
+  toInput: (Project obj) {
+    Map<String, dynamic> json = obj.toJson();
+    json.remove('_id');
+    return json;
+  },
   filterObject: (Project project, Map<String, dynamic> filter) => true,
 );

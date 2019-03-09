@@ -15,7 +15,7 @@ const todoFragment = '''
             title
             color
         }
-        label {
+        labels {
             _id
         }
         createdAt
@@ -31,6 +31,8 @@ final fastterTodos = FastterListRedux<Todo, AppState>(
     Map<String, dynamic> json = obj.toJson();
     json.remove('_id');
     json['project'] = obj.project == null ? null : obj.project.id;
+    json['labels'] =
+        obj.labels == null ? [] : obj.labels.map((l) => l.id).toList();
     return json;
   },
   filterObject: _filterTodo,

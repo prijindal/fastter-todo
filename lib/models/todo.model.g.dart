@@ -22,7 +22,11 @@ Todo _$TodoFromJson(Map<String, dynamic> json) {
           : DateTime.parse(json['updatedAt'] as String),
       project: json['project'] == null
           ? null
-          : Project.fromJson(json['project'] as Map<String, dynamic>));
+          : Project.fromJson(json['project'] as Map<String, dynamic>))
+    ..labels = (json['labels'] as List)
+        ?.map(
+            (e) => e == null ? null : Label.fromJson(e as Map<String, dynamic>))
+        ?.toList();
 }
 
 Map<String, dynamic> _$TodoToJson(Todo instance) => <String, dynamic>{
@@ -32,5 +36,6 @@ Map<String, dynamic> _$TodoToJson(Todo instance) => <String, dynamic>{
       'dueDate': instance.dueDate?.toIso8601String(),
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
-      'project': instance.project
+      'project': instance.project,
+      'labels': instance.labels
     };

@@ -107,30 +107,42 @@ class _TodoItem extends StatelessWidget {
 
   Widget _buildSubtitle() {
     List<Widget> children = [];
-    if (todo.project != null && showProject) {
-      children.add(Flex(
-        direction: Axis.horizontal,
-        children: <Widget>[
-          Flexible(
-            child: Text(todo.project.title),
-          ),
-          Icon(
-            Icons.group_work,
-            color: HexColor(todo.project.color),
-            size: 16.0,
-          ),
-        ],
-      ));
-    }
     if (todo.dueDate != null && showDueDate) {
-      children.add(Text(dueDateFormatter(todo.dueDate)));
+      children.add(
+        Flexible(
+          child: Text(dueDateFormatter(todo.dueDate)),
+        ),
+      );
+    }
+    if (todo.project != null && showProject) {
+      children.add(
+        Flexible(
+          child: Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(todo.project.title),
+              ),
+              Icon(
+                Icons.group_work,
+                color: HexColor(todo.project.color),
+                size: 16.0,
+              ),
+            ],
+          ),
+        ),
+      );
     }
     if (children.isEmpty) {
       return null;
     }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Flex(
+      direction: Axis.horizontal,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: children,
     );
   }
