@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+import '../components/pageroutes.dart';
 import '../models/project.model.dart';
 import '../components/todolist.dart';
 import '../screens/todos.dart';
@@ -23,25 +24,25 @@ class HomeContainer extends StatelessWidget {
 class _HomeContainer extends StatelessWidget {
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     if (settings.isInitialRoute || settings.name == "/") {
-      return MaterialPageRoute(
+      return FadePageRoute(
         builder: (BuildContext context) => InboxScreen(),
       );
     } else if (settings.name == "/all") {
-      return MaterialPageRoute(
+      return FadePageRoute(
         builder: (BuildContext context) => AllTodosScreen(),
       );
     } else if (settings.name == "/today") {
-      return MaterialPageRoute(
+      return FadePageRoute(
         builder: (BuildContext context) => TodayScreen(),
       );
     } else if (settings.name == "/7days") {
-      return MaterialPageRoute(
+      return FadePageRoute(
         builder: (BuildContext context) => SevenDayScreen(),
       );
     } else if (settings.name == "/todos") {
       Map<String, dynamic> arguments = settings.arguments;
       final Project project = arguments['project'];
-      return MaterialPageRoute(
+      return FadePageRoute(
         builder: (BuildContext context) => TodoList(
               filter: {'project': project.id},
               title: project.title,
@@ -49,7 +50,7 @@ class _HomeContainer extends StatelessWidget {
             ),
       );
     }
-    return MaterialPageRoute(
+    return FadePageRoute(
       builder: (BuildContext context) => Scaffold(
             body: Text("404"),
           ),

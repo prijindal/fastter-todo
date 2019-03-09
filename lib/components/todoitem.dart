@@ -144,8 +144,7 @@ class _TodoItem extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildBody(BuildContext context) {
     return Dismissible(
       key: new Key(todo.id),
       confirmDismiss: (direction) async {
@@ -221,6 +220,16 @@ class _TodoItem extends StatelessWidget {
           title: Text(todo.title),
           subtitle: _buildSubtitle(),
         ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: todo.id == null ? "New todo" : todo.id,
+      child: Material(
+        child: _buildBody(context),
       ),
     );
   }
