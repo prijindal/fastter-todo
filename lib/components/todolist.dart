@@ -7,6 +7,7 @@ import 'package:flutter_offline/flutter_offline.dart';
 
 import '../models/base.model.dart';
 import '../models/todo.model.dart';
+import '../models/project.model.dart';
 import '../components/todoinput.dart';
 import '../components/todoitem.dart';
 import '../fastter/fastter_action.dart';
@@ -35,6 +36,7 @@ class TodoList extends StatelessWidget {
       builder: (BuildContext context, Store<AppState> store) {
         return _TodoList(
           selectedTodos: store.state.selectedTodos,
+          projects: store.state.projects,
           todos: ListState<Todo>(
             fetching: store.state.todos.fetching,
             adding: store.state.todos.adding,
@@ -44,6 +46,7 @@ class TodoList extends StatelessWidget {
                 .where((todo) => fastterTodos.filterObject(todo, filter))
                 .toList(),
           ),
+          filter: filter,
           title: title,
           syncStart: () {
             var action = StartSync<Todo>();
@@ -60,17 +63,21 @@ class TodoList extends StatelessWidget {
 
 class _TodoList extends StatefulWidget {
   final ListState<Todo> todos;
+  final ListState<Project> projects;
   final Completer Function() syncStart;
   final String title;
   final bool showProject;
   final bool showDueDate;
   final List<String> selectedTodos;
+  final Map<String, dynamic> filter;
 
   _TodoList({
     Key key,
     @required this.todos,
+    @required this.projects,
     @required this.syncStart,
     @required this.selectedTodos,
+    this.filter = const <String, dynamic>{},
     this.title = "Todos",
     this.showProject = true,
     this.showDueDate = true,
@@ -97,6 +104,10 @@ class _TodoListState extends State<_TodoList> {
         child: widget.selectedTodos.isEmpty
             ? (showInput
                 ? TodoInput(
+                    project: widget.filter.containsKey('project')
+                        ? widget.projects.items.singleWhere(
+                            (project) => project.id == widget.filter['project'])
+                        : null,
                     onBackButton: () {
                       setState(() {
                         showInput = false;
@@ -124,12 +135,25 @@ class _TodoListState extends State<_TodoList> {
     }
     return Stack(
       children: [
-        Flex(
-          direction: Axis.vertical,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Flexible(
-              child: ListView.builder(
+        widget.todos.items.length == 0
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text("No Tasks yet"),
+                    RaisedButton(
+                      child: Text("Add a todo"),
+                      onPressed: () {
+                        setState(() {
+                          showInput = true;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              )
+            : ListView.builder(
                 itemCount: widget.todos.items.length,
                 itemBuilder: (context, index) => TodoItem(
                       todo: widget.todos.items[index],
@@ -137,9 +161,6 @@ class _TodoListState extends State<_TodoList> {
                       showDueDate: widget.showDueDate,
                     ),
               ),
-            ),
-          ],
-        ),
         _buildBottom(),
       ],
     );

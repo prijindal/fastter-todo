@@ -14,7 +14,12 @@ import '../helpers/todouihelpers.dart';
 
 class TodoInput extends StatelessWidget {
   final void Function() onBackButton;
-  TodoInput({Key key, this.onBackButton}) : super(key: key);
+  final Project project;
+  TodoInput({
+    Key key,
+    this.onBackButton,
+    this.project,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +29,7 @@ class TodoInput extends StatelessWidget {
         return _TodoInput(
           addTodo: (todo) => store.dispatch(AddItem<Todo>(todo)),
           onBackButton: onBackButton,
+          project: project,
         );
       },
     );
@@ -33,11 +39,13 @@ class TodoInput extends StatelessWidget {
 class _TodoInput extends StatefulWidget {
   final void Function() onBackButton;
   final void Function(Todo todo) addTodo;
+  final Project project;
 
   _TodoInput({
     Key key,
     @required this.addTodo,
     this.onBackButton,
+    this.project,
   }) : super(key: key);
 
   _TodoInputState createState() => _TodoInputState();
@@ -54,6 +62,9 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   @override
   initState() {
     super.initState();
+    if (widget.project != null) {
+      project = widget.project;
+    }
     WidgetsBinding.instance.addObserver(this);
     if (Platform.isAndroid || Platform.isIOS) {
       subscribingId = KeyboardVisibilityNotification().addNewListener(

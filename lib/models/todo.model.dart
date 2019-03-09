@@ -35,3 +35,15 @@ class Todo extends BaseModel {
 
   Map<String, dynamic> toJson() => _$TodoToJson(this);
 }
+
+class TodoFilter {
+  final Project project;
+  final DateTime gteDueDate;
+  final DateTime lteDueDate;
+
+  const TodoFilter({
+    this.project,
+    this.gteDueDate,
+    this.lteDueDate,
+  });
+}
