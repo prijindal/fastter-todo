@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -30,10 +29,8 @@ class TodoItem extends StatelessWidget {
         return _TodoItem(
           todo: todo,
           deleteTodo: () => store.dispatch(DeleteItem<Todo>(todo.id)),
-          updateTodo: (Todo updated) {
-            updated.loading = true;
-            store.dispatch(UpdateItem<Todo>(todo.id, updated));
-          },
+          updateTodo: (Todo updated) =>
+              store.dispatch(UpdateItem<Todo>(todo.id, updated)),
           showProject: showProject,
           showDueDate: showDueDate,
           selected: store.state.selectedTodos.contains(todo.id),
@@ -192,7 +189,6 @@ class _TodoItem extends StatelessWidget {
         ],
       ),
       child: Material(
-        elevation: todo.loading == true ? 10.0 : 0.0,
         child: ListTile(
           leading: GestureDetector(
             onTap: () {

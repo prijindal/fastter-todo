@@ -138,7 +138,6 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
       title: titleInputController.text,
       dueDate: dueDate,
       project: project,
-      loading: true,
     );
     widget.addTodo(todo);
     if (mounted) {

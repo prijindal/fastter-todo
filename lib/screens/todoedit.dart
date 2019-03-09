@@ -8,10 +8,8 @@ import '../models/project.model.dart';
 import '../store/state.dart';
 import '../fastter/fastter_action.dart';
 import '../helpers/todouihelpers.dart';
-import '../components/hexcolor.dart';
 import '../store/selectedtodos.dart';
 import '../helpers/theme.dart';
-import '../helpers/todouihelpers.dart';
 import '../components/projectdropdown.dart';
 
 class TodoEditScreen extends StatelessWidget {
@@ -30,10 +28,8 @@ class TodoEditScreen extends StatelessWidget {
         return _TodoEditScreen(
             todo: todo,
             projects: store.state.projects,
-            updateTodo: (Todo updated) {
-              updated.loading = true;
-              store.dispatch(UpdateItem<Todo>(todo.id, updated));
-            },
+            updateTodo: (Todo updated) =>
+                store.dispatch(UpdateItem<Todo>(todo.id, updated)),
             deleteTodo: () {
               store.dispatch(UnSelectTodo(todo.id));
               store.dispatch(DeleteItem<Todo>(todo.id));
@@ -179,7 +175,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
             right: 48.0,
             top: headerHeight - 32.0,
             child: FloatingActionButton(
-              child: Icon(Icons.arrow_right),
+              child: Icon(Icons.save),
               onPressed: _onSave,
             ),
           )

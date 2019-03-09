@@ -15,7 +15,6 @@ class Todo extends BaseModel {
     this.createdAt,
     this.updatedAt,
     this.project,
-    this.loading,
   });
 
   factory Todo.fromJson(Map<String, dynamic> json) => _$TodoFromJson(json);
@@ -24,9 +23,6 @@ class Todo extends BaseModel {
   final String id;
   String title;
   bool completed = false;
-
-  @JsonKey(ignore: true)
-  bool loading = false;
 
   DateTime dueDate;
 

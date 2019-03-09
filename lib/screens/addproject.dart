@@ -4,11 +4,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_colorpicker/block_picker.dart';
 
 import '../fastter/fastter_action.dart';
-import '../helpers/navigator.dart';
-import '../models/base.model.dart';
 import '../models/project.model.dart';
 import '../store/state.dart';
-import '../components/hexcolor.dart';
 
 class AddProjectScreen extends StatelessWidget {
   @override
@@ -85,7 +82,7 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
         title: Text("Add new project"),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.arrow_right),
+            icon: Icon(Icons.save),
             onPressed: _onSave,
           )
         ],
