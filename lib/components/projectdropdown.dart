@@ -9,14 +9,16 @@ import '../store/state.dart';
 import '../components/hexcolor.dart';
 
 class ProjectDropdown extends StatelessWidget {
+  final bool expanded;
   final void Function(Project) onSelected;
   final Project selectedProject;
   final void Function() onOpening;
 
   ProjectDropdown({
     @required this.onSelected,
-    @required this.selectedProject,
-    @required this.onOpening,
+    this.selectedProject,
+    this.onOpening,
+    this.expanded = false,
   });
 
   @override
@@ -30,6 +32,7 @@ class ProjectDropdown extends StatelessWidget {
           onSelected: onSelected,
           selectedProject: selectedProject,
           onOpening: onOpening,
+          expanded: expanded,
         );
       },
     );
@@ -42,10 +45,12 @@ class _ProjectDropdown extends StatefulWidget {
     @required this.projects,
     @required this.syncStart,
     @required this.onSelected,
-    @required this.selectedProject,
-    @required this.onOpening,
+    this.selectedProject,
+    this.onOpening,
+    this.expanded = false,
   }) : super(key: key);
 
+  final bool expanded;
   final VoidCallback syncStart;
   final ListState<Project> projects;
   final void Function(Project) onSelected;
@@ -64,7 +69,9 @@ class _ProjectDropdownState extends State<_ProjectDropdown> {
   }
 
   RelativeRect _getPosition() {
-    widget.onOpening();
+    if (widget.onOpening != null) {
+      widget.onOpening();
+    }
     final RenderBox overlay = Overlay.of(context).context.findRenderObject();
     final RenderBox renderBox = _menuKey.currentContext.findRenderObject();
     return RelativeRect.fromRect(
@@ -77,39 +84,69 @@ class _ProjectDropdownState extends State<_ProjectDropdown> {
     );
   }
 
+  _showMenu() {
+    showMenu<Project>(
+      position: _getPosition(),
+      initialValue: widget.selectedProject,
+      context: context,
+      items: widget.projects.items
+          .map((project) => PopupMenuItem<Project>(
+                value: project,
+                child: ListTile(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    widget.onSelected(project);
+                  },
+                  leading: Icon(
+                    Icons.group_work,
+                    color: HexColor(project.color),
+                  ),
+                  title: Text(project.title),
+                ),
+              ))
+          .toList()
+            ..add(PopupMenuItem<Project>(
+              value: null,
+              child: ListTile(
+                onTap: () {
+                  Navigator.of(context).pop();
+                  widget.onSelected(null);
+                },
+                leading: Icon(
+                  Icons.group_work,
+                ),
+                title: Text("Inbox"),
+              ),
+            )),
+    );
+  }
+
+  Icon _buildIcon() {
+    return Icon(
+      Icons.group_work,
+      color: widget.selectedProject == null
+          ? null
+          : HexColor(widget.selectedProject.color),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.expanded) {
+      return ListTile(
+        key: _menuKey,
+        leading: _buildIcon(),
+        title: Text("Project"),
+        subtitle: Text(widget.selectedProject == null
+            ? "Inbox"
+            : widget.selectedProject.title),
+        onTap: _showMenu,
+      );
+    }
     return IconButton(
       key: _menuKey,
-      icon: Icon(
-        Icons.group_work,
-        color: widget.selectedProject == null
-            ? null
-            : HexColor(widget.selectedProject.color),
-      ),
-      onPressed: () {
-        showMenu<Project>(
-          position: _getPosition(),
-          initialValue: widget.selectedProject,
-          context: context,
-          items: widget.projects.items
-              .map((project) => PopupMenuItem<Project>(
-                    value: project,
-                    child: ListTile(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        widget.onSelected(project);
-                      },
-                      leading: Icon(
-                        Icons.group_work,
-                        color: HexColor(project.color),
-                      ),
-                      title: Text(project.title),
-                    ),
-                  ))
-              .toList(),
-        );
-      },
+      icon: _buildIcon(),
+      onPressed: _showMenu,
     );
   }
 }

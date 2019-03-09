@@ -13,6 +13,7 @@ class HomeContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: mainNavigatorKey,
       theme: primaryTheme,
       home: _HomeContainer(),
     );

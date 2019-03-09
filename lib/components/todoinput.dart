@@ -55,7 +55,6 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    this._focusKeyboard();
     if (Platform.isAndroid || Platform.isIOS) {
       subscribingId = KeyboardVisibilityNotification().addNewListener(
           onChange: (bool visible) {
@@ -66,6 +65,12 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
         }
       });
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    this._focusKeyboard();
   }
 
   @override

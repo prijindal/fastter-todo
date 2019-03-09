@@ -43,7 +43,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-enum PopupAction { delete }
+enum _PopupAction { delete }
 
 class _HomeAppBar extends StatelessWidget {
   final void Function() onLogout;
@@ -80,17 +80,17 @@ class _HomeAppBar extends StatelessWidget {
             : new Text(title),
         actions: selectedtodos.length > 0
             ? <Widget>[
-                PopupMenuButton<PopupAction>(
-                  onSelected: (PopupAction value) {
-                    if (value == PopupAction.delete) {
+                PopupMenuButton<_PopupAction>(
+                  onSelected: (_PopupAction value) {
+                    if (value == _PopupAction.delete) {
                       deleteSelected();
                     }
                   },
                   icon: Icon(Icons.more_vert),
                   itemBuilder: (context) => [
-                        PopupMenuItem<PopupAction>(
+                        PopupMenuItem<_PopupAction>(
                           child: Text("Delete"),
-                          value: PopupAction.delete,
+                          value: _PopupAction.delete,
                         )
                       ],
                 )

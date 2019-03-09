@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:async';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_offline/flutter_offline.dart';
 
 import '../models/base.model.dart';
 import '../models/todo.model.dart';
@@ -10,6 +12,7 @@ import '../components/todoitem.dart';
 import '../fastter/fastter_action.dart';
 import '../store/state.dart';
 import '../store/todos.dart';
+import 'todoeditbar.dart';
 
 class TodoList extends StatelessWidget {
   final Map<String, dynamic> filter;
@@ -31,6 +34,7 @@ class TodoList extends StatelessWidget {
       converter: (Store<AppState> store) => store,
       builder: (BuildContext context, Store<AppState> store) {
         return _TodoList(
+          selectedTodos: store.state.selectedTodos,
           todos: ListState<Todo>(
             fetching: store.state.todos.fetching,
             adding: store.state.todos.adding,
@@ -60,11 +64,13 @@ class _TodoList extends StatefulWidget {
   final String title;
   final bool showProject;
   final bool showDueDate;
+  final List<String> selectedTodos;
 
   _TodoList({
     Key key,
     @required this.todos,
     @required this.syncStart,
+    @required this.selectedTodos,
     this.title = "Todos",
     this.showProject = true,
     this.showDueDate = true,
@@ -82,7 +88,35 @@ class _TodoListState extends State<_TodoList> {
     super.initState();
   }
 
-  Widget buildBody() {
+  Positioned _buildBottom() {
+    double position = widget.selectedTodos.isEmpty && !showInput ? 48.0 : 0;
+    return Positioned(
+      bottom: position,
+      right: position,
+      child: Container(
+        child: widget.selectedTodos.isEmpty
+            ? (showInput
+                ? TodoInput(
+                    onBackButton: () {
+                      setState(() {
+                        showInput = false;
+                      });
+                    },
+                  )
+                : FloatingActionButton(
+                    child: Icon(Icons.add),
+                    onPressed: () {
+                      setState(() {
+                        showInput = true;
+                      });
+                    },
+                  ))
+            : TodoEditBar(),
+      ),
+    );
+  }
+
+  Widget _buildBody() {
     if (widget.todos.fetching && widget.todos.items.length == 0) {
       return Center(
         child: CircularProgressIndicator(),
@@ -95,47 +129,18 @@ class _TodoListState extends State<_TodoList> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Flexible(
-              child: ListView(
-                children: widget.todos.items
-                    .map(
-                      (todo) => TodoItem(
-                            todo: todo,
-                            showProject: widget.showProject,
-                            showDueDate: widget.showDueDate,
-                          ),
-                    )
-                    .toList(),
+              child: ListView.builder(
+                itemCount: widget.todos.items.length,
+                itemBuilder: (context, index) => TodoItem(
+                      todo: widget.todos.items[index],
+                      showProject: widget.showProject,
+                      showDueDate: widget.showDueDate,
+                    ),
               ),
             ),
           ],
         ),
-        showInput
-            ? Container()
-            : Positioned(
-                bottom: 48.0,
-                right: 48.0,
-                child: FloatingActionButton(
-                  child: Icon(Icons.add),
-                  onPressed: () {
-                    setState(() {
-                      showInput = true;
-                    });
-                  },
-                ),
-              ),
-        showInput
-            ? Positioned(
-                bottom: 0,
-                right: 0,
-                child: TodoInput(
-                  onBackButton: () {
-                    setState(() {
-                      showInput = false;
-                    });
-                  },
-                ),
-              )
-            : Container(),
+        _buildBottom(),
       ],
     );
   }
@@ -145,11 +150,63 @@ class _TodoListState extends State<_TodoList> {
     return completer.future;
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildChild() {
     return RefreshIndicator(
-      child: buildBody(),
+      child: _buildBody(),
       onRefresh: _onRefresh,
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (Platform.isAndroid || Platform.isIOS) {
+      return OfflineBuilder(
+        connectivityBuilder: (context, connectivity, child) {
+          final bool connected = connectivity != ConnectivityResult.none;
+          return new Stack(
+            fit: StackFit.expand,
+            children: <Widget>[
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 350),
+                padding: EdgeInsets.only(top: connected ? 0 : 24.0),
+                child: child,
+              ),
+              Positioned(
+                height: 32.0,
+                left: 0.0,
+                right: 0.0,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 350),
+                  color: connected ? Colors.transparent : Color(0xFFEE4400),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 350),
+                    child: connected
+                        ? Container()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text('OFFLINE'),
+                              SizedBox(width: 8.0),
+                              SizedBox(
+                                width: 12.0,
+                                height: 12.0,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+        child: _buildChild(),
+      );
+    }
+    return _buildChild();
   }
 }
