@@ -44,7 +44,7 @@ class _GoogleSignInForm extends StatefulWidget {
 
 class _GoogleSignInFormState extends State<_GoogleSignInForm> {
   _startGoogleFlow() {
-    if (Platform.isFuchsia) {
+    if (Platform.isAndroid || Platform.isIOS) {
       GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
       _googleSignIn.signIn().then((account) {
         account.authentication.then((auth) {
