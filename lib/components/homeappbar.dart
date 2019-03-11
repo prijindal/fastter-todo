@@ -103,7 +103,12 @@ class _HomeAppBar extends StatelessWidget {
                   unSelectAll();
                 },
               )
-            : null,
+            : IconButton(
+                icon: Icon(Icons.menu),
+                onPressed: () {
+                  homeScaffoldKey.currentState.openDrawer();
+                },
+              ),
         title: _buildTitle(),
         actions: selectedtodos.length > 0
             ? <Widget>[

@@ -5,7 +5,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import '../models/base.model.dart';
 import '../models/user.model.dart';
 import '../models/project.model.dart';
-import '../fastter/fastter_action.dart';
 import '../screens/loading.dart';
 import '../store/state.dart';
 import '../helpers/navigator.dart';
@@ -23,7 +22,6 @@ class HomeAppDrawer extends StatelessWidget {
         return _HomeAppDrawer(
           user: store.state.user,
           projects: store.state.projects,
-          syncStart: () => store.dispatch(StartSync<Project>()),
           disablePop: disablePop,
         );
       },
@@ -31,38 +29,27 @@ class HomeAppDrawer extends StatelessWidget {
   }
 }
 
-class _HomeAppDrawer extends StatefulWidget {
+class _HomeAppDrawer extends StatelessWidget {
   final UserState user;
   final ListState<Project> projects;
-  final VoidCallback syncStart;
   final bool disablePop;
 
   _HomeAppDrawer({
     Key key,
     @required this.user,
     @required this.projects,
-    @required this.syncStart,
     this.disablePop = false,
   }) : super(key: key);
 
-  __HomeAppDrawerState createState() => __HomeAppDrawerState();
-}
-
-class __HomeAppDrawerState extends State<_HomeAppDrawer> {
-  @override
-  void initState() {
-    widget.syncStart();
-    super.initState();
-  }
-
   void _pushRouteNamed(
+    BuildContext context,
     String routeName, {
     Object arguments,
   }) {
     navigatorKey.currentState
         .pushReplacementNamed(routeName, arguments: arguments);
     history.add(RouteInfo(routeName, arguments: arguments));
-    if (!widget.disablePop) {
+    if (!disablePop) {
       Navigator.pop(context);
     }
   }
@@ -81,14 +68,14 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
     return Drawer(
       child: ListView(
         children: <Widget>[
-          widget.user != null && widget.user.user != null
+          user != null && user.user != null
               ? UserAccountsDrawerHeader(
                   currentAccountPicture: Icon(
                     Icons.person,
                     color: Colors.white,
                   ),
-                  accountName: Text(widget.user.user.email),
-                  accountEmail: Text(widget.user.user.email),
+                  accountName: Text(user.user.email),
+                  accountEmail: Text(user.user.email),
                 )
               : Container(),
           ListTile(
@@ -97,7 +84,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.inbox),
             title: Text("Inbox"),
             onTap: () {
-              _pushRouteNamed("/");
+              _pushRouteNamed(context, "/");
             },
           ),
           ListTile(
@@ -106,7 +93,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.select_all),
             title: Text("All Todos"),
             onTap: () {
-              _pushRouteNamed("/all");
+              _pushRouteNamed(context, "/all");
             },
           ),
           ListTile(
@@ -115,7 +102,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.calendar_today),
             title: Text("Today"),
             onTap: () {
-              _pushRouteNamed("/today");
+              _pushRouteNamed(context, "/today");
             },
           ),
           ListTile(
@@ -124,7 +111,7 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
             leading: Icon(Icons.calendar_view_day),
             title: Text("7 Days"),
             onTap: () {
-              _pushRouteNamed("/7days");
+              _pushRouteNamed(context, "/7days");
             },
           ),
           ProjectExpansionTile(
@@ -132,7 +119,8 @@ class __HomeAppDrawerState extends State<_HomeAppDrawer> {
                 ? ((history.last.arguments as Map)['project'] as Project)
                 : null,
             onChildSelected: (project) {
-              _pushRouteNamed("/todos", arguments: {'project': project});
+              _pushRouteNamed(context, "/todos",
+                  arguments: {'project': project});
             },
           ),
           AboutListTile(

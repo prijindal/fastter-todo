@@ -11,14 +11,10 @@ import '../store/selectedtodos.dart';
 
 class TodoItem extends StatelessWidget {
   final Todo todo;
-  final bool showProject;
-  final bool showDueDate;
 
   TodoItem({
     Key key,
     @required this.todo,
-    this.showProject = true,
-    this.showDueDate = true,
   }) : super(key: key);
 
   @override
@@ -31,8 +27,6 @@ class TodoItem extends StatelessWidget {
           deleteTodo: () => store.dispatch(DeleteItem<Todo>(todo.id)),
           updateTodo: (Todo updated) =>
               store.dispatch(UpdateItem<Todo>(todo.id, updated)),
-          showProject: showProject,
-          showDueDate: showDueDate,
           selected: store.state.selectedTodos.contains(todo.id),
           toggleSelected: () => store.dispatch(ToggleSelectTodo(todo.id)),
         );
@@ -49,9 +43,6 @@ class _TodoItem extends StatelessWidget {
   final bool selected;
   final VoidCallback toggleSelected;
 
-  final bool showProject;
-  final bool showDueDate;
-
   _TodoItem({
     Key key,
     @required this.todo,
@@ -59,8 +50,6 @@ class _TodoItem extends StatelessWidget {
     @required this.updateTodo,
     @required this.selected,
     @required this.toggleSelected,
-    this.showProject = true,
-    this.showDueDate = true,
   }) : super(key: key);
 
   _selectDate(BuildContext context) {
@@ -104,14 +93,14 @@ class _TodoItem extends StatelessWidget {
 
   Widget _buildSubtitle() {
     List<Widget> children = [];
-    if (todo.dueDate != null && showDueDate) {
+    if (todo.dueDate != null) {
       children.add(
         Flexible(
           child: Text(dueDateFormatter(todo.dueDate)),
         ),
       );
     }
-    if (todo.project != null && showProject) {
+    if (todo.project != null) {
       children.add(
         Flexible(
           child: Flex(
@@ -160,7 +149,7 @@ class _TodoItem extends StatelessWidget {
           deleteTodo();
           Scaffold.of(context).removeCurrentSnackBar();
           Scaffold.of(context)
-              .showSnackBar(SnackBar(content: Text("${todo.title} dismissed")));
+              .showSnackBar(SnackBar(content: Text("${todo.title} deleted")));
         }
       },
       background: Flex(
@@ -212,7 +201,6 @@ class _TodoItem extends StatelessWidget {
               ),
             ),
           ),
-          isThreeLine: false,
           selected: selected,
           onTap: () {
             toggleSelected();

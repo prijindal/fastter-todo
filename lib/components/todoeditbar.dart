@@ -24,28 +24,40 @@ class TodoEditBar extends StatelessWidget {
       builder: (BuildContext context, Store<AppState> store) {
         void onMarkCompleted() {
           store.state.selectedTodos.forEach((todoid) {
-            Todo todo = store.state.todos.items
-                .singleWhere((item) => item.id == todoid);
-            todo.completed = true;
-            store.dispatch(UpdateItem<Todo>(todoid, todo));
+            if (store.state.todos.items.isNotEmpty) {
+              Todo todo = store.state.todos.items
+                  .singleWhere((item) => item.id == todoid);
+              if (todo != null) {
+                todo.completed = true;
+                store.dispatch(UpdateItem<Todo>(todoid, todo));
+              }
+            }
           });
         }
 
         void onChangeDate(DateTime date) {
           store.state.selectedTodos.forEach((todoid) {
-            Todo todo = store.state.todos.items
-                .singleWhere((item) => item.id == todoid);
-            todo.dueDate = date;
-            store.dispatch(UpdateItem<Todo>(todoid, todo));
+            if (store.state.todos.items.isNotEmpty) {
+              Todo todo = store.state.todos.items
+                  .singleWhere((item) => item.id == todoid);
+              if (todo != null) {
+                todo.dueDate = date;
+                store.dispatch(UpdateItem<Todo>(todoid, todo));
+              }
+            }
           });
         }
 
         void onChangeProject(Project project) {
           store.state.selectedTodos.forEach((todoid) {
-            Todo todo = store.state.todos.items
-                .singleWhere((item) => item.id == todoid);
-            todo.project = project;
-            store.dispatch(UpdateItem<Todo>(todoid, todo));
+            if (store.state.todos.items.isNotEmpty) {
+              Todo todo = store.state.todos.items
+                  .singleWhere((item) => item.id == todoid);
+              if (todo != null) {
+                todo.project = project;
+                store.dispatch(UpdateItem<Todo>(todoid, todo));
+              }
+            }
           });
         }
 
@@ -61,7 +73,7 @@ class TodoEditBar extends StatelessWidget {
   }
 }
 
-class _TodoEditBar extends StatefulWidget {
+class _TodoEditBar extends StatelessWidget {
   final List<String> selectedTodos;
   final ListState<Todo> todos;
   final VoidCallback onMarkCompleted;
@@ -77,66 +89,66 @@ class _TodoEditBar extends StatefulWidget {
     @required this.onChangeProject,
   }) : super(key: key);
 
-  __TodoEditBarState createState() => __TodoEditBarState();
-}
-
-class __TodoEditBarState extends State<_TodoEditBar> {
-  Future<void> _showDatePicker() async {
+  Future<void> _showDatePicker(BuildContext context) async {
     DateTime selectedDate = await todoSelectDate(context);
-    widget.onChangeDate(selectedDate);
+    onChangeDate(selectedDate);
   }
 
   Widget _buildMarkCompletedButton() {
     return IconButton(
       icon: Icon(Icons.check),
-      onPressed: widget.onMarkCompleted,
+      onPressed: onMarkCompleted,
     );
   }
 
-  Widget _buildChangeDateButton() {
+  Widget _buildChangeDateButton(BuildContext context) {
     return IconButton(
       icon: Icon(
         Icons.calendar_today,
         color: Theme.of(context).accentColor,
       ),
-      onPressed: _showDatePicker,
+      onPressed: () => _showDatePicker(context),
     );
   }
 
   Widget _buildEditButton() {
-    String todoid = widget.selectedTodos[0];
-    Todo todo = widget.todos.items.singleWhere((item) => item.id == todoid);
-    return IconButton(
-      icon: Icon(Icons.edit),
-      onPressed: () {
-        mainNavigatorKey.currentState.push(
-          MaterialPageRoute(
-            builder: (context) => TodoEditScreen(
-                  todo: todo,
-                ),
-          ),
-        );
-      },
-    );
+    String todoid = selectedTodos[0];
+    if (todos.items.isNotEmpty) {
+      Todo todo = todos.items.singleWhere((item) => item.id == todoid);
+      return IconButton(
+        icon: Icon(Icons.edit),
+        onPressed: () {
+          mainNavigatorKey.currentState.push(
+            MaterialPageRoute(
+              builder: (context) => TodoEditScreen(
+                    todo: todo,
+                  ),
+            ),
+          );
+        },
+      );
+    } else {
+      return null;
+    }
   }
 
   Widget _buildChangeProjectButton() {
     return ProjectDropdown(
-      onSelected: widget.onChangeProject,
+      onSelected: onChangeProject,
     );
   }
 
-  List<Widget> _buildButtons() {
-    if (widget.selectedTodos.length == 1) {
+  List<Widget> _buildButtons(BuildContext context) {
+    if (selectedTodos.length == 1) {
       return <Widget>[
-        _buildChangeDateButton(),
+        _buildChangeDateButton(context),
         _buildEditButton(),
         _buildChangeProjectButton(),
       ];
     }
     return <Widget>[
       _buildMarkCompletedButton(),
-      _buildChangeDateButton(),
+      _buildChangeDateButton(context),
       _buildChangeProjectButton(),
     ];
   }
@@ -152,7 +164,7 @@ class __TodoEditBarState extends State<_TodoEditBar> {
           direction: Axis.horizontal,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: _buildButtons(),
+          children: _buildButtons(context),
         ),
       ),
     );

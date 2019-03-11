@@ -15,7 +15,6 @@ class InboxScreen extends StatelessWidget {
     return TodoList(
       filter: {'project': null},
       title: "Inbox",
-      showProject: false,
     );
   }
 }
@@ -28,7 +27,6 @@ class TodayScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return TodoList(
       title: "Today",
-      showDueDate: false,
       filter: {
         '_operators': {
           'dueDate': {

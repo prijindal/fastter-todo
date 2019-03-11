@@ -48,10 +48,10 @@ class _AppContainerState extends State<_AppContainer> {
   @override
   void initState() {
     super.initState();
-    tryLogin();
+    _tryLogin();
   }
 
-  void tryLogin() async {
+  void _tryLogin() async {
     if (widget.user == null || widget.user.bearer == null) {
       widget.clearAuth();
     } else {

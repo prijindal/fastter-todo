@@ -10,6 +10,7 @@ import '../models/todo.model.dart';
 import '../models/project.model.dart';
 import '../components/todoinput.dart';
 import '../components/todoitem.dart';
+import '../components/homeappbar.dart';
 import '../fastter/fastter_action.dart';
 import '../store/state.dart';
 import '../store/todos.dart';
@@ -18,15 +19,11 @@ import 'todoeditbar.dart';
 class TodoList extends StatelessWidget {
   final Map<String, dynamic> filter;
   final String title;
-  final bool showProject;
-  final bool showDueDate;
 
   TodoList({
     Key key,
     this.filter = const {},
     this.title = "Todos",
-    this.showProject = true,
-    this.showDueDate = true,
   }) : super(key: key);
 
   @override
@@ -53,8 +50,6 @@ class TodoList extends StatelessWidget {
             store.dispatch(action);
             return action.completer;
           },
-          showProject: showProject,
-          showDueDate: showDueDate,
         );
       },
     );
@@ -66,8 +61,6 @@ class _TodoList extends StatefulWidget {
   final ListState<Project> projects;
   final Completer Function() syncStart;
   final String title;
-  final bool showProject;
-  final bool showDueDate;
   final List<String> selectedTodos;
   final Map<String, dynamic> filter;
 
@@ -79,8 +72,6 @@ class _TodoList extends StatefulWidget {
     @required this.selectedTodos,
     this.filter = const <String, dynamic>{},
     this.title = "Todos",
-    this.showProject = true,
-    this.showDueDate = true,
   }) : super(key: key);
 
   _TodoListState createState() => _TodoListState();
@@ -88,12 +79,6 @@ class _TodoList extends StatefulWidget {
 
 class _TodoListState extends State<_TodoList> {
   bool showInput = false;
-
-  @override
-  void initState() {
-    widget.syncStart();
-    super.initState();
-  }
 
   Positioned _buildBottom() {
     double position = widget.selectedTodos.isEmpty && !showInput ? 48.0 : 0;
@@ -104,9 +89,11 @@ class _TodoListState extends State<_TodoList> {
         child: widget.selectedTodos.isEmpty
             ? (showInput
                 ? TodoInput(
-                    project: widget.filter.containsKey('project')
+                    project: (widget.filter.containsKey('project') &&
+                            widget.projects.items.isNotEmpty)
                         ? widget.projects.items.singleWhere(
-                            (project) => project.id == widget.filter['project'])
+                            (project) => project.id == widget.filter['project'],
+                            orElse: () => null)
                         : null,
                     onBackButton: () {
                       setState(() {
@@ -157,8 +144,6 @@ class _TodoListState extends State<_TodoList> {
                 itemCount: widget.todos.items.length,
                 itemBuilder: (context, index) => TodoItem(
                       todo: widget.todos.items[index],
-                      showProject: widget.showProject,
-                      showDueDate: widget.showDueDate,
                     ),
               ),
         _buildBottom(),
@@ -178,8 +163,7 @@ class _TodoListState extends State<_TodoList> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _build() {
     if (Platform.isAndroid || Platform.isIOS) {
       return OfflineBuilder(
         connectivityBuilder: (context, connectivity, child) {
@@ -229,5 +213,13 @@ class _TodoListState extends State<_TodoList> {
       );
     }
     return _buildChild();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: HomeAppBar(),
+      body: _build(),
+    );
   }
 }

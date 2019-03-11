@@ -4,7 +4,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/base.model.dart';
 import '../models/project.model.dart';
-import '../fastter/fastter_action.dart';
 import '../store/state.dart';
 import '../components/hexcolor.dart';
 
@@ -28,7 +27,6 @@ class ProjectDropdown extends StatelessWidget {
       builder: (BuildContext context, Store<AppState> store) {
         return _ProjectDropdown(
           projects: store.state.projects,
-          syncStart: () => store.dispatch(StartSync<Project>()),
           onSelected: onSelected,
           selectedProject: selectedProject,
           onOpening: onOpening,
@@ -39,11 +37,12 @@ class ProjectDropdown extends StatelessWidget {
   }
 }
 
-class _ProjectDropdown extends StatefulWidget {
+class _ProjectDropdown extends StatelessWidget {
+  final GlobalKey _menuKey = GlobalKey();
+
   _ProjectDropdown({
     Key key,
     @required this.projects,
-    @required this.syncStart,
     @required this.onSelected,
     this.selectedProject,
     this.onOpening,
@@ -51,26 +50,14 @@ class _ProjectDropdown extends StatefulWidget {
   }) : super(key: key);
 
   final bool expanded;
-  final VoidCallback syncStart;
   final ListState<Project> projects;
   final void Function(Project) onSelected;
   final Project selectedProject;
   final void Function() onOpening;
 
-  _ProjectDropdownState createState() => _ProjectDropdownState();
-}
-
-class _ProjectDropdownState extends State<_ProjectDropdown> {
-  GlobalKey _menuKey = GlobalKey();
-  @override
-  void initState() {
-    super.initState();
-    widget.syncStart();
-  }
-
-  RelativeRect _getPosition() {
-    if (widget.onOpening != null) {
-      widget.onOpening();
+  RelativeRect _getPosition(BuildContext context) {
+    if (onOpening != null) {
+      onOpening();
     }
     final RenderBox overlay = Overlay.of(context).context.findRenderObject();
     final RenderBox renderBox = _menuKey.currentContext.findRenderObject();
@@ -84,18 +71,18 @@ class _ProjectDropdownState extends State<_ProjectDropdown> {
     );
   }
 
-  _showMenu() {
+  _showMenu(BuildContext context) {
     showMenu<Project>(
-      position: _getPosition(),
-      initialValue: widget.selectedProject,
+      position: _getPosition(context),
+      initialValue: selectedProject,
       context: context,
-      items: widget.projects.items
+      items: projects.items
           .map((project) => PopupMenuItem<Project>(
                 value: project,
                 child: ListTile(
                   onTap: () {
                     Navigator.of(context).pop();
-                    widget.onSelected(project);
+                    onSelected(project);
                   },
                   leading: Icon(
                     Icons.group_work,
@@ -110,7 +97,7 @@ class _ProjectDropdownState extends State<_ProjectDropdown> {
               child: ListTile(
                 onTap: () {
                   Navigator.of(context).pop();
-                  widget.onSelected(null);
+                  onSelected(null);
                 },
                 leading: Icon(
                   Icons.group_work,
@@ -124,29 +111,26 @@ class _ProjectDropdownState extends State<_ProjectDropdown> {
   Icon _buildIcon() {
     return Icon(
       Icons.group_work,
-      color: widget.selectedProject == null
-          ? null
-          : HexColor(widget.selectedProject.color),
+      color: selectedProject == null ? null : HexColor(selectedProject.color),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.expanded) {
+    if (expanded) {
       return ListTile(
         key: _menuKey,
         leading: _buildIcon(),
         title: Text("Project"),
-        subtitle: Text(widget.selectedProject == null
-            ? "Inbox"
-            : widget.selectedProject.title),
-        onTap: _showMenu,
+        subtitle:
+            Text(selectedProject == null ? "Inbox" : selectedProject.title),
+        onTap: () => _showMenu(context),
       );
     }
     return IconButton(
       key: _menuKey,
       icon: _buildIcon(),
-      onPressed: _showMenu,
+      onPressed: () => _showMenu(context),
     );
   }
 }
