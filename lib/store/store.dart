@@ -35,13 +35,19 @@ Future<Store<AppState>> initState() async {
   );
 
   _persistor.load().then((AppState state) {
-    _store.dispatch(
-      InitStateReset(
-        user: state.user,
-        projects: state.projects,
-        todos: state.todos,
-      ),
-    );
+    if (state.user != null &&
+        state.user.user != null &&
+        state.user.bearer != null) {
+      _store.dispatch(
+        InitStateReset(
+          user: state.user,
+          projects: state.projects,
+          todos: state.todos,
+        ),
+      );
+    } else {
+      _store.dispatch(ClearAll());
+    }
   });
 
   return _store;

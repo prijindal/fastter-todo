@@ -20,8 +20,10 @@ dependencies:
   flutter:
     sdk: flutter
   event_bus: any
+  font_awesome_flutter: any
   flutter_colorpicker: any
   flutter_offline: any
+  flutter_signin_button: any
   flutter_redux: any
   google_sign_in: any
   intl: any

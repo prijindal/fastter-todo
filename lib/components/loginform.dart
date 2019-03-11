@@ -40,10 +40,9 @@ class _LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<_LoginForm> {
-  TextEditingController emailController =
-      new TextEditingController(text: "priyanshujindal1995@gmail.com");
+  TextEditingController emailController = new TextEditingController(text: "");
   TextEditingController passwordController =
-      new TextEditingController(text: "admin");
+      new TextEditingController(text: "");
 
   FocusNode emailFocusNode = new FocusNode();
   FocusNode passwordFocusNode = new FocusNode();

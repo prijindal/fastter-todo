@@ -196,6 +196,9 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
                   .map<Widget>(
                     (project) => ListTile(
                           dense: true,
+                          enabled: widget.selectedProject == null
+                              ? true
+                              : widget.selectedProject.id != project.id,
                           selected: widget.selectedProject == null
                               ? false
                               : widget.selectedProject.id == project.id,

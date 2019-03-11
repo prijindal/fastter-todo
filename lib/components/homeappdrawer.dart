@@ -46,8 +46,7 @@ class _HomeAppDrawer extends StatelessWidget {
     String routeName, {
     Object arguments,
   }) {
-    navigatorKey.currentState
-        .pushReplacementNamed(routeName, arguments: arguments);
+    navigatorKey.currentState.pushNamed(routeName, arguments: arguments);
     history.add(RouteInfo(routeName, arguments: arguments));
     if (!disablePop) {
       Navigator.pop(context);
@@ -88,6 +87,7 @@ class _HomeAppDrawer extends StatelessWidget {
               : Container(),
           ListTile(
             dense: true,
+            enabled: routeName != "/",
             selected: routeName == "/",
             leading: Icon(Icons.inbox),
             title: Text("Inbox"),
@@ -97,6 +97,7 @@ class _HomeAppDrawer extends StatelessWidget {
           ),
           ListTile(
             dense: true,
+            enabled: routeName != "/all",
             selected: routeName == "/all",
             leading: Icon(Icons.select_all),
             title: Text("All Todos"),
@@ -106,6 +107,7 @@ class _HomeAppDrawer extends StatelessWidget {
           ),
           ListTile(
             dense: true,
+            enabled: routeName != "/today",
             selected: routeName == "/today",
             leading: Icon(Icons.calendar_today),
             title: Text("Today"),
@@ -115,6 +117,7 @@ class _HomeAppDrawer extends StatelessWidget {
           ),
           ListTile(
             dense: true,
+            enabled: routeName != "/7days",
             selected: routeName == "/7days",
             leading: Icon(Icons.calendar_view_day),
             title: Text("7 Days"),

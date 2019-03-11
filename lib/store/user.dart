@@ -1,3 +1,4 @@
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:redux/redux.dart';
 import '../models/user.model.dart';
 import 'state.dart';
@@ -107,8 +108,11 @@ class UserMiddleware extends MiddlewareClass<AppState> {
       fastter.bearer = action.bearer;
       fastter.user = action.user;
     } else if (action is LogoutUserAction || action is LoginUserError) {
+      store.dispatch(ClearAll());
       fastter.bearer = null;
       fastter.user = null;
+      GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
+      _googleSignIn.signOut();
     } else if (action is LoginUserAction) {
       try {
         fastter.login(action.email, action.password).then((response) {

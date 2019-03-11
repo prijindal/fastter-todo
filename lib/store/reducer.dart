@@ -29,6 +29,14 @@ AppState appStateReducer(AppState state, dynamic action) {
       projects: action.projects,
     );
   }
+  if (action is ClearAll) {
+    return AppState(
+      user: UserState(bearer: null, user: null),
+      rehydrated: true,
+      todos: ListState<Todo>(),
+      projects: ListState<Project>(),
+    );
+  }
   return AppState(
     rehydrated: state.rehydrated,
     user: userReducer(state.user, action),

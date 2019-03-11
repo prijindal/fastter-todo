@@ -3,6 +3,7 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../fastter/fastter.dart';
@@ -75,8 +76,8 @@ class _GoogleSignInFormState extends State<_GoogleSignInForm> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: RaisedButton(
-        child: Text("Google Sign In"),
+      child: SignInButton(
+        Buttons.Google,
         onPressed: _startGoogleFlow,
       ),
     );

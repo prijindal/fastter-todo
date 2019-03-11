@@ -3,6 +3,8 @@ import '../models/base.model.dart';
 import '../models/todo.model.dart';
 import '../models/project.model.dart';
 
+class ClearAll {}
+
 class AppState {
   AppState({
     this.user,
