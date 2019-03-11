@@ -147,24 +147,17 @@ class _HomePageState extends State<_HomePage> {
     queryData = MediaQuery.of(context);
     if (queryData.size.width >= 768) {
       return Material(
-        child: Center(
-          child: Container(
-            constraints: BoxConstraints(
-              maxWidth: min(1200.0, queryData.size.width),
-              maxHeight: min(800.0, queryData.size.height),
+        child: Row(
+          // direction: Axis.horizontal,
+          children: <Widget>[
+            Flexible(
+              flex: 0,
+              child: HomeAppDrawer(
+                disablePop: true,
+              ),
             ),
-            child: Flex(
-              direction: Axis.horizontal,
-              children: <Widget>[
-                Flexible(
-                  child: HomeAppDrawer(
-                    disablePop: true,
-                  ),
-                ),
-                Flexible(child: _buildHomeApp()),
-              ],
-            ),
-          ),
+            Flexible(child: _buildHomeApp()),
+          ],
         ),
       );
     }
