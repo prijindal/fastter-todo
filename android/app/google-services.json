@@ -1,0 +1,44 @@
+{
+  "project_info": {
+    "project_number": "352904497289",
+    "project_id": "fastter"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809815249253:android:4c301a456a30a217",
+        "android_client_info": {
+          "package_name": "com.prijindal.fastter_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "352904497289-9dhrno7ren2novjpg88cpdqbvc17ik02.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.prijindal.fastter_flutter",
+            "certificate_hash": "e2b2dc1297e29e908e76adbe59be76ee55412c12"
+          }
+        },
+        {
+          "client_id": "352904497289-n0a0p2q3jop4dcdfhgjj7av9d4g03m7m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLxlsVDH2nRVRLQ7O91oDGCyb5wpUvHVk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

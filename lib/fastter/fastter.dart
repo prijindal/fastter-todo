@@ -185,9 +185,9 @@ class Fastter {
           mutation(\$email:String!,\$password:String!) {
             login(input: {email: \$email, password:\$password}) {
               bearer
-              user { _id, email }
+              user { ...user }
             }
-          }''',
+          } $userFragment''',
         variables: {
           'email': email,
           'password': password,

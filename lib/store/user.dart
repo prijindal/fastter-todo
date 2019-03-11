@@ -19,6 +19,12 @@ class LoginUserError {
   LoginUserError(this.errorMessage);
 }
 
+class GoogleLoginUserAction {
+  GoogleLoginUserAction(this.idToken);
+
+  final String idToken;
+}
+
 class LoginUserAction {
   LoginUserAction(this.email, this.password);
 
@@ -33,6 +39,13 @@ UserState userReducer(UserState state, dynamic action) {
     return UserState(
       user: null,
       bearer: null,
+      isLoading: true,
+      errorMessage: null,
+    );
+  } else if (action is GoogleLoginUserAction) {
+    return UserState(
+      bearer: null,
+      user: null,
       isLoading: true,
       errorMessage: null,
     );
@@ -76,7 +89,7 @@ class UserMiddleware extends MiddlewareClass<AppState> {
       try {
         fastter
             .request(new Request(
-          query: '{current {_id, email}}',
+          query: '{current {...user}} $userFragment',
         ))
             .then((resp) {
           CurrentData response = CurrentData.fromJson(resp);
@@ -99,6 +112,34 @@ class UserMiddleware extends MiddlewareClass<AppState> {
     } else if (action is LoginUserAction) {
       try {
         fastter.login(action.email, action.password).then((response) {
+          if (response != null && response.login != null) {
+            if (response != null &&
+                response.login != null &&
+                response.login.user != null) {
+              store.dispatch(LoginUserSuccessfull(
+                  response.login.user, response.login.bearer));
+            } else {
+              store.dispatch(LoginUserError('Wrong username password'));
+            }
+          }
+        });
+      } catch (error) {
+        store.dispatch(LoginUserError(error.toString()));
+      }
+    } else if (action is GoogleLoginUserAction) {
+      try {
+        fastter
+            .request(
+          new Request(
+            query:
+                "mutation(\$idToken: String!) {login:loginWithGoogle(input:{idToken:\$idToken}) {bearer, user {...user}}} $userFragment",
+            variables: {
+              'idToken': action.idToken,
+            },
+          ),
+        )
+            .then((resp) {
+          LoginData response = LoginData.fromJson(resp);
           if (response != null && response.login != null) {
             if (response != null &&
                 response.login != null &&

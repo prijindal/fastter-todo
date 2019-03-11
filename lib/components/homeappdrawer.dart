@@ -70,10 +70,16 @@ class _HomeAppDrawer extends StatelessWidget {
         children: <Widget>[
           user != null && user.user != null
               ? UserAccountsDrawerHeader(
-                  currentAccountPicture: Icon(
-                    Icons.person,
-                    color: Colors.white,
-                  ),
+                  currentAccountPicture: user.user.picture == null
+                      ? Icon(
+                          Icons.person,
+                          color: Colors.white,
+                        )
+                      : CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            user.user.picture,
+                          ),
+                        ),
                   accountName: Text(user.user.email),
                   accountEmail: Text(user.user.email),
                 )

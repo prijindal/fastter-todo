@@ -23,6 +23,7 @@ dependencies:
   flutter_colorpicker: any
   flutter_offline: any
   flutter_redux: any
+  google_sign_in: any
   intl: any
   json_annotation: any
   keyboard_visibility: any

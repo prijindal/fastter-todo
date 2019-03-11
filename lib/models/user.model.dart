@@ -9,6 +9,8 @@ class User extends BaseModel {
   User({
     this.id,
     this.email,
+    this.name,
+    this.picture,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
@@ -16,6 +18,8 @@ class User extends BaseModel {
   @JsonKey(name: '_id', nullable: false)
   final String id;
   final String email;
+  final String picture;
+  final String name;
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }
@@ -78,3 +82,12 @@ class UserState {
 
   Map<String, dynamic> toJson() => _$UserStateToJson(this);
 }
+
+String userFragment = '''
+  fragment user on User {
+    _id
+    email
+    name
+    picture
+  }
+''';
