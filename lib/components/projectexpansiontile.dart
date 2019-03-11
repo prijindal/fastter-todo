@@ -139,6 +139,7 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
             iconColor: _iconColor.value,
             textColor: _headerColor.value,
             child: ListTile(
+              dense: true,
               onTap: _handleTap,
               leading: Icon(Icons.group_work),
               title: Row(

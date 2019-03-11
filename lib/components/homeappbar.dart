@@ -6,16 +6,20 @@ import '../models/todo.model.dart';
 import '../models/project.model.dart';
 import '../fastter/fastter_action.dart';
 import '../store/state.dart';
-import '../store/user.dart';
+import '../store/todos.dart';
 import '../store/selectedtodos.dart';
 import '../helpers/theme.dart';
 import '../helpers/navigator.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final Map<String, dynamic> filter;
+
   @override
   final Size preferredSize;
 
-  HomeAppBar() : preferredSize = Size.fromHeight(kToolbarHeight);
+  HomeAppBar({
+    @required this.filter,
+  }) : preferredSize = Size.fromHeight(kToolbarHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -23,38 +27,46 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       converter: (Store<AppState> store) => store,
       builder: (BuildContext context, Store<AppState> store) {
         return _HomeAppBar(
-            onLogout: () => store.dispatch(LogoutUserAction()),
-            selectedtodos: store.state.selectedTodos,
-            unSelectAll: () {
-              store.state.selectedTodos.forEach((todoid) {
-                store.dispatch(UnSelectTodo(todoid));
-              });
-            },
-            deleteSelected: () {
-              store.state.selectedTodos.forEach((todoid) {
-                store.dispatch(DeleteItem<Todo>(todoid));
-                store.dispatch(UnSelectTodo(todoid));
-              });
+          selectedtodos: store.state.selectedTodos,
+          unSelectAll: () {
+            store.state.selectedTodos.forEach((todoid) {
+              store.dispatch(UnSelectTodo(todoid));
             });
+          },
+          deleteSelected: () {
+            store.state.selectedTodos.forEach((todoid) {
+              store.dispatch(DeleteItem<Todo>(todoid));
+              store.dispatch(UnSelectTodo(todoid));
+            });
+          },
+          deleteAll: () {
+            store.state.todos.items
+                .where((todo) => fastterTodos.filterObject(todo, filter))
+                .toList()
+                .forEach((todo) {
+              store.dispatch(DeleteItem<Todo>(todo.id));
+            });
+          },
+        );
       },
     );
   }
 }
 
-enum _PopupAction { delete }
+enum _PopupAction { delete, deleteall }
 
 class _HomeAppBar extends StatelessWidget {
-  final void Function() onLogout;
   final List<String> selectedtodos;
   final VoidCallback deleteSelected;
+  final VoidCallback deleteAll;
   final VoidCallback unSelectAll;
 
   _HomeAppBar({
     Key key,
-    @required this.onLogout,
     @required this.selectedtodos,
     @required this.deleteSelected,
     @required this.unSelectAll,
+    @required this.deleteAll,
   }) : super(key: key);
 
   Widget _buildTitle() {
@@ -91,6 +103,52 @@ class _HomeAppBar extends StatelessWidget {
     return Text(title);
   }
 
+  void _deleteSelected(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: Text("Are you sure"),
+            content: Text("This will delete ${selectedtodos.length} tasks"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Cancel"),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              FlatButton(
+                child: Text("Yes"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  deleteSelected();
+                },
+              ),
+            ],
+          ),
+    );
+  }
+
+  void _deleteAll(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: Text("Are you sure"),
+            content: Text("This will delete all tasks"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Cancel"),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              FlatButton(
+                child: Text("Yes"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  deleteAll();
+                },
+              ),
+            ],
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedTheme(
@@ -110,29 +168,35 @@ class _HomeAppBar extends StatelessWidget {
                 },
               ),
         title: _buildTitle(),
-        actions: selectedtodos.length > 0
-            ? <Widget>[
-                PopupMenuButton<_PopupAction>(
-                  onSelected: (_PopupAction value) {
-                    if (value == _PopupAction.delete) {
-                      deleteSelected();
-                    }
-                  },
-                  icon: Icon(Icons.more_vert),
-                  itemBuilder: (context) => [
-                        PopupMenuItem<_PopupAction>(
-                          child: Text("Delete"),
-                          value: _PopupAction.delete,
-                        )
-                      ],
-                )
-              ]
-            : [
-                IconButton(
-                  icon: Icon(Icons.exit_to_app),
-                  onPressed: onLogout,
-                ),
-              ],
+        actions: [
+          PopupMenuButton<_PopupAction>(
+            onSelected: (_PopupAction value) {
+              if (selectedtodos.length > 0) {
+                if (value == _PopupAction.delete) {
+                  _deleteSelected(context);
+                }
+              } else {
+                if (value == _PopupAction.deleteall) {
+                  _deleteAll(context);
+                }
+              }
+            },
+            icon: Icon(Icons.more_vert),
+            itemBuilder: (context) => selectedtodos.length > 0
+                ? [
+                    PopupMenuItem<_PopupAction>(
+                      child: Text("Delete"),
+                      value: _PopupAction.delete,
+                    )
+                  ]
+                : [
+                    PopupMenuItem<_PopupAction>(
+                      child: Text("Delete All"),
+                      value: _PopupAction.deleteall,
+                    )
+                  ],
+          )
+        ],
       ),
     );
   }

@@ -69,8 +69,10 @@ class _HomeAppDrawer extends StatelessWidget {
       child: ListView(
         children: <Widget>[
           user != null && user.user != null
-              ? UserAccountsDrawerHeader(
-                  currentAccountPicture: user.user.picture == null
+              ? ListTile(
+                  onTap: () =>
+                      Navigator.of(context).pushNamed('/settings/account'),
+                  leading: user.user.picture == null
                       ? Icon(
                           Icons.person,
                           color: Colors.white,
@@ -80,8 +82,8 @@ class _HomeAppDrawer extends StatelessWidget {
                             user.user.picture,
                           ),
                         ),
-                  accountName: Text(user.user.email),
-                  accountEmail: Text(user.user.email),
+                  title: Text(user.user.email),
+                  subtitle: Text(user.user.email),
                 )
               : Container(),
           ListTile(
@@ -129,11 +131,11 @@ class _HomeAppDrawer extends StatelessWidget {
                   arguments: {'project': project});
             },
           ),
-          AboutListTile(
-            icon: const Icon(Icons.info),
-            applicationName: "Fastter Todo App",
-            applicationVersion: "0.0.1",
-          )
+          ListTile(
+            dense: true,
+            title: Text("Settings"),
+            onTap: () => Navigator.of(context).pushNamed('/settings'),
+          ),
         ],
       ),
     );

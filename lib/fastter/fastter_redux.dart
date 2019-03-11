@@ -56,9 +56,9 @@ class FastterListRedux<T extends BaseModel, S> {
           adding: true,
         );
       } else if (action is AddCompletedAction<T>) {
-        if (state.items.isEmpty ||
-            state.items.singleWhere((item) => item.id != action.item.id) !=
-                null) {
+        state.items.removeWhere((item) => item.id == null);
+        if (state.items.where((item) => item.id == action.item.id).length ==
+            0) {
           state.items.insert(0, action.item);
         } else {
           final itemindex =

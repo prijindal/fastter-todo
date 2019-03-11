@@ -3,6 +3,7 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../fastter/fastter.dart';
 import '../models/user.model.dart';
@@ -43,7 +44,7 @@ class _GoogleSignInForm extends StatefulWidget {
 
 class _GoogleSignInFormState extends State<_GoogleSignInForm> {
   _startGoogleFlow() {
-    if (Platform.isAndroid || Platform.isIOS) {
+    if (Platform.isFuchsia) {
       GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
       _googleSignIn.signIn().then((account) {
         account.authentication.then((auth) {
@@ -59,7 +60,7 @@ class _GoogleSignInFormState extends State<_GoogleSignInForm> {
               ),
         ),
       );
-    } else
+    } else {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => _GoogleSignInScreen(
@@ -68,6 +69,7 @@ class _GoogleSignInFormState extends State<_GoogleSignInForm> {
               ),
         ),
       );
+    }
   }
 
   @override
@@ -95,6 +97,13 @@ class _GoogleSignInScreen extends StatefulWidget {
 
 class _GoogleSignInScreenState extends State<_GoogleSignInScreen> {
   TextEditingController _idTokenController = TextEditingController(text: "");
+  final String urlString = URL + "/google/oauth2";
+
+  @override
+  initState() {
+    super.initState();
+    launch(urlString);
+  }
 
   _onLogin() {
     widget.loginWithGoogle(_idTokenController.text);
@@ -103,6 +112,9 @@ class _GoogleSignInScreenState extends State<_GoogleSignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Sign in with google"),
+      ),
       body: widget.user.isLoading
           ? Center(
               child: CircularProgressIndicator(),
@@ -111,7 +123,7 @@ class _GoogleSignInScreenState extends State<_GoogleSignInScreen> {
               child: Column(
                 children: <Widget>[
                   Text("Go to this url"),
-                  Text(URL + "/google/oauth2"),
+                  Text(urlString),
                   Text("And input the string below"),
                   TextField(
                     controller: _idTokenController,
