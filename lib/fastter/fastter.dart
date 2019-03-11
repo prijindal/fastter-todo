@@ -94,9 +94,20 @@ class Fastter {
         print('connected');
       });
       socket.on('graphqlResponse', (dynamic response) {
-        Response resp = Response.fromJson(response);
-        if (this.requests.containsKey(resp.requestId)) {
-          this.requests[resp.requestId].fire(resp);
+        if (response != null) {
+          Response resp = Response.fromJson(response);
+          if (this.requests.containsKey(resp.requestId)) {
+            this.requests[resp.requestId].fire(resp);
+          }
+        }
+      });
+      socket.on('graphqlSubscriptionResponse', (dynamic response) {
+        if (response != null) {
+          response.keys.forEach((key) {
+            if (this.subscriptions.containsKey(key)) {
+              this.subscriptions[key].fire(response[key]);
+            }
+          });
         }
       });
       socket.on('disconnect', (_) => print('disconnect'));
@@ -176,6 +187,12 @@ class Fastter {
         .then((response) {
       ee.fire(Response.fromJson(json.decode(response.body)));
     });
+  }
+
+  EventBus addSubscription(String field) {
+    final ee = EventBus();
+    this.subscriptions[field] = ee;
+    return ee;
   }
 
   Future<LoginData> login(String email, String password) {

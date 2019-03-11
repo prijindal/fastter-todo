@@ -3,6 +3,8 @@ import 'package:redux/redux.dart';
 import '../models/user.model.dart';
 import 'state.dart';
 import '../fastter/fastter.dart';
+import 'projects.dart';
+import 'todos.dart';
 
 class ConfirmUserAction {
   final String bearer;
@@ -107,6 +109,9 @@ class UserMiddleware extends MiddlewareClass<AppState> {
     } else if (action is LoginUserSuccessfull) {
       fastter.bearer = action.bearer;
       fastter.user = action.user;
+
+      fastterProjects.queries.initSubscriptions(store);
+      fastterTodos.queries.initSubscriptions(store);
     } else if (action is LogoutUserAction || action is LoginUserError) {
       store.dispatch(ClearAll());
       fastter.bearer = null;

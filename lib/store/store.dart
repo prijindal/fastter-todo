@@ -38,6 +38,9 @@ Future<Store<AppState>> initState() async {
     if (state.user != null &&
         state.user.user != null &&
         state.user.bearer != null) {
+      fastterProjects.queries.initSubscriptions(_store);
+      fastterTodos.queries.initSubscriptions(_store);
+
       _store.dispatch(
         InitStateReset(
           user: state.user,

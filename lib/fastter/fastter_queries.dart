@@ -1,8 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:redux/redux.dart';
+import 'package:tuple/tuple.dart';
+import 'package:event_bus/event_bus.dart';
 import '../models/base.model.dart';
 import './fastter.dart';
 
-class GraphQLQueries<T extends BaseModel> {
+import 'fastter_action.dart';
+
+class GraphQLQueries<T extends BaseModel, S> {
   final String name;
   final String fragment;
   final T Function(Map<String, dynamic>) fromJson;
@@ -139,5 +144,49 @@ class GraphQLQueries<T extends BaseModel> {
       }
       return null;
     });
+  }
+
+  Future<Tuple3<EventBus, EventBus, EventBus>> initSubscriptions(
+      Store<S> store) async {
+    await fastter.request(new Request(
+      query: '''subscription {
+          ${name}sAdded { ...$name }
+        }
+        $fragment
+        ''',
+    ));
+    await fastter.request(new Request(
+      query: '''subscription {
+          ${name}sUpdated { ...$name }
+        }
+        $fragment
+        ''',
+    ));
+    await fastter.request(new Request(
+      query: '''subscription {
+          ${name}sDeleted { ...$name }
+        }
+        $fragment
+        ''',
+    ));
+    final addEvent = fastter.addSubscription('${name}sAdded');
+    final updateEvent = fastter.addSubscription('${name}sUpdated');
+    final deleteEvent = fastter.addSubscription('${name}sDeleted');
+    addEvent.on<Map<String, dynamic>>().listen((data) {
+      store.dispatch(AddCompletedAction<T>(fromJson(data)));
+    });
+    updateEvent.on<Map<String, dynamic>>().listen((data) {
+      final item = fromJson(data);
+      store.dispatch(UpdateCompletedAction<T>(item.id, item));
+    });
+    deleteEvent.on<Map<String, dynamic>>().listen((data) {
+      final item = fromJson(data);
+      store.dispatch(DeleteCompletedAction<T>(item.id));
+    });
+    return Tuple3<EventBus, EventBus, EventBus>(
+      addEvent,
+      updateEvent,
+      deleteEvent,
+    );
   }
 }

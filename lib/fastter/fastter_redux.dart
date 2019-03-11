@@ -5,7 +5,7 @@ import 'fastter_queries.dart';
 import 'fastter_middleware.dart';
 
 class FastterListRedux<T extends BaseModel, S> {
-  GraphQLQueries queries;
+  GraphQLQueries<T, S> queries;
   ListDataMiddleware<T, S> middleware;
   final String name;
   final String fragment;
@@ -20,7 +20,7 @@ class FastterListRedux<T extends BaseModel, S> {
     @required this.toInput,
     @required this.filterObject,
   }) {
-    queries = GraphQLQueries<T>(
+    queries = GraphQLQueries<T, S>(
       name: name,
       fragment: fragment,
       fromJson: fromJson,

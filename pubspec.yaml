@@ -33,6 +33,7 @@ dependencies:
   redux_persist_flutter: any
   socket_io_client: any
   redux_logging: any
+  tuple: any
   url_launcher: any
   uuid: any
 
