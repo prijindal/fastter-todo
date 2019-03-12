@@ -89,6 +89,7 @@ class _TodoItem extends StatelessWidget {
     if (todo.dueDate != null) {
       children.add(
         Flexible(
+          flex: 0,
           child: Text(dueDateFormatter(todo.dueDate)),
         ),
       );

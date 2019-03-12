@@ -22,10 +22,10 @@ class TodayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => TodoList(
         title: 'Today',
+        dateView: true,
         filter: <String, dynamic>{
           '_operators': {
             'dueDate': {
-              'gte': startOfToday,
               'lte': startOfToday.add(const Duration(days: 1)),
             },
           },
@@ -37,10 +37,10 @@ class SevenDayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => TodoList(
         title: '7 Days',
+        dateView: true,
         filter: <String, dynamic>{
           '_operators': {
             'dueDate': {
-              'gte': startOfToday,
               'lte': startOfToday.add(const Duration(days: 7)),
             },
           },

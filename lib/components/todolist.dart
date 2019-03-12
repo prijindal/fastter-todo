@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +20,15 @@ import 'todoeditbar.dart';
 class TodoList extends StatelessWidget {
   const TodoList({
     this.filter = const <String, dynamic>{},
+    this.dateView = false,
     this.title = 'Todos',
     Key key,
   }) : super(key: key);
 
   final Map<String, dynamic> filter;
+  final bool dateView;
   final String title;
+
   @override
   Widget build(BuildContext context) =>
       StoreConnector<AppState, Store<AppState>>(
@@ -32,6 +36,7 @@ class TodoList extends StatelessWidget {
         builder: (context, store) => _TodoList(
               selectedTodos: store.state.selectedTodos,
               projects: store.state.projects,
+              dateView: dateView,
               todos: ListState<Todo>(
                 fetching: store.state.todos.fetching,
                 adding: store.state.todos.adding,
@@ -58,6 +63,7 @@ class _TodoList extends StatefulWidget {
     @required this.projects,
     @required this.syncStart,
     @required this.selectedTodos,
+    this.dateView = false,
     this.filter = const <String, dynamic>{},
     this.title = 'Todos',
     Key key,
@@ -66,6 +72,7 @@ class _TodoList extends StatefulWidget {
   final ListState<Todo> todos;
   final ListState<Project> projects;
   final Completer Function() syncStart;
+  final bool dateView;
   final String title;
   final List<String> selectedTodos;
   final Map<String, dynamic> filter;
@@ -75,16 +82,16 @@ class _TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<_TodoList> {
-  bool showInput = false;
+  bool _showInput = false;
 
   Positioned _buildBottom() {
-    final position = widget.selectedTodos.isEmpty && !showInput ? 48.0 : 0.0;
+    final position = widget.selectedTodos.isEmpty && !_showInput ? 48.0 : 0.0;
     return Positioned(
       bottom: position,
       right: position,
       child: Container(
         child: widget.selectedTodos.isEmpty
-            ? (showInput
+            ? (_showInput
                 ? TodoInput(
                     project: (widget.filter.containsKey('project') &&
                             widget.projects.items.isNotEmpty)
@@ -94,7 +101,7 @@ class _TodoListState extends State<_TodoList> {
                         : null,
                     onBackButton: () {
                       setState(() {
-                        showInput = false;
+                        _showInput = false;
                       });
                     },
                   )
@@ -103,7 +110,7 @@ class _TodoListState extends State<_TodoList> {
                     child: const Icon(Icons.add),
                     onPressed: () {
                       setState(() {
-                        showInput = true;
+                        _showInput = true;
                       });
                     },
                   ))
@@ -111,6 +118,89 @@ class _TodoListState extends State<_TodoList> {
       ),
     );
   }
+
+  String _dueDateCategorize(DateTime dueDate) {
+    final now = DateTime.now();
+    final diff = dueDate.difference(now);
+    if (diff.inDays < 0) {
+      return "Overschedule";
+    }
+    if (diff.inDays < 2) {
+      if (dueDate.day == now.day) {
+        return 'Today';
+      } else if (dueDate.day == now.day + 1) {
+        return 'Tomorrow';
+      }
+    } else if (diff.inDays < 7 && diff.inDays > 0) {
+      return "This Week";
+    } else if (now.year == dueDate.year) {
+      return DateFormat.MMM().format(dueDate);
+    }
+    return DateFormat.yMMM().format(dueDate);
+  }
+
+  Widget _buildPendingTodos() {
+    if (!widget.dateView) {
+      return Column(
+        children: widget.todos.items
+            .where((todo) => todo.completed != true)
+            .map((todo) => TodoItem(
+                  todo: todo,
+                ))
+            .toList(),
+      );
+    }
+    Map<String, List<Todo>> mapDueDateToList = {};
+
+    final items =
+        widget.todos.items.where((todo) => todo.completed != true).toList();
+    items.sort((a, b) {
+      return a.dueDate.difference(b.dueDate).inDays;
+    });
+
+    for (final todo in items) {
+      String dueDateString = _dueDateCategorize(todo.dueDate);
+      if (!mapDueDateToList.containsKey(dueDateString)) {
+        mapDueDateToList[dueDateString] = [];
+      }
+      mapDueDateToList[dueDateString].add(todo);
+    }
+
+    final children = <ExpansionTile>[];
+
+    for (final dueDateString in mapDueDateToList.keys) {
+      children.add(
+        ExpansionTile(
+          initiallyExpanded: true,
+          title: Text(dueDateString),
+          children: mapDueDateToList[dueDateString]
+              .map((todo) => TodoItem(todo: todo))
+              .toList(),
+        ),
+      );
+    }
+
+    return Column(
+      children: children,
+    );
+  }
+
+  ListView _buildListView() => ListView(
+        children: [
+          _buildPendingTodos(),
+          widget.todos.items.where((todo) => todo.completed == true).isNotEmpty
+              ? ExpansionTile(
+                  title: const Text('Completed'),
+                  children: widget.todos.items
+                      .where((todo) => todo.completed == true)
+                      .map((todo) => TodoItem(
+                            todo: todo,
+                          ))
+                      .toList(),
+                )
+              : Container(),
+        ],
+      );
 
   Widget _buildBody() {
     if (widget.todos.fetching && widget.todos.items.isEmpty) {
@@ -131,19 +221,14 @@ class _TodoListState extends State<_TodoList> {
                       child: const Text('Add a todo'),
                       onPressed: () {
                         setState(() {
-                          showInput = true;
+                          _showInput = true;
                         });
                       },
                     ),
                   ],
                 ),
               )
-            : ListView.builder(
-                itemCount: widget.todos.items.length,
-                itemBuilder: (context, index) => TodoItem(
-                      todo: widget.todos.items[index],
-                    ),
-              ),
+            : _buildListView(),
         _buildBottom(),
       ],
     );
