@@ -1,34 +1,33 @@
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:flutter_colorpicker/block_picker.dart';
 
+import '../components/colorpicker.dart';
 import '../fastter/fastter_action.dart';
 import '../models/project.model.dart';
 import '../store/state.dart';
 
 class AddProjectScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return StoreConnector<AppState, Store<AppState>>(
-      converter: (Store<AppState> store) => store,
-      builder: (BuildContext context, Store<AppState> store) {
-        return _AddProjectScreen(
-          onAddProject: (Project project) =>
-              store.dispatch(AddItem<Project>(project)),
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) => _AddProjectScreen(
+              onAddProject: (project) =>
+                  store.dispatch(AddItem<Project>(project)),
+            ),
+      );
 }
 
 class _AddProjectScreen extends StatefulWidget {
-  final void Function(Project) onAddProject;
-  _AddProjectScreen({
-    Key key,
+  const _AddProjectScreen({
     @required this.onAddProject,
+    Key key,
   }) : super(key: key);
 
+  final void Function(Project) onAddProject;
+
+  @override
   _AddProjectScreenState createState() => _AddProjectScreenState();
 }
 
@@ -36,8 +35,7 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
   TextEditingController titleController = TextEditingController();
   FocusNode titleFocusNode = FocusNode();
 
-  Color _pickerColor = Color(0xff443a49);
-  Color _currentColor = Color(0x443a49);
+  Color _currentColor = const Color(0x443a49);
 
   void _onSave() {
     widget.onAddProject(
@@ -49,30 +47,10 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
     Navigator.of(context).pop();
   }
 
-  void _pickColor() {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-            title: const Text('Pick a color'),
-            content: SingleChildScrollView(
-              child: BlockPicker(
-                pickerColor: _pickerColor,
-                onColorChanged: (Color color) {
-                  _pickerColor = color;
-                },
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text('Got it'),
-                onPressed: () {
-                  setState(() => _currentColor = _pickerColor);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-    );
+  void _pickColor(Color color) {
+    setState(() {
+      _currentColor = color;
+    });
   }
 
   @override
@@ -96,20 +74,10 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
               labelText: 'Title',
             ),
           ),
-          ListTile(
-            onTap: _pickColor,
-            leading: Container(
-              width: 32.0,
-              height: 32.0,
-              decoration: BoxDecoration(
-                color: _currentColor,
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-            ),
-            title: const Text('Color'),
-            subtitle: Text('#${_currentColor.value.toRadixString(16)}'),
-          )
+          ColorPicker(
+            currentValue: _currentColor,
+            onChange: _pickColor,
+          ),
         ],
       ),
     );

@@ -256,7 +256,6 @@ class Fastter {
       });
 
   Future<dynamic> logout() async {
-    print(bearer);
     if (bearer != null && bearer.isNotEmpty) {
       return request(
         Request(

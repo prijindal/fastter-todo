@@ -99,6 +99,7 @@ class _TodoListState extends State<_TodoList> {
                     },
                   )
                 : FloatingActionButton(
+                    heroTag: widget.filter.toString(),
                     child: const Icon(Icons.add),
                     onPressed: () {
                       setState(() {
