@@ -17,11 +17,13 @@ class Project extends BaseModel {
       _$ProjectFromJson(json);
 
   @JsonKey(name: '_id', nullable: false)
+  @override
   final String id;
   final String title;
   final String color;
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  @override
   Map<String, dynamic> toJson() => _$ProjectToJson(this);
 }

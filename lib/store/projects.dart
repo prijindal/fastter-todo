@@ -3,7 +3,7 @@ import '../fastter/fastter_redux.dart';
 import '../models/project.model.dart';
 import './state.dart';
 
-const projectFragment = '''
+const _projectFragment = '''
     fragment project on Project {
         _id
         title
@@ -13,14 +13,15 @@ const projectFragment = '''
     }
 ''';
 
-final fastterProjects = FastterListRedux<Project, AppState>(
+final FastterListRedux<Project, AppState> fastterProjects =
+    FastterListRedux<Project, AppState>(
   name: 'project',
-  fragment: projectFragment,
+  fragment: _projectFragment,
   fromJson: (json) => Project.fromJson(json),
-  toInput: (Project obj) {
-    Map<String, dynamic> json = obj.toJson();
+  toInput: (obj) {
+    final json = obj.toJson();
     json.remove('_id');
     return json;
   },
-  filterObject: (Project project, Map<String, dynamic> filter) => true,
+  filterObject: (project, filter) => true,
 );

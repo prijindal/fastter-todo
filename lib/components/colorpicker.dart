@@ -24,7 +24,7 @@ class _ColorPickerState extends State<ColorPicker> {
             content: SingleChildScrollView(
               child: BlockPicker(
                 pickerColor: _pickerColor,
-                onColorChanged: (Color color) {
+                onColorChanged: (color) {
                   _pickerColor = color;
                 },
               ),
@@ -43,20 +43,18 @@ class _ColorPickerState extends State<ColorPicker> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      onTap: _pickColor,
-      leading: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: widget.currentValue,
-          border: Border.all(color: Colors.black),
-          borderRadius: BorderRadius.circular(16.0),
+  Widget build(BuildContext context) => ListTile(
+        onTap: _pickColor,
+        leading: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: widget.currentValue,
+            border: Border.all(color: Colors.black),
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
-      ),
-      title: const Text('Color'),
-      subtitle: Text('#${widget.currentValue.value.toRadixString(16)}'),
-    );
-  }
+        title: const Text('Color'),
+        subtitle: Text('#${widget.currentValue.value.toRadixString(16)}'),
+      );
 }

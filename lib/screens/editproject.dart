@@ -95,44 +95,42 @@ class _EditProjectScreenState extends State<_EditProjectScreen> {
               ],
             ));
     if (shouldDelete) {
-      navigatorKey.currentState
-          .pushNamedAndRemoveUntil('/', (route) => route.isFirst);
-      history.add(RouteInfo('/'));
       widget.deleteProject();
+      history.add(RouteInfo('/'));
+      await navigatorKey.currentState
+          .pushNamedAndRemoveUntil('/', (route) => route.isFirst);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Project'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _onSave,
-          )
-        ],
-      ),
-      body: ListView(
-        children: [
-          TextField(
-            focusNode: titleFocusNode,
-            controller: titleController,
-            decoration: InputDecoration(
-              labelText: 'Title',
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Edit Project'),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: _onSave,
+            )
+          ],
+        ),
+        body: ListView(
+          children: [
+            TextField(
+              focusNode: titleFocusNode,
+              controller: titleController,
+              decoration: InputDecoration(
+                labelText: 'Title',
+              ),
             ),
-          ),
-          ColorPicker(
-            currentValue: _currentColor,
-            onChange: _pickColor,
-          ),
-          FlatButton(
-            child: const Text('Delete Project'),
-            onPressed: _deleteProject,
-          )
-        ],
-      ),
-    );
-  }
+            ColorPicker(
+              currentValue: _currentColor,
+              onChange: _pickColor,
+            ),
+            FlatButton(
+              child: const Text('Delete Project'),
+              onPressed: _deleteProject,
+            )
+          ],
+        ),
+      );
 }

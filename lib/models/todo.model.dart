@@ -1,8 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 
 import 'base.model.dart';
-import 'project.model.dart';
 import 'label.model.dart';
+import 'project.model.dart';
 part 'todo.model.g.dart';
 
 @JsonSerializable()
@@ -20,6 +20,7 @@ class Todo extends BaseModel {
   factory Todo.fromJson(Map<String, dynamic> json) => _$TodoFromJson(json);
 
   @JsonKey(name: '_id', nullable: false)
+  @override
   final String id;
   String title;
   bool completed = false;
@@ -33,17 +34,6 @@ class Todo extends BaseModel {
   Project project;
   List<Label> labels;
 
+  @override
   Map<String, dynamic> toJson() => _$TodoToJson(this);
-}
-
-class TodoFilter {
-  final Project project;
-  final DateTime gteDueDate;
-  final DateTime lteDueDate;
-
-  const TodoFilter({
-    this.project,
-    this.gteDueDate,
-    this.lteDueDate,
-  });
 }

@@ -16,11 +16,13 @@ class User extends BaseModel {
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   @JsonKey(name: '_id', nullable: false)
+  @override
   final String id;
   final String email;
   final String picture;
   final String name;
 
+  @override
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }
 
@@ -45,9 +47,10 @@ class LoginData extends Object {
   LoginData({
     this.login,
   });
-  LoginField login;
   factory LoginData.fromJson(Map<String, dynamic> json) =>
       _$LoginDataFromJson(json);
+
+  LoginField login;
 
   Map<String, dynamic> toJson() => _$LoginDataToJson(this);
 }
@@ -57,20 +60,16 @@ class CurrentData extends Object {
   CurrentData({
     this.current,
   });
-  User current;
   factory CurrentData.fromJson(Map<String, dynamic> json) =>
       _$CurrentDataFromJson(json);
+
+  User current;
 
   Map<String, dynamic> toJson() => _$CurrentDataToJson(this);
 }
 
 @JsonSerializable()
 class UserState {
-  final User user;
-  final String bearer;
-  final bool isLoading;
-  final String errorMessage;
-
   UserState({
     @required this.user,
     @required this.bearer,
@@ -79,6 +78,11 @@ class UserState {
   });
   factory UserState.fromJson(Map<String, dynamic> json) =>
       _$UserStateFromJson(json);
+
+  final User user;
+  final String bearer;
+  final bool isLoading;
+  final String errorMessage;
 
   Map<String, dynamic> toJson() => _$UserStateToJson(this);
 }

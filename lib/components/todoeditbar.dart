@@ -20,7 +20,7 @@ class TodoEditBar extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) {
           void onMarkCompleted() {
-            store.state.selectedTodos.forEach((todoid) {
+            for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
@@ -29,11 +29,11 @@ class TodoEditBar extends StatelessWidget {
                   store.dispatch(UpdateItem<Todo>(todoid, todo));
                 }
               }
-            });
+            }
           }
 
           void onChangeDate(DateTime date) {
-            store.state.selectedTodos.forEach((todoid) {
+            for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
@@ -42,11 +42,11 @@ class TodoEditBar extends StatelessWidget {
                   store.dispatch(UpdateItem<Todo>(todoid, todo));
                 }
               }
-            });
+            }
           }
 
           void onChangeProject(Project project) {
-            store.state.selectedTodos.forEach((todoid) {
+            for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
@@ -55,7 +55,7 @@ class TodoEditBar extends StatelessWidget {
                   store.dispatch(UpdateItem<Todo>(todoid, todo));
                 }
               }
-            });
+            }
           }
 
           return _TodoEditBar(

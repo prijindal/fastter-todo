@@ -11,7 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fastter_flutter/routes/root.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Counter increments smoke test', (tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(RootContainer());
 

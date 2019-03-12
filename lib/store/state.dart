@@ -14,14 +14,6 @@ class AppState {
     this.selectedTodos = const [],
   });
 
-  bool rehydrated;
-  UserState user;
-  ListState<Todo> todos;
-  ListState<Project> projects;
-
-  // Temporary state of the app
-  List<String> selectedTodos = [];
-
   factory AppState.fromJson(dynamic json) {
     if (json != null && json['user'] != null) {
       return AppState(
@@ -45,6 +37,14 @@ class AppState {
       return AppState();
     }
   }
+
+  bool rehydrated;
+  UserState user;
+  ListState<Todo> todos;
+  ListState<Project> projects;
+
+  // Temporary state of the app
+  List<String> selectedTodos = [];
 
   Map<String, dynamic> toJson() => <String, dynamic>{
         'user': user != null ? user.toJson() : <String, dynamic>{},

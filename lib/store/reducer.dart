@@ -1,13 +1,15 @@
 import 'package:meta/meta.dart';
+
+import '../models/base.model.dart';
+import '../models/project.model.dart';
+import '../models/todo.model.dart';
 import '../models/user.model.dart';
-import 'user.dart';
-import 'todos.dart';
+import './state.dart';
+
 import 'projects.dart';
 import 'selectedtodos.dart';
-import '../models/base.model.dart';
-import '../models/todo.model.dart';
-import '../models/project.model.dart';
-import './state.dart';
+import 'todos.dart';
+import 'user.dart';
 
 class InitStateReset {
   InitStateReset({
@@ -33,8 +35,8 @@ AppState appStateReducer(AppState state, dynamic action) {
     return AppState(
       user: UserState(bearer: null, user: null),
       rehydrated: true,
-      todos: ListState<Todo>(),
-      projects: ListState<Project>(),
+      todos: const ListState<Todo>(),
+      projects: const ListState<Project>(),
     );
   }
   return AppState(

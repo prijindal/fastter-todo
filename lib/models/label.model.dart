@@ -15,10 +15,12 @@ class Label extends BaseModel {
   factory Label.fromJson(Map<String, dynamic> json) => _$LabelFromJson(json);
 
   @JsonKey(name: '_id', nullable: false)
+  @override
   final String id;
   final String title;
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  @override
   Map<String, dynamic> toJson() => _$LabelToJson(this);
 }

@@ -7,23 +7,23 @@ import '../store/state.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return StoreConnector<AppState, Store<AppState>>(
-      converter: (Store<AppState> store) => store,
-      builder: (BuildContext context, Store<AppState> store) {
-        return _ProfileScreen(
-          user: store.state.user,
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) => _ProfileScreen(
+              user: store.state.user,
+            ),
+      );
 }
 
 class _ProfileScreen extends StatefulWidget {
+  const _ProfileScreen({
+    @required this.user,
+    Key key,
+  }) : super(key: key);
   final UserState user;
 
-  _ProfileScreen({Key key, @required this.user}) : super(key: key);
-
+  @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
@@ -34,19 +34,19 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-            title: Text("Type your name"),
+            title: const Text('Type your name'),
             content: TextFormField(
               initialValue: user.name,
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text("Cancel"),
+                child: const Text('Cancel'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
-                child: Text("Save"),
+                child: const Text('Save'),
                 onPressed: () {
                   // Save name
                 },
@@ -60,20 +60,20 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-            title: Text("Type your Email"),
+            title: const Text('Type your Email'),
             content: TextFormField(
               initialValue: user.email,
               keyboardType: TextInputType.emailAddress,
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text("Cancel"),
+                child: const Text('Cancel'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
-                child: Text("Save"),
+                child: const Text('Save'),
                 onPressed: () {
                   // Save name
                 },
@@ -87,20 +87,20 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-            title: Text("Type your Password"),
+            title: const Text('Type your Password'),
             content: TextFormField(
               keyboardType: TextInputType.text,
               obscureText: true,
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text("Cancel"),
+                child: const Text('Cancel'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
-                child: Text("Save"),
+                child: const Text('Save'),
                 onPressed: () {
                   // Save name
                 },
@@ -114,17 +114,18 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-            title: Text("Are you sure?"),
-            content: Text("All the tasks and projects will also be deleted"),
+            title: const Text('Are you sure?'),
+            content:
+                const Text('All the tasks and projects will also be deleted'),
             actions: <Widget>[
               FlatButton(
-                child: Text("No"),
+                child: const Text('No'),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               FlatButton(
-                child: Text("Yes"),
+                child: const Text('Yes'),
                 onPressed: () {
                   // Save name
                 },
@@ -135,45 +136,43 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Account"),
-      ),
-      body: ListView(
-        children: <Widget>[
-          ListTile(
-            title: Text("Avatar"),
-            trailing: user.picture == null
-                ? Icon(
-                    Icons.person,
-                    color: Colors.white,
-                  )
-                : CircleAvatar(
-                    backgroundImage: NetworkImage(user.picture),
-                  ),
-          ),
-          ListTile(
-            title: Text("Name"),
-            subtitle: Text(user.name),
-            onTap: _editName,
-          ),
-          ListTile(
-            title: Text("Email"),
-            subtitle: Text(user.email),
-            onTap: _editEmail,
-          ),
-          ListTile(
-            title: Text("Password"),
-            subtitle: Text("Change your password"),
-            onTap: _changePassword,
-          ),
-          ListTile(
-            title: Text("Delete your account"),
-            onTap: _deleteAccount,
-          )
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Account'),
+        ),
+        body: ListView(
+          children: <Widget>[
+            ListTile(
+              title: const Text('Avatar'),
+              trailing: user.picture == null
+                  ? const Icon(
+                      Icons.person,
+                      color: Colors.white,
+                    )
+                  : CircleAvatar(
+                      backgroundImage: NetworkImage(user.picture),
+                    ),
+            ),
+            ListTile(
+              title: const Text('Name'),
+              subtitle: Text(user.name),
+              onTap: _editName,
+            ),
+            ListTile(
+              title: const Text('Email'),
+              subtitle: Text(user.email),
+              onTap: _editEmail,
+            ),
+            ListTile(
+              title: const Text('Password'),
+              subtitle: const Text('Change your password'),
+              onTap: _changePassword,
+            ),
+            ListTile(
+              title: const Text('Delete your account'),
+              onTap: _deleteAccount,
+            )
+          ],
+        ),
+      );
 }

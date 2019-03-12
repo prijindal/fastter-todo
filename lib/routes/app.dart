@@ -17,7 +17,7 @@ class AppContainer extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _AppContainer(
               user: store.state.user,
-              confirmUser: (String bearer) =>
+              confirmUser: (bearer) =>
                   store.dispatch(ConfirmUserAction(bearer)),
               clearAuth: () => store.dispatch(LogoutUserAction()),
               rehydrated: store.state.rehydrated,

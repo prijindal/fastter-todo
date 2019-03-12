@@ -60,14 +60,12 @@ class _HomeContainer extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: mainNavigatorKey,
-      theme: primaryTheme,
-      onGenerateRoute: _onGenerateRoute,
-      initialRoute: '/',
-    );
-  }
+  Widget build(BuildContext context) => MaterialApp(
+        navigatorKey: mainNavigatorKey,
+        theme: primaryTheme,
+        onGenerateRoute: _onGenerateRoute,
+        initialRoute: '/',
+      );
 }
 
 class _HomePage extends StatefulWidget {
@@ -109,7 +107,7 @@ class _HomePageState extends State<_HomePage> {
         builder: (context) => SevenDayScreen(),
       );
     } else if (settings.name == '/todos') {
-      Map<String, dynamic> arguments = settings.arguments;
+      final Map<String, dynamic> arguments = settings.arguments;
       final Project project = arguments['project'];
       return MaterialPageRoute<void>(
         builder: (context) => TodoList(
@@ -125,17 +123,15 @@ class _HomePageState extends State<_HomePage> {
     );
   }
 
-  Widget _buildHomeApp() {
-    return AnimatedTheme(
-      data: primaryTheme,
-      isMaterialAppTheme: true,
-      child: Navigator(
-        initialRoute: '/',
-        onGenerateRoute: _onGenerateRoute,
-        key: navigatorKey,
-      ),
-    );
-  }
+  Widget _buildHomeApp() => AnimatedTheme(
+        data: primaryTheme,
+        isMaterialAppTheme: true,
+        child: Navigator(
+          initialRoute: '/',
+          onGenerateRoute: _onGenerateRoute,
+          key: navigatorKey,
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {

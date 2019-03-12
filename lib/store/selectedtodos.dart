@@ -17,7 +17,7 @@ class UnSelectTodo {
 }
 
 List<String> selectedTodos(
-    [List<String> state = const <String>[], dynamic action = null]) {
+    [List<String> state = const <String>[], dynamic action]) {
   if (action is ToggleSelectTodo) {
     if (state.contains(action.todoid)) {
       return List<String>.from(state)..remove(action.todoid);

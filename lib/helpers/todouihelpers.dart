@@ -8,9 +8,7 @@ Future<DateTime> todoSelectDate(BuildContext context, [DateTime initialDate]) {
     initialDate: initialDate == null ? now : initialDate,
     firstDate: now.subtract(const Duration(days: 365)),
     lastDate: now.add(const Duration(days: 365)),
-  ).then((date) {
-    return DateTime(date.year, date.month, date.day, 0, 0, 0);
-  });
+  ).then((date) => DateTime(date.year, date.month, date.day, 0, 0, 0));
   return selectedDate;
 }
 

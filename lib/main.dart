@@ -44,7 +44,7 @@ Future<void> main() async {
   };
   final store = await initState();
 
-  runZoned<Future<void>>(() async {
+  await runZoned<Future<void>>(() async {
     runApp(FlutterReduxApp(store));
   }, onError: (Object error, StackTrace stackTrace) async {
     debugPrint(error.toString());

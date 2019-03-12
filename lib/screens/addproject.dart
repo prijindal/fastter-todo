@@ -35,7 +35,7 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
   TextEditingController titleController = TextEditingController();
   FocusNode titleFocusNode = FocusNode();
 
-  Color _currentColor = const Color(0x443a49);
+  Color _currentColor = const Color(0xff443a49);
 
   void _onSave() {
     widget.onAddProject(
@@ -54,32 +54,30 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add new project'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _onSave,
-          )
-        ],
-      ),
-      body: ListView(
-        children: [
-          TextField(
-            focusNode: titleFocusNode,
-            controller: titleController,
-            decoration: InputDecoration(
-              labelText: 'Title',
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Add new project'),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: _onSave,
+            )
+          ],
+        ),
+        body: ListView(
+          children: [
+            TextField(
+              focusNode: titleFocusNode,
+              controller: titleController,
+              decoration: InputDecoration(
+                labelText: 'Title',
+              ),
             ),
-          ),
-          ColorPicker(
-            currentValue: _currentColor,
-            onChange: _pickColor,
-          ),
-        ],
-      ),
-    );
-  }
+            ColorPicker(
+              currentValue: _currentColor,
+              onChange: _pickColor,
+            ),
+          ],
+        ),
+      );
 }

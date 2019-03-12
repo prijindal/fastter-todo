@@ -85,7 +85,7 @@ class _TodoItem extends StatelessWidget {
   }
 
   Widget _buildSubtitle() {
-    final List<Widget> children = [];
+    final children = <Widget>[];
     if (todo.dueDate != null) {
       children.add(
         Flexible(

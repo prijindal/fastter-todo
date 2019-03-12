@@ -31,24 +31,22 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
               selectedtodos: store.state.selectedTodos,
               filter: filter,
               unSelectAll: () {
-                store.state.selectedTodos.forEach((todoid) {
+                for (final todoid in store.state.selectedTodos) {
                   store.dispatch(UnSelectTodo(todoid));
-                });
+                }
               },
               projects: store.state.projects,
               deleteSelected: () {
-                store.state.selectedTodos.forEach((todoid) {
+                for (final todoid in store.state.selectedTodos) {
                   store.dispatch(DeleteItem<Todo>(todoid));
                   store.dispatch(UnSelectTodo(todoid));
-                });
+                }
               },
               deleteAll: () {
-                store.state.todos.items
-                    .where((todo) => fastterTodos.filterObject(todo, filter))
-                    .toList()
-                    .forEach((todo) {
+                for (final todo in store.state.todos.items
+                    .where((todo) => fastterTodos.filterObject(todo, filter))) {
                   store.dispatch(DeleteItem<Todo>(todo.id));
-                });
+                }
               },
             ),
       );
@@ -74,14 +72,13 @@ class _HomeAppBar extends StatelessWidget {
   final VoidCallback unSelectAll;
   final ListState<Project> projects;
 
-  Project get _project => projects.items.singleWhere(
-      (item) => item.id == (filter['project'] as String),
-      orElse: () => null);
+  Project get _project => projects.items
+      .singleWhere((item) => item.id == filter['project'], orElse: () => null);
 
   Widget _buildTitle() {
     if (selectedtodos.isNotEmpty) {
-      return Text(
-          '${selectedtodos.length.toString()} Todo${selectedtodos.length > 1 ? 's' : ''} selected');
+      return Text('${selectedtodos.length.toString()} '
+          'Todo${selectedtodos.length > 1 ? 's' : ''} selected');
     }
     String routeName;
     if (history.isNotEmpty) {
@@ -197,7 +194,7 @@ class _HomeAppBar extends StatelessWidget {
                 )
               ];
             } else {
-              List<PopupMenuItem<_PopupAction>> items = [];
+              final items = <PopupMenuItem<_PopupAction>>[];
               if (_project != null) {
                 items.add(PopupMenuItem<_PopupAction>(
                   child: const Text('Edit Project'),

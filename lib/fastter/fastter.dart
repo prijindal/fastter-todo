@@ -119,11 +119,11 @@ class Fastter {
       });
       socket.on('graphqlSubscriptionResponse', (dynamic response) {
         if (response != null && response is Map<String, dynamic>) {
-          response.keys.forEach((key) {
+          for (final key in response.keys) {
             if (subscriptions.containsKey(key)) {
               subscriptions[key].fire(response[key]);
             }
-          });
+          }
         }
       });
       socket.on('disconnect', (dynamic _) => print('disconnect'));
@@ -270,13 +270,13 @@ class Fastter {
       ).then<dynamic>((data) {
         bearer = null;
         user = null;
-        requests.values.forEach((ee) {
+        for (final ee in requests.values) {
           ee.destroy();
-        });
+        }
         requests = {};
-        subscriptions.values.forEach((ee) {
+        for (final ee in subscriptions.values) {
           ee.destroy();
-        });
+        }
         subscriptions = {};
         return data;
       });
