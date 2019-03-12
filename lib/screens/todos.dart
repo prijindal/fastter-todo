@@ -4,7 +4,9 @@ import '../components/todolist.dart';
 
 class AllTodosScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => const TodoList();
+  Widget build(BuildContext context) => const TodoList(
+        dateView: true,
+      );
 }
 
 class InboxScreen extends StatelessWidget {

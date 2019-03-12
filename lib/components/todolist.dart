@@ -125,14 +125,14 @@ class _TodoListState extends State<_TodoList> {
     if (diff.inDays < 0) {
       return "Overschedule";
     }
-    if (diff.inDays < 2) {
+    if (diff.inDays < 7) {
       if (dueDate.day == now.day) {
         return 'Today';
       } else if (dueDate.day == now.day + 1) {
         return 'Tomorrow';
+      } else {
+        return "This Week";
       }
-    } else if (diff.inDays < 7 && diff.inDays > 0) {
-      return "This Week";
     } else if (now.year == dueDate.year) {
       return DateFormat.MMM().format(dueDate);
     }

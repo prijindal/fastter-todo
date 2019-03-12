@@ -104,6 +104,7 @@ class _TodoItem extends StatelessWidget {
             children: <Widget>[
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8),
+                constraints: BoxConstraints(maxWidth: 200, maxHeight: 40),
                 child: Text(todo.project.title),
               ),
               Icon(
