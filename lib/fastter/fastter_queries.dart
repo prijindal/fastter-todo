@@ -25,7 +25,7 @@ class GraphQLQueries<T extends BaseModel, S> {
     String extraFields = "",
   ]) {
     String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
-    return fastter
+    return Fastter.instance
         .request(
       new Request(
         query: '''
@@ -54,7 +54,7 @@ class GraphQLQueries<T extends BaseModel, S> {
 
   Future<T> addMutation(dynamic object) {
     String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
-    return fastter
+    return Fastter.instance
         .request(
       new Request(
         query: '''
@@ -86,7 +86,7 @@ class GraphQLQueries<T extends BaseModel, S> {
 
   Future<T> deleteMutation(String id) {
     String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
-    return fastter
+    return Fastter.instance
         .request(
       new Request(
         query: '''
@@ -118,7 +118,7 @@ class GraphQLQueries<T extends BaseModel, S> {
     String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
     Map<String, dynamic> input = toInput(object);
     input['_id'] = id;
-    return fastter
+    return Fastter.instance
         .request(
       new Request(
         query: '''
@@ -148,30 +148,30 @@ class GraphQLQueries<T extends BaseModel, S> {
 
   Future<Tuple3<EventBus, EventBus, EventBus>> initSubscriptions(
       Store<S> store) async {
-    await fastter.request(new Request(
+    await Fastter.instance.request(new Request(
       query: '''subscription {
           ${name}sAdded { ...$name }
         }
         $fragment
         ''',
     ));
-    await fastter.request(new Request(
+    await Fastter.instance.request(new Request(
       query: '''subscription {
           ${name}sUpdated { ...$name }
         }
         $fragment
         ''',
     ));
-    await fastter.request(new Request(
+    await Fastter.instance.request(new Request(
       query: '''subscription {
           ${name}sDeleted { ...$name }
         }
         $fragment
         ''',
     ));
-    final addEvent = fastter.addSubscription('${name}sAdded');
-    final updateEvent = fastter.addSubscription('${name}sUpdated');
-    final deleteEvent = fastter.addSubscription('${name}sDeleted');
+    final addEvent = Fastter.instance.addSubscription('${name}sAdded');
+    final updateEvent = Fastter.instance.addSubscription('${name}sUpdated');
+    final deleteEvent = Fastter.instance.addSubscription('${name}sDeleted');
     addEvent.on<Map<String, dynamic>>().listen((data) {
       store.dispatch(AddCompletedAction<T>(fromJson(data)));
     });

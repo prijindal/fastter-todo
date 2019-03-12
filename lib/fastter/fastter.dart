@@ -57,6 +57,21 @@ class RequestStreamEvent {
 }
 
 class Fastter {
+  static Fastter _instance;
+
+  static Fastter get instance => getInstance();
+
+  static Fastter getInstance() {
+    if (_instance == null) {
+      const API_TOKEN = "MlwjS+Qwco5Sd2qq+4oU7LKBCyUh2aaTbow7SrKW/GI=";
+      const URL = "https://apifastter.easycode.club";
+
+      _instance = new Fastter(URL, API_TOKEN);
+      _instance.connect();
+    }
+    return _instance;
+  }
+
   final String url;
   void Function(Request request) onStarted;
   void Function(Request request, Response response) onCompleted;
@@ -219,7 +234,7 @@ class Fastter {
     });
   }
 
-  Future<dynamic> logout(String email, String password) {
+  Future<dynamic> logout() {
     return request(
       new Request(
         query: '''
@@ -232,6 +247,15 @@ class Fastter {
       ),
     ).then((data) {
       bearer = null;
+      user = null;
+      this.requests.values.forEach((ee) {
+        ee.destroy();
+      });
+      this.requests = {};
+      this.subscriptions.values.forEach((ee) {
+        ee.destroy();
+      });
+      this.subscriptions = {};
       return data;
     });
   }
@@ -247,8 +271,3 @@ class FastterError {
     return error.toString();
   }
 }
-
-const API_TOKEN = "MlwjS+Qwco5Sd2qq+4oU7LKBCyUh2aaTbow7SrKW/GI=";
-const URL = "https://apifastter.easycode.club";
-
-Fastter fastter = new Fastter(URL, API_TOKEN);

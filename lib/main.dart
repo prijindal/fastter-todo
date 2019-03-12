@@ -31,9 +31,9 @@ void _setTargetPlatformForDesktop() {
 Future<void> main() async {
   _setTargetPlatformForDesktop();
   bool isInDebugMode = false;
-  profile(() {
+  if (!kReleaseMode) {
     isInDebugMode = true;
-  });
+  }
 
   FlutterError.onError = (FlutterErrorDetails details) {
     if (isInDebugMode) {

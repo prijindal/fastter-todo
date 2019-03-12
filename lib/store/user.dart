@@ -88,9 +88,9 @@ class UserMiddleware extends MiddlewareClass<AppState> {
   @override
   void call(Store<AppState> store, action, NextDispatcher next) {
     if (action is ConfirmUserAction) {
-      fastter.bearer = action.bearer;
+      Fastter.instance.bearer = action.bearer;
       try {
-        fastter
+        Fastter.instance
             .request(new Request(
           query: '{current {...user}} $userFragment',
         ))
@@ -107,20 +107,19 @@ class UserMiddleware extends MiddlewareClass<AppState> {
         store.dispatch(LoginUserError(error.toString()));
       }
     } else if (action is LoginUserSuccessfull) {
-      fastter.bearer = action.bearer;
-      fastter.user = action.user;
+      Fastter.instance.bearer = action.bearer;
+      Fastter.instance.user = action.user;
 
       fastterProjects.queries.initSubscriptions(store);
       fastterTodos.queries.initSubscriptions(store);
     } else if (action is LogoutUserAction || action is LoginUserError) {
       store.dispatch(ClearAll());
-      fastter.bearer = null;
-      fastter.user = null;
+      Fastter.instance.logout();
       GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
       _googleSignIn.signOut();
     } else if (action is LoginUserAction) {
       try {
-        fastter.login(action.email, action.password).then((response) {
+        Fastter.instance.login(action.email, action.password).then((response) {
           if (response != null && response.login != null) {
             if (response != null &&
                 response.login != null &&
@@ -137,7 +136,7 @@ class UserMiddleware extends MiddlewareClass<AppState> {
       }
     } else if (action is GoogleLoginUserAction) {
       try {
-        fastter
+        Fastter.instance
             .request(
           new Request(
             query:

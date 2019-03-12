@@ -98,7 +98,7 @@ class _GoogleSignInScreen extends StatefulWidget {
 
 class _GoogleSignInScreenState extends State<_GoogleSignInScreen> {
   TextEditingController _idTokenController = TextEditingController(text: "");
-  final String urlString = URL + "/google/oauth2";
+  final String urlString = Fastter.instance.url + "/google/oauth2";
 
   @override
   initState() {
