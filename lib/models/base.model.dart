@@ -22,11 +22,11 @@ class ListState<T extends BaseModel> {
   final bool updating;
   final List<T> items;
 
-  Map<String, dynamic> toJson() => ({
+  Map<String, dynamic> toJson() => <String, dynamic>{
         'fetching': false,
         'adding': false,
         'deleting': false,
         'updating': false,
         'items': items.map((t) => t.toJson()).toList(),
-      });
+      };
 }

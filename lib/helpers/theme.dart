@@ -6,5 +6,5 @@ ThemeData primaryTheme =
 ThemeData whiteTheme = ThemeData.lerp(
   ThemeData.dark(),
   ThemeData(primaryColor: Colors.white),
-  1.0,
+  1,
 );

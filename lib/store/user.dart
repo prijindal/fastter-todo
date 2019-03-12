@@ -1,25 +1,29 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:redux/redux.dart';
-import '../models/user.model.dart';
-import 'state.dart';
+
 import '../fastter/fastter.dart';
+import '../models/user.model.dart';
 import 'projects.dart';
+import 'state.dart';
 import 'todos.dart';
 
 class ConfirmUserAction {
-  final String bearer;
   ConfirmUserAction(this.bearer);
+
+  final String bearer;
 }
 
 class LoginUserSuccessfull {
+  LoginUserSuccessfull(this.user, this.bearer);
+
   final User user;
   final String bearer;
-  LoginUserSuccessfull(this.user, this.bearer);
 }
 
 class LoginUserError {
-  final String errorMessage;
   LoginUserError(this.errorMessage);
+
+  final String errorMessage;
 }
 
 class GoogleLoginUserAction {
@@ -86,22 +90,19 @@ UserState userReducer(UserState state, dynamic action) {
 
 class UserMiddleware extends MiddlewareClass<AppState> {
   @override
-  void call(Store<AppState> store, action, NextDispatcher next) {
+  void call(Store<AppState> store, dynamic action, NextDispatcher next) {
     if (action is ConfirmUserAction) {
       Fastter.instance.bearer = action.bearer;
       try {
-        Fastter.instance
-            .request(new Request(
-          query: '{current {...user}} $userFragment',
-        ))
-            .then((resp) {
-          CurrentData response = CurrentData.fromJson(resp);
+        Fastter.instance.checkCurrent().then((response) {
           if (response != null && response.current != null) {
             store.dispatch(
                 LoginUserSuccessfull(response.current, action.bearer));
           } else {
             store.dispatch(LoginUserError('Invalid User'));
           }
+        }).catchError((dynamic error) {
+          store.dispatch(LoginUserError(error.toString()));
         });
       } catch (error) {
         store.dispatch(LoginUserError(error.toString()));
@@ -115,21 +116,21 @@ class UserMiddleware extends MiddlewareClass<AppState> {
     } else if (action is LogoutUserAction || action is LoginUserError) {
       store.dispatch(ClearAll());
       Fastter.instance.logout();
-      GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
+      final _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
       _googleSignIn.signOut();
     } else if (action is LoginUserAction) {
       try {
         Fastter.instance.login(action.email, action.password).then((response) {
-          if (response != null && response.login != null) {
-            if (response != null &&
-                response.login != null &&
-                response.login.user != null) {
-              store.dispatch(LoginUserSuccessfull(
-                  response.login.user, response.login.bearer));
-            } else {
-              store.dispatch(LoginUserError('Wrong username password'));
-            }
+          if (response != null &&
+              response.login != null &&
+              response.login.user != null) {
+            store.dispatch(LoginUserSuccessfull(
+                response.login.user, response.login.bearer));
+          } else {
+            store.dispatch(LoginUserError('Wrong username password'));
           }
+        }).catchError((dynamic error) {
+          store.dispatch(LoginUserError(error.toString()));
         });
       } catch (error) {
         store.dispatch(LoginUserError(error.toString()));
@@ -138,26 +139,30 @@ class UserMiddleware extends MiddlewareClass<AppState> {
       try {
         Fastter.instance
             .request(
-          new Request(
-            query:
-                "mutation(\$idToken: String!) {login:loginWithGoogle(input:{idToken:\$idToken}) {bearer, user {...user}}} $userFragment",
-            variables: {
+          Request(
+            query: '''
+            mutation(\$idToken: String!) {
+              login:loginWithGoogle(input:{idToken:\$idToken}) {bearer, user {...user}}
+            }
+            $userFragment
+            ''',
+            variables: <String, dynamic>{
               'idToken': action.idToken,
             },
           ),
         )
             .then((resp) {
-          LoginData response = LoginData.fromJson(resp);
-          if (response != null && response.login != null) {
-            if (response != null &&
-                response.login != null &&
-                response.login.user != null) {
-              store.dispatch(LoginUserSuccessfull(
-                  response.login.user, response.login.bearer));
-            } else {
-              store.dispatch(LoginUserError('Wrong username password'));
-            }
+          final response = LoginData.fromJson(resp);
+          if (response != null &&
+              response.login != null &&
+              response.login.user != null) {
+            store.dispatch(LoginUserSuccessfull(
+                response.login.user, response.login.bearer));
+          } else {
+            store.dispatch(LoginUserError('Wrong username password'));
           }
+        }).catchError((dynamic error) {
+          store.dispatch(LoginUserError(error.toString()));
         });
       } catch (error) {
         store.dispatch(LoginUserError(error.toString()));

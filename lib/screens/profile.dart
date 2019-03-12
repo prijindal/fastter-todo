@@ -31,7 +31,7 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   User get user => widget.user.user;
 
   void _editName() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
             title: Text("Type your name"),
@@ -57,7 +57,7 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   }
 
   void _editEmail() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
             title: Text("Type your Email"),
@@ -84,7 +84,7 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   }
 
   void _changePassword() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
             title: Text("Type your Password"),
@@ -111,7 +111,7 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   }
 
   void _deleteAccount() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
             title: Text("Are you sure?"),

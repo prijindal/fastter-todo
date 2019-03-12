@@ -7,11 +7,12 @@ import './fastter_queries.dart';
 
 // T is the basemodel and s is the state
 class ListDataMiddleware<T extends BaseModel, S> extends MiddlewareClass<S> {
-  final GraphQLQueries queries;
   ListDataMiddleware({@required this.queries});
 
+  final GraphQLQueries<T, S> queries;
+
   @override
-  void call(Store<S> store, action, NextDispatcher next) {
+  void call(Store<S> store, dynamic action, NextDispatcher next) {
     if (action is StartSync<T>) {
       queries.syncQuery(action.filter).then((items) {
         store.dispatch(SyncCompletedAction<T>(items));

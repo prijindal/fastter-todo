@@ -9,7 +9,7 @@ class StartSync<T extends BaseModel> extends Action<T> {
     completer = Completer();
   }
 
-  Completer completer;
+  Completer<List<T>> completer;
   final Map<String, dynamic> filter;
 }
 

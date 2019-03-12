@@ -2,34 +2,31 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../screens/loading.dart';
-import '../models/user.model.dart';
-import '../screens/login.dart';
 import '../helpers/theme.dart';
-import 'home.dart';
+import '../models/user.model.dart';
+import '../screens/loading.dart';
+import '../screens/login.dart';
 import '../store/state.dart';
 import '../store/user.dart';
+import 'home.dart';
 
 class AppContainer extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return StoreConnector<AppState, Store<AppState>>(
-      converter: (Store<AppState> store) => store,
-      builder: (BuildContext context, Store<AppState> store) {
-        return _AppContainer(
-          user: store.state.user,
-          confirmUser: (String bearer) =>
-              store.dispatch(ConfirmUserAction(bearer)),
-          clearAuth: () => store.dispatch(LogoutUserAction()),
-          rehydrated: store.state.rehydrated,
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) => _AppContainer(
+              user: store.state.user,
+              confirmUser: (String bearer) =>
+                  store.dispatch(ConfirmUserAction(bearer)),
+              clearAuth: () => store.dispatch(LogoutUserAction()),
+              rehydrated: store.state.rehydrated,
+            ),
+      );
 }
 
 class _AppContainer extends StatefulWidget {
-  _AppContainer({
+  const _AppContainer({
     @required this.user,
     @required this.confirmUser,
     @required this.clearAuth,
@@ -41,6 +38,7 @@ class _AppContainer extends StatefulWidget {
   final void Function() clearAuth;
   final bool rehydrated;
 
+  @override
   _AppContainerState createState() => _AppContainerState();
 }
 
@@ -51,7 +49,7 @@ class _AppContainerState extends State<_AppContainer> {
     _tryLogin();
   }
 
-  void _tryLogin() async {
+  void _tryLogin() {
     if (widget.user == null || widget.user.bearer == null) {
       widget.clearAuth();
     } else {

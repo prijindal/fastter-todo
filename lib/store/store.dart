@@ -3,28 +3,28 @@ import 'package:redux/redux.dart';
 import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 
-import 'todos.dart';
 import 'projects.dart';
+import 'reducer.dart';
+import 'state.dart';
+import 'todos.dart';
 import 'user.dart';
-import './state.dart';
-import './reducer.dart';
 
 Future<Store<AppState>> initState() async {
   dynamic storage;
   if (Platform.isAndroid || Platform.isIOS) {
     storage = FlutterStorage();
   } else {
-    final String homeFolder = Platform.environment['HOME'];
+    final homeFolder = Platform.environment['HOME'];
     final file = File('$homeFolder/.config/fastter_flutter/state.json');
     file.createSync(recursive: true);
     storage = FileStorage(file);
   }
-  final Persistor<AppState> _persistor = Persistor<AppState>(
+  final _persistor = Persistor<AppState>(
     storage: storage, // Or use other engines
-    serializer:
-        JsonSerializer<AppState>(AppState.fromJson), // Or use other serializers
+    serializer: JsonSerializer<AppState>(
+        (dynamic data) => AppState.fromJson(data)), // Or use other serializers
   );
-  final Store<AppState> _store = Store<AppState>(
+  final _store = Store<AppState>(
     appStateReducer,
     initialState: AppState(
       rehydrated: false,
@@ -37,7 +37,8 @@ Future<Store<AppState>> initState() async {
     ],
   );
 
-  _persistor.load().then((AppState state) {
+  try {
+    final state = await _persistor.load();
     if (state.user != null &&
         state.user.user != null &&
         state.user.bearer != null) {
@@ -51,9 +52,9 @@ Future<Store<AppState>> initState() async {
     } else {
       _store.dispatch(ClearAll());
     }
-  }).catchError((error) {
+  } catch (error) {
     _store.dispatch(ClearAll());
-  });
+  }
 
   return _store;
 }

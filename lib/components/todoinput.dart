@@ -1,74 +1,75 @@
-import 'dart:math';
 import 'dart:io';
+import 'dart:math';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
-import '../models/todo.model.dart';
-import '../models/project.model.dart';
-import './projectdropdown.dart';
 import '../fastter/fastter_action.dart';
-import '../store/state.dart';
 import '../helpers/todouihelpers.dart';
+import '../models/project.model.dart';
+import '../models/todo.model.dart';
+import '../store/state.dart';
+
+import 'projectdropdown.dart';
 
 class TodoInput extends StatelessWidget {
-  final void Function() onBackButton;
-  final Project project;
-  TodoInput({
+  const TodoInput({
     Key key,
     this.onBackButton,
     this.project,
   }) : super(key: key);
 
+  final void Function() onBackButton;
+  final Project project;
+
   @override
-  Widget build(BuildContext context) {
-    return StoreConnector<AppState, Store<AppState>>(
-      converter: (Store<AppState> store) => store,
-      builder: (BuildContext context, Store<AppState> store) {
-        return _TodoInput(
-          addTodo: (todo) => store.dispatch(AddItem<Todo>(todo)),
-          onBackButton: onBackButton,
-          project: project,
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) => _TodoInput(
+              addTodo: (todo) => store.dispatch(AddItem<Todo>(todo)),
+              onBackButton: onBackButton,
+              project: project,
+            ),
+      );
 }
 
 class _TodoInput extends StatefulWidget {
+  const _TodoInput({
+    @required this.addTodo,
+    this.onBackButton,
+    this.project,
+    Key key,
+  }) : super(key: key);
+
   final void Function() onBackButton;
   final void Function(Todo todo) addTodo;
   final Project project;
 
-  _TodoInput({
-    Key key,
-    @required this.addTodo,
-    this.onBackButton,
-    this.project,
-  }) : super(key: key);
-
+  @override
   _TodoInputState createState() => _TodoInputState();
 }
 
 class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
-  TextEditingController titleInputController = TextEditingController(text: "");
-  FocusNode _titleFocusNode = FocusNode();
+  final TextEditingController titleInputController =
+      TextEditingController(text: '');
+  final FocusNode _titleFocusNode = FocusNode();
   bool _isPreventClose = false;
   DateTime dueDate;
   Project project;
   int subscribingId;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     if (widget.project != null) {
       project = widget.project;
     }
     WidgetsBinding.instance.addObserver(this);
     if (Platform.isAndroid || Platform.isIOS) {
-      subscribingId = KeyboardVisibilityNotification().addNewListener(
-          onChange: (bool visible) {
+      subscribingId =
+          KeyboardVisibilityNotification().addNewListener(onChange: (visible) {
         if (visible == false) {
           _unFocusKeyboard();
         } else {
@@ -81,7 +82,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    this._focusKeyboard();
+    _focusKeyboard();
   }
 
   @override
@@ -93,11 +94,11 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  _focusKeyboard() async {
+  void _focusKeyboard() {
     FocusScope.of(context).requestFocus(_titleFocusNode);
   }
 
-  _unFocusKeyboard() async {
+  void _unFocusKeyboard() {
     _titleFocusNode.unfocus();
     if (_isPreventClose) {
       return;
@@ -106,13 +107,13 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
       setState(() {
         _isPreventClose = true;
       });
-      showDialog(
+      showDialog<void>(
         context: context,
-        builder: (BuildContext context) => AlertDialog(
-              title: Text("Do you want to save before cancelling?"),
+        builder: (context) => AlertDialog(
+              title: const Text('Do you want to save before cancelling?'),
               actions: <Widget>[
                 FlatButton(
-                  child: Text("No"),
+                  child: const Text('No'),
                   onPressed: () {
                     Navigator.of(context).pop();
                     setState(() {
@@ -122,7 +123,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
                   },
                 ),
                 FlatButton(
-                  child: Text("Yes"),
+                  child: const Text('Yes'),
                   onPressed: () {
                     Navigator.of(context).pop();
                     _onSave();
@@ -140,12 +141,10 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     }
   }
 
-  _onSave() {
-    if (dueDate == null) {
-      dueDate = DateTime.now();
-    }
-    dueDate = new DateTime(dueDate.year, dueDate.month, dueDate.day, 0, 0, 0);
-    Todo todo = Todo(
+  void _onSave() {
+    dueDate ??= DateTime.now();
+    dueDate = DateTime(dueDate.year, dueDate.month, dueDate.day, 0, 0, 0);
+    final todo = Todo(
       title: titleInputController.text,
       dueDate: dueDate,
       project: project,
@@ -157,12 +156,11 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     }
   }
 
-  _showDatePicker() {
+  void _showDatePicker() {
     setState(() {
       _isPreventClose = true;
     });
-    Future<DateTime> selectedDate = todoSelectDate(context);
-    selectedDate.then((dueDate) {
+    todoSelectDate(context).then((dueDate) {
       setState(() {
         this.dueDate = dueDate;
         _isPreventClose = false;
@@ -171,7 +169,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     });
   }
 
-  _onSelectProject(Project selectedproject) {
+  void _onSelectProject(Project selectedproject) {
     setState(() {
       project = selectedproject;
       _isPreventClose = false;
@@ -180,64 +178,62 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 4.0,
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        child: Center(
-          child: Container(
-            color: Colors.white,
-            width: min(480.0, MediaQuery.of(context).size.width - 20.0),
-            padding: EdgeInsets.all(4.0),
-            child: Form(
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: titleInputController,
-                    focusNode: _titleFocusNode,
-                    decoration: InputDecoration(
-                      labelText: "Add a task",
+  Widget build(BuildContext context) => Material(
+        elevation: 4,
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Center(
+            child: Container(
+              color: Colors.white,
+              width: min(480, MediaQuery.of(context).size.width - 20.0),
+              padding: const EdgeInsets.all(4),
+              child: Form(
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: titleInputController,
+                      focusNode: _titleFocusNode,
+                      decoration: InputDecoration(
+                        labelText: 'Add a task',
+                      ),
+                      onFieldSubmitted: (title) {
+                        _onSave();
+                      },
                     ),
-                    onFieldSubmitted: (title) {
-                      _onSave();
-                    },
-                  ),
-                  Flex(
-                    direction: Axis.horizontal,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(
-                          Icons.calendar_today,
-                          color: dueDate == null ? null : Colors.redAccent,
+                    Flex(
+                      direction: Axis.horizontal,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(
+                            Icons.calendar_today,
+                            color: dueDate == null ? null : Colors.redAccent,
+                          ),
+                          onPressed: _showDatePicker,
                         ),
-                        onPressed: _showDatePicker,
-                      ),
-                      ProjectDropdown(
-                        selectedProject: project,
-                        onSelected: _onSelectProject,
-                        onOpening: () {
-                          setState(() {
-                            _isPreventClose = true;
-                          });
-                        },
-                      ),
-                      Flexible(
-                        child: Container(),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: _onSave,
-                      )
-                    ],
-                  ),
-                ],
+                        ProjectDropdown(
+                          selectedProject: project,
+                          onSelected: _onSelectProject,
+                          onOpening: () {
+                            setState(() {
+                              _isPreventClose = true;
+                            });
+                          },
+                        ),
+                        Flexible(
+                          child: Container(),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: _onSave,
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

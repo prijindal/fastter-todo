@@ -8,11 +8,6 @@ import './fastter.dart';
 import 'fastter_action.dart';
 
 class GraphQLQueries<T extends BaseModel, S> {
-  final String name;
-  final String fragment;
-  final T Function(Map<String, dynamic>) fromJson;
-  final Map<String, dynamic> Function(T) toInput;
-
   GraphQLQueries({
     @required this.name,
     @required this.fragment,
@@ -20,15 +15,21 @@ class GraphQLQueries<T extends BaseModel, S> {
     @required this.toInput,
   });
 
+  final String name;
+  final String fragment;
+  final T Function(Map<String, dynamic>) fromJson;
+  final Map<String, dynamic> Function(T) toInput;
+
+  String get capitalized => name.replaceRange(0, 1, name[0].toUpperCase());
+
   Future<List<T>> syncQuery([
     Map<String, dynamic> filter = const <String, dynamic>{},
-    String extraFields = "",
-  ]) {
-    String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
-    return Fastter.instance
-        .request(
-      new Request(
-        query: '''
+    String extraFields = '',
+  ]) =>
+      Fastter.instance
+          .request(
+        Request(
+          query: '''
             query(\$filter:FilterFindMany${capitalized}Input){
               ${name}s(filter:\$filter) {
                 ...$name
@@ -37,27 +38,24 @@ class GraphQLQueries<T extends BaseModel, S> {
             }
             $fragment
           ''',
-        variables: {
-          'filter': filter,
-        },
-      ),
-    )
-        .then((response) {
-      if (response.containsKey('${name}s')) {
-        return (response['${name}s'] as List<dynamic>)
-            .map<T>((todo) => fromJson(todo))
-            .toList();
-      }
-      return null;
-    });
-  }
+          variables: <String, dynamic>{
+            'filter': filter,
+          },
+        ),
+      )
+          .then((response) {
+        if (response.containsKey('${name}s')) {
+          return (response['${name}s'] as List<dynamic>)
+              .map<T>((dynamic data) => fromJson(data))
+              .toList();
+        }
+        return null;
+      });
 
-  Future<T> addMutation(dynamic object) {
-    String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
-    return Fastter.instance
-        .request(
-      new Request(
-        query: '''
+  Future<T> addMutation(dynamic object) => Fastter.instance
+          .request(
+        Request(
+          query: '''
             mutation(\$object:CreateOne${capitalized}Input!){
                   create$capitalized(record: \$object) {
                     record {
@@ -67,29 +65,26 @@ class GraphQLQueries<T extends BaseModel, S> {
               }
               $fragment
           ''',
-        variables: {
-          'object': toInput(object),
-        },
-      ),
-    )
-        .then(
-      (response) {
-        if (response.containsKey('create$capitalized')) {
-          if (response['create$capitalized'].containsKey('record')) {
-            return fromJson(response['create$capitalized']['record']);
+          variables: <String, dynamic>{
+            'object': toInput(object),
+          },
+        ),
+      )
+          .then(
+        (response) {
+          if (response.containsKey('create$capitalized')) {
+            if (response['create$capitalized'].containsKey('record')) {
+              return fromJson(response['create$capitalized']['record']);
+            }
           }
-        }
-        return null;
-      },
-    );
-  }
+          return null;
+        },
+      );
 
-  Future<T> deleteMutation(String id) {
-    String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
-    return Fastter.instance
-        .request(
-      new Request(
-        query: '''
+  Future<T> deleteMutation(String id) => Fastter.instance
+          .request(
+        Request(
+          query: '''
           mutation(\$_id:MongoID!){
             delete$capitalized(_id: \$_id) {
               record {
@@ -99,28 +94,26 @@ class GraphQLQueries<T extends BaseModel, S> {
           }
           $fragment
         ''',
-        variables: {
-          '_id': id,
-        },
-      ),
-    )
-        .then((response) {
-      if (response.containsKey('delete$capitalized')) {
-        if (response['delete$capitalized'].containsKey('record')) {
-          return fromJson(response['delete$capitalized']['record']);
+          variables: <String, dynamic>{
+            '_id': id,
+          },
+        ),
+      )
+          .then((response) {
+        if (response.containsKey('delete$capitalized')) {
+          if (response['delete$capitalized'].containsKey('record')) {
+            return fromJson(response['delete$capitalized']['record']);
+          }
         }
-      }
-      return null;
-    });
-  }
+        return null;
+      });
 
   Future<T> updateMutation(String id, dynamic object) {
-    String capitalized = name.replaceRange(0, 1, name[0].toUpperCase());
-    Map<String, dynamic> input = toInput(object);
+    final input = toInput(object);
     input['_id'] = id;
     return Fastter.instance
         .request(
-      new Request(
+      Request(
         query: '''
           mutation(\$object:UpdateById${capitalized}Input!){
             update$capitalized(record: \$object) {
@@ -131,7 +124,7 @@ class GraphQLQueries<T extends BaseModel, S> {
             }
             $fragment
           ''',
-        variables: {
+        variables: <String, dynamic>{
           'object': input,
         },
       ),
@@ -148,21 +141,21 @@ class GraphQLQueries<T extends BaseModel, S> {
 
   Future<Tuple3<EventBus, EventBus, EventBus>> initSubscriptions(
       Store<S> store) async {
-    await Fastter.instance.request(new Request(
+    await Fastter.instance.request(Request(
       query: '''subscription {
           ${name}sAdded { ...$name }
         }
         $fragment
         ''',
     ));
-    await Fastter.instance.request(new Request(
+    await Fastter.instance.request(Request(
       query: '''subscription {
           ${name}sUpdated { ...$name }
         }
         $fragment
         ''',
     ));
-    await Fastter.instance.request(new Request(
+    await Fastter.instance.request(Request(
       query: '''subscription {
           ${name}sDeleted { ...$name }
         }

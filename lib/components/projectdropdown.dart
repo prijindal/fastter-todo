@@ -2,53 +2,48 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+import '../components/hexcolor.dart';
 import '../models/base.model.dart';
 import '../models/project.model.dart';
 import '../store/state.dart';
-import '../components/hexcolor.dart';
 
 class ProjectDropdown extends StatelessWidget {
-  final bool expanded;
-  final void Function(Project) onSelected;
-  final Project selectedProject;
-  final void Function() onOpening;
-
-  ProjectDropdown({
+  const ProjectDropdown({
     @required this.onSelected,
     this.selectedProject,
     this.onOpening,
     this.expanded = false,
   });
 
+  final bool expanded;
+  final void Function(Project) onSelected;
+  final Project selectedProject;
+  final void Function() onOpening;
   @override
-  Widget build(BuildContext context) {
-    return StoreConnector<AppState, Store<AppState>>(
-      converter: (Store<AppState> store) => store,
-      builder: (BuildContext context, Store<AppState> store) {
-        return _ProjectDropdown(
-          projects: store.state.projects,
-          onSelected: onSelected,
-          selectedProject: selectedProject,
-          onOpening: onOpening,
-          expanded: expanded,
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) => _ProjectDropdown(
+              projects: store.state.projects,
+              onSelected: onSelected,
+              selectedProject: selectedProject,
+              onOpening: onOpening,
+              expanded: expanded,
+            ),
+      );
 }
 
 class _ProjectDropdown extends StatelessWidget {
-  final GlobalKey _menuKey = GlobalKey();
-
   _ProjectDropdown({
-    Key key,
     @required this.projects,
     @required this.onSelected,
     this.selectedProject,
     this.onOpening,
     this.expanded = false,
+    Key key,
   }) : super(key: key);
 
+  final GlobalKey _menuKey = GlobalKey();
   final bool expanded;
   final ListState<Project> projects;
   final void Function(Project) onSelected;
@@ -71,7 +66,7 @@ class _ProjectDropdown extends StatelessWidget {
     );
   }
 
-  _showMenu(BuildContext context) {
+  void _showMenu(BuildContext context) {
     showMenu<Project>(
       position: _getPosition(context),
       initialValue: selectedProject,
@@ -99,21 +94,19 @@ class _ProjectDropdown extends StatelessWidget {
                   Navigator.of(context).pop();
                   onSelected(null);
                 },
-                leading: Icon(
+                leading: const Icon(
                   Icons.group_work,
                 ),
-                title: Text("Inbox"),
+                title: const Text('Inbox'),
               ),
             )),
     );
   }
 
-  Icon _buildIcon() {
-    return Icon(
-      Icons.group_work,
-      color: selectedProject == null ? null : HexColor(selectedProject.color),
-    );
-  }
+  Icon _buildIcon() => Icon(
+        Icons.group_work,
+        color: selectedProject == null ? null : HexColor(selectedProject.color),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -121,9 +114,9 @@ class _ProjectDropdown extends StatelessWidget {
       return ListTile(
         key: _menuKey,
         leading: _buildIcon(),
-        title: Text("Project"),
+        title: const Text('Project'),
         subtitle:
-            Text(selectedProject == null ? "Inbox" : selectedProject.title),
+            Text(selectedProject == null ? 'Inbox' : selectedProject.title),
         onTap: () => _showMenu(context),
       );
     }

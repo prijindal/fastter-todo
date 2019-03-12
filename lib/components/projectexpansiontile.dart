@@ -2,48 +2,45 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+import '../components/hexcolor.dart';
 import '../helpers/navigator.dart';
 import '../models/base.model.dart';
 import '../models/project.model.dart';
-import '../store/state.dart';
-import '../components/hexcolor.dart';
 import '../screens/addproject.dart';
+import '../store/state.dart';
 
 class ProjectExpansionTile extends StatelessWidget {
+  const ProjectExpansionTile({
+    @required this.onChildSelected,
+    this.selectedProject,
+    Key key,
+  }) : super(key: key);
+
   final Project selectedProject;
   final void Function(Project) onChildSelected;
 
-  ProjectExpansionTile({
-    Key key,
-    this.selectedProject,
-    @required this.onChildSelected,
-  }) : super(key: key);
-
   @override
-  Widget build(BuildContext context) {
-    return StoreConnector<AppState, Store<AppState>>(
-      converter: (Store<AppState> store) => store,
-      builder: (BuildContext context, Store<AppState> store) {
-        return _ProjectExpansionTile(
-          projects: store.state.projects,
-          onChildSelected: onChildSelected,
-          selectedProject: selectedProject,
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) => _ProjectExpansionTile(
+              projects: store.state.projects,
+              onChildSelected: onChildSelected,
+              selectedProject: selectedProject,
+            ),
+      );
 }
 
 class _ProjectExpansionTile extends StatefulWidget {
-  final ListState<Project> projects;
-  final Project selectedProject;
-  final void Function(Project) onChildSelected;
-
-  _ProjectExpansionTile({
+  const _ProjectExpansionTile({
     @required this.projects,
     @required this.onChildSelected,
     this.selectedProject,
   });
+
+  final ListState<Project> projects;
+  final Project selectedProject;
+  final void Function(Project) onChildSelected;
 
   @override
   _ProjectExpansionTileState createState() => _ProjectExpansionTileState();
@@ -56,7 +53,7 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
   static final Animatable<double> _easeInTween =
       CurveTween(curve: Curves.easeIn);
   static final Animatable<double> _halfTween =
-      Tween<double>(begin: 0.0, end: 0.5);
+      Tween<double>(begin: 0, end: 0.5);
 
   final ColorTween _borderColorTween = ColorTween();
   final ColorTween _headerColorTween = ColorTween();
@@ -87,7 +84,9 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
         _controller.drive(_backgroundColorTween.chain(_easeOutTween));
 
     _isExpanded = PageStorage.of(context)?.readState(context) != null;
-    if (_isExpanded) _controller.value = 1.0;
+    if (_isExpanded) {
+      _controller.value = 1.0;
+    }
   }
 
   @override
@@ -97,8 +96,8 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
   }
 
   void _openNewProjectPage() {
-    mainNavigatorKey.currentState.push(
-      MaterialPageRoute(
+    mainNavigatorKey.currentState.push<void>(
+      MaterialPageRoute<void>(
         builder: (context) => AddProjectScreen(),
       ),
     );
@@ -110,8 +109,10 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
       if (_isExpanded) {
         _controller.forward();
       } else {
-        _controller.reverse().then<void>((void value) {
-          if (!mounted) return;
+        _controller.reverse().then<void>((value) {
+          if (!mounted) {
+            return;
+          }
           setState(() {
             // Rebuild without widget.children.
           });
@@ -122,7 +123,7 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
   }
 
   Widget _buildChildren(BuildContext context, Widget child) {
-    final Color borderSideColor = _borderColor.value ?? Colors.transparent;
+    final borderSideColor = _borderColor.value ?? Colors.transparent;
 
     return Container(
       decoration: BoxDecoration(
@@ -141,12 +142,12 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
             child: ListTile(
               dense: true,
               onTap: _handleTap,
-              leading: Icon(Icons.group_work),
+              leading: const Icon(Icons.group_work),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Projects"),
+                  const Text('Projects'),
                   RotationTransition(
                     turns: _iconTurns,
                     child: const Icon(Icons.expand_more),
@@ -154,7 +155,7 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
                 ],
               ),
               trailing: IconButton(
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
                 onPressed: _openNewProjectPage,
               ),
             ),
@@ -172,8 +173,8 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
 
   @override
   void didChangeDependencies() {
-    final ThemeData theme = Theme.of(context);
-    _borderColorTween..end = theme.dividerColor;
+    final theme = Theme.of(context);
+    _borderColorTween.end = theme.dividerColor;
     _headerColorTween
       ..begin = theme.textTheme.subhead.color
       ..end = theme.accentColor;
@@ -185,7 +186,7 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
 
   @override
   Widget build(BuildContext context) {
-    final bool closed = !_isExpanded && _controller.isDismissed;
+    final closed = !_isExpanded && _controller.isDismissed;
     return AnimatedBuilder(
       animation: _controller.view,
       builder: _buildChildren,
@@ -196,19 +197,17 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
                   .map<Widget>(
                     (project) => ListTile(
                           dense: true,
-                          enabled: widget.selectedProject == null
-                              ? true
-                              : widget.selectedProject.id != project.id,
-                          selected: widget.selectedProject == null
-                              ? false
-                              : widget.selectedProject.id == project.id,
+                          enabled: widget.selectedProject == null ||
+                              widget.selectedProject.id != project.id,
+                          selected: widget.selectedProject != null &&
+                              widget.selectedProject.id == project.id,
                           leading: Icon(
                             Icons.group_work,
                             color: project.color == null
                                 ? null
                                 : HexColor(project.color),
                           ),
-                          title: new Text(project.title),
+                          title: Text(project.title),
                           onTap: () => widget.onChildSelected(project),
                         ),
                   )

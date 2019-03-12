@@ -10,8 +10,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'helpers/theme.dart';
 import 'routes/root.dart';
 import 'screens/loading.dart';
-import 'store/store.dart';
 import 'store/state.dart';
+import 'store/store.dart';
 
 /// If the current platform is desktop, override the default platform to
 /// a supported platform (iOS for macOS, Android for Linux and Windows).
@@ -30,12 +30,12 @@ void _setTargetPlatformForDesktop() {
 
 Future<void> main() async {
   _setTargetPlatformForDesktop();
-  bool isInDebugMode = false;
+  var isInDebugMode = false;
   if (!kReleaseMode) {
     isInDebugMode = true;
   }
 
-  FlutterError.onError = (FlutterErrorDetails details) {
+  FlutterError.onError = (details) {
     if (isInDebugMode) {
       FlutterError.dumpErrorToConsole(details);
     } else {

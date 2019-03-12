@@ -7,10 +7,6 @@ import 'package:uuid/uuid.dart';
 import '../models/user.model.dart';
 
 class Response {
-  String requestId;
-  Map<String, dynamic> data;
-  List<dynamic> errors;
-
   Response({
     this.errors,
     this.data,
@@ -22,6 +18,10 @@ class Response {
         data: json['data'],
         requestId: json['requestId'],
       );
+
+  String requestId;
+  Map<String, dynamic> data;
+  List<dynamic> errors;
 }
 
 class Request {
@@ -30,18 +30,18 @@ class Request {
     this.variables,
   });
 
+  factory Request.fromJson(Map<String, dynamic> json) => Request(
+        query: json['query'],
+        variables: json['variables'],
+      );
+
   String requestId;
   String jwtToken;
   String apiToken;
   String query;
   Map<String, dynamic> variables;
 
-  factory Request.fromJson(Map<String, dynamic> json) => Request(
-        query: json['query'],
-        variables: json['variables'],
-      );
-
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => <String, dynamic>{
         'requestId': requestId,
         'jwtToken': jwtToken,
         'apiToken': apiToken,
@@ -51,23 +51,41 @@ class Request {
 }
 
 class RequestStreamEvent {
+  RequestStreamEvent(this.request, this.completer);
+
   final Request request;
   final Completer completer;
-  RequestStreamEvent(this.request, this.completer);
 }
 
 class Fastter {
+  Fastter(
+    this.url,
+    this.apiToken, {
+    String type = 'socket',
+    this.onStarted,
+    this.onCompleted,
+  }) {
+    requests = {};
+    subscriptions = {};
+    if (type == 'socket') {
+      socket = IO.io(url, <dynamic, dynamic>{
+        'forceNew': true,
+        'transports': ['websocket']
+      });
+    }
+    _initListeners();
+  }
+
   static Fastter _instance;
 
   static Fastter get instance => getInstance();
 
   static Fastter getInstance() {
     if (_instance == null) {
-      const API_TOKEN = "MlwjS+Qwco5Sd2qq+4oU7LKBCyUh2aaTbow7SrKW/GI=";
-      const URL = "https://apifastter.easycode.club";
+      const API_TOKEN = 'MlwjS+Qwco5Sd2qq+4oU7LKBCyUh2aaTbow7SrKW/GI=';
+      const URL = 'https://apifastter.easycode.club';
 
-      _instance = new Fastter(URL, API_TOKEN);
-      _instance.connect();
+      _instance = Fastter(URL, API_TOKEN);
     }
     return _instance;
   }
@@ -84,59 +102,41 @@ class Fastter {
   String bearer;
   User user;
 
-  Fastter(
-    this.url,
-    String apiToken, {
-    String type = "socket",
-    this.onStarted,
-    this.onCompleted,
-  }) {
-    requests = {};
-    subscriptions = {};
-    this.apiToken = apiToken;
-    if (type == "socket") {
-      socket = IO.io(url, <dynamic, dynamic>{
-        'forceNew': true,
-        'transports': ['websocket']
-      });
-    }
-    _initListeners();
-  }
+  final Uuid _uuidGenerator = Uuid();
 
-  _initListeners() {
+  void _initListeners() {
     if (socket != null) {
-      socket.on('connect', (_) {
+      socket.on('connect', (dynamic _) {
         print('connected');
       });
       socket.on('graphqlResponse', (dynamic response) {
         if (response != null) {
-          Response resp = Response.fromJson(response);
-          if (this.requests.containsKey(resp.requestId)) {
-            this.requests[resp.requestId].fire(resp);
+          final resp = Response.fromJson(response);
+          if (requests.containsKey(resp.requestId)) {
+            requests[resp.requestId].fire(resp);
           }
         }
       });
       socket.on('graphqlSubscriptionResponse', (dynamic response) {
-        if (response != null) {
+        if (response != null && response is Map<String, dynamic>) {
           response.keys.forEach((key) {
-            if (this.subscriptions.containsKey(key)) {
-              this.subscriptions[key].fire(response[key]);
+            if (subscriptions.containsKey(key)) {
+              subscriptions[key].fire(response[key]);
             }
           });
         }
       });
-      socket.on('disconnect', (_) => print('disconnect'));
+      socket.on('disconnect', (dynamic _) => print('disconnect'));
     }
   }
 
-  connect() {
+  void connect() {
     socket.connect();
   }
 
   Future<Map<String, dynamic>> request(Request data) {
-    var completer = new Completer<Map<String, dynamic>>();
-    Uuid uuidGenerator = new Uuid();
-    String requestId = uuidGenerator.v1();
+    final completer = Completer<Map<String, dynamic>>();
+    final String requestId = _uuidGenerator.v1();
     data.requestId = requestId;
     if (bearer != null) {
       data.jwtToken = bearer;
@@ -147,19 +147,22 @@ class Fastter {
     if (onStarted != null) {
       onStarted(data);
     }
-    EventBus ee = new EventBus(sync: true);
-    ee.on<Response>().listen((Response resp) {
+    final ee = EventBus(sync: true);
+    ee.on<Response>().listen((resp) {
       // response.data = (response.type).fromJson(resp['data']);
-      if (resp.errors != null && resp.errors.length > 0) {
-        throw new FastterError(resp.errors[0]);
+      if (resp.errors != null && resp.errors.isNotEmpty) {
+        if (!completer.isCompleted) {
+          completer.completeError(resp.errors[0]);
+        }
       } else if (resp.data != null) {
-        // resolve(response)
-        completer.complete(resp.data);
+        if (!completer.isCompleted) {
+          completer.complete(resp.data);
+        }
         if (onCompleted != null) {
           onCompleted(data, resp);
         }
       } else {
-        throw new FastterError(resp);
+        throw Exception(resp);
       }
     });
     if (socket != null) {
@@ -171,23 +174,23 @@ class Fastter {
   }
 
   void _requestSocket(Request data, EventBus ee) {
-    this.requests[data.requestId] = ee;
+    requests[data.requestId] = ee;
     try {
       socket.emit('graphql', data.toJson());
     } catch (error) {
-      throw FastterError(error);
+      throw Exception(error);
     }
   }
 
   void _requestHttp(Request data, EventBus ee) {
-    Map<String, String> headers = {
+    final headers = <String, String>{
       'Content-Type': 'application/json',
     };
     headers['Authorization'] = data.jwtToken;
     headers['API_TOKEN'] = data.apiToken;
     http
         .post(
-      url + "/graphql",
+      '$url/graphql',
       body: json.encode(
         data.toJson(),
         toEncodable: (dynamic item) {
@@ -206,68 +209,80 @@ class Fastter {
 
   EventBus addSubscription(String field) {
     final ee = EventBus();
-    this.subscriptions[field] = ee;
+    subscriptions[field] = ee;
     return ee;
   }
 
-  Future<LoginData> login(String email, String password) {
-    return request(
-      new Request(
-        query: '''
+  Future<CurrentData> checkCurrent() async {
+    if (bearer != null && bearer.isNotEmpty) {
+      return request(
+        Request(
+          query: '''
+              {current {...user}} $userFragment
+            ''',
+        ),
+      ).then((resp) {
+        final response = CurrentData.fromJson(resp);
+        if (response != null && response.current != null) {
+          user = response.current;
+        }
+        return response;
+      });
+    } else {
+      return null;
+    }
+  }
+
+  Future<LoginData> login(String email, String password) => request(
+        Request(
+          query: '''
           mutation(\$email:String!,\$password:String!) {
             login(input: {email: \$email, password:\$password}) {
               bearer
               user { ...user }
             }
           } $userFragment''',
-        variables: {
-          'email': email,
-          'password': password,
-        },
-      ),
-    ).then((dynamic data) {
-      LoginData loginData = LoginData.fromJson(data);
-      if (loginData != null && loginData.login != null) {
-        bearer = loginData.login.bearer;
-      }
-      return loginData;
-    });
-  }
+          variables: <String, dynamic>{
+            'email': email,
+            'password': password,
+          },
+        ),
+      ).then((dynamic data) {
+        final loginData = LoginData.fromJson(data);
+        if (loginData != null && loginData.login != null) {
+          bearer = loginData.login.bearer;
+        }
+        return loginData;
+      });
 
-  Future<dynamic> logout() {
-    return request(
-      new Request(
-        query: '''
+  Future<dynamic> logout() async {
+    print(bearer);
+    if (bearer != null && bearer.isNotEmpty) {
+      return request(
+        Request(
+          query: '''
           mutation {
             logout {
               status
             }
           }''',
-        variables: {},
-      ),
-    ).then((data) {
-      bearer = null;
-      user = null;
-      this.requests.values.forEach((ee) {
-        ee.destroy();
+          variables: <String, dynamic>{},
+        ),
+      ).then<dynamic>((data) {
+        bearer = null;
+        user = null;
+        requests.values.forEach((ee) {
+          ee.destroy();
+        });
+        requests = {};
+        subscriptions.values.forEach((ee) {
+          ee.destroy();
+        });
+        subscriptions = {};
+        return data;
       });
-      this.requests = {};
-      this.subscriptions.values.forEach((ee) {
-        ee.destroy();
-      });
-      this.subscriptions = {};
-      return data;
-    });
-  }
-}
-
-class FastterError {
-  FastterError(this.error);
-
-  final dynamic error;
-
-  @override
-  String toString() {
-    return error.toString();
+    } else {
+      return null;
+    }
   }
 }

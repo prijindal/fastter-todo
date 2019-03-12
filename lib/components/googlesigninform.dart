@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -12,27 +11,24 @@ import '../store/state.dart';
 import '../store/user.dart';
 
 class GoogleSignInForm extends StatelessWidget {
+  @protected
   @override
-  Widget build(BuildContext context) {
-    return StoreConnector<AppState, void Function(String)>(
-      converter: (Store<AppState> store) =>
-          (String idToken) => store.dispatch(GoogleLoginUserAction(idToken)),
-      builder: (BuildContext context, fn) {
-        return StoreConnector<AppState, UserState>(
-            converter: (Store<AppState> store) => store.state.user,
-            builder: (BuildContext context, userState) {
-              return _GoogleSignInForm(
-                loginWithGoogle: (String idToken) => fn(idToken),
-                user: userState,
-              );
-            });
-      },
-    );
-  }
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, void Function(String)>(
+        converter: (store) =>
+            (idToken) => store.dispatch(GoogleLoginUserAction(idToken)),
+        builder: (context, fn) => StoreConnector<AppState, UserState>(
+              converter: (store) => store.state.user,
+              builder: (context, userState) => _GoogleSignInForm(
+                    loginWithGoogle: (idToken) => fn(idToken),
+                    user: userState,
+                  ),
+            ),
+      );
 }
 
 class _GoogleSignInForm extends StatefulWidget {
-  _GoogleSignInForm({
+  const _GoogleSignInForm({
     @required this.loginWithGoogle,
     @required this.user,
   });
@@ -40,30 +36,31 @@ class _GoogleSignInForm extends StatefulWidget {
   final UserState user;
   final void Function(String) loginWithGoogle;
 
+  @override
   _GoogleSignInFormState createState() => _GoogleSignInFormState();
 }
 
 class _GoogleSignInFormState extends State<_GoogleSignInForm> {
-  _startGoogleFlow() {
+  void _startGoogleFlow() {
     if (Platform.isAndroid || Platform.isIOS) {
-      GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
+      final _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
       _googleSignIn.signIn().then((account) {
         account.authentication.then((auth) {
           widget.loginWithGoogle(auth.idToken);
         });
       });
-      Navigator.of(context).push(
-        MaterialPageRoute(
+      Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
           builder: (context) => Scaffold(
                 body: Center(
-                  child: CircularProgressIndicator(),
+                  child: const CircularProgressIndicator(),
                 ),
               ),
         ),
       );
     } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(
+      Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
           builder: (context) => _GoogleSignInScreen(
                 loginWithGoogle: widget.loginWithGoogle,
                 user: widget.user,
@@ -74,18 +71,16 @@ class _GoogleSignInFormState extends State<_GoogleSignInForm> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: SignInButton(
-        Buttons.Google,
-        onPressed: _startGoogleFlow,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Container(
+        child: SignInButton(
+          Buttons.Google,
+          onPressed: _startGoogleFlow,
+        ),
+      );
 }
 
 class _GoogleSignInScreen extends StatefulWidget {
-  _GoogleSignInScreen({
+  const _GoogleSignInScreen({
     @required this.loginWithGoogle,
     @required this.user,
   });
@@ -93,49 +88,48 @@ class _GoogleSignInScreen extends StatefulWidget {
   final UserState user;
   final void Function(String) loginWithGoogle;
 
+  @override
   _GoogleSignInScreenState createState() => _GoogleSignInScreenState();
 }
 
 class _GoogleSignInScreenState extends State<_GoogleSignInScreen> {
-  TextEditingController _idTokenController = TextEditingController(text: "");
-  final String urlString = Fastter.instance.url + "/google/oauth2";
+  final _idTokenController = TextEditingController(text: '');
+  final String urlString = '${Fastter.instance.url}/google/oauth2';
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     launch(urlString);
   }
 
-  _onLogin() {
+  void _onLogin() {
     widget.loginWithGoogle(_idTokenController.text);
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Sign in with google"),
-      ),
-      body: widget.user.isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : Container(
-              child: Column(
-                children: <Widget>[
-                  Text("Go to this url"),
-                  Text(urlString),
-                  Text("And input the string below"),
-                  TextField(
-                    controller: _idTokenController,
-                  ),
-                  RaisedButton(
-                    child: Text("Login"),
-                    onPressed: _onLogin,
-                  )
-                ],
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Sign in with google'),
+        ),
+        body: widget.user.isLoading
+            ? Center(
+                child: const CircularProgressIndicator(),
+              )
+            : Container(
+                child: Column(
+                  children: <Widget>[
+                    const Text('Go to this url'),
+                    Text(urlString),
+                    const Text('And input the string below'),
+                    TextField(
+                      controller: _idTokenController,
+                    ),
+                    RaisedButton(
+                      child: const Text('Login'),
+                      onPressed: _onLogin,
+                    )
+                  ],
+                ),
               ),
-            ),
-    );
-  }
+      );
 }

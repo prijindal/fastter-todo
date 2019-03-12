@@ -50,10 +50,10 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
   }
 
   void _pickColor() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text("Pick a color"),
+            title: const Text('Pick a color'),
             content: SingleChildScrollView(
               child: BlockPicker(
                 pickerColor: _pickerColor,
@@ -79,10 +79,10 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add new project"),
+        title: const Text('Add new project'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.save),
+            icon: const Icon(Icons.save),
             onPressed: _onSave,
           )
         ],
@@ -93,7 +93,7 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
             focusNode: titleFocusNode,
             controller: titleController,
             decoration: InputDecoration(
-              labelText: "Title",
+              labelText: 'Title',
             ),
           ),
           ListTile(
@@ -107,8 +107,8 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
                 borderRadius: BorderRadius.circular(16.0),
               ),
             ),
-            title: Text("Color"),
-            subtitle: Text('#' + _currentColor.value.toRadixString(16)),
+            title: const Text('Color'),
+            subtitle: Text('#${_currentColor.value.toRadixString(16)}'),
           )
         ],
       ),

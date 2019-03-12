@@ -13,21 +13,21 @@ class InboxScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TodoList(
-      filter: {'project': null},
-      title: "Inbox",
+      filter: <String, dynamic>{'project': null},
+      title: 'Inbox',
     );
   }
 }
 
 DateTime now = DateTime.now();
-DateTime startOfToday = new DateTime(now.year, now.month, now.day, 0, 0, 0, 0);
+DateTime startOfToday = DateTime(now.year, now.month, now.day, 0, 0, 0, 0);
 
 class TodayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TodoList(
-      title: "Today",
-      filter: {
+      title: 'Today',
+      filter: <String, dynamic>{
         '_operators': {
           'dueDate': {
             'gte': startOfToday,
@@ -43,8 +43,8 @@ class SevenDayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TodoList(
-      title: "7 Days",
-      filter: {
+      title: '7 Days',
+      filter: <String, dynamic>{
         '_operators': {
           'dueDate': {
             'gte': startOfToday,
