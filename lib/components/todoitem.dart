@@ -51,7 +51,9 @@ class _TodoItem extends StatelessWidget {
 
   void _selectDate(BuildContext context) {
     todoSelectDate(context, todo.dueDate).then((dueDate) {
-      todo.dueDate = dueDate;
+      if (dueDate != null) {
+        todo.dueDate = dueDate.dateTime;
+      }
       updateTodo(
         todo,
       );

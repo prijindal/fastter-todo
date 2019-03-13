@@ -94,7 +94,9 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
   void _selectDate() {
     todoSelectDate(context, _dueDate).then((dueDate) {
       setState(() {
-        _dueDate = dueDate;
+        if (dueDate != null) {
+          _dueDate = dueDate.dateTime;
+        }
       });
     });
   }

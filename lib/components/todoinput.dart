@@ -56,7 +56,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
       TextEditingController(text: '');
   final FocusNode _titleFocusNode = FocusNode();
   bool _isPreventClose = false;
-  DateTime dueDate;
+  DateTime dueDate = DateTime.now();
   Project project;
   int subscribingId;
 
@@ -142,8 +142,9 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   }
 
   void _onSave() {
-    dueDate ??= DateTime.now();
-    dueDate = DateTime(dueDate.year, dueDate.month, dueDate.day, 0, 0, 0);
+    if (dueDate != null) {
+      dueDate = DateTime(dueDate.year, dueDate.month, dueDate.day, 0, 0, 0);
+    }
     final todo = Todo(
       title: titleInputController.text,
       dueDate: dueDate,
@@ -160,9 +161,11 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     setState(() {
       _isPreventClose = true;
     });
-    todoSelectDate(context).then((dueDate) {
+    todoSelectDate(context).then((date) {
       setState(() {
-        this.dueDate = dueDate;
+        if (date != null) {
+          dueDate = date.dateTime;
+        }
         _isPreventClose = false;
         _focusKeyboard();
       });

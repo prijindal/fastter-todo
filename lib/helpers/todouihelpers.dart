@@ -1,14 +1,16 @@
 import 'package:intl/intl.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import '../components/date_picker.dart';
 
-Future<DateTime> todoSelectDate(BuildContext context, [DateTime initialDate]) {
+Future<DatePickerResponse> todoSelectDate(BuildContext context,
+    [DateTime initialDate]) {
   final now = DateTime.now();
   final selectedDate = showDatePicker(
     context: context,
     initialDate: initialDate == null ? now : initialDate,
     firstDate: now.subtract(const Duration(days: 365)),
     lastDate: now.add(const Duration(days: 365)),
-  ).then((date) => DateTime(date.year, date.month, date.day, 0, 0, 0));
+  );
   return selectedDate;
 }
 

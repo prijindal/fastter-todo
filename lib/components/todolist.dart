@@ -120,6 +120,9 @@ class _TodoListState extends State<_TodoList> {
   }
 
   String _dueDateCategorize(DateTime dueDate) {
+    if (dueDate == null) {
+      return "No date";
+    }
     final now = DateTime.now();
     final diff = dueDate.difference(now);
     if (diff.inDays < 0) {
@@ -155,6 +158,9 @@ class _TodoListState extends State<_TodoList> {
     final items =
         widget.todos.items.where((todo) => todo.completed != true).toList();
     items.sort((a, b) {
+      if (a.dueDate == null || b.dueDate == null) {
+        return a.createdAt.difference(b.createdAt).inDays;
+      }
       return a.dueDate.difference(b.dueDate).inDays;
     });
 
