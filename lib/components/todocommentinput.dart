@@ -47,6 +47,8 @@ class _TodoCommentInput extends StatefulWidget {
   _TodoCommentInputState createState() => _TodoCommentInputState();
 }
 
+enum TodoCommentInputAttachmentType { image }
+
 class _TodoCommentInputState extends State<_TodoCommentInput> {
   TextEditingController commentContentController = TextEditingController();
 
@@ -73,12 +75,33 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
             width: min(480, MediaQuery.of(context).size.width - 20.0),
             padding: const EdgeInsets.all(4),
             child: Form(
-              child: TextFormField(
+              child: TextField(
                 controller: commentContentController,
                 decoration: InputDecoration(
                   labelText: "Add new comment",
+                  suffixIcon: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      PopupMenuButton<TodoCommentInputAttachmentType>(
+                        child: Icon(Icons.attach_file),
+                        itemBuilder: (context) => [
+                              PopupMenuItem<TodoCommentInputAttachmentType>(
+                                child: ListTile(
+                                  leading: Icon(Icons.image),
+                                  title: Text("Image"),
+                                ),
+                              ),
+                            ],
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: _addComment,
+                      ),
+                    ],
+                  ),
                 ),
-                onFieldSubmitted: (title) {
+                onSubmitted: (title) {
                   _addComment();
                 },
               ),

@@ -31,6 +31,7 @@ class TodoCommentsScreen extends StatelessWidget {
                         todocomment.todo.id == todo.id)
                     .toList(),
               ),
+              syncStart: () => store.dispatch(StartSync<TodoComment>()),
               addComment: (TodoComment comment) =>
                   store.dispatch(AddItem<TodoComment>(comment)),
             ),
@@ -42,18 +43,26 @@ class _TodoCommentsScreen extends StatefulWidget {
     @required this.todo,
     @required this.todoComments,
     @required this.addComment,
+    @required this.syncStart,
     Key key,
   }) : super(key: key);
 
   final Todo todo;
   final ListState<TodoComment> todoComments;
   final void Function(TodoComment) addComment;
+  final VoidCallback syncStart;
 
   _TodoCommentsScreenState createState() => _TodoCommentsScreenState();
 }
 
 class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
   ScrollController scrollController = ScrollController();
+
+  @override
+  void initState() {
+    widget.syncStart();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

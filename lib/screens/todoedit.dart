@@ -206,7 +206,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
               right: 48,
               top: headerHeight - 32.0,
               child: FloatingActionButton(
-                child: const Icon(Icons.save),
+                child: const Icon(Icons.send),
                 onPressed: _onSave,
               ),
             )

@@ -6,6 +6,7 @@ import '../fastter/fastter.dart';
 import '../models/user.model.dart';
 import 'projects.dart';
 import 'state.dart';
+import 'todocomments.dart';
 import 'todos.dart';
 
 class ConfirmUserAction {
@@ -150,6 +151,7 @@ class UserMiddleware extends MiddlewareClass<AppState> {
 
       fastterProjects.queries.initSubscriptions(store);
       fastterTodos.queries.initSubscriptions(store);
+      fastterTodoComments.queries.initSubscriptions(store);
     } else if (action is LogoutUserAction || action is LoginUserError) {
       store.dispatch(ClearAll());
       Fastter.instance.logout();

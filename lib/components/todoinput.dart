@@ -230,7 +230,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
                           child: Container(),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.add),
+                          icon: const Icon(Icons.send),
                           onPressed: _onSave,
                         )
                       ],
