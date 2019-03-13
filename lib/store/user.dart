@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:redux/redux.dart';
 
@@ -40,15 +41,19 @@ class LoginUserAction {
 }
 
 class UpdateUserAction {
-  UpdateUserAction({this.name, this.email});
+  UpdateUserAction({this.name, this.email, this.picture})
+      : completer = Completer<void>();
 
+  final Completer<void> completer;
   final String name;
   final String email;
+  final String picture;
 }
 
 class UpdateUserPasswordAction {
-  UpdateUserPasswordAction(this.password);
+  UpdateUserPasswordAction(this.password) : completer = Completer<void>();
 
+  final Completer<void> completer;
   final String password;
 }
 
@@ -106,7 +111,7 @@ UserState userReducer(UserState state, dynamic action) {
     return UserState(
       user: User(
         id: state.user.id,
-        picture: state.user.picture,
+        picture: action.picture != null ? action.picture : state.user.picture,
         name: action.name != null ? action.name : state.user.name,
         email: action.email != null ? action.email : state.user.email,
       ),
@@ -127,7 +132,6 @@ class UserMiddleware extends MiddlewareClass<AppState> {
       Fastter.instance.bearer = action.bearer;
       try {
         Fastter.instance.checkCurrent().then((response) {
-          print(response);
           if (response != null && response.current != null) {
             store.dispatch(
                 LoginUserSuccessfull(response.current, action.bearer));
@@ -206,8 +210,8 @@ class UserMiddleware extends MiddlewareClass<AppState> {
             .request(
           Request(
             query: '''
-              mutation(\$email:String, \$name:String) {
-                updateUser(input:{email:\$email,name:\$name}) {
+              mutation(\$email:String, \$name:String, \$picture: String) {
+                updateUser(input:{email:\$email,name:\$name, picture: \$picture}) {
                   ...user
                 }
               }
@@ -216,10 +220,13 @@ class UserMiddleware extends MiddlewareClass<AppState> {
             variables: {
               'name': action.name,
               'email': action.email,
+              'picture': action.picture,
             },
           ),
         )
-            .catchError((error) {
+            .then((value) {
+          action.completer.complete();
+        }).catchError((error) {
           store.dispatch(LoginUserError(error.toString()));
         });
       } catch (error) {
@@ -243,7 +250,9 @@ class UserMiddleware extends MiddlewareClass<AppState> {
             },
           ),
         )
-            .catchError((error) {
+            .then((value) {
+          action.completer.complete();
+        }).catchError((error) {
           store.dispatch(LoginUserError(error.toString()));
         });
       } catch (error) {
