@@ -9,6 +9,7 @@ import '../models/base.model.dart';
 import '../models/project.model.dart';
 import '../models/todo.model.dart';
 import '../screens/todoedit.dart';
+import '../screens/todocomments.dart';
 import '../store/state.dart';
 
 import 'projectdropdown.dart';
@@ -128,6 +129,27 @@ class _TodoEditBar extends StatelessWidget {
     }
   }
 
+  Widget _buildCommentButton() {
+    final todoid = selectedTodos[0];
+    if (todos.items.isNotEmpty) {
+      final todo = todos.items.singleWhere((item) => item.id == todoid);
+      return IconButton(
+        icon: const Icon(Icons.comment),
+        onPressed: () {
+          mainNavigatorKey.currentState.push<void>(
+            MaterialPageRoute<void>(
+              builder: (context) => TodoCommentsScreen(
+                    todo: todo,
+                  ),
+            ),
+          );
+        },
+      );
+    } else {
+      return null;
+    }
+  }
+
   Widget _buildChangeProjectButton() => ProjectDropdown(
         onSelected: onChangeProject,
         selectedProject: todos.items.isNotEmpty
@@ -143,6 +165,7 @@ class _TodoEditBar extends StatelessWidget {
         _buildChangeDateButton(context),
         _buildEditButton(),
         _buildChangeProjectButton(),
+        _buildCommentButton(),
       ];
     }
     return <Widget>[

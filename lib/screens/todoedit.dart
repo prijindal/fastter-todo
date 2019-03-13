@@ -9,6 +9,8 @@ import '../helpers/todouihelpers.dart';
 import '../models/base.model.dart';
 import '../models/project.model.dart';
 import '../models/todo.model.dart';
+import '../models/todocomment.model.dart';
+import '../screens/todocomments.dart';
 import '../store/selectedtodos.dart';
 import '../store/state.dart';
 
@@ -25,14 +27,22 @@ class TodoEditScreen extends StatelessWidget {
       StoreConnector<AppState, Store<AppState>>(
         converter: (store) => store,
         builder: (context, store) => _TodoEditScreen(
-            todo: todo,
-            projects: store.state.projects,
-            updateTodo: (updated) =>
-                store.dispatch(UpdateItem<Todo>(todo.id, updated)),
-            deleteTodo: () {
-              store.dispatch(UnSelectTodo(todo.id));
-              store.dispatch(DeleteItem<Todo>(todo.id));
-            }),
+              todo: todo,
+              projects: store.state.projects,
+              todoComments: ListState<TodoComment>(
+                items: store.state.todoComments.items
+                    .where((todocomment) =>
+                        todocomment.todo != null &&
+                        todocomment.todo.id == todo.id)
+                    .toList(),
+              ),
+              updateTodo: (updated) =>
+                  store.dispatch(UpdateItem<Todo>(todo.id, updated)),
+              deleteTodo: () {
+                store.dispatch(UnSelectTodo(todo.id));
+                store.dispatch(DeleteItem<Todo>(todo.id));
+              },
+            ),
       );
 }
 
@@ -40,6 +50,7 @@ class _TodoEditScreen extends StatefulWidget {
   const _TodoEditScreen({
     @required this.todo,
     @required this.projects,
+    @required this.todoComments,
     @required this.updateTodo,
     @required this.deleteTodo,
     Key key,
@@ -47,6 +58,7 @@ class _TodoEditScreen extends StatefulWidget {
 
   final Todo todo;
   final ListState<Project> projects;
+  final ListState<TodoComment> todoComments;
   final void Function(Todo) updateTodo;
   final VoidCallback deleteTodo;
 
@@ -101,6 +113,16 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
         }
       });
     });
+  }
+
+  void _openComments() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TodoCommentsScreen(
+              todo: widget.todo,
+            ),
+      ),
+    );
   }
 
   void _delete() {
@@ -169,6 +191,14 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                       ? null
                       : Text(dueDateFormatter(_dueDate)),
                   onTap: _selectDate,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.comment),
+                  title: const Text('Comments'),
+                  subtitle: widget.todoComments.items.isEmpty
+                      ? Text('No Comments')
+                      : Text('${widget.todoComments.items.length} Comments'),
+                  onTap: _openComments,
                 )
               ],
             ),
