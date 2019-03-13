@@ -86,6 +86,28 @@ class _TodoItem extends StatelessWidget {
     updateTodo(todo);
   }
 
+  Widget _buildProject() {
+    return Flexible(
+      child: Flex(
+        direction: Axis.horizontal,
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            constraints: BoxConstraints(maxWidth: 200, maxHeight: 40),
+            child: Text(todo.project.title),
+          ),
+          Icon(
+            Icons.group_work,
+            color: HexColor(todo.project.color),
+            size: 16,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSubtitle() {
     final children = <Widget>[];
     if (todo.dueDate != null) {
@@ -97,27 +119,7 @@ class _TodoItem extends StatelessWidget {
       );
     }
     if (todo.project != null) {
-      children.add(
-        Flexible(
-          child: Flex(
-            direction: Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 8),
-                constraints: BoxConstraints(maxWidth: 200, maxHeight: 40),
-                child: Text(todo.project.title),
-              ),
-              Icon(
-                Icons.group_work,
-                color: HexColor(todo.project.color),
-                size: 16,
-              ),
-            ],
-          ),
-        ),
-      );
+      children.add(_buildProject());
     }
     if (children.isEmpty) {
       return null;
@@ -127,6 +129,17 @@ class _TodoItem extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: children,
+    );
+  }
+
+  Widget _buildTitle() {
+    return Text(
+      todo.title,
+      style: TextStyle(
+        decoration: todo.completed == true
+            ? TextDecoration.lineThrough
+            : TextDecoration.none,
+      ),
     );
   }
 
@@ -174,18 +187,24 @@ class _TodoItem extends StatelessWidget {
         ),
         child: Material(
           child: ListTile(
-            leading: GestureDetector(
+            leading: InkWell(
               onTap: () {
                 _toggleCompleted(!(todo.completed == true));
               },
               child: Container(
-                width: 48,
-                height: 48,
+                constraints: BoxConstraints.expand(
+                  width: 48,
+                  height: 48,
+                ),
+                decoration:
+                    BoxDecoration(border: Border.all(color: Colors.black)),
                 child: Center(
                   child: AnimatedContainer(
+                    constraints: BoxConstraints(
+                      maxWidth: 16,
+                      maxHeight: 16,
+                    ),
                     duration: const Duration(milliseconds: 300),
-                    width: 16,
-                    height: 16,
                     decoration: BoxDecoration(
                       color: (todo.completed == true)
                           ? Theme.of(context).accentColor
@@ -199,8 +218,15 @@ class _TodoItem extends StatelessWidget {
             ),
             selected: selected,
             onTap: toggleSelected,
-            title: Text(todo.title),
-            subtitle: _buildSubtitle(),
+            title: todo.dueDate != null || todo.project == null
+                ? _buildTitle()
+                : Row(
+                    children: <Widget>[
+                      _buildTitle(),
+                      _buildProject(),
+                    ],
+                  ),
+            subtitle: todo.dueDate == null ? null : _buildSubtitle(),
           ),
         ),
       );

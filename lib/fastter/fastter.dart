@@ -152,7 +152,7 @@ class Fastter {
       // response.data = (response.type).fromJson(resp['data']);
       if (resp.errors != null && resp.errors.isNotEmpty) {
         if (!completer.isCompleted) {
-          completer.completeError(resp.errors[0]);
+          completer.completeError(resp.errors[0].message);
         }
       } else if (resp.data != null) {
         if (!completer.isCompleted) {

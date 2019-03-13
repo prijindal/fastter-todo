@@ -77,7 +77,9 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
   }
 
   void _onSave() {
-    _dueDate = DateTime(_dueDate.year, _dueDate.month, _dueDate.day, 0, 0, 0);
+    if (_dueDate != null) {
+      _dueDate = DateTime(_dueDate.year, _dueDate.month, _dueDate.day, 0, 0, 0);
+    }
     final todo = Todo(
       id: widget.todo.id,
       title: _titleInputController.text,

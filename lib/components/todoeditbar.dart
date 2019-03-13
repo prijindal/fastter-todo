@@ -130,6 +130,11 @@ class _TodoEditBar extends StatelessWidget {
 
   Widget _buildChangeProjectButton() => ProjectDropdown(
         onSelected: onChangeProject,
+        selectedProject: todos.items.isNotEmpty
+            ? todos.items
+                .singleWhere((item) => item.id == selectedTodos[0])
+                .project
+            : null,
       );
 
   List<Widget> _buildButtons(BuildContext context) {
