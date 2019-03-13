@@ -20,12 +20,14 @@ dependencies:
   flutter:
     sdk: flutter
   event_bus: any
+  firebase_storage: any
   font_awesome_flutter: any
   flutter_colorpicker: any
   flutter_offline: any
-  flutter_signin_button: any
   flutter_redux: any
+  flutter_signin_button: any
   google_sign_in: any
+  image_picker: any
   intl: any
   json_annotation: any
   keyboard_visibility: any

@@ -121,7 +121,7 @@ class _TodoListState extends State<_TodoList> {
 
   String _dueDateCategorize(DateTime dueDate) {
     if (dueDate == null) {
-      return "No date";
+      return "No Due Date";
     }
     final now = DateTime.now();
     final diff = dueDate.difference(now);

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../fastter/fastter.dart';
 import '../models/user.model.dart';
@@ -99,7 +98,6 @@ class _GoogleSignInScreenState extends State<_GoogleSignInScreen> {
   @override
   void initState() {
     super.initState();
-    launch(urlString);
   }
 
   void _onLogin() {

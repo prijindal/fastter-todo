@@ -86,40 +86,56 @@ class _TodoItem extends StatelessWidget {
     updateTodo(todo);
   }
 
-  Widget _buildProject() {
-    return Flexible(
-      child: Flex(
-        direction: Axis.horizontal,
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            constraints: BoxConstraints(maxWidth: 200, maxHeight: 40),
-            child: Text(todo.project.title),
-          ),
-          Icon(
-            Icons.group_work,
-            color: HexColor(todo.project.color),
-            size: 16,
-          ),
-        ],
+  TextStyle _subtitleTextStyle(ThemeData theme) {
+    final TextStyle style = theme.textTheme.body1;
+    Color color = theme.disabledColor;
+    return style.copyWith(color: color);
+  }
+
+  Widget _buildProject(BuildContext context) {
+    return DefaultTextStyle(
+      style: _subtitleTextStyle(Theme.of(context)),
+      child: Flexible(
+        child: Flex(
+          direction: Axis.horizontal,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              constraints: BoxConstraints(maxWidth: 200, maxHeight: 40),
+              child: Text(
+                todo.project.title,
+              ),
+            ),
+            Icon(
+              Icons.group_work,
+              color: HexColor(todo.project.color),
+              size: 16,
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildSubtitle() {
+  _buildDueDate(BuildContext context) {
+    return DefaultTextStyle(
+      style: _subtitleTextStyle(Theme.of(context)),
+      child: Flexible(
+        flex: 0,
+        child: Text(dueDateFormatter(todo.dueDate)),
+      ),
+    );
+  }
+
+  Widget _buildSubtitle(BuildContext context) {
     final children = <Widget>[];
     if (todo.dueDate != null) {
-      children.add(
-        Flexible(
-          flex: 0,
-          child: Text(dueDateFormatter(todo.dueDate)),
-        ),
-      );
+      children.add(_buildDueDate(context));
     }
     if (todo.project != null) {
-      children.add(_buildProject());
+      children.add(_buildProject(context));
     }
     if (children.isEmpty) {
       return null;
@@ -196,8 +212,6 @@ class _TodoItem extends StatelessWidget {
                   width: 48,
                   height: 48,
                 ),
-                decoration:
-                    BoxDecoration(border: Border.all(color: Colors.black)),
                 child: Center(
                   child: AnimatedContainer(
                     constraints: BoxConstraints(
@@ -223,10 +237,10 @@ class _TodoItem extends StatelessWidget {
                 : Row(
                     children: <Widget>[
                       _buildTitle(),
-                      _buildProject(),
+                      _buildProject(context),
                     ],
                   ),
-            subtitle: todo.dueDate == null ? null : _buildSubtitle(),
+            subtitle: todo.dueDate == null ? null : _buildSubtitle(context),
           ),
         ),
       );

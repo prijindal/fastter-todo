@@ -71,10 +71,9 @@ class _HomeAppDrawer extends StatelessWidget {
                   onTap: () =>
                       Navigator.of(context).pushNamed('/settings/account'),
                   leading:
-                      user.user.picture == null && user.user.picture.isNotEmpty
+                      user.user.picture == null || user.user.picture.isEmpty
                           ? const Icon(
                               Icons.person,
-                              color: Colors.white,
                             )
                           : CircleAvatar(
                               backgroundImage: NetworkImage(
