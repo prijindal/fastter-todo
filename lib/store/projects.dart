@@ -21,6 +21,8 @@ final FastterListRedux<Project, AppState> fastterProjects =
   toInput: (obj) {
     final json = obj.toJson();
     json.remove('_id');
+    json.remove('createdAt');
+    json.remove('updatedAt');
     return json;
   },
   filterObject: (project, filter) => true,

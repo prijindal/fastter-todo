@@ -30,6 +30,8 @@ final FastterListRedux<Todo, AppState> fastterTodos =
   toInput: (obj) {
     final json = obj.toJson();
     json.remove('_id');
+    json.remove('createdAt');
+    json.remove('updatedAt');
     json['project'] = obj.project == null ? null : obj.project.id;
     json['labels'] =
         obj.labels == null ? <String>[] : obj.labels.map((l) => l.id).toList();

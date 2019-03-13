@@ -23,6 +23,8 @@ final FastterListRedux<TodoComment, AppState> fastterTodoComments =
   toInput: (obj) {
     final json = obj.toJson();
     json.remove('_id');
+    json.remove('createdAt');
+    json.remove('updatedAt');
     json['todo'] = obj.todo == null ? null : obj.todo.id;
     return json;
   },

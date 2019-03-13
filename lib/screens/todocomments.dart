@@ -1,8 +1,9 @@
-import 'dart:math';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+import '../components/todocommentitem.dart';
+import '../components/todocommentinput.dart';
 import '../fastter/fastter_action.dart';
 import '../models/base.model.dart';
 import '../models/todo.model.dart';
@@ -36,7 +37,7 @@ class TodoCommentsScreen extends StatelessWidget {
       );
 }
 
-class _TodoCommentsScreen extends StatefulWidget {
+class _TodoCommentsScreen extends StatelessWidget {
   const _TodoCommentsScreen({
     @required this.todo,
     @required this.todoComments,
@@ -48,69 +49,34 @@ class _TodoCommentsScreen extends StatefulWidget {
   final ListState<TodoComment> todoComments;
   final void Function(TodoComment) addComment;
 
-  _TodoCommentsScreenState createState() => _TodoCommentsScreenState();
-}
-
-class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
-  TextEditingController commentContentController = TextEditingController();
-
-  void _addComment() {
-    widget.addComment(
-      TodoComment(
-        content: commentContentController.text,
-        todo: widget.todo,
-      ),
-    );
-    commentContentController.clear();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.todo.title),
+        title: Text(todo.title),
       ),
       body: Stack(
         children: <Widget>[
-          ListView(
-            children: widget.todoComments.items
-                .map(
-                  (comment) => ListTile(
-                        title: Text(comment.content),
-                      ),
+          todoComments.items.isEmpty
+              ? Container(
+                  child: Center(
+                    child: Text("No Comments"),
+                  ),
                 )
-                .toList(),
-          ),
+              : ListView(
+                  children: todoComments.items
+                      .map(
+                        (todoComment) => TodoCommentItem(
+                              todoComment: todoComment,
+                            ),
+                      )
+                      .toList(),
+                ),
           Positioned(
             bottom: 0,
             left: 0,
-            child: Material(
-              elevation: 4,
-              child: Container(
-                color: Colors.white,
-                width:
-                    MediaQuery.of(context).orientation == Orientation.portrait
-                        ? MediaQuery.of(context).size.width
-                        : MediaQuery.of(context).size.width -
-                            304, // 304 is the _kWidth of drawer,
-                child: Center(
-                  child: Container(
-                    width: min(480, MediaQuery.of(context).size.width - 20.0),
-                    padding: const EdgeInsets.all(4),
-                    child: Form(
-                      child: TextFormField(
-                        controller: commentContentController,
-                        decoration: InputDecoration(
-                          labelText: "Add new comment",
-                        ),
-                        onFieldSubmitted: (title) {
-                          _addComment();
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+            child: TodoCommentInput(
+              todo: todo,
             ),
           )
         ],
