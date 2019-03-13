@@ -81,7 +81,7 @@ class _HomeAppDrawer extends StatelessWidget {
                                 user.user.picture,
                               ),
                             ),
-                  title: Text(user.user.email),
+                  title: Text(user.user.name),
                   subtitle: Text(user.user.email),
                 )
               : Container(),

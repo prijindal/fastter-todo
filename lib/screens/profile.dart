@@ -4,6 +4,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../models/user.model.dart';
 import '../store/state.dart';
+import '../store/user.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override
@@ -12,6 +13,10 @@ class ProfileScreen extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _ProfileScreen(
               user: store.state.user,
+              updateUser: ({String name, String email}) =>
+                  store.dispatch(UpdateUserAction(name: name, email: email)),
+              updatePassword: (String password) =>
+                  store.dispatch(UpdateUserPasswordAction(password)),
             ),
       );
 }
@@ -19,8 +24,13 @@ class ProfileScreen extends StatelessWidget {
 class _ProfileScreen extends StatefulWidget {
   const _ProfileScreen({
     @required this.user,
+    @required this.updateUser,
+    @required this.updatePassword,
     Key key,
   }) : super(key: key);
+
+  final void Function({String name, String email}) updateUser;
+  final void Function(String) updatePassword;
   final UserState user;
 
   @override
@@ -31,12 +41,14 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   User get user => widget.user.user;
 
   void _editName() {
+    final TextEditingController nameController =
+        TextEditingController(text: user.name);
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
             title: const Text('Type your name'),
             content: TextFormField(
-              initialValue: user.name,
+              controller: nameController,
             ),
             actions: <Widget>[
               FlatButton(
@@ -48,7 +60,8 @@ class _ProfileScreenState extends State<_ProfileScreen> {
               FlatButton(
                 child: const Text('Save'),
                 onPressed: () {
-                  // Save name
+                  Navigator.of(context).pop();
+                  widget.updateUser(name: nameController.text);
                 },
               )
             ],
@@ -57,12 +70,14 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   }
 
   void _editEmail() {
+    final TextEditingController emailController =
+        TextEditingController(text: user.name);
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
             title: const Text('Type your Email'),
             content: TextFormField(
-              initialValue: user.email,
+              controller: emailController,
               keyboardType: TextInputType.emailAddress,
             ),
             actions: <Widget>[
@@ -76,6 +91,8 @@ class _ProfileScreenState extends State<_ProfileScreen> {
                 child: const Text('Save'),
                 onPressed: () {
                   // Save name
+                  Navigator.of(context).pop();
+                  widget.updateUser(email: emailController.text);
                 },
               )
             ],
@@ -84,11 +101,14 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   }
 
   void _changePassword() {
+    final TextEditingController passwordController =
+        TextEditingController(text: user.name);
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
             title: const Text('Type your Password'),
             content: TextFormField(
+              controller: passwordController,
               keyboardType: TextInputType.text,
               obscureText: true,
             ),
@@ -103,6 +123,8 @@ class _ProfileScreenState extends State<_ProfileScreen> {
                 child: const Text('Save'),
                 onPressed: () {
                   // Save name
+                  Navigator.of(context).pop();
+                  widget.updatePassword(passwordController.text);
                 },
               )
             ],

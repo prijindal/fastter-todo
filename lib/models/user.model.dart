@@ -74,6 +74,7 @@ class UserState {
     @required this.user,
     @required this.bearer,
     this.isLoading = false,
+    this.initLoaded = false,
     this.errorMessage,
   });
   factory UserState.fromJson(Map<String, dynamic> json) =>
@@ -82,6 +83,7 @@ class UserState {
   final User user;
   final String bearer;
   final bool isLoading;
+  final bool initLoaded;
   final String errorMessage;
 
   Map<String, dynamic> toJson() => _$UserStateToJson(this);

@@ -39,6 +39,19 @@ class LoginUserAction {
   final String password;
 }
 
+class UpdateUserAction {
+  UpdateUserAction({this.name, this.email});
+
+  final String name;
+  final String email;
+}
+
+class UpdateUserPasswordAction {
+  UpdateUserPasswordAction(this.password);
+
+  final String password;
+}
+
 class LogoutUserAction {}
 
 UserState userReducer(UserState state, dynamic action) {
@@ -48,10 +61,12 @@ UserState userReducer(UserState state, dynamic action) {
       bearer: null,
       isLoading: true,
       errorMessage: null,
+      initLoaded: true,
     );
   } else if (action is GoogleLoginUserAction) {
     return UserState(
       bearer: null,
+      initLoaded: true,
       user: null,
       isLoading: true,
       errorMessage: null,
@@ -60,6 +75,7 @@ UserState userReducer(UserState state, dynamic action) {
     return UserState(
       user: state.user,
       bearer: action.bearer,
+      initLoaded: false,
       isLoading: true,
       errorMessage: null,
     );
@@ -67,6 +83,7 @@ UserState userReducer(UserState state, dynamic action) {
     return UserState(
       user: null,
       bearer: null,
+      initLoaded: true,
       isLoading: false,
       errorMessage: null,
     );
@@ -75,11 +92,26 @@ UserState userReducer(UserState state, dynamic action) {
         user: null,
         bearer: null,
         isLoading: false,
+        initLoaded: true,
         errorMessage: action.errorMessage);
   } else if (action is LoginUserSuccessfull) {
     return UserState(
       user: action.user,
+      initLoaded: true,
       bearer: action.bearer,
+      isLoading: false,
+      errorMessage: null,
+    );
+  } else if (action is UpdateUserAction) {
+    return UserState(
+      user: User(
+        id: state.user.id,
+        picture: state.user.picture,
+        name: action.name != null ? action.name : state.user.name,
+        email: action.email != null ? action.email : state.user.email,
+      ),
+      initLoaded: true,
+      bearer: state.bearer,
       isLoading: false,
       errorMessage: null,
     );
@@ -95,6 +127,7 @@ class UserMiddleware extends MiddlewareClass<AppState> {
       Fastter.instance.bearer = action.bearer;
       try {
         Fastter.instance.checkCurrent().then((response) {
+          print(response);
           if (response != null && response.current != null) {
             store.dispatch(
                 LoginUserSuccessfull(response.current, action.bearer));
@@ -162,6 +195,55 @@ class UserMiddleware extends MiddlewareClass<AppState> {
             store.dispatch(LoginUserError('Wrong username password'));
           }
         }).catchError((dynamic error) {
+          store.dispatch(LoginUserError(error.toString()));
+        });
+      } catch (error) {
+        store.dispatch(LoginUserError(error.toString()));
+      }
+    } else if (action is UpdateUserAction) {
+      try {
+        Fastter.instance
+            .request(
+          Request(
+            query: '''
+              mutation(\$email:String, \$name:String) {
+                updateUser(input:{email:\$email,name:\$name}) {
+                  ...user
+                }
+              }
+              $userFragment
+            ''',
+            variables: {
+              'name': action.name,
+              'email': action.email,
+            },
+          ),
+        )
+            .catchError((error) {
+          store.dispatch(LoginUserError(error.toString()));
+        });
+      } catch (error) {
+        store.dispatch(LoginUserError(error.toString()));
+      }
+    } else if (action is UpdateUserPasswordAction) {
+      try {
+        Fastter.instance
+            .request(
+          Request(
+            query: '''
+              mutation(\$password:String) {
+                updatePassword(input:{password:\$password}) {
+                  ...user
+                }
+              }
+              $userFragment
+            ''',
+            variables: {
+              'password': action.password,
+            },
+          ),
+        )
+            .catchError((error) {
           store.dispatch(LoginUserError(error.toString()));
         });
       } catch (error) {
