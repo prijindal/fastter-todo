@@ -33,6 +33,7 @@ dependencies:
   keyboard_visibility: any
   redux_persist: any
   redux_persist_flutter: any
+  share: any
   socket_io_client: any
   redux_logging: any
   tuple: any

@@ -2,6 +2,7 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:share/share.dart';
 
 import '../fastter/fastter_action.dart';
 import '../helpers/navigator.dart';
@@ -54,7 +55,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       );
 }
 
-enum _PopupAction { delete, deleteall, editproject, copy }
+enum _PopupAction { delete, deleteall, editproject, copy, share }
 
 class _HomeAppBar extends StatelessWidget {
   const _HomeAppBar({
@@ -140,23 +141,26 @@ class _HomeAppBar extends StatelessWidget {
     );
   }
 
-  void _copySelected(BuildContext context) {
-    if (selectedtodos.length == 1 && todos.items.isNotEmpty) {
-      final todoid = selectedtodos[0];
-      final todo = todos.items.singleWhere((item) => item.id == todoid);
-      Clipboard.setData(ClipboardData(text: todo.title));
-    } else {
-      String text = "";
-      for (var title in todos.items.map(((todo) => todo.title))) {
-        text += title + "\n";
-      }
-      Clipboard.setData(ClipboardData(text: text));
+  String _tasksToString() {
+    String text = "";
+    for (var todo
+        in todos.items.where((todo) => selectedtodos.contains(todo.id))) {
+      text += todo.title + "\n";
     }
+    return text;
+  }
+
+  void _copySelected(BuildContext context) {
+    Clipboard.setData(ClipboardData(text: _tasksToString()));
     Scaffold.of(context).showSnackBar(
       SnackBar(
         content: Text("Copied to clipboard"),
       ),
     );
+  }
+
+  void _shareSelected(BuildContext context) {
+    Share.share(_tasksToString());
   }
 
   void _deleteAll(BuildContext context) {
@@ -200,6 +204,8 @@ class _HomeAppBar extends StatelessWidget {
               _deleteSelected(context);
             } else if (value == _PopupAction.copy) {
               _copySelected(context);
+            } else if (value == _PopupAction.share) {
+              _shareSelected(context);
             }
           } else {
             if (value == _PopupAction.deleteall) {
@@ -216,6 +222,10 @@ class _HomeAppBar extends StatelessWidget {
               PopupMenuItem<_PopupAction>(
                 child: const Text('Copy'),
                 value: _PopupAction.copy,
+              ),
+              PopupMenuItem<_PopupAction>(
+                child: const Text('Share'),
+                value: _PopupAction.share,
               ),
               PopupMenuItem<_PopupAction>(
                 child: const Text('Delete'),
