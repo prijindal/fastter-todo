@@ -201,50 +201,57 @@ class _TodoItem extends StatelessWidget {
             ),
           ],
         ),
-        child: Material(
-          child: ListTile(
-            leading: InkWell(
-              onTap: () {
-                _toggleCompleted(!(todo.completed == true));
-              },
-              child: Container(
-                constraints: BoxConstraints.expand(
-                  width: 48,
-                  height: 48,
-                ),
-                child: Center(
-                  child: AnimatedContainer(
-                    constraints: BoxConstraints(
-                      maxWidth: 16,
-                      maxHeight: 16,
-                    ),
-                    duration: const Duration(milliseconds: 300),
-                    decoration: BoxDecoration(
-                      color: (todo.completed == true)
-                          ? Theme.of(context).accentColor
-                          : Colors.transparent,
-                      border: Border.all(color: Colors.black),
-                      borderRadius: const BorderRadius.all(Radius.circular(18)),
-                    ),
+        child: ListTile(
+          leading: InkWell(
+            onTap: () {
+              _toggleCompleted(!(todo.completed == true));
+            },
+            child: Container(
+              constraints: BoxConstraints.expand(
+                width: 48,
+                height: 48,
+              ),
+              child: Center(
+                child: AnimatedContainer(
+                  constraints: BoxConstraints(
+                    maxWidth: 16,
+                    maxHeight: 16,
+                  ),
+                  duration: const Duration(milliseconds: 300),
+                  decoration: BoxDecoration(
+                    color: (todo.completed == true)
+                        ? Theme.of(context).accentColor
+                        : Colors.transparent,
+                    border: Border.all(color: Colors.black),
+                    borderRadius: const BorderRadius.all(Radius.circular(18)),
                   ),
                 ),
               ),
             ),
-            selected: selected,
-            onTap: toggleSelected,
-            title: todo.dueDate != null || todo.project == null
-                ? _buildTitle()
-                : Row(
-                    children: <Widget>[
-                      _buildTitle(),
-                      _buildProject(context),
-                    ],
-                  ),
-            subtitle: todo.dueDate == null ? null : _buildSubtitle(context),
           ),
+          selected: selected,
+          onTap: toggleSelected,
+          title: todo.dueDate != null || todo.project == null
+              ? _buildTitle()
+              : Row(
+                  children: <Widget>[
+                    _buildTitle(),
+                    _buildProject(context),
+                  ],
+                ),
+          subtitle: todo.dueDate == null ? null : _buildSubtitle(context),
         ),
       );
 
   @override
-  Widget build(BuildContext context) => _buildBody(context);
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Theme.of(context).dividerColor,
+            ),
+          ),
+        ),
+        child: _buildBody(context),
+      );
 }

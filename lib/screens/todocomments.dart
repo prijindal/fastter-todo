@@ -37,7 +37,7 @@ class TodoCommentsScreen extends StatelessWidget {
       );
 }
 
-class _TodoCommentsScreen extends StatelessWidget {
+class _TodoCommentsScreen extends StatefulWidget {
   const _TodoCommentsScreen({
     @required this.todo,
     @required this.todoComments,
@@ -49,37 +49,52 @@ class _TodoCommentsScreen extends StatelessWidget {
   final ListState<TodoComment> todoComments;
   final void Function(TodoComment) addComment;
 
+  _TodoCommentsScreenState createState() => _TodoCommentsScreenState();
+}
+
+class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
+  ScrollController scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(todo.title),
+        title: Text(widget.todo.title),
       ),
-      body: Stack(
-        children: <Widget>[
-          todoComments.items.isEmpty
-              ? Container(
-                  child: Center(
-                    child: Text("No Comments"),
+      body: Container(
+        color: Theme.of(context).backgroundColor,
+        child: Flex(
+          direction: Axis.vertical,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            widget.todoComments.items.isEmpty
+                ? Flexible(
+                    child: Center(
+                      child: Text("No Comments"),
+                    ),
+                  )
+                : Flexible(
+                    child: SingleChildScrollView(
+                      controller: scrollController,
+                      child: Column(
+                        children: widget.todoComments.items.reversed
+                            .map(
+                              (todoComment) => TodoCommentItem(
+                                    todoComment: todoComment,
+                                  ),
+                            )
+                            .toList(),
+                      ),
+                    ),
                   ),
-                )
-              : ListView(
-                  children: todoComments.items
-                      .map(
-                        (todoComment) => TodoCommentItem(
-                              todoComment: todoComment,
-                            ),
-                      )
-                      .toList(),
-                ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            child: TodoCommentInput(
-              todo: todo,
-            ),
-          )
-        ],
+            TodoCommentInput(
+                todo: widget.todo,
+                onAdded: () {
+                  scrollController
+                      .jumpTo(scrollController.position.maxScrollExtent);
+                }),
+          ],
+        ),
       ),
     );
   }

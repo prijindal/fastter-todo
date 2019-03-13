@@ -59,9 +59,7 @@ class _TodoCommentItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       key: Key(todoComment.id),
-      confirmDismiss: (direction) async {
-        return _confirmDelete(context);
-      },
+      confirmDismiss: (direction) => _confirmDelete(context),
       onDismissed: (direction) {
         deleteComment();
         Scaffold.of(context).removeCurrentSnackBar();
@@ -92,9 +90,11 @@ class _TodoCommentItem extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
-        title: Text(todoComment.content),
-        subtitle: Text(dateFromNowFormatter(todoComment.createdAt)),
+      child: Card(
+        child: ListTile(
+          title: Text(todoComment.content),
+          subtitle: Text(dateFromNowFormatter(todoComment.createdAt)),
+        ),
       ),
     );
   }

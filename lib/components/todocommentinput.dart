@@ -11,10 +11,12 @@ import '../store/state.dart';
 class TodoCommentInput extends StatelessWidget {
   const TodoCommentInput({
     @required this.todo,
+    this.onAdded,
     Key key,
   }) : super(key: key);
 
   final Todo todo;
+  final VoidCallback onAdded;
 
   @override
   Widget build(BuildContext context) =>
@@ -22,8 +24,12 @@ class TodoCommentInput extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _TodoCommentInput(
               todo: todo,
-              addComment: (TodoComment comment) =>
-                  store.dispatch(AddItem<TodoComment>(comment)),
+              addComment: (TodoComment comment) {
+                store.dispatch(AddItem<TodoComment>(comment));
+                if (onAdded != null) {
+                  onAdded();
+                }
+              },
             ),
       );
 }
@@ -61,10 +67,7 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
       elevation: 4,
       child: Container(
         color: Colors.white,
-        width: MediaQuery.of(context).orientation == Orientation.portrait
-            ? MediaQuery.of(context).size.width
-            : MediaQuery.of(context).size.width -
-                304, // 304 is the _kWidth of drawer,
+        width: MediaQuery.of(context).size.width,
         child: Center(
           child: Container(
             width: min(480, MediaQuery.of(context).size.width - 20.0),
