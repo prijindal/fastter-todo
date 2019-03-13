@@ -12,6 +12,7 @@ import '../helpers/theme.dart';
 
 import '../models/project.model.dart';
 import '../models/todo.model.dart';
+import '../models/todocomment.model.dart';
 import '../screens/profile.dart';
 import '../screens/settings.dart';
 import '../screens/todos.dart';
@@ -25,6 +26,8 @@ class HomeContainer extends StatelessWidget {
         builder: (context, store) => _HomeContainer(
               projectSyncStart: () => store.dispatch(StartSync<Project>()),
               todoSyncStart: () => store.dispatch(StartSync<Todo>()),
+              todoCommentsSyncStart: () =>
+                  store.dispatch(StartSync<TodoComment>()),
             ),
       );
 }
@@ -33,10 +36,12 @@ class _HomeContainer extends StatelessWidget {
   const _HomeContainer({
     @required this.projectSyncStart,
     @required this.todoSyncStart,
+    @required this.todoCommentsSyncStart,
   });
 
   final VoidCallback projectSyncStart;
   final VoidCallback todoSyncStart;
+  final VoidCallback todoCommentsSyncStart;
 
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     if (settings.isInitialRoute || settings.name == '/') {
@@ -44,6 +49,7 @@ class _HomeContainer extends StatelessWidget {
         builder: (context) => _HomePage(
               projectSyncStart: projectSyncStart,
               todoSyncStart: todoSyncStart,
+              todoCommentsSyncStart: todoCommentsSyncStart,
             ),
       );
     } else if (settings.name == '/settings') {
@@ -72,10 +78,12 @@ class _HomePage extends StatefulWidget {
   const _HomePage({
     @required this.projectSyncStart,
     @required this.todoSyncStart,
+    @required this.todoCommentsSyncStart,
   });
 
   final VoidCallback projectSyncStart;
   final VoidCallback todoSyncStart;
+  final VoidCallback todoCommentsSyncStart;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -87,6 +95,7 @@ class _HomePageState extends State<_HomePage> {
     super.initState();
     widget.todoSyncStart();
     widget.projectSyncStart();
+    widget.todoCommentsSyncStart();
   }
 
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {

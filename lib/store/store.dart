@@ -8,6 +8,7 @@ import 'reducer.dart';
 import 'state.dart';
 import 'todos.dart';
 import 'user.dart';
+import 'todocomments.dart';
 
 Future<Store<AppState>> initState() async {
   dynamic storage;
@@ -33,6 +34,7 @@ Future<Store<AppState>> initState() async {
       _persistor.createMiddleware(),
       fastterProjects.middleware,
       fastterTodos.middleware,
+      fastterTodoComments.middleware,
       UserMiddleware(),
     ],
   );
@@ -47,6 +49,7 @@ Future<Store<AppState>> initState() async {
           user: state.user,
           projects: state.projects,
           todos: state.todos,
+          todoComments: state.todoComments,
         ),
       );
     } else {

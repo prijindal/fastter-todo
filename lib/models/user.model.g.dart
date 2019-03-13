@@ -59,6 +59,7 @@ UserState _$UserStateFromJson(Map<String, dynamic> json) {
           : User.fromJson(json['user'] as Map<String, dynamic>),
       bearer: json['bearer'] as String,
       isLoading: json['isLoading'] as bool,
+      initLoaded: json['initLoaded'] as bool,
       errorMessage: json['errorMessage'] as String);
 }
 
@@ -66,5 +67,6 @@ Map<String, dynamic> _$UserStateToJson(UserState instance) => <String, dynamic>{
       'user': instance.user,
       'bearer': instance.bearer,
       'isLoading': instance.isLoading,
+      'initLoaded': instance.initLoaded,
       'errorMessage': instance.errorMessage
     };

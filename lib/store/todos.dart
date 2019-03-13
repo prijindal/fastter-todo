@@ -8,7 +8,6 @@ const String _todoFragment = '''
         _id
         title
         completed
-        content
         dueDate
         project {
             _id

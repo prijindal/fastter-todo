@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import '../helpers/navigator.dart';
 import '../models/base.model.dart';
 import '../models/project.model.dart';
+import '../models/todo.model.dart';
 import '../models/user.model.dart';
 import '../screens/loading.dart';
 import '../store/state.dart';
@@ -23,6 +24,11 @@ class HomeAppDrawer extends StatelessWidget {
         builder: (context, store) => _HomeAppDrawer(
               user: store.state.user,
               projects: store.state.projects,
+              todos: ListState<Todo>(
+                items: store.state.todos.items
+                    .where((todo) => todo.completed != true)
+                    .toList(),
+              ),
               disablePop: disablePop,
             ),
       );
@@ -32,12 +38,14 @@ class _HomeAppDrawer extends StatelessWidget {
   const _HomeAppDrawer({
     @required this.user,
     @required this.projects,
+    @required this.todos,
     this.disablePop = false,
     Key key,
   }) : super(key: key);
 
   final UserState user;
   final ListState<Project> projects;
+  final ListState<Todo> todos;
   final bool disablePop;
 
   void _pushRouteNamed(
@@ -89,7 +97,16 @@ class _HomeAppDrawer extends StatelessWidget {
             enabled: routeName != '/',
             selected: routeName == '/',
             leading: const Icon(Icons.inbox),
-            title: const Text('Inbox'),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Inbox'),
+                Text(todos.items
+                    .where((todo) => todo.project == null)
+                    .length
+                    .toString()),
+              ],
+            ),
             onTap: () {
               _pushRouteNamed(context, '/');
             },
@@ -99,7 +116,13 @@ class _HomeAppDrawer extends StatelessWidget {
             enabled: routeName != '/all',
             selected: routeName == '/all',
             leading: const Icon(Icons.select_all),
-            title: const Text('All Todos'),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('All Todos'),
+                Text(todos.items.length.toString()),
+              ],
+            ),
             onTap: () {
               _pushRouteNamed(context, '/all');
             },
@@ -109,7 +132,19 @@ class _HomeAppDrawer extends StatelessWidget {
             enabled: routeName != '/today',
             selected: routeName == '/today',
             leading: const Icon(Icons.calendar_today),
-            title: const Text('Today'),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Today'),
+                Text(todos.items
+                    .where((todo) =>
+                        todo.dueDate != null &&
+                        todo.dueDate.difference(DateTime.now()).inDays >= 0 &&
+                        todo.dueDate.day == DateTime.now().day)
+                    .length
+                    .toString()),
+              ],
+            ),
             onTap: () {
               _pushRouteNamed(context, '/today');
             },
@@ -119,7 +154,19 @@ class _HomeAppDrawer extends StatelessWidget {
             enabled: routeName != '/7days',
             selected: routeName == '/7days',
             leading: const Icon(Icons.calendar_view_day),
-            title: const Text('7 Days'),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('7 Days'),
+                Text(todos.items
+                    .where((todo) =>
+                        todo.dueDate != null &&
+                        todo.dueDate.difference(DateTime.now()).inDays >= 0 &&
+                        todo.dueDate.difference(DateTime.now()).inDays < 7)
+                    .length
+                    .toString()),
+              ],
+            ),
             onTap: () {
               _pushRouteNamed(context, '/7days');
             },

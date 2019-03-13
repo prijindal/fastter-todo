@@ -6,6 +6,7 @@ import '../components/hexcolor.dart';
 import '../helpers/navigator.dart';
 import '../models/base.model.dart';
 import '../models/project.model.dart';
+import '../models/todo.model.dart';
 import '../screens/addproject.dart';
 import '../store/state.dart';
 
@@ -25,6 +26,11 @@ class ProjectExpansionTile extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _ProjectExpansionTile(
               projects: store.state.projects,
+              todos: ListState<Todo>(
+                items: store.state.todos.items
+                    .where((todo) => todo.completed != true)
+                    .toList(),
+              ),
               onChildSelected: onChildSelected,
               selectedProject: selectedProject,
             ),
@@ -34,11 +40,13 @@ class ProjectExpansionTile extends StatelessWidget {
 class _ProjectExpansionTile extends StatefulWidget {
   const _ProjectExpansionTile({
     @required this.projects,
+    @required this.todos,
     @required this.onChildSelected,
     this.selectedProject,
   });
 
   final ListState<Project> projects;
+  final ListState<Todo> todos;
   final Project selectedProject;
   final void Function(Project) onChildSelected;
 
@@ -207,7 +215,21 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
                                 ? null
                                 : HexColor(project.color),
                           ),
-                          title: Text(project.title),
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(
+                                    maxWidth: 200, maxHeight: 40),
+                                child: Text(project.title),
+                              ),
+                              Text(widget.todos.items
+                                  .where(
+                                      (todo) => todo.project.id == project.id)
+                                  .length
+                                  .toString()),
+                            ],
+                          ),
                           onTap: () => widget.onChildSelected(project),
                         ),
                   )

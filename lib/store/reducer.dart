@@ -3,12 +3,14 @@ import 'package:meta/meta.dart';
 import '../models/base.model.dart';
 import '../models/project.model.dart';
 import '../models/todo.model.dart';
+import '../models/todocomment.model.dart';
 import '../models/user.model.dart';
 import './state.dart';
 
 import 'projects.dart';
 import 'selectedtodos.dart';
 import 'todos.dart';
+import 'todocomments.dart';
 import 'user.dart';
 
 class InitStateReset {
@@ -16,10 +18,12 @@ class InitStateReset {
     @required this.user,
     this.todos = const ListState<Todo>(),
     this.projects = const ListState<Project>(),
+    this.todoComments = const ListState<TodoComment>(),
   });
   final UserState user;
   final ListState<Todo> todos;
   final ListState<Project> projects;
+  final ListState<TodoComment> todoComments;
 }
 
 AppState appStateReducer(AppState state, dynamic action) {
@@ -29,6 +33,7 @@ AppState appStateReducer(AppState state, dynamic action) {
       rehydrated: true,
       todos: action.todos,
       projects: action.projects,
+      todoComments: action.todoComments,
     );
   }
   if (action is ClearAll) {
@@ -37,6 +42,7 @@ AppState appStateReducer(AppState state, dynamic action) {
       rehydrated: true,
       todos: const ListState<Todo>(),
       projects: const ListState<Project>(),
+      todoComments: const ListState<TodoComment>(),
     );
   }
   return AppState(
@@ -44,6 +50,7 @@ AppState appStateReducer(AppState state, dynamic action) {
     user: userReducer(state.user, action),
     todos: fastterTodos.reducer(state.todos, action),
     projects: fastterProjects.reducer(state.projects, action),
+    todoComments: fastterTodoComments.reducer(state.todoComments, action),
     selectedTodos: selectedTodos(state.selectedTodos, action),
   );
 }

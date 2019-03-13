@@ -1,6 +1,7 @@
 import '../models/base.model.dart';
 import '../models/project.model.dart';
 import '../models/todo.model.dart';
+import '../models/todocomment.model.dart';
 import '../models/user.model.dart';
 
 class ClearAll {}
@@ -11,6 +12,7 @@ class AppState {
     this.rehydrated = false,
     this.todos = const ListState<Todo>(),
     this.projects = const ListState<Project>(),
+    this.todoComments = const ListState<TodoComment>(),
     this.selectedTodos = const [],
   });
 
@@ -32,6 +34,14 @@ class AppState {
                   .toList()
               : [],
         ),
+        todoComments: ListState<TodoComment>(
+          items: json['todoComments'] != null &&
+                  json['todoComments']['items'] != null
+              ? (json['todoComments']['items'] as List<dynamic>)
+                  .map<TodoComment>((dynamic t) => TodoComment.fromJson(t))
+                  .toList()
+              : [],
+        ),
       );
     } else {
       return AppState();
@@ -42,6 +52,7 @@ class AppState {
   UserState user;
   ListState<Todo> todos;
   ListState<Project> projects;
+  ListState<TodoComment> todoComments;
 
   // Temporary state of the app
   List<String> selectedTodos = [];
@@ -50,6 +61,7 @@ class AppState {
         'user': user != null ? user.toJson() : <String, dynamic>{},
         'todos': todos.toJson(),
         'projects': projects.toJson(),
+        'todoComments': todoComments.toJson(),
       };
 
   @override
