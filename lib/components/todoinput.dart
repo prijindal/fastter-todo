@@ -184,10 +184,13 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   Widget build(BuildContext context) => Material(
         elevation: 4,
         child: Container(
-          width: MediaQuery.of(context).size.width,
+          color: Colors.white,
+          width: MediaQuery.of(context).orientation == Orientation.portrait
+              ? MediaQuery.of(context).size.width
+              : MediaQuery.of(context).size.width -
+                  304, // 304 is the _kWidth of drawer
           child: Center(
             child: Container(
-              color: Colors.white,
               width: min(480, MediaQuery.of(context).size.width - 20.0),
               padding: const EdgeInsets.all(4),
               child: Form(

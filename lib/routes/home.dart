@@ -137,7 +137,7 @@ class _HomePageState extends State<_HomePage> {
   Widget build(BuildContext context) {
     MediaQueryData queryData;
     queryData = MediaQuery.of(context);
-    if (queryData.size.width >= 768) {
+    if (queryData.orientation == Orientation.landscape) {
       return Material(
         child: Row(
           // direction: Axis.horizontal,
