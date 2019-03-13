@@ -224,8 +224,9 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
                                 child: Text(project.title),
                               ),
                               Text(widget.todos.items
-                                  .where(
-                                      (todo) => todo.project.id == project.id)
+                                  .where((todo) =>
+                                      todo.project != null &&
+                                      todo.project.id == project.id)
                                   .length
                                   .toString()),
                             ],

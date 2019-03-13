@@ -119,7 +119,7 @@ class _HomeAppDrawer extends StatelessWidget {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('All Todos'),
+                const Text('All Tasks'),
                 Text(todos.items.length.toString()),
               ],
             ),
