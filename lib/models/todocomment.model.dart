@@ -4,11 +4,17 @@ import 'base.model.dart';
 import 'todo.model.dart';
 part 'todocomment.model.g.dart';
 
+enum TodoCommentType {
+  image,
+  text,
+}
+
 @JsonSerializable()
 class TodoComment extends BaseModel {
   TodoComment({
     this.id,
     this.content,
+    this.type,
     this.createdAt,
     this.updatedAt,
     this.todo,
@@ -20,7 +26,8 @@ class TodoComment extends BaseModel {
   @JsonKey(name: '_id', nullable: false)
   @override
   final String id;
-  String content;
+  final TodoCommentType type;
+  final String content;
 
   final DateTime createdAt;
 

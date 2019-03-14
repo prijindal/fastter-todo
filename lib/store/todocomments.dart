@@ -7,6 +7,7 @@ const String _todoCommentsFragment = '''
     fragment todoComment on TodoComment {
         _id
         content
+        type
         todo {
             _id
         }

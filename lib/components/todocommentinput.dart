@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:uuid/uuid.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -7,6 +8,7 @@ import '../fastter/fastter_action.dart';
 import '../models/todo.model.dart';
 import '../models/todocomment.model.dart';
 import '../store/state.dart';
+import 'image_picker.dart';
 
 class TodoCommentInput extends StatelessWidget {
   const TodoCommentInput({
@@ -52,14 +54,38 @@ enum TodoCommentInputAttachmentType { image }
 class _TodoCommentInputState extends State<_TodoCommentInput> {
   TextEditingController commentContentController = TextEditingController();
 
+  void _addImageComment() {
+    ImagePickerUploader(
+      context: context,
+      value: null,
+      storagePath: 'todocomments/${Uuid().v1()}.jpg',
+      onError: (error) {},
+      onChange: (value) {
+        if (value != null && value.isNotEmpty) {
+          widget.addComment(
+            TodoComment(
+              content: value,
+              type: TodoCommentType.image,
+              todo: widget.todo,
+              createdAt: DateTime.now(),
+            ),
+          );
+        }
+      },
+    ).editPicture();
+  }
+
   void _addComment() {
-    widget.addComment(
-      TodoComment(
-        content: commentContentController.text,
-        todo: widget.todo,
-        createdAt: DateTime.now(),
-      ),
-    );
+    if (commentContentController.text.isNotEmpty) {
+      widget.addComment(
+        TodoComment(
+          content: commentContentController.text,
+          type: TodoCommentType.text,
+          todo: widget.todo,
+          createdAt: DateTime.now(),
+        ),
+      );
+    }
     commentContentController.clear();
   }
 
@@ -84,9 +110,16 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       PopupMenuButton<TodoCommentInputAttachmentType>(
+                        onSelected: (selected) {
+                          if (selected ==
+                              TodoCommentInputAttachmentType.image) {
+                            _addImageComment();
+                          }
+                        },
                         child: Icon(Icons.attach_file),
                         itemBuilder: (context) => [
                               PopupMenuItem<TodoCommentInputAttachmentType>(
+                                value: TodoCommentInputAttachmentType.image,
                                 child: ListTile(
                                   leading: Icon(Icons.image),
                                   title: Text("Image"),
@@ -96,14 +129,16 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
                       ),
                       IconButton(
                         icon: Icon(Icons.send),
-                        onPressed: _addComment,
+                        onPressed: commentContentController.text.isNotEmpty
+                            ? _addComment
+                            : null,
                       ),
                     ],
                   ),
                 ),
-                onSubmitted: (title) {
-                  _addComment();
-                },
+                onSubmitted: commentContentController.text.isNotEmpty
+                    ? (title) => _addComment()
+                    : null,
               ),
             ),
           ),

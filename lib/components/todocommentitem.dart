@@ -92,7 +92,17 @@ class _TodoCommentItem extends StatelessWidget {
       ),
       child: Card(
         child: ListTile(
-          title: Text(todoComment.content),
+          title: todoComment.type == TodoCommentType.image
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Image.network(
+                      todoComment.content,
+                      height: 200.0,
+                    ),
+                  ],
+                )
+              : Text(todoComment.content),
           subtitle: Text(dateFromNowFormatter(todoComment.createdAt)),
         ),
       ),
