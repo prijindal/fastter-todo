@@ -4,6 +4,7 @@ import 'package:redux/redux.dart';
 
 import '../fastter/fastter.dart';
 import '../models/user.model.dart';
+import '../helpers/firebase.dart' show initMessaging;
 import 'projects.dart';
 import 'state.dart';
 import 'todocomments.dart';
@@ -130,21 +131,7 @@ class UserMiddleware extends MiddlewareClass<AppState> {
   @override
   void call(Store<AppState> store, dynamic action, NextDispatcher next) {
     if (action is ConfirmUserAction) {
-      Fastter.instance.bearer = action.bearer;
-      try {
-        Fastter.instance.checkCurrent().then((response) {
-          if (response != null && response.current != null) {
-            store.dispatch(
-                LoginUserSuccessfull(response.current, action.bearer));
-          } else {
-            store.dispatch(LoginUserError('Invalid User'));
-          }
-        }).catchError((dynamic error) {
-          store.dispatch(LoginUserError(error.toString()));
-        });
-      } catch (error) {
-        store.dispatch(LoginUserError(error.toString()));
-      }
+      _confirmUser(store, action);
     } else if (action is LoginUserSuccessfull) {
       Fastter.instance.bearer = action.bearer;
       Fastter.instance.user = action.user;
@@ -158,60 +145,85 @@ class UserMiddleware extends MiddlewareClass<AppState> {
       final _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
       _googleSignIn.signOut();
     } else if (action is LoginUserAction) {
-      try {
-        Fastter.instance.login(action.email, action.password).then((response) {
-          if (response != null &&
-              response.login != null &&
-              response.login.user != null) {
-            store.dispatch(LoginUserSuccessfull(
-                response.login.user, response.login.bearer));
-          } else {
-            store.dispatch(LoginUserError('Wrong username password'));
-          }
-        }).catchError((dynamic error) {
-          store.dispatch(LoginUserError(error.toString()));
-        });
-      } catch (error) {
-        store.dispatch(LoginUserError(error.toString()));
-      }
+      _loginUser(store, action);
     } else if (action is GoogleLoginUserAction) {
-      try {
-        Fastter.instance
-            .request(
-          Request(
-            query: '''
+      _googleLogin(store, action);
+    } else if (action is UpdateUserAction) {
+      _updateUser(store, action);
+    } else if (action is UpdateUserPasswordAction) {
+      _updatePassword(store, action);
+    }
+    next(action);
+  }
+
+  Future<void> _confirmUser(
+      Store<AppState> store, ConfirmUserAction action) async {
+    Fastter.instance.bearer = action.bearer;
+    try {
+      final response = await Fastter.instance.checkCurrent();
+      if (response != null && response.current != null) {
+        store.dispatch(LoginUserSuccessfull(response.current, action.bearer));
+        initMessaging();
+      } else {
+        throw new Exception('Invalid User');
+      }
+    } catch (error) {
+      store.dispatch(LoginUserError(error.toString()));
+    }
+  }
+
+  Future<void> _loginUser(Store<AppState> store, LoginUserAction action) async {
+    try {
+      final response =
+          await Fastter.instance.login(action.email, action.password);
+      if (response.login.user != null) {
+        store.dispatch(
+          LoginUserSuccessfull(response.login.user, response.login.bearer),
+        );
+        initMessaging();
+      } else {
+        throw Exception('Wrong username password');
+      }
+    } catch (error) {
+      store.dispatch(LoginUserError(error.toString()));
+    }
+  }
+
+  Future<void> _googleLogin(
+      Store<AppState> store, GoogleLoginUserAction action) async {
+    try {
+      final resp = await Fastter.instance.request(
+        Request(
+          query: '''
             mutation(\$idToken: String!) {
               login:loginWithGoogle(input:{idToken:\$idToken}) {bearer, user {...user}}
             }
             $userFragment
             ''',
-            variables: <String, dynamic>{
-              'idToken': action.idToken,
-            },
-          ),
-        )
-            .then((resp) {
-          final response = LoginData.fromJson(resp);
-          if (response != null &&
-              response.login != null &&
-              response.login.user != null) {
-            store.dispatch(LoginUserSuccessfull(
-                response.login.user, response.login.bearer));
-          } else {
-            store.dispatch(LoginUserError('Wrong username password'));
-          }
-        }).catchError((dynamic error) {
-          store.dispatch(LoginUserError(error.toString()));
-        });
-      } catch (error) {
-        store.dispatch(LoginUserError(error.toString()));
+          variables: <String, dynamic>{
+            'idToken': action.idToken,
+          },
+        ),
+      );
+
+      final response = LoginData.fromJson(resp);
+      if (response.login.user != null) {
+        store.dispatch(
+            LoginUserSuccessfull(response.login.user, response.login.bearer));
+      } else {
+        throw Exception('Wrong username password');
       }
-    } else if (action is UpdateUserAction) {
-      try {
-        Fastter.instance
-            .request(
-          Request(
-            query: '''
+    } catch (error) {
+      store.dispatch(LoginUserError(error.toString()));
+    }
+  }
+
+  Future<void> _updateUser(
+      Store<AppState> store, UpdateUserAction action) async {
+    try {
+      await Fastter.instance.request(
+        Request(
+          query: '''
               mutation(\$email:String, \$name:String, \$picture: String) {
                 updateUser(input:{email:\$email,name:\$name, picture: \$picture}) {
                   ...user
@@ -219,27 +231,25 @@ class UserMiddleware extends MiddlewareClass<AppState> {
               }
               $userFragment
             ''',
-            variables: {
-              'name': action.name,
-              'email': action.email,
-              'picture': action.picture,
-            },
-          ),
-        )
-            .then((value) {
-          action.completer.complete();
-        }).catchError((error) {
-          store.dispatch(LoginUserError(error.toString()));
-        });
-      } catch (error) {
-        store.dispatch(LoginUserError(error.toString()));
-      }
-    } else if (action is UpdateUserPasswordAction) {
-      try {
-        Fastter.instance
-            .request(
-          Request(
-            query: '''
+          variables: {
+            'name': action.name,
+            'email': action.email,
+            'picture': action.picture,
+          },
+        ),
+      );
+      action.completer.complete();
+    } catch (error) {
+      store.dispatch(LoginUserError(error.toString()));
+    }
+  }
+
+  Future<void> _updatePassword(
+      Store<AppState> store, UpdateUserPasswordAction action) async {
+    try {
+      await Fastter.instance.request(
+        Request(
+          query: '''
               mutation(\$password:String) {
                 updatePassword(input:{password:\$password}) {
                   ...user
@@ -247,20 +257,13 @@ class UserMiddleware extends MiddlewareClass<AppState> {
               }
               $userFragment
             ''',
-            variables: {
-              'password': action.password,
-            },
-          ),
-        )
-            .then((value) {
-          action.completer.complete();
-        }).catchError((error) {
-          store.dispatch(LoginUserError(error.toString()));
-        });
-      } catch (error) {
-        store.dispatch(LoginUserError(error.toString()));
-      }
+          variables: {
+            'password': action.password,
+          },
+        ),
+      );
+    } catch (error) {
+      store.dispatch(LoginUserError(error.toString()));
     }
-    next(action);
   }
 }

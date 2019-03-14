@@ -20,6 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   event_bus: any
+  firebase_messaging: any
   firebase_storage: any
   font_awesome_flutter: any
   flutter_colorpicker: any

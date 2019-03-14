@@ -84,6 +84,7 @@ class Fastter {
     if (_instance == null) {
       const API_TOKEN = 'MlwjS+Qwco5Sd2qq+4oU7LKBCyUh2aaTbow7SrKW/GI=';
       const URL = 'https://apifastter.easycode.club';
+      // const URL = 'http://localhost:4000';
 
       _instance = Fastter(URL, API_TOKEN);
     }
