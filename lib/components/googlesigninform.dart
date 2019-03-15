@@ -4,10 +4,10 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 
-import '../fastter/fastter.dart';
-import '../models/user.model.dart';
-import '../store/state.dart';
-import '../store/user.dart';
+import 'package:fastter_dart/fastter/fastter.dart';
+import 'package:fastter_dart/models/user.model.dart';
+import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/store/user.dart';
 
 class GoogleSignInForm extends StatelessWidget {
   @protected

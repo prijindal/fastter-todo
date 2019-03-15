@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
-import '../fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_action.dart';
 import '../helpers/todouihelpers.dart';
-import '../models/project.model.dart';
-import '../models/todo.model.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/store/state.dart';
 
 import 'projectdropdown.dart';
 

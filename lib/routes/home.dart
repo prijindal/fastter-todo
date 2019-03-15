@@ -5,18 +5,18 @@ import 'package:flutter_redux/flutter_redux.dart';
 import '../components/homeappdrawer.dart';
 import '../components/todolist.dart';
 
-import '../fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_action.dart';
 
 import '../helpers/navigator.dart';
 import '../helpers/theme.dart';
 
-import '../models/project.model.dart';
-import '../models/todo.model.dart';
-import '../models/todocomment.model.dart';
+import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/models/todocomment.model.dart';
 import '../screens/profile.dart';
 import '../screens/settings.dart';
 import '../screens/todos.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/store/state.dart';
 
 class HomeContainer extends StatelessWidget {
   @override

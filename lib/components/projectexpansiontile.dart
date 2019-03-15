@@ -4,11 +4,11 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../components/hexcolor.dart';
 import '../helpers/navigator.dart';
-import '../models/base.model.dart';
-import '../models/project.model.dart';
-import '../models/todo.model.dart';
+import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/todo.model.dart';
 import '../screens/addproject.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/store/state.dart';
 
 class ProjectExpansionTile extends StatelessWidget {
   const ProjectExpansionTile({

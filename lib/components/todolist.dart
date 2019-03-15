@@ -9,12 +9,12 @@ import 'package:flutter_offline/flutter_offline.dart';
 import '../components/homeappbar.dart';
 import '../components/todoinput.dart';
 import '../components/todoitem.dart';
-import '../fastter/fastter_action.dart';
-import '../models/base.model.dart';
-import '../models/project.model.dart';
-import '../models/todo.model.dart';
-import '../store/state.dart';
-import '../store/todos.dart';
+import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/store/todos.dart';
 import 'todoeditbar.dart';
 
 class TodoList extends StatelessWidget {

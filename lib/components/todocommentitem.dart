@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../helpers/todouihelpers.dart';
-import '../fastter/fastter_action.dart';
-import '../models/todocomment.model.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/models/todocomment.model.dart';
+import 'package:fastter_dart/store/state.dart';
 
 class TodoCommentItem extends StatelessWidget {
   final TodoComment todoComment;

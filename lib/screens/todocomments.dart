@@ -4,11 +4,11 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../components/todocommentitem.dart';
 import '../components/todocommentinput.dart';
-import '../fastter/fastter_action.dart';
-import '../models/base.model.dart';
-import '../models/todo.model.dart';
-import '../models/todocomment.model.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/models/todocomment.model.dart';
+import 'package:fastter_dart/store/state.dart';
 
 class TodoCommentsScreen extends StatelessWidget {
   const TodoCommentsScreen({

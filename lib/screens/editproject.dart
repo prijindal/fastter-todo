@@ -4,11 +4,11 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../components/colorpicker.dart';
 import '../components/hexcolor.dart';
-import '../fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_action.dart';
 import '../helpers/navigator.dart';
-import '../models/project.model.dart';
-import '../models/todo.model.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/store/state.dart';
 
 class EditProjectScreen extends StatelessWidget {
   const EditProjectScreen({

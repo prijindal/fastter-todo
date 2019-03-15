@@ -4,9 +4,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../components/image_picker.dart';
 
-import '../models/user.model.dart';
-import '../store/state.dart';
-import '../store/user.dart';
+import 'package:fastter_dart/models/user.model.dart';
+import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/store/user.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override

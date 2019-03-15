@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../components/hexcolor.dart';
-import '../fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_action.dart';
 import '../helpers/todouihelpers.dart';
-import '../models/todo.model.dart';
-import '../store/selectedtodos.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/store/selectedtodos.dart';
+import 'package:fastter_dart/store/state.dart';
 
 class TodoItem extends StatelessWidget {
   const TodoItem({
@@ -92,10 +92,11 @@ class _TodoItem extends StatelessWidget {
     return style.copyWith(color: color);
   }
 
-  Widget _buildProject(BuildContext context) {
+  Widget _buildProject(BuildContext context, {int flex = 1}) {
     return DefaultTextStyle(
       style: _subtitleTextStyle(Theme.of(context)),
       child: Flexible(
+        flex: flex,
         child: Flex(
           direction: Axis.horizontal,
           mainAxisAlignment: MainAxisAlignment.end,
@@ -233,10 +234,14 @@ class _TodoItem extends StatelessWidget {
           onTap: toggleSelected,
           title: todo.dueDate != null || todo.project == null
               ? _buildTitle()
-              : Row(
+              : Flex(
+                  direction: Axis.horizontal,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    _buildTitle(),
-                    _buildProject(context),
+                    Flexible(
+                      child: _buildTitle(),
+                    ),
+                    _buildProject(context, flex: 0),
                   ],
                 ),
           subtitle: todo.dueDate == null ? null : _buildSubtitle(context),

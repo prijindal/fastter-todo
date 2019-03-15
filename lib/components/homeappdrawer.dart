@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../helpers/navigator.dart';
-import '../models/base.model.dart';
-import '../models/project.model.dart';
-import '../models/todo.model.dart';
-import '../models/user.model.dart';
+import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/models/user.model.dart';
 import '../screens/loading.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/store/state.dart';
 
 import 'projectexpansiontile.dart';
 

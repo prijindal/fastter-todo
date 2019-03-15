@@ -155,6 +155,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  fastter_dart:
+    dependency: "direct main"
+    description:
+      path: "../fastter_dart"
+      relative: true
+    source: path
+    version: "0.0.0"
   firebase_core:
     dependency: transitive
     description:

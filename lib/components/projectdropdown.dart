@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../components/hexcolor.dart';
-import '../models/base.model.dart';
-import '../models/project.model.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/store/state.dart';
 
 class ProjectDropdown extends StatelessWidget {
   const ProjectDropdown({

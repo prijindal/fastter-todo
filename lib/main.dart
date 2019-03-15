@@ -10,8 +10,9 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'helpers/theme.dart';
 import 'routes/root.dart';
 import 'screens/loading.dart';
-import 'store/state.dart';
-import 'store/store.dart';
+import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/store/store.dart';
+import 'helpers/firebase.dart' show initMessaging;
 
 /// If the current platform is desktop, override the default platform to
 /// a supported platform (iOS for macOS, Android for Linux and Windows).
@@ -42,7 +43,7 @@ Future<void> main() async {
       Zone.current.handleUncaughtError(details.exception, details.stack);
     }
   };
-  final store = await initState();
+  final store = await initState(initMessaging: initMessaging);
 
   await runZoned<Future<void>>(() async {
     runApp(FlutterReduxApp(store));

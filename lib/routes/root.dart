@@ -3,7 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../helpers/theme.dart';
 import '../screens//loading.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/store/state.dart';
 import './app.dart';
 
 class RootContainer extends StatelessWidget {

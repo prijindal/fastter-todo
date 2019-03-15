@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../components/projectdropdown.dart';
-import '../fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_action.dart';
 import '../helpers/theme.dart';
 import '../helpers/todouihelpers.dart';
-import '../models/base.model.dart';
-import '../models/project.model.dart';
-import '../models/todo.model.dart';
-import '../models/todocomment.model.dart';
+import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/models/todocomment.model.dart';
 import '../screens/todocomments.dart';
-import '../store/selectedtodos.dart';
-import '../store/state.dart';
+import 'package:fastter_dart/store/selectedtodos.dart';
+import 'package:fastter_dart/store/state.dart';
 
 class TodoEditScreen extends StatelessWidget {
   const TodoEditScreen({

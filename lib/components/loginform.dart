@@ -2,9 +2,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../models/user.model.dart';
-import '../store/state.dart';
-import '../store/user.dart';
+import 'package:fastter_dart/models/user.model.dart';
+import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/store/user.dart';
 
 class LoginForm extends StatelessWidget {
   @override
