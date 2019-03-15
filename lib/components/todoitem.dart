@@ -9,6 +9,7 @@ import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
+import 'label.dart';
 
 class TodoItem extends StatelessWidget {
   const TodoItem({
@@ -174,39 +175,13 @@ class _TodoItem extends StatelessWidget {
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width - 100,
             ),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Container(
-                constraints: BoxConstraints(
-                  minWidth: MediaQuery.of(context).size.width - 100,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: labels
-                      .map<Widget>((label) => _buildLabel(context, label))
-                      .toList(),
-                ),
-              ),
+            child: LabelsList(
+              labels: todo.labels,
             ),
           )
         ],
       );
     }
-  }
-
-  Widget _buildLabel(BuildContext context, Label label) {
-    return Container(
-      color: Theme.of(context).primaryColor,
-      padding: EdgeInsets.symmetric(horizontal: 2.0),
-      child: Text(
-        label.title,
-        style: TextStyle(
-          fontSize: Theme.of(context).textTheme.body1.fontSize,
-          color: Colors.grey[200],
-        ),
-      ),
-    );
   }
 
   Widget _buildTitle(BuildContext context) {

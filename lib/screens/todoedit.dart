@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import '../components/projectdropdown.dart';
+import '../components/labelselector.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import '../helpers/theme.dart';
 import '../helpers/todouihelpers.dart';
 import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
@@ -29,6 +31,7 @@ class TodoEditScreen extends StatelessWidget {
         builder: (context, store) => _TodoEditScreen(
               todo: todo,
               projects: store.state.projects,
+              labels: store.state.labels,
               todoComments: ListState<TodoComment>(
                 items: store.state.todoComments.items
                     .where((todocomment) =>
@@ -50,6 +53,7 @@ class _TodoEditScreen extends StatefulWidget {
   const _TodoEditScreen({
     @required this.todo,
     @required this.projects,
+    @required this.labels,
     @required this.todoComments,
     @required this.updateTodo,
     @required this.deleteTodo,
@@ -58,6 +62,7 @@ class _TodoEditScreen extends StatefulWidget {
 
   final Todo todo;
   final ListState<Project> projects;
+  final ListState<Label> labels;
   final ListState<TodoComment> todoComments;
   final void Function(Todo) updateTodo;
   final VoidCallback deleteTodo;
@@ -72,6 +77,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
   final double headerHeight = 120;
   final TextEditingController _titleInputController = TextEditingController();
   Project _project;
+  List<Label> _labels;
   DateTime _dueDate;
 
   @override
@@ -79,6 +85,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
     super.initState();
     _titleInputController.text = widget.todo.title;
     _project = widget.todo.project;
+    _labels = widget.todo.labels;
     _dueDate = widget.todo.dueDate;
   }
 
@@ -86,6 +93,14 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
     setState(() {
       _project = selectedproject;
     });
+  }
+
+  void _onSelectLabels(dynamic selectedlabels) {
+    if (selectedlabels is List<Label>) {
+      setState(() {
+        _labels = selectedlabels;
+      });
+    }
   }
 
   void _onSave() {
@@ -97,6 +112,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
       title: _titleInputController.text,
       dueDate: _dueDate,
       project: _project,
+      labels: _labels,
       completed: widget.todo.completed,
       createdAt: widget.todo.createdAt,
       updatedAt: widget.todo.updatedAt,
@@ -183,6 +199,11 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                   expanded: true,
                   selectedProject: _project,
                   onSelected: _onSelectProject,
+                ),
+                LabelSelector(
+                  expanded: true,
+                  selectedLabels: _labels,
+                  onSelected: _onSelectLabels,
                 ),
                 ListTile(
                   leading: const Icon(Icons.calendar_today),

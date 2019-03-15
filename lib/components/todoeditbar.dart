@@ -168,8 +168,14 @@ class _TodoEditBar extends StatelessWidget {
     }
   }
 
+  void _onChangeLabels(dynamic data) {
+    if (data is List<Label>) {
+      onChangeLabels(data);
+    }
+  }
+
   Widget _buildSelectLabelsButton() => LabelSelector(
-        onSelected: onChangeLabels,
+        onSelected: _onChangeLabels,
         selectedLabels: todos.items.isNotEmpty
             ? todos.items
                 .singleWhere((item) => item.id == selectedTodos[0])
