@@ -5,11 +5,13 @@ import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:fastter_dart/store/projects.dart';
+import 'package:fastter_dart/store/labels.dart';
 import 'package:fastter_dart/store/reducer.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_dart/store/todocomments.dart';
+import 'package:fastter_dart/store/todoreminders.dart';
 
 import 'helpers/firebase.dart' show initMessaging;
 
@@ -36,8 +38,10 @@ Future<Store<AppState>> initState() async {
     middleware: <Middleware<AppState>>[
       _persistor.createMiddleware(),
       fastterProjects.middleware,
+      fastterLabels.middleware,
       fastterTodos.middleware,
       fastterTodoComments.middleware,
+      fastterTodoReminders.middleware,
       UserMiddleware(
         initMessaging: initMessaging,
         onLogout: () {

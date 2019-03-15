@@ -11,46 +11,20 @@ import '../helpers/navigator.dart';
 import '../helpers/theme.dart';
 
 import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
+import 'package:fastter_dart/models/todoreminder.model.dart';
 import '../screens/profile.dart';
 import '../screens/settings.dart';
 import '../screens/todos.dart';
 import 'package:fastter_dart/store/state.dart';
 
 class HomeContainer extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _HomeContainer(
-              projectSyncStart: () => store.dispatch(StartSync<Project>()),
-              todoSyncStart: () => store.dispatch(StartSync<Todo>()),
-              todoCommentsSyncStart: () =>
-                  store.dispatch(StartSync<TodoComment>()),
-            ),
-      );
-}
-
-class _HomeContainer extends StatelessWidget {
-  const _HomeContainer({
-    @required this.projectSyncStart,
-    @required this.todoSyncStart,
-    @required this.todoCommentsSyncStart,
-  });
-
-  final VoidCallback projectSyncStart;
-  final VoidCallback todoSyncStart;
-  final VoidCallback todoCommentsSyncStart;
-
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
     if (settings.isInitialRoute || settings.name == '/') {
       return MaterialPageRoute<void>(
-        builder: (context) => _HomePage(
-              projectSyncStart: projectSyncStart,
-              todoSyncStart: todoSyncStart,
-              todoCommentsSyncStart: todoCommentsSyncStart,
-            ),
+        builder: (context) => HomePage(),
       );
     } else if (settings.name == '/settings') {
       return MaterialPageRoute<void>(builder: (context) => SettingsScreen());
@@ -74,16 +48,37 @@ class _HomeContainer extends StatelessWidget {
       );
 }
 
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) => _HomePage(
+              projectSyncStart: () => store.dispatch(StartSync<Project>()),
+              labelSyncStart: () => store.dispatch(StartSync<Label>()),
+              todoSyncStart: () => store.dispatch(StartSync<Todo>()),
+              todoCommentsSyncStart: () =>
+                  store.dispatch(StartSync<TodoComment>()),
+              todoRemindersSyncStart: () =>
+                  store.dispatch(StartSync<TodoReminder>()),
+            ),
+      );
+}
+
 class _HomePage extends StatefulWidget {
   const _HomePage({
+    @required this.labelSyncStart,
     @required this.projectSyncStart,
     @required this.todoSyncStart,
     @required this.todoCommentsSyncStart,
+    @required this.todoRemindersSyncStart,
   });
 
   final VoidCallback projectSyncStart;
+  final VoidCallback labelSyncStart;
   final VoidCallback todoSyncStart;
   final VoidCallback todoCommentsSyncStart;
+  final VoidCallback todoRemindersSyncStart;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -96,6 +91,8 @@ class _HomePageState extends State<_HomePage> {
     widget.todoSyncStart();
     widget.projectSyncStart();
     widget.todoCommentsSyncStart();
+    widget.labelSyncStart();
+    widget.todoRemindersSyncStart();
   }
 
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
