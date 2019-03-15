@@ -42,7 +42,7 @@ class _LoginFormState extends State<_LoginForm> {
   FocusNode emailFocusNode = FocusNode();
   FocusNode passwordFocusNode = FocusNode();
 
-  void login() {
+  void _login() {
     widget.login(emailController.text, passwordController.text);
   }
 
@@ -76,9 +76,9 @@ class _LoginFormState extends State<_LoginForm> {
                       labelText: 'Password',
                     ),
                   ),
-                  FlatButton(
+                  RaisedButton(
                     child: const Text('Login'),
-                    onPressed: widget.user.isLoading ? null : login,
+                    onPressed: widget.user.isLoading ? null : _login,
                   ),
                   Text(widget.user.errorMessage == null
                       ? ''

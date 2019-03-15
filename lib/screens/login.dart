@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../components/googlesigninform.dart';
 import '../components/loginform.dart';
+import 'signup.dart';
 
 class LoginScreen extends StatelessWidget {
   @override
@@ -14,6 +15,18 @@ class LoginScreen extends StatelessWidget {
             GoogleSignInForm(),
             const Text('Or'),
             LoginForm(),
+            const Text('Or'),
+            RaisedButton(
+              child: Text("Signup"),
+              color: Colors.grey[300],
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => SignupScreen(),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       );

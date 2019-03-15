@@ -15,6 +15,7 @@ class ProfileScreen extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _ProfileScreen(
             user: store.state.user,
+            deleteUser: () => store.dispatch(DeleteUserAction()),
             updateUser: ({String name, String email, String picture}) {
               final action =
                   UpdateUserAction(name: name, email: email, picture: picture);
@@ -34,12 +35,14 @@ class _ProfileScreen extends StatefulWidget {
     @required this.user,
     @required this.updateUser,
     @required this.updatePassword,
+    @required this.deleteUser,
     Key key,
   }) : super(key: key);
 
   final Future<void> Function({String name, String email, String picture})
       updateUser;
   final Future<void> Function(String) updatePassword;
+  final VoidCallback deleteUser;
   final UserState user;
 
   @override
@@ -182,8 +185,8 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     }
   }
 
-  void _deleteAccount() {
-    showDialog<void>(
+  Future<void> _deleteAccount() async {
+    final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
             title: const Text('Are you sure?'),
@@ -193,18 +196,21 @@ class _ProfileScreenState extends State<_ProfileScreen> {
               FlatButton(
                 child: const Text('No'),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(false);
                 },
               ),
               FlatButton(
                 child: const Text('Yes'),
                 onPressed: () {
-                  // Save name
+                  Navigator.of(context).pop(true);
                 },
               )
             ],
           ),
     );
+    if (shouldDelete == true) {
+      widget.deleteUser();
+    }
   }
 
   @override
@@ -241,10 +247,10 @@ class _ProfileScreenState extends State<_ProfileScreen> {
               subtitle: const Text('Change your password'),
               onTap: _changePassword,
             ),
-            // ListTile(
-            //   title: const Text('Delete your account'),
-            //   onTap: _deleteAccount,
-            // )
+            ListTile(
+              title: const Text('Delete your account'),
+              onTap: _deleteAccount,
+            )
           ],
         ),
       );
