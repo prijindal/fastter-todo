@@ -7,6 +7,7 @@ import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import '../screens/addlabel.dart';
+import '../screens/managelabels.dart';
 import 'package:fastter_dart/store/state.dart';
 
 class LabelExpansionTile extends StatelessWidget {
@@ -224,7 +225,19 @@ class _LabelExpansionTileState extends State<_LabelExpansionTile>
                           onTap: () => widget.onChildSelected(label),
                         ),
                   )
-                  .toList(),
+                  .toList()
+                    ..add(
+                      ListTile(
+                        dense: true,
+                        title: Text("Manage Labels"),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => ManageLabelsScreen()),
+                          );
+                        },
+                      ),
+                    ),
             ),
     );
   }

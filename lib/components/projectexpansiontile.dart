@@ -9,6 +9,7 @@ import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import '../screens/addproject.dart';
 import 'package:fastter_dart/store/state.dart';
+import '../screens/manageprojects.dart';
 
 class ProjectExpansionTile extends StatelessWidget {
   const ProjectExpansionTile({
@@ -234,7 +235,19 @@ class _ProjectExpansionTileState extends State<_ProjectExpansionTile>
                           onTap: () => widget.onChildSelected(project),
                         ),
                   )
-                  .toList(),
+                  .toList()
+                    ..add(
+                      ListTile(
+                        dense: true,
+                        title: Text("Manage Projects"),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => ManageProjectsScreen()),
+                          );
+                        },
+                      ),
+                    ),
             ),
     );
   }
