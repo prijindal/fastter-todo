@@ -306,6 +306,7 @@ class _TodoListState extends State<_TodoList> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: HomeAppBar(
+          title: widget.title,
           filter: widget.filter,
         ),
         body: _build(),

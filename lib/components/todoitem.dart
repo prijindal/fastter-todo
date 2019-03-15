@@ -6,6 +6,7 @@ import '../components/hexcolor.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import '../helpers/todouihelpers.dart';
 import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
 
@@ -23,6 +24,12 @@ class TodoItem extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _TodoItem(
               todo: todo,
+              labels: store.state.labels.items
+                  .where((label) => todo.labels
+                      .map<String>((todolabel) => todolabel.id)
+                      .toList()
+                      .contains(label.id))
+                  .toList(),
               deleteTodo: () => store.dispatch(DeleteItem<Todo>(todo.id)),
               updateTodo: (updated) =>
                   store.dispatch(UpdateItem<Todo>(todo.id, updated)),
@@ -35,6 +42,7 @@ class TodoItem extends StatelessWidget {
 class _TodoItem extends StatelessWidget {
   const _TodoItem({
     @required this.todo,
+    @required this.labels,
     @required this.deleteTodo,
     @required this.updateTodo,
     @required this.selected,
@@ -43,6 +51,7 @@ class _TodoItem extends StatelessWidget {
   }) : super(key: key);
 
   final Todo todo;
+  final List<Label> labels;
   final VoidCallback deleteTodo;
   final void Function(Todo) updateTodo;
 
@@ -130,11 +139,12 @@ class _TodoItem extends StatelessWidget {
     );
   }
 
-  Widget _buildSubtitle(BuildContext context) {
+  Widget _buildSubtitleFirstRow(BuildContext context) {
     final children = <Widget>[];
-    if (todo.dueDate != null) {
-      children.add(_buildDueDate(context));
+    if (todo.dueDate == null) {
+      return null;
     }
+    children.add(_buildDueDate(context));
     if (todo.project != null) {
       children.add(_buildProject(context));
     }
@@ -149,7 +159,57 @@ class _TodoItem extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle() {
+  Widget _buildSubtitle(BuildContext context) {
+    final firstRow = _buildSubtitleFirstRow(context);
+    if (labels.isEmpty) {
+      return firstRow;
+    } else {
+      return Column(
+        children: <Widget>[
+          Container(
+            child: firstRow,
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 4.0),
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width - 100,
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                constraints: BoxConstraints(
+                  minWidth: MediaQuery.of(context).size.width - 100,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: labels
+                      .map<Widget>((label) => _buildLabel(context, label))
+                      .toList(),
+                ),
+              ),
+            ),
+          )
+        ],
+      );
+    }
+  }
+
+  Widget _buildLabel(BuildContext context, Label label) {
+    return Container(
+      color: Theme.of(context).primaryColor,
+      padding: EdgeInsets.symmetric(horizontal: 2.0),
+      child: Text(
+        label.title,
+        style: TextStyle(
+          fontSize: Theme.of(context).textTheme.body1.fontSize,
+          color: Colors.grey[200],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTitle(BuildContext context) {
     return Text(
       todo.title,
       style: TextStyle(
@@ -233,18 +293,18 @@ class _TodoItem extends StatelessWidget {
           selected: selected,
           onTap: toggleSelected,
           title: todo.dueDate != null || todo.project == null
-              ? _buildTitle()
+              ? _buildTitle(context)
               : Flex(
                   direction: Axis.horizontal,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Flexible(
-                      child: _buildTitle(),
+                      child: _buildTitle(context),
                     ),
                     _buildProject(context, flex: 0),
                   ],
                 ),
-          subtitle: todo.dueDate == null ? null : _buildSubtitle(context),
+          subtitle: _buildSubtitle(context),
         ),
       );
 

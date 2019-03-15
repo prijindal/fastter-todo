@@ -4,12 +4,14 @@ import 'package:flutter_redux/flutter_redux.dart';
 
 import '../helpers/navigator.dart';
 import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/user.model.dart';
 import '../screens/loading.dart';
 import 'package:fastter_dart/store/state.dart';
 
+import 'labelexpansiontile.dart';
 import 'projectexpansiontile.dart';
 
 class HomeAppDrawer extends StatelessWidget {
@@ -178,6 +180,14 @@ class _HomeAppDrawer extends StatelessWidget {
             onChildSelected: (project) {
               _pushRouteNamed(context, '/todos',
                   arguments: {'project': project});
+            },
+          ),
+          LabelExpansionTile(
+            selectedLabel: routeName == '/todos'
+                ? ((history.last.arguments as Map)['label'] as Label)
+                : null,
+            onChildSelected: (label) {
+              _pushRouteNamed(context, '/todos', arguments: {'label': label});
             },
           ),
           ListTile(

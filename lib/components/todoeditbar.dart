@@ -6,6 +6,7 @@ import 'package:fastter_dart/fastter/fastter_action.dart';
 import '../helpers/navigator.dart';
 import '../helpers/todouihelpers.dart';
 import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import '../screens/todoedit.dart';
@@ -13,6 +14,7 @@ import '../screens/todocomments.dart';
 import 'package:fastter_dart/store/state.dart';
 
 import 'projectdropdown.dart';
+import 'labelselector.dart';
 
 class TodoEditBar extends StatelessWidget {
   @override
@@ -59,12 +61,26 @@ class TodoEditBar extends StatelessWidget {
             }
           }
 
+          void onChangeLabels(List<Label> labels) {
+            for (final todoid in store.state.selectedTodos) {
+              if (store.state.todos.items.isNotEmpty) {
+                final todo = store.state.todos.items
+                    .singleWhere((item) => item.id == todoid);
+                if (todo != null) {
+                  todo.labels = labels;
+                  store.dispatch(UpdateItem<Todo>(todoid, todo));
+                }
+              }
+            }
+          }
+
           return _TodoEditBar(
             selectedTodos: store.state.selectedTodos,
             onMarkCompleted: onMarkCompleted,
             todos: store.state.todos,
             onChangeDate: onChangeDate,
             onChangeProject: onChangeProject,
+            onChangeLabels: onChangeLabels,
           );
         },
       );
@@ -77,6 +93,7 @@ class _TodoEditBar extends StatelessWidget {
     @required this.onMarkCompleted,
     @required this.onChangeDate,
     @required this.onChangeProject,
+    @required this.onChangeLabels,
     Key key,
   }) : super(key: key);
 
@@ -85,6 +102,7 @@ class _TodoEditBar extends StatelessWidget {
   final VoidCallback onMarkCompleted;
   final void Function(DateTime) onChangeDate;
   final void Function(Project) onChangeProject;
+  final void Function(List<Label>) onChangeLabels;
 
   Future<void> _showDatePicker(BuildContext context) async {
     final todoid = selectedTodos[0];
@@ -150,6 +168,15 @@ class _TodoEditBar extends StatelessWidget {
     }
   }
 
+  Widget _buildSelectLabelsButton() => LabelSelector(
+        onSelected: onChangeLabels,
+        selectedLabels: todos.items.isNotEmpty
+            ? todos.items
+                .singleWhere((item) => item.id == selectedTodos[0])
+                .labels
+            : null,
+      );
+
   Widget _buildChangeProjectButton() => ProjectDropdown(
         onSelected: onChangeProject,
         selectedProject: todos.items.isNotEmpty
@@ -165,6 +192,7 @@ class _TodoEditBar extends StatelessWidget {
         _buildChangeDateButton(context),
         _buildEditButton(),
         _buildChangeProjectButton(),
+        _buildSelectLabelsButton(),
         _buildCommentButton(),
       ];
     }
@@ -172,6 +200,7 @@ class _TodoEditBar extends StatelessWidget {
       _buildMarkCompletedButton(),
       _buildChangeDateButton(context),
       _buildChangeProjectButton(),
+      _buildSelectLabelsButton(),
     ];
   }
 

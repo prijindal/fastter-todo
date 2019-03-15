@@ -114,11 +114,22 @@ class _HomePageState extends State<_HomePage> {
       );
     } else if (settings.name == '/todos') {
       final Map<String, dynamic> arguments = settings.arguments;
-      final Project project = arguments['project'];
+      Map<String, dynamic> filters = {};
+      String title;
+      if (arguments.containsKey('label')) {
+        final Label label = arguments['label'];
+        filters['label'] = label.id;
+        title = label.title;
+      }
+      if (arguments.containsKey('project')) {
+        final Project project = arguments['project'];
+        filters['project'] = project.id;
+        title = project.title;
+      }
       return MaterialPageRoute<void>(
         builder: (context) => TodoList(
-              filter: <String, dynamic>{'project': project.id},
-              title: project.title,
+              filter: filters,
+              title: title,
             ),
       );
     }
