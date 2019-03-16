@@ -267,18 +267,18 @@ class _TodoItem extends StatelessWidget {
           ),
           selected: selected,
           onTap: toggleSelected,
-          title: todo.dueDate != null || todo.project == null
-              ? _buildTitle(context)
-              : Flex(
-                  direction: Axis.horizontal,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Flexible(
-                      child: _buildTitle(context),
-                    ),
-                    _buildProject(context, flex: 0),
-                  ],
-                ),
+          title: Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Flexible(
+                child: _buildTitle(context),
+              ),
+              todo.dueDate == null && todo.project != null
+                  ? _buildProject(context, flex: 0)
+                  : Container(),
+            ],
+          ),
           subtitle: _buildSubtitle(context),
         ),
       );

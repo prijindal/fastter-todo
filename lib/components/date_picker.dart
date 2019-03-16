@@ -324,6 +324,10 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
     _mode = widget.initialDatePickerMode;
   }
 
+  DateTime _selectedDate;
+  DatePickerMode _mode;
+  final GlobalKey _pickerKey = GlobalKey();
+
   bool _announcedInitialDate = false;
 
   MaterialLocalizations localizations;
@@ -342,10 +346,6 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
       );
     }
   }
-
-  DateTime _selectedDate;
-  DatePickerMode _mode;
-  final GlobalKey _pickerKey = GlobalKey();
 
   void _vibrate() {
     switch (Theme.of(context).platform) {

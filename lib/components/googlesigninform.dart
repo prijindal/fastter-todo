@@ -26,7 +26,7 @@ class GoogleSignInForm extends StatelessWidget {
       );
 }
 
-class _GoogleSignInForm extends StatefulWidget {
+class _GoogleSignInForm extends StatelessWidget {
   const _GoogleSignInForm({
     @required this.loginWithGoogle,
     @required this.user,
@@ -35,17 +35,12 @@ class _GoogleSignInForm extends StatefulWidget {
   final UserState user;
   final void Function(String) loginWithGoogle;
 
-  @override
-  _GoogleSignInFormState createState() => _GoogleSignInFormState();
-}
-
-class _GoogleSignInFormState extends State<_GoogleSignInForm> {
-  void _startGoogleFlow() {
+  void _startGoogleFlow(BuildContext context) {
     if (Platform.isAndroid || Platform.isIOS) {
       final _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
       _googleSignIn.signIn().then((account) {
         account.authentication.then((auth) {
-          widget.loginWithGoogle(auth.idToken);
+          loginWithGoogle(auth.idToken);
         });
       });
       Navigator.of(context).push<void>(
@@ -61,8 +56,8 @@ class _GoogleSignInFormState extends State<_GoogleSignInForm> {
       Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
           builder: (context) => _GoogleSignInScreen(
-                loginWithGoogle: widget.loginWithGoogle,
-                user: widget.user,
+                loginWithGoogle: loginWithGoogle,
+                user: user,
               ),
         ),
       );
@@ -73,7 +68,7 @@ class _GoogleSignInFormState extends State<_GoogleSignInForm> {
   Widget build(BuildContext context) => Container(
         child: SignInButton(
           Buttons.Google,
-          onPressed: _startGoogleFlow,
+          onPressed: () => _startGoogleFlow(context),
         ),
       );
 }
