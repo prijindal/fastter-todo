@@ -5,17 +5,18 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:share/share.dart';
 
 import 'package:fastter_dart/fastter/fastter_action.dart';
-import '../helpers/navigator.dart';
-import '../helpers/theme.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import '../screens/editlabel.dart';
-import '../screens/editproject.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
+
+import '../helpers/navigator.dart';
+import '../helpers/theme.dart';
+import '../screens/editlabel.dart';
+import '../screens/editproject.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({
@@ -125,7 +126,7 @@ class _HomeAppBar extends StatelessWidget {
         if (_project != null) {
           title = _project.title;
         } else {
-          final map = (history.last.arguments as Map);
+          final map = history.last.arguments as Map;
           if (map.containsKey('project')) {
             title = (map['project'] as Project).title;
           }
@@ -161,10 +162,10 @@ class _HomeAppBar extends StatelessWidget {
   }
 
   String _tasksToString() {
-    String text = "";
-    for (var todo
+    var text = '';
+    for (final todo
         in todos.items.where((todo) => selectedtodos.contains(todo.id))) {
-      text += todo.title + "\n";
+      text += '${todo.title}\n';
     }
     return text;
   }
@@ -173,7 +174,7 @@ class _HomeAppBar extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: _tasksToString()));
     Scaffold.of(context).showSnackBar(
       SnackBar(
-        content: Text("Copied to clipboard"),
+        content: const Text('Copied to clipboard'),
       ),
     );
   }

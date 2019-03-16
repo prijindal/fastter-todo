@@ -2,10 +2,11 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../components/colorpicker.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/store/state.dart';
+
+import '../components/colorpicker.dart';
 
 class AddProjectScreen extends StatelessWidget {
   @override

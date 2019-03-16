@@ -3,19 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:fastter_dart/fastter/fastter_action.dart';
-import '../helpers/navigator.dart';
-import '../helpers/todouihelpers.dart';
+import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import '../screens/todoedit.dart';
-import '../screens/todocomments.dart';
-import 'package:fastter_dart/store/state.dart';
-import '../components/prioritydialog.dart';
 
-import 'projectdropdown.dart';
+import '../components/prioritydialog.dart';
+import '../helpers/navigator.dart';
+import '../helpers/todouihelpers.dart';
+import '../screens/todocomments.dart';
+import '../screens/todoedit.dart';
+
 import 'labelselector.dart';
+import 'projectdropdown.dart';
 
 class TodoEditBar extends StatelessWidget {
   @override
@@ -191,7 +192,7 @@ class _TodoEditBar extends StatelessWidget {
     }
   }
 
-  void _selectPriority(BuildContext context) async {
+  Future<void> _selectPriority(BuildContext context) async {
     final priority = await showPriorityDialog(context);
     if (priority != null) {
       onChangePriority(priority);

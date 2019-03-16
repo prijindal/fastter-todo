@@ -14,25 +14,23 @@ class LabelsList extends StatelessWidget {
   final List<Label> labels;
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        constraints: BoxConstraints(
-          minWidth: MediaQuery.of(context).size.width - 100,
+  Widget build(BuildContext context) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Container(
+          constraints: BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width - 100,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: labels
+                .map<Widget>((label) => LabelItem(
+                      label: label,
+                    ))
+                .toList(),
+          ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: labels
-              .map<Widget>((label) => LabelItem(
-                    label: label,
-                  ))
-              .toList(),
-        ),
-      ),
-    );
-  }
+      );
 }
 
 class LabelItem extends StatelessWidget {
@@ -67,8 +65,8 @@ class _LabelItem extends StatelessWidget {
     final filteredLabel = labels.items.singleWhere((l) => l.id == label.id);
     return Container(
       color: Theme.of(context).primaryColor,
-      margin: EdgeInsets.symmetric(horizontal: 2.0),
-      padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
       child: Text(
         filteredLabel.title,
         style: TextStyle(

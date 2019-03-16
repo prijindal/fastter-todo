@@ -15,7 +15,7 @@ Future<String> initMessaging() async {
         ),
       );
     });
-    return await _firebaseMessaging.getToken();
+    return _firebaseMessaging.getToken();
   }
   return null;
 }

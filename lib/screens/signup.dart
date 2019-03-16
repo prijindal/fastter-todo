@@ -29,6 +29,7 @@ class _SignupScreen extends StatefulWidget {
   final UserState user;
   final void Function(String email, String password) signup;
 
+  @override
   _SignupScreenState createState() => _SignupScreenState();
 }
 
@@ -46,7 +47,7 @@ class _SignupScreenState extends State<_SignupScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text("Signup"),
+          title: const Text('Signup'),
         ),
         body: Container(
           alignment: Alignment.center,

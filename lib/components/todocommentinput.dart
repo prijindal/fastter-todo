@@ -46,6 +46,7 @@ class _TodoCommentInput extends StatefulWidget {
   final Todo todo;
   final void Function(TodoComment) addComment;
 
+  @override
   _TodoCommentInputState createState() => _TodoCommentInputState();
 }
 
@@ -59,7 +60,7 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
       context: context,
       value: null,
       storagePath: 'todocomments/${Uuid().v1()}.jpg',
-      onError: (error) {},
+      onError: (dynamic error) {},
       onChange: (value) {
         if (value != null && value.isNotEmpty) {
           widget.addComment(
@@ -90,60 +91,58 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Material(
-      elevation: 4,
-      child: Container(
-        color: Colors.white,
-        width: MediaQuery.of(context).size.width,
-        child: Center(
-          child: Container(
-            width: min(480, MediaQuery.of(context).size.width - 20.0),
-            padding: const EdgeInsets.all(4),
-            child: Form(
-              child: TextField(
-                controller: commentContentController,
-                decoration: InputDecoration(
-                  labelText: "Add new comment",
-                  suffixIcon: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      PopupMenuButton<TodoCommentInputAttachmentType>(
-                        onSelected: (selected) {
-                          if (selected ==
-                              TodoCommentInputAttachmentType.image) {
-                            _addImageComment();
-                          }
-                        },
-                        child: Icon(Icons.attach_file),
-                        itemBuilder: (context) => [
-                              PopupMenuItem<TodoCommentInputAttachmentType>(
-                                value: TodoCommentInputAttachmentType.image,
-                                child: ListTile(
-                                  leading: Icon(Icons.image),
-                                  title: Text("Image"),
+  Widget build(BuildContext context) => Material(
+        elevation: 4,
+        child: Container(
+          color: Colors.white,
+          width: MediaQuery.of(context).size.width,
+          child: Center(
+            child: Container(
+              width: min(480, MediaQuery.of(context).size.width - 20.0),
+              padding: const EdgeInsets.all(4),
+              child: Form(
+                child: TextField(
+                  controller: commentContentController,
+                  decoration: InputDecoration(
+                    labelText: 'Add new comment',
+                    suffixIcon: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        PopupMenuButton<TodoCommentInputAttachmentType>(
+                          onSelected: (selected) {
+                            if (selected ==
+                                TodoCommentInputAttachmentType.image) {
+                              _addImageComment();
+                            }
+                          },
+                          child: const Icon(Icons.attach_file),
+                          itemBuilder: (context) => [
+                                PopupMenuItem<TodoCommentInputAttachmentType>(
+                                  value: TodoCommentInputAttachmentType.image,
+                                  child: ListTile(
+                                    leading: const Icon(Icons.image),
+                                    title: const Text('Image'),
+                                  ),
                                 ),
-                              ),
-                            ],
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: commentContentController.text.isNotEmpty
-                            ? _addComment
-                            : null,
-                      ),
-                    ],
+                              ],
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.send),
+                          onPressed: commentContentController.text.isNotEmpty
+                              ? _addComment
+                              : null,
+                        ),
+                      ],
+                    ),
                   ),
+                  onSubmitted: commentContentController.text.isNotEmpty
+                      ? (title) => _addComment()
+                      : null,
                 ),
-                onSubmitted: commentContentController.text.isNotEmpty
-                    ? (title) => _addComment()
-                    : null,
               ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

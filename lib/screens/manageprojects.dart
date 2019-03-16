@@ -3,14 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_colorpicker/block_picker.dart';
 
-import '../components/hexcolor.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
-import '../helpers/navigator.dart';
-import '../helpers/theme.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
+
+import '../components/hexcolor.dart';
+import '../helpers/navigator.dart';
+import '../helpers/theme.dart';
 import 'addproject.dart';
 import 'editproject.dart';
 
@@ -55,31 +56,30 @@ class _ManageProjectsScreen extends StatefulWidget {
   final void Function(Project) deleteProject;
   final void Function(Project, Color) updateColor;
 
+  @override
   _ManageProjectsScreenState createState() => _ManageProjectsScreenState();
 }
 
 class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
   List<String> selectedProjects = <String>[];
 
-  Future<bool> _deleteProject(String title) async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-            title: Text(title),
-            content: const Text('All tasks will move to inbox'),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop<bool>(false),
-                child: const Text('No'),
-              ),
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop<bool>(true),
-                child: const Text('Yes'),
-              )
-            ],
-          ),
-    );
-  }
+  Future<bool> _deleteProject(String title) async => showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(title),
+              content: const Text('All tasks will move to inbox'),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () => Navigator.of(context).pop<bool>(false),
+                  child: const Text('No'),
+                ),
+                FlatButton(
+                  onPressed: () => Navigator.of(context).pop<bool>(true),
+                  child: const Text('Yes'),
+                )
+              ],
+            ),
+      );
 
   void _unSelectAll() {
     setState(() {
@@ -87,66 +87,60 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
     });
   }
 
-  Widget _buildChangeColorButton() {
-    return IconButton(
-      icon: Icon(Icons.color_lens),
-      onPressed: () async {
-        Color _pickerColor;
-        Color selectedColor = await showDialog<Color>(
-          context: context,
-          builder: (context) => AlertDialog(
-                title: const Text('Pick a color'),
-                content: SingleChildScrollView(
-                  child: BlockPicker(
-                    pickerColor: _pickerColor,
-                    onColorChanged: (color) {
-                      _pickerColor = color;
-                    },
+  Widget _buildChangeColorButton() => IconButton(
+        icon: const Icon(Icons.color_lens),
+        onPressed: () async {
+          Color _pickerColor;
+          final selectedColor = await showDialog<Color>(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: const Text('Pick a color'),
+                  content: SingleChildScrollView(
+                    child: BlockPicker(
+                      pickerColor: _pickerColor,
+                      onColorChanged: (color) {
+                        _pickerColor = color;
+                      },
+                    ),
                   ),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: const Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop(null);
+                      },
+                    ),
+                    FlatButton(
+                      child: const Text('Got it'),
+                      onPressed: () {
+                        Navigator.of(context).pop(_pickerColor);
+                      },
+                    ),
+                  ],
                 ),
-                actions: <Widget>[
-                  FlatButton(
-                    child: const Text('Cancel'),
-                    onPressed: () {
-                      Navigator.of(context).pop(null);
-                    },
-                  ),
-                  FlatButton(
-                    child: const Text('Got it'),
-                    onPressed: () {
-                      Navigator.of(context).pop(_pickerColor);
-                    },
-                  ),
-                ],
-              ),
-        );
-        if (selectedColor != null) {
-          final projects = widget.projects.items
-              .where((project) => selectedProjects.contains(project.id))
-              .toList();
-          projects.forEach((project) {
-            widget.updateColor(project, selectedColor);
-          });
-        }
-      },
-    );
-  }
+          );
+          if (selectedColor != null) {
+            final projects = widget.projects.items
+                .where((project) => selectedProjects.contains(project.id))
+                .toList();
+            for (final project in projects) {
+              widget.updateColor(project, selectedColor);
+            }
+          }
+        },
+      );
 
-  Widget _buildDeleteButton() {
-    return IconButton(
-      icon: Icon(Icons.delete),
-      onPressed: () async {
-        if (await _deleteProject('Delete' + _buildAppBarTitle() + '?')) {
-          final projects = widget.projects.items
-              .where((project) => selectedProjects.contains(project.id))
-              .toList();
-          projects.forEach((project) {
-            widget.deleteProject(project);
-          });
-        }
-      },
-    );
-  }
+  Widget _buildDeleteButton() => IconButton(
+        icon: const Icon(Icons.delete),
+        onPressed: () async {
+          if (await _deleteProject('Delete ${_buildAppBarTitle()} ?')) {
+            final projects = widget.projects.items
+                .where((project) => selectedProjects.contains(project.id))
+                .toList();
+            projects.forEach(widget.deleteProject);
+          }
+        },
+      );
 
   Widget _buildEditButton() {
     if (selectedProjects.isNotEmpty && widget.projects.items.isNotEmpty) {
@@ -172,7 +166,7 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
   }
 
   List<Widget> _buildButtons() {
-    if (selectedProjects.length == 0) {
+    if (selectedProjects.isEmpty) {
       return [];
     }
     if (selectedProjects.length == 1) {
@@ -195,9 +189,9 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
       right: position,
       child: selectedProjects.isEmpty
           ? FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
+              child: const Icon(Icons.add),
+              onPressed: () => Navigator.of(context).push<void>(
+                    MaterialPageRoute<void>(
                       builder: (context) => AddProjectScreen(),
                     ),
                   ),
@@ -218,74 +212,70 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
     );
   }
 
-  String _buildAppBarTitle() {
-    return '${selectedProjects.length.toString()} '
-        'Project${selectedProjects.length > 1 ? 's' : ''}';
-  }
+  String _buildAppBarTitle() => '${selectedProjects.length.toString()} '
+      'Project${selectedProjects.length > 1 ? 's' : ''}';
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: AnimatedTheme(
-          data: selectedProjects.isNotEmpty ? whiteTheme : primaryTheme,
-          child: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: selectedProjects.isNotEmpty
-                  ? _unSelectAll
-                  : () {
-                      Navigator.of(context).pop();
-                    },
+  Widget build(BuildContext context) => Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: AnimatedTheme(
+            data: selectedProjects.isNotEmpty ? whiteTheme : primaryTheme,
+            child: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: selectedProjects.isNotEmpty
+                    ? _unSelectAll
+                    : () {
+                        Navigator.of(context).pop();
+                      },
+              ),
+              title: Text(selectedProjects.isNotEmpty
+                  ? '${_buildAppBarTitle()} selected'
+                  : 'Manage Projects'),
             ),
-            title: Text(selectedProjects.isNotEmpty
-                ? _buildAppBarTitle() + ' selected'
-                : "Manage Projects"),
           ),
         ),
-      ),
-      body: Stack(
-        children: [
-          ListView(
-            children: widget.projects.items
-                .map(
-                  (project) => ListTile(
-                        onTap: () {
-                          if (selectedProjects.contains(project.id)) {
-                            setState(() {
-                              selectedProjects.remove(project.id);
-                            });
-                          } else {
-                            setState(() {
-                              selectedProjects.add(project.id);
-                            });
-                          }
-                        },
-                        selected: selectedProjects.contains(project.id),
-                        leading: Icon(
-                          Icons.group_work,
-                          color: project.color == null
-                              ? null
-                              : HexColor(project.color),
-                        ),
-                        title: Text(project.title),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () async {
-                            if (await _deleteProject(
-                                'Delete ${project.title}?')) {
-                              widget.deleteProject(project);
+        body: Stack(
+          children: [
+            ListView(
+              children: widget.projects.items
+                  .map(
+                    (project) => ListTile(
+                          onTap: () {
+                            if (selectedProjects.contains(project.id)) {
+                              setState(() {
+                                selectedProjects.remove(project.id);
+                              });
+                            } else {
+                              setState(() {
+                                selectedProjects.add(project.id);
+                              });
                             }
                           },
+                          selected: selectedProjects.contains(project.id),
+                          leading: Icon(
+                            Icons.group_work,
+                            color: project.color == null
+                                ? null
+                                : HexColor(project.color),
+                          ),
+                          title: Text(project.title),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              if (await _deleteProject(
+                                  'Delete ${project.title}?')) {
+                                widget.deleteProject(project);
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                )
-                .toList(),
-          ),
-          _buildBottom(),
-        ],
-      ),
-    );
-  }
+                  )
+                  .toList(),
+            ),
+            _buildBottom(),
+          ],
+        ),
+      );
 }

@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:fastter_dart/fastter/fastter_action.dart';
-import '../helpers/navigator.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
+
+import '../helpers/navigator.dart';
 
 class EditLabelScreen extends StatelessWidget {
   const EditLabelScreen({

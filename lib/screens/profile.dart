@@ -2,11 +2,11 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../components/image_picker.dart';
-
 import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
+
+import '../components/image_picker.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override
@@ -62,18 +62,17 @@ class _ProfileScreenState extends State<_ProfileScreen> {
         widget.updateUser(picture: value);
         scaffoldKey.currentState.showSnackBar(
           SnackBar(
-            content: Text('Picture Updated Succefully'),
+            content: const Text('Picture Updated Succefully'),
           ),
         );
       },
-      onError: (error) {},
+      onError: (dynamic error) {},
     ).editPicture();
   }
 
-  void _editName() async {
-    final TextEditingController nameController =
-        TextEditingController(text: user.name);
-    final bool shouldUpdate = await showDialog<bool>(
+  Future<void> _editName() async {
+    final nameController = TextEditingController(text: user.name);
+    final shouldUpdate = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
             title: const Text('Type your name'),
@@ -97,20 +96,18 @@ class _ProfileScreenState extends State<_ProfileScreen> {
           ),
     );
     if (shouldUpdate) {
-      widget.updateUser(name: nameController.text).then((_) {
-        scaffoldKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text("Name updated Succesfully"),
-          ),
-        );
-      });
+      await widget.updateUser(name: nameController.text);
+      scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: const Text('Name updated Succesfully'),
+        ),
+      );
     }
   }
 
-  void _editEmail() async {
-    final TextEditingController emailController =
-        TextEditingController(text: user.email);
-    final bool shouldUpdate = await showDialog<bool>(
+  Future<void> _editEmail() async {
+    final emailController = TextEditingController(text: user.email);
+    final shouldUpdate = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
             title: const Text('Type your Email'),
@@ -136,19 +133,18 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     );
 
     if (shouldUpdate) {
-      widget.updateUser(email: emailController.text).then((_) {
-        scaffoldKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text("Email updated Succesfully"),
-          ),
-        );
-      });
+      await widget.updateUser(email: emailController.text);
+      scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: const Text('Email updated Succesfully'),
+        ),
+      );
     }
   }
 
   Future<void> _changePassword() async {
-    final TextEditingController passwordController = TextEditingController();
-    bool shouldChangePassword = await showDialog<bool>(
+    final passwordController = TextEditingController();
+    final shouldChangePassword = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
             title: const Text('Type your Password'),
@@ -175,13 +171,12 @@ class _ProfileScreenState extends State<_ProfileScreen> {
           ),
     );
     if (shouldChangePassword == true) {
-      widget.updatePassword(passwordController.text).then((_) {
-        scaffoldKey.currentState.showSnackBar(
-          SnackBar(
-            content: Text("Password Updated Succesfully"),
-          ),
-        );
-      });
+      await widget.updatePassword(passwordController.text);
+      scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: const Text('Password Updated Succesfully'),
+        ),
+      );
     }
   }
 

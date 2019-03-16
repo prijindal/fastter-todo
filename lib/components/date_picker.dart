@@ -49,9 +49,9 @@ enum DatePickerMode {
 }
 
 class DatePickerResponse {
-  DateTime dateTime;
-
   DatePickerResponse(this.dateTime);
+
+  DateTime dateTime;
 }
 
 const double _kDatePickerHeaderPortraitHeight = 100.0;

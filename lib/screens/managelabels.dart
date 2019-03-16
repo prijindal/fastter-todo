@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:fastter_dart/fastter/fastter_action.dart';
-import '../helpers/navigator.dart';
-import '../helpers/theme.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
+
+import '../helpers/navigator.dart';
+import '../helpers/theme.dart';
 import 'addlabel.dart';
 import 'editlabel.dart';
 
@@ -37,31 +38,30 @@ class _ManageLabelsScreen extends StatefulWidget {
   final ListState<Label> labels;
   final void Function(Label) deleteLabel;
 
+  @override
   _ManageLabelsScreenState createState() => _ManageLabelsScreenState();
 }
 
 class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
   List<String> selectedLabels = <String>[];
 
-  Future<bool> _deleteLabel(String title) async {
-    return await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-            title: Text(title),
-            content: const Text('All tasks will move to inbox'),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop<bool>(false),
-                child: const Text('No'),
-              ),
-              FlatButton(
-                onPressed: () => Navigator.of(context).pop<bool>(true),
-                child: const Text('Yes'),
-              )
-            ],
-          ),
-    );
-  }
+  Future<bool> _deleteLabel(String title) => showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text(title),
+              content: const Text('All tasks will move to inbox'),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () => Navigator.of(context).pop<bool>(false),
+                  child: const Text('No'),
+                ),
+                FlatButton(
+                  onPressed: () => Navigator.of(context).pop<bool>(true),
+                  child: const Text('Yes'),
+                )
+              ],
+            ),
+      );
 
   void _unSelectAll() {
     setState(() {
@@ -69,21 +69,17 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
     });
   }
 
-  Widget _buildDeleteButton() {
-    return IconButton(
-      icon: Icon(Icons.delete),
-      onPressed: () async {
-        if (await _deleteLabel('Delete' + _buildAppBarTitle() + '?')) {
-          final labels = widget.labels.items
-              .where((label) => selectedLabels.contains(label.id))
-              .toList();
-          labels.forEach((label) {
-            widget.deleteLabel(label);
-          });
-        }
-      },
-    );
-  }
+  Widget _buildDeleteButton() => IconButton(
+        icon: const Icon(Icons.delete),
+        onPressed: () async {
+          if (await _deleteLabel('Delete${_buildAppBarTitle()}?')) {
+            final labels = widget.labels.items
+                .where((label) => selectedLabels.contains(label.id))
+                .toList();
+            labels.forEach(widget.deleteLabel);
+          }
+        },
+      );
 
   Widget _buildEditButton() {
     if (selectedLabels.isNotEmpty && widget.labels.items.isNotEmpty) {
@@ -109,7 +105,7 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
   }
 
   List<Widget> _buildButtons() {
-    if (selectedLabels.length == 0) {
+    if (selectedLabels.isEmpty) {
       return [];
     }
     if (selectedLabels.length == 1) {
@@ -130,9 +126,9 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
       right: position,
       child: selectedLabels.isEmpty
           ? FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
+              child: const Icon(Icons.add),
+              onPressed: () => Navigator.of(context).push<void>(
+                    MaterialPageRoute<void>(
                       builder: (context) => AddLabelScreen(),
                     ),
                   ),
@@ -153,67 +149,64 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
     );
   }
 
-  String _buildAppBarTitle() {
-    return '${selectedLabels.length.toString()} '
-        'Label${selectedLabels.length > 1 ? 's' : ''}';
-  }
+  String _buildAppBarTitle() => '${selectedLabels.length.toString()} '
+      'Label${selectedLabels.length > 1 ? 's' : ''}';
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: AnimatedTheme(
-          data: selectedLabels.isNotEmpty ? whiteTheme : primaryTheme,
-          child: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: selectedLabels.isNotEmpty
-                  ? _unSelectAll
-                  : () {
-                      Navigator.of(context).pop();
-                    },
+  Widget build(BuildContext context) => Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: AnimatedTheme(
+            data: selectedLabels.isNotEmpty ? whiteTheme : primaryTheme,
+            child: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: selectedLabels.isNotEmpty
+                    ? _unSelectAll
+                    : () {
+                        Navigator.of(context).pop();
+                      },
+              ),
+              title: Text(selectedLabels.isNotEmpty
+                  ? '${_buildAppBarTitle()} selected'
+                  : 'Manage Labels'),
             ),
-            title: Text(selectedLabels.isNotEmpty
-                ? _buildAppBarTitle() + ' selected'
-                : "Manage Labels"),
           ),
         ),
-      ),
-      body: Stack(
-        children: [
-          ListView(
-            children: widget.labels.items
-                .map(
-                  (label) => ListTile(
-                        onTap: () {
-                          if (selectedLabels.contains(label.id)) {
-                            setState(() {
-                              selectedLabels.remove(label.id);
-                            });
-                          } else {
-                            setState(() {
-                              selectedLabels.add(label.id);
-                            });
-                          }
-                        },
-                        selected: selectedLabels.contains(label.id),
-                        title: Text(label.title),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () async {
-                            if (await _deleteLabel('Delete ${label.title}?')) {
-                              widget.deleteLabel(label);
+        body: Stack(
+          children: [
+            ListView(
+              children: widget.labels.items
+                  .map(
+                    (label) => ListTile(
+                          onTap: () {
+                            if (selectedLabels.contains(label.id)) {
+                              setState(() {
+                                selectedLabels.remove(label.id);
+                              });
+                            } else {
+                              setState(() {
+                                selectedLabels.add(label.id);
+                              });
                             }
                           },
+                          selected: selectedLabels.contains(label.id),
+                          title: Text(label.title),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              if (await _deleteLabel(
+                                  'Delete ${label.title}?')) {
+                                widget.deleteLabel(label);
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                )
-                .toList(),
-          ),
-          _buildBottom(),
-        ],
-      ),
-    );
-  }
+                  )
+                  .toList(),
+            ),
+            _buildBottom(),
+          ],
+        ),
+      );
 }

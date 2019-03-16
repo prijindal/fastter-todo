@@ -8,9 +8,10 @@ import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
 class LabelSelectorDialog extends StatelessWidget {
-  LabelSelectorDialog({
+  const LabelSelectorDialog({
     @required this.selectedLabels,
   });
+
   final List<Label> selectedLabels;
 
   @override
@@ -37,6 +38,7 @@ class _LabelSelectorDialog extends StatefulWidget {
   final List<Label> selectedLabels;
   final void Function(Label) createLabel;
 
+  @override
   _LabelSelectorDialogState createState() => _LabelSelectorDialogState();
 }
 
@@ -50,29 +52,29 @@ class _LabelSelectorDialogState extends State<_LabelSelectorDialog> {
   }
 
   void _addNewLabel() {
-    TextEditingController textController = TextEditingController();
+    final textController = TextEditingController();
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-            title: Text("New Label"),
+            title: const Text('New Label'),
             content: TextField(
               controller: textController,
               decoration: InputDecoration(
-                labelText: "Add a label",
+                labelText: 'Add a label',
               ),
             ),
             actions: <Widget>[
               FlatButton(
-                child: Text("Cancel"),
+                child: const Text('Cancel'),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               FlatButton(
-                child: Text("Save"),
+                child: const Text('Save'),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  widget.createLabel(new Label(
-                    title: textController.text,
-                  ));
+                  widget.createLabel(
+                    Label(title: textController.text),
+                  );
                 },
               ),
             ],
@@ -81,54 +83,52 @@ class _LabelSelectorDialogState extends State<_LabelSelectorDialog> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text("Select Labels"),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: widget.labels.items
-              .map<Widget>(
-                (label) => CheckboxListTile(
-                      value: selectedLabels
-                          .map((label) => label.id)
-                          .contains(label.id),
-                      onChanged: (isSelected) {
-                        // new value
-                        if (isSelected) {
-                          setState(() {
-                            selectedLabels.add(label);
-                          });
-                        } else {
-                          setState(() {
-                            selectedLabels.removeWhere((selectedLabel) =>
-                                selectedLabel.id == label.id);
-                          });
-                        }
-                      },
-                      title: Text(label.title),
+  Widget build(BuildContext context) => AlertDialog(
+        title: const Text('Select Labels'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: widget.labels.items
+                .map<Widget>(
+                  (label) => CheckboxListTile(
+                        value: selectedLabels
+                            .map((label) => label.id)
+                            .contains(label.id),
+                        onChanged: (isSelected) {
+                          // new value
+                          if (isSelected) {
+                            setState(() {
+                              selectedLabels.add(label);
+                            });
+                          } else {
+                            setState(() {
+                              selectedLabels.removeWhere((selectedLabel) =>
+                                  selectedLabel.id == label.id);
+                            });
+                          }
+                        },
+                        title: Text(label.title),
+                      ),
+                )
+                .toList()
+                  ..add(
+                    ListTile(
+                      leading: const Icon(Icons.add),
+                      title: const Text('Add new label'),
+                      onTap: _addNewLabel,
                     ),
-              )
-              .toList()
-                ..add(
-                  ListTile(
-                    leading: Icon(Icons.add),
-                    title: Text("Add new label"),
-                    onTap: _addNewLabel,
                   ),
-                ),
+          ),
         ),
-      ),
-      actions: <Widget>[
-        FlatButton(
-          child: Text("Cancel"),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        FlatButton(
-          child: Text("Ok"),
-          onPressed: () => Navigator.of(context).pop(selectedLabels),
-        ),
-      ],
-    );
-  }
+        actions: <Widget>[
+          FlatButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          FlatButton(
+            child: const Text('Ok'),
+            onPressed: () => Navigator.of(context).pop(selectedLabels),
+          ),
+        ],
+      );
 }

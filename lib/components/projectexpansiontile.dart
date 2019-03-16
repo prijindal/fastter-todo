@@ -2,10 +2,11 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../components/hexcolor.dart';
 import 'package:fastter_dart/models/project.model.dart';
-import '../screens/addproject.dart';
 import 'package:fastter_dart/store/state.dart';
+
+import '../components/hexcolor.dart';
+import '../screens/addproject.dart';
 import '../screens/manageprojects.dart';
 import 'expansiontile.dart';
 
@@ -34,7 +35,7 @@ class ProjectExpansionTile extends StatelessWidget {
               builder: (context) => ManageProjectsScreen(),
             ),
             icon: const Icon(Icons.group_work),
-            title: "Projects",
+            title: 'Projects',
             buildChild: (project) => ListTile(
                   dense: true,
                   enabled: selectedProject == null ||
@@ -51,7 +52,7 @@ class ProjectExpansionTile extends StatelessWidget {
                     children: [
                       Container(
                         constraints:
-                            BoxConstraints(maxWidth: 200, maxHeight: 40),
+                            const BoxConstraints(maxWidth: 200, maxHeight: 40),
                         child: Text(project.title),
                       ),
                       Text(todos.items

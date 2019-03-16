@@ -2,13 +2,14 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../components/hexcolor.dart';
-import 'package:fastter_dart/fastter/fastter_action.dart';
-import '../helpers/todouihelpers.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/fastter/fastter_action.dart';
+
+import '../components/hexcolor.dart';
+import '../helpers/todouihelpers.dart';
 import 'label.dart';
 import 'prioritydialog.dart';
 
@@ -98,48 +99,45 @@ class _TodoItem extends StatelessWidget {
   }
 
   TextStyle _subtitleTextStyle(ThemeData theme) {
-    final TextStyle style = theme.textTheme.body1;
-    Color color = theme.disabledColor;
+    final style = theme.textTheme.body1;
+    final color = theme.disabledColor;
     return style.copyWith(color: color);
   }
 
-  Widget _buildProject(BuildContext context, {int flex = 1}) {
-    return DefaultTextStyle(
-      style: _subtitleTextStyle(Theme.of(context)),
-      child: Flexible(
-        flex: flex,
-        child: Flex(
-          direction: Axis.horizontal,
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              constraints: BoxConstraints(maxWidth: 200, maxHeight: 40),
-              child: Text(
-                todo.project.title,
+  Widget _buildProject(BuildContext context, {int flex = 1}) =>
+      DefaultTextStyle(
+        style: _subtitleTextStyle(Theme.of(context)),
+        child: Flexible(
+          flex: flex,
+          child: Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                constraints: const BoxConstraints(maxWidth: 200, maxHeight: 40),
+                child: Text(
+                  todo.project.title,
+                ),
               ),
-            ),
-            Icon(
-              Icons.group_work,
-              color: HexColor(todo.project.color),
-              size: 16,
-            ),
-          ],
+              Icon(
+                Icons.group_work,
+                color: HexColor(todo.project.color),
+                size: 16,
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 
-  _buildDueDate(BuildContext context) {
-    return DefaultTextStyle(
-      style: _subtitleTextStyle(Theme.of(context)),
-      child: Flexible(
-        flex: 0,
-        child: Text(dueDateFormatter(todo.dueDate)),
-      ),
-    );
-  }
+  Widget _buildDueDate(BuildContext context) => DefaultTextStyle(
+        style: _subtitleTextStyle(Theme.of(context)),
+        child: Flexible(
+          flex: 0,
+          child: Text(dueDateFormatter(todo.dueDate)),
+        ),
+      );
 
   Widget _buildSubtitleFirstRow(BuildContext context) {
     final children = <Widget>[];
@@ -172,7 +170,7 @@ class _TodoItem extends StatelessWidget {
             child: firstRow,
           ),
           Container(
-            margin: EdgeInsets.only(top: 4.0),
+            margin: const EdgeInsets.only(top: 4),
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width - 100,
             ),
@@ -185,16 +183,14 @@ class _TodoItem extends StatelessWidget {
     }
   }
 
-  Widget _buildTitle(BuildContext context) {
-    return Text(
-      todo.title,
-      style: TextStyle(
-        decoration: todo.completed == true
-            ? TextDecoration.lineThrough
-            : TextDecoration.none,
-      ),
-    );
-  }
+  Widget _buildTitle(BuildContext context) => Text(
+        todo.title,
+        style: TextStyle(
+          decoration: todo.completed == true
+              ? TextDecoration.lineThrough
+              : TextDecoration.none,
+        ),
+      );
 
   Widget _buildBody(BuildContext context) => Dismissible(
         key: Key(todo.id),
@@ -244,13 +240,13 @@ class _TodoItem extends StatelessWidget {
               _toggleCompleted(!(todo.completed == true));
             },
             child: Container(
-              constraints: BoxConstraints.expand(
+              constraints: const BoxConstraints.expand(
                 width: 48,
                 height: 48,
               ),
               child: Center(
                 child: AnimatedContainer(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxWidth: 20,
                     maxHeight: 20,
                   ),

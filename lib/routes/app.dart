@@ -2,12 +2,13 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../helpers/theme.dart';
 import 'package:fastter_dart/models/user.model.dart';
-import '../screens/loading.dart';
-import '../screens/login.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
+
+import '../helpers/theme.dart';
+import '../screens/loading.dart';
+import '../screens/login.dart';
 import 'home.dart';
 
 class AppContainer extends StatelessWidget {

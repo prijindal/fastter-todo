@@ -1,20 +1,20 @@
 import 'dart:async';
-import 'package:intl/intl.dart';
 import 'dart:io';
+import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-
-import '../components/homeappbar.dart';
-import '../components/todoinput.dart';
-import '../components/todoitem.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
+
+import '../components/homeappbar.dart';
+import '../components/todoinput.dart';
+import '../components/todoitem.dart';
 import 'todoeditbar.dart';
 
 class TodoList extends StatelessWidget {
@@ -121,12 +121,12 @@ class _TodoListState extends State<_TodoList> {
 
   String _dueDateCategorize(DateTime dueDate) {
     if (dueDate == null) {
-      return "No Due Date";
+      return 'No Due Date';
     }
     final now = DateTime.now();
     final diff = dueDate.difference(now);
     if (diff.inDays < 0) {
-      return "Overschedule";
+      return 'Overschedule';
     }
     if (diff.inDays < 7) {
       if (dueDate.day == now.day) {
@@ -153,7 +153,7 @@ class _TodoListState extends State<_TodoList> {
             .toList(),
       );
     }
-    Map<String, List<Todo>> mapDueDateToList = {};
+    final mapDueDateToList = <String, List<Todo>>{};
 
     final items =
         widget.todos.items.where((todo) => todo.completed != true).toList();
@@ -165,7 +165,7 @@ class _TodoListState extends State<_TodoList> {
     });
 
     for (final todo in items) {
-      String dueDateString = _dueDateCategorize(todo.dueDate);
+      final dueDateString = _dueDateCategorize(todo.dueDate);
       if (!mapDueDateToList.containsKey(dueDateString)) {
         mapDueDateToList[dueDateString] = [];
       }

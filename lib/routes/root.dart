@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+import 'package:fastter_dart/store/state.dart';
+
 import '../helpers/theme.dart';
 import '../screens//loading.dart';
-import 'package:fastter_dart/store/state.dart';
 import './app.dart';
 
 class RootContainer extends StatelessWidget {

@@ -6,11 +6,11 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
 import 'package:fastter_dart/fastter/fastter_action.dart';
-import '../helpers/todouihelpers.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
+import '../helpers/todouihelpers.dart';
 import 'projectdropdown.dart';
 
 class TodoInput extends StatelessWidget {

@@ -2,10 +2,11 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../helpers/navigator.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
+
+import '../helpers/navigator.dart';
 
 class BaseExpansionTile<T extends BaseModel> extends StatelessWidget {
   const BaseExpansionTile({

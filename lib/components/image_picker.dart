@@ -30,9 +30,8 @@ class ImagePickerUploader {
 
   Future<void> _uploadProfilePicture() async {
     try {
-      final StorageReference ref =
-          FirebaseStorage.instance.ref().child(storagePath);
-      final StorageUploadTask uploadTask = ref.putFile(_image);
+      final ref = FirebaseStorage.instance.ref().child(storagePath);
+      final uploadTask = ref.putFile(_image);
       final String downloadUrl =
           await (await uploadTask.onComplete).ref.getDownloadURL();
       onChange(downloadUrl);
@@ -41,21 +40,21 @@ class ImagePickerUploader {
     }
   }
 
-  void _selectAndUploadPicture() async {
+  Future<void> _selectAndUploadPicture() async {
     await _selectProfilePicture();
     await _uploadProfilePicture();
   }
 
-  void _takeAndUploadPicture() async {
+  Future<void> _takeAndUploadPicture() async {
     await _takeProfilePicture();
     await _uploadProfilePicture();
   }
 
-  void _urlSelectPicture() async {
-    final TextEditingController urlController = TextEditingController(
+  Future<void> _urlSelectPicture() async {
+    final urlController = TextEditingController(
       text: value,
     );
-    final bool shouldUpdate = await showDialog<bool>(
+    final shouldUpdate = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
             title: const Text('Type a url'),
@@ -87,7 +86,7 @@ class ImagePickerUploader {
     showDialog<void>(
       context: context,
       builder: (context) => SimpleDialog(
-            title: Text("Change Profile Picture"),
+            title: const Text('Change Profile Picture'),
             children: (Platform.isAndroid || Platform.isIOS)
                 ? <Widget>[
                     value == null || value.isEmpty
@@ -97,32 +96,32 @@ class ImagePickerUploader {
                           )
                         : Image.network(
                             value,
-                            height: 200.0,
-                            width: 200.0,
+                            height: 200,
+                            width: 200,
                           ),
                     ListTile(
-                      title: Text("Take a picture"),
+                      title: const Text('Take a picture'),
                       onTap: () {
                         Navigator.of(context).pop();
                         _takeAndUploadPicture();
                       },
                     ),
                     ListTile(
-                      title: Text("Select a picture"),
+                      title: const Text('Select a picture'),
                       onTap: () {
                         Navigator.of(context).pop();
                         _selectAndUploadPicture();
                       },
                     ),
                     ListTile(
-                      title: Text("Input a url"),
+                      title: const Text('Input a url'),
                       onTap: () {
                         Navigator.of(context).pop();
                         _urlSelectPicture();
                       },
                     ),
                     ListTile(
-                      title: Text("Remove picture"),
+                      title: const Text('Remove picture'),
                       onTap: () {
                         onChange(null);
                       },
@@ -136,18 +135,18 @@ class ImagePickerUploader {
                           )
                         : Image.network(
                             value,
-                            height: 200.0,
-                            width: 200.0,
+                            height: 200,
+                            width: 200,
                           ),
                     ListTile(
-                      title: Text("Input a url"),
+                      title: const Text('Input a url'),
                       onTap: () {
                         Navigator.of(context).pop();
                         _urlSelectPicture();
                       },
                     ),
                     ListTile(
-                      title: Text("Remove picture"),
+                      title: const Text('Remove picture'),
                       onTap: () {
                         onChange(null);
                       },

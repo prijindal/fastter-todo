@@ -90,11 +90,6 @@ class _GoogleSignInScreenState extends State<_GoogleSignInScreen> {
   final _idTokenController = TextEditingController(text: '');
   final String urlString = '${Fastter.instance.url}/google/oauth2';
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   void _onLogin() {
     widget.loginWithGoogle(_idTokenController.text);
   }

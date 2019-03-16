@@ -17,11 +17,11 @@ class LoginScreen extends StatelessWidget {
             LoginForm(),
             const Text('Or'),
             RaisedButton(
-              child: Text("Signup"),
+              child: const Text('Signup'),
               color: Colors.grey[300],
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
+                Navigator.of(context).push<void>(
+                  MaterialPageRoute<void>(
                     builder: (context) => SignupScreen(),
                   ),
                 );

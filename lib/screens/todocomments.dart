@@ -2,13 +2,14 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../components/todocommentitem.dart';
-import '../components/todocommentinput.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
 import 'package:fastter_dart/store/state.dart';
+
+import '../components/todocommentinput.dart';
+import '../components/todocommentitem.dart';
 
 class TodoCommentsScreen extends StatelessWidget {
   const TodoCommentsScreen({
@@ -52,6 +53,7 @@ class _TodoCommentsScreen extends StatefulWidget {
   final void Function(TodoComment) addComment;
   final VoidCallback syncStart;
 
+  @override
   _TodoCommentsScreenState createState() => _TodoCommentsScreenState();
 }
 
@@ -65,46 +67,44 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.todo.title),
-      ),
-      body: Container(
-        color: Theme.of(context).backgroundColor,
-        child: Flex(
-          direction: Axis.vertical,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            widget.todoComments.items.isEmpty
-                ? Flexible(
-                    child: Center(
-                      child: Text("No Comments"),
-                    ),
-                  )
-                : Flexible(
-                    child: SingleChildScrollView(
-                      controller: scrollController,
-                      child: Column(
-                        children: widget.todoComments.items.reversed
-                            .map(
-                              (todoComment) => TodoCommentItem(
-                                    todoComment: todoComment,
-                                  ),
-                            )
-                            .toList(),
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text(widget.todo.title),
+        ),
+        body: Container(
+          color: Theme.of(context).backgroundColor,
+          child: Flex(
+            direction: Axis.vertical,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              widget.todoComments.items.isEmpty
+                  ? Flexible(
+                      child: Center(
+                        child: const Text('No Comments'),
+                      ),
+                    )
+                  : Flexible(
+                      child: SingleChildScrollView(
+                        controller: scrollController,
+                        child: Column(
+                          children: widget.todoComments.items.reversed
+                              .map(
+                                (todoComment) => TodoCommentItem(
+                                      todoComment: todoComment,
+                                    ),
+                              )
+                              .toList(),
+                        ),
                       ),
                     ),
-                  ),
-            TodoCommentInput(
-                todo: widget.todo,
-                onAdded: () {
-                  scrollController
-                      .jumpTo(scrollController.position.maxScrollExtent);
-                }),
-          ],
+              TodoCommentInput(
+                  todo: widget.todo,
+                  onAdded: () {
+                    scrollController
+                        .jumpTo(scrollController.position.maxScrollExtent);
+                  }),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
 }

@@ -2,20 +2,21 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../components/projectdropdown.dart';
-import '../components/labelselector.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
-import '../helpers/theme.dart';
-import '../helpers/todouihelpers.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
-import '../screens/todocomments.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
+
+import '../components/labelselector.dart';
 import '../components/prioritydialog.dart';
+import '../components/projectdropdown.dart';
+import '../helpers/theme.dart';
+import '../helpers/todouihelpers.dart';
+import '../screens/todocomments.dart';
 
 class TodoEditScreen extends StatelessWidget {
   const TodoEditScreen({
@@ -125,7 +126,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
     Navigator.of(context).pop();
   }
 
-  void _selectPriority() async {
+  Future<void> _selectPriority() async {
     final priority = await showPriorityDialog(context);
     if (priority != null) {
       setState(() {
@@ -145,7 +146,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
   }
 
   void _openComments() {
-    Navigator.of(context).push(
+    Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => TodoCommentsScreen(
               todo: widget.todo,
@@ -238,7 +239,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                   leading: const Icon(Icons.comment),
                   title: const Text('Comments'),
                   subtitle: widget.todoComments.items.isEmpty
-                      ? Text('No Comments')
+                      ? const Text('No Comments')
                       : Text('${widget.todoComments.items.length} Comments'),
                   onTap: _openComments,
                 )

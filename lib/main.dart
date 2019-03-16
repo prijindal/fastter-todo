@@ -7,10 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+import 'package:fastter_dart/store/state.dart';
+
 import 'helpers/theme.dart';
 import 'routes/root.dart';
 import 'screens/loading.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'store.dart';
 
 /// If the current platform is desktop, override the default platform to

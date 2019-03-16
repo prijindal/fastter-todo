@@ -5,8 +5,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
-import 'labelselectordialog.dart';
 import 'label.dart';
+import 'labelselectordialog.dart';
 
 class LabelSelector extends StatelessWidget {
   const LabelSelector({

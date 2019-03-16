@@ -2,23 +2,23 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../components/homeappdrawer.dart';
-import '../components/todolist.dart';
-
 import 'package:fastter_dart/fastter/fastter_action.dart';
-
-import '../helpers/navigator.dart';
-import '../helpers/theme.dart';
-
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
+import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/models/todoreminder.model.dart';
+
+import '../components/homeappdrawer.dart';
+import '../components/todolist.dart';
+
+import '../helpers/navigator.dart';
+import '../helpers/theme.dart';
+
 import '../screens/profile.dart';
 import '../screens/settings.dart';
 import '../screens/todos.dart';
-import 'package:fastter_dart/store/state.dart';
 
 class HomeContainer extends StatelessWidget {
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
@@ -114,7 +114,7 @@ class _HomePageState extends State<_HomePage> {
       );
     } else if (settings.name == '/todos') {
       final Map<String, dynamic> arguments = settings.arguments;
-      Map<String, dynamic> filters = {};
+      final filters = <String, dynamic>{};
       String title;
       if (arguments.containsKey('label')) {
         final Label label = arguments['label'];
