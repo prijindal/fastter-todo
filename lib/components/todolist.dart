@@ -134,7 +134,7 @@ class _TodoListState extends State<_TodoList> {
       } else if (dueDate.day == now.day + 1) {
         return 'Tomorrow';
       } else {
-        return "This Week";
+        return DateFormat.EEEE().format(dueDate);
       }
     } else if (now.year == dueDate.year) {
       return DateFormat.MMM().format(dueDate);

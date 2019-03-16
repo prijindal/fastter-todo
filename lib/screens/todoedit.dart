@@ -15,6 +15,7 @@ import 'package:fastter_dart/models/todocomment.model.dart';
 import '../screens/todocomments.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
+import '../components/prioritydialog.dart';
 
 class TodoEditScreen extends StatelessWidget {
   const TodoEditScreen({
@@ -79,6 +80,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
   Project _project;
   List<Label> _labels;
   DateTime _dueDate;
+  int _priority;
 
   @override
   void initState() {
@@ -87,6 +89,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
     _project = widget.todo.project;
     _labels = widget.todo.labels;
     _dueDate = widget.todo.dueDate;
+    _priority = widget.todo.priority;
   }
 
   void _onSelectProject(Project selectedproject) {
@@ -116,9 +119,19 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
       completed: widget.todo.completed,
       createdAt: widget.todo.createdAt,
       updatedAt: widget.todo.updatedAt,
+      priority: _priority,
     );
     widget.updateTodo(todo);
     Navigator.of(context).pop();
+  }
+
+  void _selectPriority() async {
+    final priority = await showPriorityDialog(context);
+    if (priority != null) {
+      setState(() {
+        _priority = priority;
+      });
+    }
   }
 
   void _selectDate() {
@@ -204,6 +217,14 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                   expanded: true,
                   selectedLabels: _labels,
                   onSelected: _onSelectLabels,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.priority_high),
+                  title: const Text('Priority'),
+                  subtitle: _priority == null
+                      ? null
+                      : Text('Priority ${_priority.toString()}'),
+                  onTap: _selectPriority,
                 ),
                 ListTile(
                   leading: const Icon(Icons.calendar_today),

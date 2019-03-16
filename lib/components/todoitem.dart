@@ -10,6 +10,7 @@ import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'label.dart';
+import 'prioritydialog.dart';
 
 class TodoItem extends StatelessWidget {
   const TodoItem({
@@ -250,15 +251,18 @@ class _TodoItem extends StatelessWidget {
               child: Center(
                 child: AnimatedContainer(
                   constraints: BoxConstraints(
-                    maxWidth: 16,
-                    maxHeight: 16,
+                    maxWidth: 20,
+                    maxHeight: 20,
                   ),
                   duration: const Duration(milliseconds: 300),
                   decoration: BoxDecoration(
                     color: (todo.completed == true)
                         ? Theme.of(context).accentColor
                         : Colors.transparent,
-                    border: Border.all(color: Colors.black),
+                    border: Border.all(
+                      color: priorityColors[todo.priority - 1],
+                      width: todo.priority.toDouble(),
+                    ),
                     borderRadius: const BorderRadius.all(Radius.circular(18)),
                   ),
                 ),
