@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
@@ -254,7 +255,10 @@ class _TodoListState extends State<_TodoList> {
     if (Platform.isAndroid || Platform.isIOS) {
       return OfflineBuilder(
         connectivityBuilder: (context, connectivity, child) {
-          final connected = connectivity != ConnectivityResult.none;
+          var connected = connectivity != ConnectivityResult.none;
+          if (connected == true) {
+            connected = Fastter.instance.socket.connected;
+          }
           return Stack(
             fit: StackFit.expand,
             children: <Widget>[

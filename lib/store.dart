@@ -63,6 +63,7 @@ Future<Store<AppState>> initState() async {
           projects: state.projects,
           todos: state.todos,
           todoComments: state.todoComments,
+          lazyActions: state.lazyActions,
         ),
       );
     } else {

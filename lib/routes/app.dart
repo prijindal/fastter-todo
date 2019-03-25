@@ -60,7 +60,7 @@ class _AppContainerState extends State<_AppContainer> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.rehydrated || widget.user == null || !widget.user.initLoaded) {
+    if (!widget.rehydrated || widget.user == null) {
       return MaterialApp(
         theme: primaryTheme,
         home: LoadingScreen(),
