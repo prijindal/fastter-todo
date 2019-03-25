@@ -251,6 +251,55 @@ class _TodoListState extends State<_TodoList> {
         onRefresh: _onRefresh,
       );
 
+  Widget _buildConnectivity(Widget child, bool connected) {
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 350),
+          padding: EdgeInsets.only(top: connected ? 0 : 24.0),
+          child: child,
+        ),
+        Positioned(
+          height: 32,
+          left: 0,
+          right: 0,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 350),
+            color: connected
+                ? Colors.transparent
+                : Fastter.instance.connecting
+                    ? Colors.green
+                    : const Color(0xFFEE4400),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 350),
+              child: connected
+                  ? Container()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(Fastter.instance.connecting
+                            ? 'Connecting'
+                            : 'OFFLINE'),
+                        const SizedBox(width: 8),
+                        const SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _build() {
     if (Platform.isAndroid || Platform.isIOS) {
       return OfflineBuilder(
@@ -259,52 +308,12 @@ class _TodoListState extends State<_TodoList> {
           if (connected == true) {
             connected = Fastter.instance.socket.connected;
           }
-          return Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 350),
-                padding: EdgeInsets.only(top: connected ? 0 : 24.0),
-                child: child,
-              ),
-              Positioned(
-                height: 32,
-                left: 0,
-                right: 0,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 350),
-                  color:
-                      connected ? Colors.transparent : const Color(0xFFEE4400),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 350),
-                    child: connected
-                        ? Container()
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const <Widget>[
-                              Text('OFFLINE'),
-                              SizedBox(width: 8),
-                              SizedBox(
-                                width: 12,
-                                height: 12,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                  ),
-                ),
-              ),
-            ],
-          );
+          return _buildConnectivity(child, connected);
         },
         child: _buildChild(),
       );
     }
-    return _buildChild();
+    return _buildConnectivity(_buildChild(), Fastter.instance.socket.connected);
   }
 
   @override
