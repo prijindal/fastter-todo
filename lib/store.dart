@@ -4,6 +4,7 @@ import 'package:redux_persist/redux_persist.dart';
 import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'package:fastter_dart/fastter/lazyactions.dart';
 import 'package:fastter_dart/store/projects.dart';
 import 'package:fastter_dart/store/labels.dart';
 import 'package:fastter_dart/store/reducer.dart';
@@ -12,6 +13,7 @@ import 'package:fastter_dart/store/todos.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_dart/store/todocomments.dart';
 import 'package:fastter_dart/store/todoreminders.dart';
+import 'package:fastter_dart/store/lazyactions.dart';
 
 import 'helpers/firebase.dart' show initMessaging;
 
@@ -42,6 +44,7 @@ Future<Store<AppState>> initState() async {
       fastterTodos.middleware,
       fastterTodoComments.middleware,
       fastterTodoReminders.middleware,
+      LazyActionsMiddleware(),
       UserMiddleware(
         initMessaging: initMessaging,
         onLogout: () {
@@ -66,6 +69,7 @@ Future<Store<AppState>> initState() async {
           lazyActions: state.lazyActions,
         ),
       );
+      _store.dispatch(InitLazyActions());
     } else {
       _store.dispatch(ClearAll());
     }

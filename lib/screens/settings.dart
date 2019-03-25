@@ -56,6 +56,11 @@ class _SettingsScreen extends StatelessWidget {
         body: ListView(
           children: <Widget>[
             ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('General'),
+              onTap: () => Navigator.of(context).pushNamed('/settings/general'),
+            ),
+            ListTile(
               leading: const Icon(Icons.account_circle),
               title: const Text('Account'),
               onTap: () => Navigator.of(context).pushNamed('/settings/account'),

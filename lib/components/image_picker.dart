@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_chooser/file_chooser.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class ImagePickerUploader {
@@ -21,20 +23,44 @@ class ImagePickerUploader {
   File _image;
 
   Future _takeProfilePicture() async {
-    _image = await ImagePicker.pickImage(source: ImageSource.camera);
+    if (Platform.isAndroid || Platform.isIOS) {
+      _image = await ImagePicker.pickImage(source: ImageSource.camera);
+    } else {}
   }
 
   Future _selectProfilePicture() async {
-    _image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    if (Platform.isAndroid || Platform.isIOS) {
+      _image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    } else {
+      final completer = Completer<void>();
+      showOpenPanel(
+        (FileChooserResult fileChooserResult, filepaths) {
+          if (filepaths.isNotEmpty) {
+            _image = File(filepaths[0]);
+            completer.complete();
+          }
+        },
+        allowedFileTypes: ['jpg', 'png'],
+        allowsMultipleSelection: false,
+        canSelectDirectories: false,
+      );
+      return completer.future;
+    }
   }
 
   Future<void> _uploadProfilePicture() async {
     try {
-      final ref = FirebaseStorage.instance.ref().child(storagePath);
-      final uploadTask = ref.putFile(_image);
-      final String downloadUrl =
-          await (await uploadTask.onComplete).ref.getDownloadURL();
-      onChange(downloadUrl);
+      if (Platform.isAndroid || Platform.isIOS) {
+        final ref = FirebaseStorage.instance.ref().child(storagePath);
+        final uploadTask = ref.putFile(_image);
+        final String downloadUrl =
+            await (await uploadTask.onComplete).ref.getDownloadURL();
+
+        onChange(downloadUrl);
+      } else {
+        // TODO(prijindal): Implement firebase storage upload rest api
+        print(_image);
+      }
     } catch (error) {
       onError(error);
     }

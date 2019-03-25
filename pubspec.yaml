@@ -22,6 +22,8 @@ dependencies:
   event_bus: any
   fastter_dart: 
     path: /home/prijindal/projects/fastter_dart
+  file_chooser:
+    path: /home/prijindal/softwares/flutter-desktop-embedding/plugins/file_chooser
   firebase_messaging: any
   firebase_storage: any
   font_awesome_flutter: any

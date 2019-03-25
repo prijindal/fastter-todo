@@ -8,6 +8,7 @@ import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/settings.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
@@ -58,6 +59,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   store.dispatch(DeleteItem<Todo>(todo.id));
                 }
               },
+              frontPage: store.state.user.user.settings.frontPage,
             ),
       );
 }
@@ -75,6 +77,7 @@ class _HomeAppBar extends StatelessWidget {
     @required this.todos,
     @required this.filter,
     @required this.title,
+    @required this.frontPage,
     Key key,
   }) : super(key: key);
 
@@ -87,6 +90,7 @@ class _HomeAppBar extends StatelessWidget {
   final ListState<Label> labels;
   final ListState<Todo> todos;
   final String title;
+  final FrontPage frontPage;
 
   Project get _project => projects.items
       .singleWhere((item) => item.id == filter['project'], orElse: () => null);
@@ -106,7 +110,7 @@ class _HomeAppBar extends StatelessWidget {
     if (history.isNotEmpty) {
       routeName = history.last.routeName;
     } else {
-      routeName = '/';
+      routeName = frontPage.route;
     }
     String title;
     switch (routeName) {
@@ -162,16 +166,16 @@ class _HomeAppBar extends StatelessWidget {
   }
 
   String _tasksToString() {
-    var text = '';
+    final strBuffer = StringBuffer('');
     for (final todo
         in todos.items.where((todo) => selectedtodos.contains(todo.id))) {
-      text += '${todo.title}\n';
+      strBuffer.writeln(todo.title);
     }
-    return text;
+    return strBuffer.toString();
   }
 
-  void _copySelected(BuildContext context) {
-    Clipboard.setData(ClipboardData(text: _tasksToString()));
+  Future<void> _copySelected(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: _tasksToString()));
     Scaffold.of(context).showSnackBar(
       SnackBar(
         content: const Text('Copied to clipboard'),

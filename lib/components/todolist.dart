@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
-import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
@@ -251,69 +250,56 @@ class _TodoListState extends State<_TodoList> {
         onRefresh: _onRefresh,
       );
 
-  Widget _buildConnectivity(Widget child, bool connected) {
-    return Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 350),
-          padding: EdgeInsets.only(top: connected ? 0 : 24.0),
-          child: child,
-        ),
-        Positioned(
-          height: 32,
-          left: 0,
-          right: 0,
-          child: AnimatedContainer(
+  Widget _buildConnectivity(Widget child, bool connected) => Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          AnimatedContainer(
             duration: const Duration(milliseconds: 350),
-            color: connected
-                ? Colors.transparent
-                : Fastter.instance.connecting
-                    ? Colors.green
-                    : const Color(0xFFEE4400),
-            child: AnimatedSwitcher(
+            padding: EdgeInsets.only(top: connected ? 0 : 24.0),
+            child: child,
+          ),
+          Positioned(
+            height: 32,
+            left: 0,
+            right: 0,
+            child: AnimatedContainer(
               duration: const Duration(milliseconds: 350),
-              child: connected
-                  ? Container()
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(Fastter.instance.connecting
-                            ? 'Connecting'
-                            : 'OFFLINE'),
-                        const SizedBox(width: 8),
-                        const SizedBox(
-                          width: 12,
-                          height: 12,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+              color: connected ? Colors.transparent : const Color(0xFFEE4400),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 350),
+                child: connected
+                    ? Container()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const <Widget>[
+                          Text('OFFLINE'),
+                          SizedBox(width: 8),
+                          SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+              ),
             ),
           ),
-        ),
-      ],
-    );
-  }
+        ],
+      );
 
   Widget _build() {
     if (Platform.isAndroid || Platform.isIOS) {
       return OfflineBuilder(
-        connectivityBuilder: (context, connectivity, child) {
-          var connected = connectivity != ConnectivityResult.none;
-          if (connected == true) {
-            connected = Fastter.instance.socket.connected;
-          }
-          return _buildConnectivity(child, connected);
-        },
+        connectivityBuilder: (context, connectivity, child) =>
+            _buildConnectivity(child, connectivity != ConnectivityResult.none),
         child: _buildChild(),
       );
     }
-    return _buildConnectivity(_buildChild(), Fastter.instance.socket.connected);
+    return _buildConnectivity(_buildChild(), true);
   }
 
   @override

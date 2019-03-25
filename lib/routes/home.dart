@@ -2,12 +2,15 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
+import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/models/settings.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
 import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_dart/models/todoreminder.model.dart';
 
 import '../components/homeappdrawer.dart';
@@ -16,6 +19,7 @@ import '../components/todolist.dart';
 import '../helpers/navigator.dart';
 import '../helpers/theme.dart';
 
+import '../screens/generalsettings.dart';
 import '../screens/profile.dart';
 import '../screens/settings.dart';
 import '../screens/todos.dart';
@@ -30,6 +34,9 @@ class HomeContainer extends StatelessWidget {
       return MaterialPageRoute<void>(builder: (context) => SettingsScreen());
     } else if (settings.name == '/settings/account') {
       return MaterialPageRoute<void>(builder: (context) => ProfileScreen());
+    } else if (settings.name == '/settings/general') {
+      return MaterialPageRoute<void>(
+          builder: (context) => GeneralSettingsScreen());
     } else {
       return MaterialPageRoute<void>(
         builder: (context) => Scaffold(
@@ -61,6 +68,13 @@ class HomePage extends StatelessWidget {
                   store.dispatch(StartSync<TodoComment>()),
               todoRemindersSyncStart: () =>
                   store.dispatch(StartSync<TodoReminder>()),
+              confirmUser: (bearer) =>
+                  store.dispatch(ConfirmUserAction(bearer)),
+              frontPage: store.state.user.user?.settings?.frontPage ??
+                  FrontPage(
+                    route: '/',
+                    title: 'Inbox',
+                  ),
             ),
       );
 }
@@ -72,6 +86,8 @@ class _HomePage extends StatefulWidget {
     @required this.todoSyncStart,
     @required this.todoCommentsSyncStart,
     @required this.todoRemindersSyncStart,
+    @required this.confirmUser,
+    @required this.frontPage,
   });
 
   final VoidCallback projectSyncStart;
@@ -79,6 +95,8 @@ class _HomePage extends StatefulWidget {
   final VoidCallback todoSyncStart;
   final VoidCallback todoCommentsSyncStart;
   final VoidCallback todoRemindersSyncStart;
+  final void Function(String) confirmUser;
+  final FrontPage frontPage;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -87,16 +105,20 @@ class _HomePage extends StatefulWidget {
 class _HomePageState extends State<_HomePage> {
   @override
   void initState() {
+    print(widget.frontPage.route);
     super.initState();
     widget.todoSyncStart();
     widget.projectSyncStart();
     widget.todoCommentsSyncStart();
     widget.labelSyncStart();
     widget.todoRemindersSyncStart();
+    Fastter.instance.onConnect = () {
+      widget.confirmUser(Fastter.instance.bearer);
+    };
   }
 
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
-    if (settings.isInitialRoute || settings.name == '/') {
+    if (settings.name == '/') {
       return MaterialPageRoute<void>(
         builder: (context) => InboxScreen(),
       );
@@ -144,7 +166,7 @@ class _HomePageState extends State<_HomePage> {
         data: primaryTheme,
         isMaterialAppTheme: true,
         child: Navigator(
-          initialRoute: '/',
+          initialRoute: widget.frontPage.route,
           onGenerateRoute: _onGenerateRoute,
           key: navigatorKey,
         ),

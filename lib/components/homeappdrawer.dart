@@ -8,6 +8,7 @@ import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/models/user.model.dart';
+import 'package:fastter_dart/models/settings.model.dart';
 
 import '../helpers/navigator.dart';
 import '../screens/loading.dart';
@@ -33,6 +34,7 @@ class HomeAppDrawer extends StatelessWidget {
                     .toList(),
               ),
               disablePop: disablePop,
+              frontPage: store.state.user.user.settings.frontPage,
             ),
       );
 }
@@ -42,6 +44,7 @@ class _HomeAppDrawer extends StatelessWidget {
     @required this.user,
     @required this.projects,
     @required this.todos,
+    @required this.frontPage,
     this.disablePop = false,
     Key key,
   }) : super(key: key);
@@ -50,6 +53,7 @@ class _HomeAppDrawer extends StatelessWidget {
   final ListState<Project> projects;
   final ListState<Todo> todos;
   final bool disablePop;
+  final FrontPage frontPage;
 
   void _pushRouteNamed(
     BuildContext context,
@@ -72,7 +76,7 @@ class _HomeAppDrawer extends StatelessWidget {
     if (history.isNotEmpty) {
       routeName = history.last.routeName;
     } else {
-      routeName = '/';
+      routeName = frontPage.route;
     }
     return Drawer(
       child: ListView(
