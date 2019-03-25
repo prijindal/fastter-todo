@@ -5,14 +5,13 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/models/todocomment.model.dart';
+import 'package:fastter_dart/models/todoreminder.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
-import '../components/todocommentinput.dart';
-import '../components/todocommentitem.dart';
+import '../helpers/todouihelpers.dart';
 
-class TodoCommentsScreen extends StatelessWidget {
-  const TodoCommentsScreen({
+class TodoRemindersScreen extends StatelessWidget {
+  const TodoRemindersScreen({
     @required this.todo,
     Key key,
   }) : super(key: key);
@@ -23,37 +22,41 @@ class TodoCommentsScreen extends StatelessWidget {
   Widget build(BuildContext context) =>
       StoreConnector<AppState, Store<AppState>>(
         converter: (store) => store,
-        builder: (context, store) => _TodoCommentsScreen(
+        builder: (context, store) => _TodoRemindersScreen(
               todo: todo,
-              todoComments: ListState<TodoComment>(
-                items: store.state.todoComments.items
-                    .where((todocomment) =>
-                        todocomment.todo != null &&
-                        todocomment.todo.id == todo.id)
+              todoReminders: ListState<TodoReminder>(
+                items: store.state.todoReminders.items
+                    .where((todoreminder) =>
+                        todoreminder.todo != null &&
+                        todoreminder.todo.id == todo.id)
                     .toList(),
               ),
-              syncStart: () => store.dispatch(StartSync<TodoComment>()),
+              syncStart: () => store.dispatch(StartSync<TodoReminder>()),
+              addReminder: (TodoReminder reminder) =>
+                  store.dispatch(AddItem<TodoReminder>(reminder)),
             ),
       );
 }
 
-class _TodoCommentsScreen extends StatefulWidget {
-  const _TodoCommentsScreen({
+class _TodoRemindersScreen extends StatefulWidget {
+  const _TodoRemindersScreen({
     @required this.todo,
-    @required this.todoComments,
+    @required this.todoReminders,
+    @required this.addReminder,
     @required this.syncStart,
     Key key,
   }) : super(key: key);
 
   final Todo todo;
-  final ListState<TodoComment> todoComments;
+  final ListState<TodoReminder> todoReminders;
+  final void Function(TodoReminder) addReminder;
   final VoidCallback syncStart;
 
   @override
-  _TodoCommentsScreenState createState() => _TodoCommentsScreenState();
+  _TodoRemindersScreenState createState() => _TodoRemindersScreenState();
 }
 
-class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
+class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
   ScrollController scrollController = ScrollController();
 
   @override
@@ -73,32 +76,28 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
             direction: Axis.vertical,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              widget.todoComments.items.isEmpty
+              widget.todoReminders.items.isEmpty
                   ? Flexible(
                       child: Center(
-                        child: const Text('No Comments'),
+                        child: const Text('No Reminders'),
                       ),
                     )
                   : Flexible(
                       child: SingleChildScrollView(
                         controller: scrollController,
                         child: Column(
-                          children: widget.todoComments.items.reversed
+                          children: widget.todoReminders.items.reversed
                               .map(
-                                (todoComment) => TodoCommentItem(
-                                      todoComment: todoComment,
+                                (todoReminder) => ListTile(
+                                      title: Text(todoReminder.title),
+                                      subtitle: Text(
+                                          dueDateFormatter(todoReminder.time)),
                                     ),
                               )
                               .toList(),
                         ),
                       ),
                     ),
-              TodoCommentInput(
-                  todo: widget.todo,
-                  onAdded: () {
-                    scrollController
-                        .jumpTo(scrollController.position.maxScrollExtent);
-                  }),
             ],
           ),
         ),

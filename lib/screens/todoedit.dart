@@ -8,6 +8,7 @@ import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
+import 'package:fastter_dart/models/todoreminder.model.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
 
@@ -16,7 +17,8 @@ import '../components/prioritydialog.dart';
 import '../components/projectdropdown.dart';
 import '../helpers/theme.dart';
 import '../helpers/todouihelpers.dart';
-import '../screens/todocomments.dart';
+import 'todocomments.dart';
+import 'todoreminders.dart';
 
 class TodoEditScreen extends StatelessWidget {
   const TodoEditScreen({
@@ -41,6 +43,13 @@ class TodoEditScreen extends StatelessWidget {
                         todocomment.todo.id == todo.id)
                     .toList(),
               ),
+              todoReminders: ListState<TodoReminder>(
+                items: store.state.todoReminders.items
+                    .where((todoreminder) =>
+                        todoreminder.todo != null &&
+                        todoreminder.todo.id == todo.id)
+                    .toList(),
+              ),
               updateTodo: (updated) =>
                   store.dispatch(UpdateItem<Todo>(todo.id, updated)),
               deleteTodo: () {
@@ -57,6 +66,7 @@ class _TodoEditScreen extends StatefulWidget {
     @required this.projects,
     @required this.labels,
     @required this.todoComments,
+    @required this.todoReminders,
     @required this.updateTodo,
     @required this.deleteTodo,
     Key key,
@@ -66,6 +76,7 @@ class _TodoEditScreen extends StatefulWidget {
   final ListState<Project> projects;
   final ListState<Label> labels;
   final ListState<TodoComment> todoComments;
+  final ListState<TodoReminder> todoReminders;
   final void Function(Todo) updateTodo;
   final VoidCallback deleteTodo;
 
@@ -149,6 +160,16 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
     Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => TodoCommentsScreen(
+              todo: widget.todo,
+            ),
+      ),
+    );
+  }
+
+  void _openReminders() {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => TodoRemindersScreen(
               todo: widget.todo,
             ),
       ),
@@ -242,6 +263,14 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                       ? const Text('No Comments')
                       : Text('${widget.todoComments.items.length} Comments'),
                   onTap: _openComments,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.alarm),
+                  title: const Text('Reminders'),
+                  subtitle: widget.todoReminders.items.isEmpty
+                      ? const Text('No Reminders')
+                      : Text('${widget.todoReminders.items.length} Reminders'),
+                  onTap: _openReminders,
                 )
               ],
             ),
