@@ -34,7 +34,11 @@ class HomeAppDrawer extends StatelessWidget {
                     .toList(),
               ),
               disablePop: disablePop,
-              frontPage: store.state.user.user.settings.frontPage,
+              frontPage: store.state.user.user?.settings?.frontPage ??
+                  FrontPage(
+                    route: '/',
+                    title: 'Inbox',
+                  ),
             ),
       );
 }

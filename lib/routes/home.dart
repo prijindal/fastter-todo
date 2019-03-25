@@ -105,7 +105,6 @@ class _HomePage extends StatefulWidget {
 class _HomePageState extends State<_HomePage> {
   @override
   void initState() {
-    print(widget.frontPage.route);
     super.initState();
     widget.todoSyncStart();
     widget.projectSyncStart();

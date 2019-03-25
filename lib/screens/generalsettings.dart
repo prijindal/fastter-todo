@@ -2,7 +2,6 @@ import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/models/settings.model.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
@@ -77,10 +76,12 @@ class _GeneralSettingsScreenState extends State<_GeneralSettingsScreen> {
             ),
           ),
     );
-    setState(() {
-      frontPage = newFrontPage;
-    });
-    widget.updateSettings(UserSettings(frontPage: newFrontPage));
+    if (newFrontPage != null) {
+      setState(() {
+        frontPage = newFrontPage;
+      });
+      widget.updateSettings(UserSettings(frontPage: newFrontPage));
+    }
   }
 
   @override

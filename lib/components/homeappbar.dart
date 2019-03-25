@@ -59,7 +59,11 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   store.dispatch(DeleteItem<Todo>(todo.id));
                 }
               },
-              frontPage: store.state.user.user.settings.frontPage,
+              frontPage: store.state.user.user?.settings?.frontPage ??
+                  FrontPage(
+                    route: '/',
+                    title: 'Inbox',
+                  ),
             ),
       );
 }
