@@ -1,4 +1,4 @@
-package com.prijindal.fastter_flutter
+package com.prijindal.fastter_todo
 
 import android.os.Bundle
 

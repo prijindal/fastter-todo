@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:352904497289:android:534998e5ea85c23a",
         "android_client_info": {
-          "package_name": "com.prijindal.fastter_flutter"
+          "package_name": "com.prijindal.fastter_todo"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "352904497289-0t2j37ni42jg49fb96oeor10ko8clls2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.prijindal.fastter_flutter",
+            "package_name": "com.prijindal.fastter_todo",
             "certificate_hash": "e2b2dc1297e29e908e76adbe59be76ee55412c12"
           }
         },

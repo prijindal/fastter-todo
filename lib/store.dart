@@ -23,7 +23,7 @@ Future<Store<AppState>> initState() async {
     storage = FlutterStorage();
   } else {
     final homeFolder = Platform.environment['HOME'];
-    final file = File('$homeFolder/.config/fastter_flutter/state.json');
+    final file = File('$homeFolder/.config/fastter_todo/state.json');
     file.createSync(recursive: true);
     storage = FileStorage(file);
   }

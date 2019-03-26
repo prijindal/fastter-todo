@@ -1,4 +1,4 @@
-# fastter_flutter
+# fastter_todo
 
 An example app using fastter API
 
