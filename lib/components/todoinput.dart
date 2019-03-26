@@ -180,15 +180,17 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     });
   }
 
+  double get _width => MediaQuery.of(context).orientation ==
+          Orientation.portrait
+      ? MediaQuery.of(context).size.width
+      : MediaQuery.of(context).size.width - 304; // 304 is the _kWidth of drawer
+
   @override
-  Widget build(BuildContext context) => Material(
-        elevation: 4,
+  Widget build(BuildContext context) => Card(
+        elevation: 8,
         child: Container(
           color: Colors.white,
-          width: MediaQuery.of(context).orientation == Orientation.portrait
-              ? MediaQuery.of(context).size.width
-              : MediaQuery.of(context).size.width -
-                  304, // 304 is the _kWidth of drawer
+          width: _width - 4.0,
           child: Center(
             child: Container(
               width: min(480, MediaQuery.of(context).size.width - 20.0),

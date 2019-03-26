@@ -84,39 +84,70 @@ class _TodoList extends StatefulWidget {
 class _TodoListState extends State<_TodoList> {
   bool _showInput = false;
 
-  Positioned _buildBottom() {
-    final position = widget.selectedTodos.isEmpty && !_showInput ? 48.0 : 0.0;
-    return Positioned(
-      bottom: position,
-      right: position,
-      child: Container(
-        child: widget.selectedTodos.isEmpty
-            ? (_showInput
-                ? TodoInput(
-                    project: (widget.filter.containsKey('project') &&
-                            widget.projects.items.isNotEmpty)
-                        ? widget.projects.items.singleWhere(
-                            (project) => project.id == widget.filter['project'],
-                            orElse: () => null)
-                        : null,
-                    onBackButton: () {
-                      setState(() {
-                        _showInput = false;
-                      });
-                    },
-                  )
-                : FloatingActionButton(
-                    heroTag: widget.filter.toString(),
-                    child: const Icon(Icons.add),
-                    onPressed: () {
-                      setState(() {
-                        _showInput = true;
-                      });
-                    },
-                  ))
-            : TodoEditBar(),
-      ),
+  List<Widget> _buildBottom() {
+    const duration = Duration(milliseconds: 150);
+    final positionTween = Tween<Offset>(
+      begin: const Offset(0, 10),
+      end: const Offset(0, 0),
     );
+    return [
+      Positioned(
+        bottom: 48,
+        right: 48,
+        child: AnimatedSwitcher(
+          duration: duration,
+          transitionBuilder: (Widget child, Animation<double> animation) =>
+              ScaleTransition(child: child, scale: animation),
+          child: widget.selectedTodos.isEmpty && !_showInput
+              ? FloatingActionButton(
+                  heroTag: widget.filter.toString(),
+                  child: const Icon(Icons.add),
+                  onPressed: () {
+                    setState(() {
+                      _showInput = true;
+                    });
+                  },
+                )
+              : Container(),
+        ),
+      ),
+      Positioned(
+        bottom: 0,
+        right: 2,
+        left: 2,
+        child: AnimatedSwitcher(
+          duration: duration,
+          transitionBuilder: (Widget child, Animation<double> animation) =>
+              SizeTransition(child: child, sizeFactor: animation),
+          child: widget.selectedTodos.isEmpty && _showInput
+              ? TodoInput(
+                  project: (widget.filter.containsKey('project') &&
+                          widget.projects.items.isNotEmpty)
+                      ? widget.projects.items.singleWhere(
+                          (project) => project.id == widget.filter['project'],
+                          orElse: () => null)
+                      : null,
+                  onBackButton: () {
+                    setState(() {
+                      _showInput = false;
+                    });
+                  },
+                )
+              : Container(),
+        ),
+      ),
+      Positioned(
+        bottom: 0,
+        right: 2,
+        left: 2,
+        child: AnimatedSwitcher(
+          duration: duration,
+          transitionBuilder: (Widget child, Animation<double> animation) =>
+              SizeTransition(child: child, sizeFactor: animation),
+          child: widget.selectedTodos.isNotEmpty ? TodoEditBar() : Container(),
+        ),
+      ),
+    ];
   }
 
   String _dueDateCategorize(DateTime dueDate) {
@@ -235,8 +266,7 @@ class _TodoListState extends State<_TodoList> {
                 ),
               )
             : _buildListView(),
-        _buildBottom(),
-      ],
+      ]..addAll(_buildBottom()),
     );
   }
 

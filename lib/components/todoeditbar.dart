@@ -145,45 +145,41 @@ class _TodoEditBar extends StatelessWidget {
       );
 
   Widget _buildEditButton() {
-    final todoid = selectedTodos[0];
-    if (todos.items.isNotEmpty) {
-      final todo = todos.items.singleWhere((item) => item.id == todoid);
-      return IconButton(
-        icon: const Icon(Icons.edit),
-        onPressed: () {
-          mainNavigatorKey.currentState.push<void>(
-            MaterialPageRoute<void>(
-              builder: (context) => TodoEditScreen(
-                    todo: todo,
-                  ),
-            ),
-          );
-        },
-      );
-    } else {
-      return null;
-    }
+    return IconButton(
+      icon: const Icon(Icons.edit),
+      onPressed: () {
+        mainNavigatorKey.currentState.push<void>(
+          MaterialPageRoute<void>(
+            builder: (context) {
+              final todoid = selectedTodos[0];
+              final todo = todos.items.singleWhere((item) => item.id == todoid);
+              return TodoEditScreen(
+                todo: todo,
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildCommentButton() {
-    final todoid = selectedTodos[0];
-    if (todos.items.isNotEmpty) {
-      final todo = todos.items.singleWhere((item) => item.id == todoid);
-      return IconButton(
-        icon: const Icon(Icons.comment),
-        onPressed: () {
-          mainNavigatorKey.currentState.push<void>(
-            MaterialPageRoute<void>(
-              builder: (context) => TodoCommentsScreen(
-                    todo: todo,
-                  ),
-            ),
-          );
-        },
-      );
-    } else {
-      return null;
-    }
+    return IconButton(
+      icon: const Icon(Icons.comment),
+      onPressed: () {
+        mainNavigatorKey.currentState.push<void>(
+          MaterialPageRoute<void>(
+            builder: (context) {
+              final todoid = selectedTodos[0];
+              final todo = todos.items.singleWhere((item) => item.id == todoid);
+              return TodoCommentsScreen(
+                todo: todo,
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   void _onChangeLabels(dynamic data) {
@@ -201,7 +197,7 @@ class _TodoEditBar extends StatelessWidget {
 
   Widget _buildSelectLabelsButton() => LabelSelector(
         onSelected: _onChangeLabels,
-        selectedLabels: todos.items.isNotEmpty
+        selectedLabels: todos.items.isNotEmpty && selectedTodos.isNotEmpty
             ? todos.items
                 .singleWhere((item) => item.id == selectedTodos[0])
                 .labels
@@ -210,7 +206,7 @@ class _TodoEditBar extends StatelessWidget {
 
   Widget _buildChangeProjectButton() => ProjectDropdown(
         onSelected: onChangeProject,
-        selectedProject: todos.items.isNotEmpty
+        selectedProject: todos.items.isNotEmpty && selectedTodos.isNotEmpty
             ? todos.items
                 .singleWhere((item) => item.id == selectedTodos[0])
                 .project
@@ -223,7 +219,7 @@ class _TodoEditBar extends StatelessWidget {
       );
 
   List<Widget> _buildButtons(BuildContext context) {
-    if (selectedTodos.length == 1) {
+    if (selectedTodos.length <= 1) {
       return <Widget>[
         _buildChangeDateButton(context),
         _buildEditButton(),
@@ -241,17 +237,25 @@ class _TodoEditBar extends StatelessWidget {
     ];
   }
 
+  double _width(BuildContext context) => MediaQuery.of(context).orientation ==
+          Orientation.portrait
+      ? MediaQuery.of(context).size.width
+      : MediaQuery.of(context).size.width - 304; // 304 is the _kWidth of drawer
+
   @override
-  Widget build(BuildContext context) => Material(
+  Widget build(BuildContext context) => Card(
         elevation: 20,
         child: Container(
-          width: MediaQuery.of(context).size.width,
+          width: _width(context) - 4.0,
           padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Flex(
-            direction: Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: _buildButtons(context),
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 350),
+            child: Flex(
+              direction: Axis.horizontal,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: _buildButtons(context),
+            ),
           ),
         ),
       );
