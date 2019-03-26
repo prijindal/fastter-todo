@@ -103,12 +103,12 @@ class _HomeAppBar extends StatelessWidget {
       .singleWhere((item) => item.id == filter['label'], orElse: () => null);
 
   Widget _buildTitle() {
-    if (this.title != null) {
-      return Text(this.title);
-    }
     if (selectedtodos.isNotEmpty) {
       return Text('${selectedtodos.length.toString()} '
           'Todo${selectedtodos.length > 1 ? 's' : ''} selected');
+    }
+    if (this.title != null) {
+      return Text(this.title);
     }
     String routeName;
     if (history.isNotEmpty) {
@@ -299,17 +299,20 @@ class _HomeAppBar extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedTheme(
         data: selectedtodos.isNotEmpty ? whiteTheme : primaryTheme,
         child: AppBar(
-          leading: selectedtodos.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: unSelectAll,
-                )
-              : IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () {
-                    homeScaffoldKey.currentState.openDrawer();
-                  },
-                ),
+          leading: AnimatedContainer(
+            duration: const Duration(milliseconds: 350),
+            child: selectedtodos.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: unSelectAll,
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () {
+                      homeScaffoldKey.currentState.openDrawer();
+                    },
+                  ),
+          ),
           title: _buildTitle(),
           actions: [
             _buildPopupAction(context),
