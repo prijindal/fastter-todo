@@ -8,13 +8,15 @@ FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 Future<String> initMessaging() async {
   if (Platform.isAndroid || Platform.isIOS) {
     _firebaseMessaging.requestNotificationPermissions();
-    _firebaseMessaging.configure(onMessage: (message) {
-      Scaffold.of(navigatorKey.currentContext).showSnackBar(
-        SnackBar(
-          content: Text(message['notification']['title']),
-        ),
-      );
-    });
+    _firebaseMessaging.configure(
+      onMessage: (message) {
+        Scaffold.of(navigatorKey.currentContext).showSnackBar(
+          SnackBar(
+            content: Text(message['notification']['title']),
+          ),
+        );
+      },
+    );
     return _firebaseMessaging.getToken();
   }
   return null;

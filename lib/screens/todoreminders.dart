@@ -28,7 +28,8 @@ class TodoRemindersScreen extends StatelessWidget {
                 items: store.state.todoReminders.items
                     .where((todoreminder) =>
                         todoreminder.todo != null &&
-                        todoreminder.todo.id == todo.id)
+                        todoreminder.todo.id == todo.id &&
+                        todoreminder.completed == false)
                     .toList(),
               ),
               syncStart: () => store.dispatch(StartSync<TodoReminder>()),
@@ -65,16 +66,40 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
     super.initState();
   }
 
+  void _newReminder() async {
+    final now = DateTime.now();
+    final dateResponse = await todoSelectDate(context, now);
+    if (dateResponse != null) {
+      final date = dateResponse.dateTime;
+      final time = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay(minute: date.minute, hour: date.hour),
+      );
+      final newTime =
+          DateTime(date.year, date.month, date.day, time.hour, time.minute);
+      widget.addReminder(
+        TodoReminder(
+          time: newTime,
+          title: 'New Reminder',
+          todo: widget.todo,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: Text(widget.todo.title),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _newReminder,
+          child: const Icon(Icons.add),
+        ),
         body: Container(
-          color: Theme.of(context).backgroundColor,
           child: Flex(
             direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               widget.todoReminders.items.isEmpty
                   ? Flexible(

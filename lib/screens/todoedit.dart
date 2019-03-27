@@ -47,7 +47,8 @@ class TodoEditScreen extends StatelessWidget {
                 items: store.state.todoReminders.items
                     .where((todoreminder) =>
                         todoreminder.todo != null &&
-                        todoreminder.todo.id == todo.id)
+                        todoreminder.todo.id == todo.id &&
+                        todoreminder.completed == false)
                     .toList(),
               ),
               updateTodo: (updated) =>

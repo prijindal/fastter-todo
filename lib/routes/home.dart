@@ -23,6 +23,7 @@ import '../screens/generalsettings.dart';
 import '../screens/profile.dart';
 import '../screens/settings.dart';
 import '../screens/todos.dart';
+import '../screens/todoedit.dart';
 
 class HomeContainer extends StatelessWidget {
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
@@ -151,6 +152,14 @@ class _HomePageState extends State<_HomePage> {
         builder: (context) => TodoList(
               filter: filters,
               title: title,
+            ),
+      );
+    } else if (settings.name == '/todo') {
+      final Map<String, dynamic> arguments = settings.arguments;
+      final Todo todo = arguments['todo'];
+      return MaterialPageRoute<void>(
+        builder: (context) => TodoEditScreen(
+              todo: todo,
             ),
       );
     }
