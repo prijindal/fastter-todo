@@ -32,12 +32,28 @@ android {
         disable 'InvalidPackage'
     }
 
+    def versionPropsFile = file('version.properties')
+
+    def Properties versionProps = new Properties()
+
+    if(versionPropsFile.exists())
+        versionProps.load(new FileInputStream(versionPropsFile))
+
+    List<String> runTasks = gradle.startParameter.getTaskNames();
+    def value = 0
+    for (String item : runTasks)
+    if ( item.contains("bundleRelease")) {
+        value = 1;
+    }
+    def code = Integer.parseInt(versionProps['VERSION_CODE']  ?: "0" ).intValue() + value
+    versionProps['VERSION_CODE']=code.toString()
+    versionProps.store(versionPropsFile.newWriter(), null)
+
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.prijindal.fastter_todo"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 3
+        versionCode code
         versionName '0.0.1'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
