@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -33,8 +34,16 @@ class TodoRemindersScreen extends StatelessWidget {
                     .toList(),
               ),
               syncStart: () => store.dispatch(StartSync<TodoReminder>()),
-              addReminder: (TodoReminder reminder) =>
-                  store.dispatch(AddItem<TodoReminder>(reminder)),
+              addReminder: (TodoReminder reminder) {
+                final action = AddItem<TodoReminder>(reminder);
+                store.dispatch(action);
+                return action.completer.future;
+              },
+              deleteReminder: (String reminderid) {
+                final action = DeleteItem<TodoReminder>(reminderid);
+                store.dispatch(action);
+                return action.completer.future;
+              },
             ),
       );
 }
@@ -44,13 +53,15 @@ class _TodoRemindersScreen extends StatefulWidget {
     @required this.todo,
     @required this.todoReminders,
     @required this.addReminder,
+    @required this.deleteReminder,
     @required this.syncStart,
     Key key,
   }) : super(key: key);
 
   final Todo todo;
   final ListState<TodoReminder> todoReminders;
-  final void Function(TodoReminder) addReminder;
+  final Future<TodoReminder> Function(TodoReminder) addReminder;
+  final Future<TodoReminder> Function(String) deleteReminder;
   final VoidCallback syncStart;
 
   @override
@@ -59,6 +70,7 @@ class _TodoRemindersScreen extends StatefulWidget {
 
 class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
   ScrollController scrollController = ScrollController();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -66,7 +78,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
     super.initState();
   }
 
-  void _newReminder() async {
+  Future<void> _newReminder() async {
     final now = DateTime.now();
     final dateResponse = await todoSelectDate(context, now);
     if (dateResponse != null) {
@@ -75,20 +87,35 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
         context: context,
         initialTime: TimeOfDay(minute: date.minute, hour: date.hour),
       );
-      final newTime =
-          DateTime(date.year, date.month, date.day, time.hour, time.minute);
-      widget.addReminder(
-        TodoReminder(
-          time: newTime,
-          title: 'New Reminder',
-          todo: widget.todo,
-        ),
-      );
+      if (time != null) {
+        final newTime =
+            DateTime(date.year, date.month, date.day, time.hour, time.minute);
+        final newReminder = await widget.addReminder(
+          TodoReminder(
+            time: newTime.toUtc(),
+            title: 'New Reminder',
+            todo: widget.todo,
+            completed: false,
+          ),
+        );
+        if (newReminder != null) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              content: const Text('New Reminder Created'),
+              action: SnackBarAction(
+                label: 'Undo',
+                onPressed: () => widget.deleteReminder(newReminder.id),
+              ),
+            ),
+          );
+        }
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           title: Text(widget.todo.title),
         ),
