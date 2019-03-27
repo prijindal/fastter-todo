@@ -22,7 +22,7 @@ class GeneralSettingsScreen extends StatelessWidget {
       );
 }
 
-class _GeneralSettingsScreen extends StatefulWidget {
+class _GeneralSettingsScreen extends StatelessWidget {
   const _GeneralSettingsScreen({
     @required this.settings,
     @required this.updateSettings,
@@ -31,29 +31,7 @@ class _GeneralSettingsScreen extends StatefulWidget {
   final UserSettings settings;
   final void Function(UserSettings) updateSettings;
 
-  @override
-  _GeneralSettingsScreenState createState() => _GeneralSettingsScreenState();
-}
-
-class _GeneralSettingsScreenState extends State<_GeneralSettingsScreen> {
-  FrontPage frontPage;
-
-  @override
-  void initState() {
-    setState(() {
-      if (widget.settings.frontPage == null) {
-        frontPage = FrontPage(
-          title: 'Inbox',
-          route: '/',
-        );
-      } else {
-        frontPage = widget.settings.frontPage;
-      }
-    });
-    super.initState();
-  }
-
-  Future<void> _editFrontPage() async {
+  Future<void> _editFrontPage(BuildContext context) async {
     final frontpages = <FrontPage>[
       FrontPage(route: '/', title: 'Inbox'),
       FrontPage(route: '/all', title: 'All'),
@@ -77,12 +55,34 @@ class _GeneralSettingsScreenState extends State<_GeneralSettingsScreen> {
           ),
     );
     if (newFrontPage != null) {
-      setState(() {
-        frontPage = newFrontPage;
-      });
-      widget.updateSettings(UserSettings(frontPage: newFrontPage));
+      updateSettings(UserSettings(
+        frontPage: newFrontPage,
+        notifications: settings.notifications,
+      ));
     }
   }
+
+  void _toggleNotification(bool newValue) {
+    updateSettings(UserSettings(
+      frontPage: settings.frontPage,
+      notifications: UserNotifiationsSettings(
+        enable: newValue,
+      ),
+    ));
+  }
+
+  FrontPage get _frontPage =>
+      settings.frontPage ??
+      FrontPage(
+        title: 'Inbox',
+        route: '/',
+      );
+
+  UserNotifiationsSettings get _notifications =>
+      settings.notifications ??
+      UserNotifiationsSettings(
+        enable: false,
+      );
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -93,9 +93,14 @@ class _GeneralSettingsScreenState extends State<_GeneralSettingsScreen> {
           children: <Widget>[
             ListTile(
               title: const Text('Front Page'),
-              subtitle: Text(frontPage.title ?? frontPage.route),
-              onTap: _editFrontPage,
-            )
+              subtitle: Text(_frontPage.title ?? _frontPage.route),
+              onTap: () => _editFrontPage(context),
+            ),
+            SwitchListTile(
+              title: const Text('Notifications'),
+              value: _notifications.enable,
+              onChanged: _toggleNotification,
+            ),
           ],
         ),
       );
