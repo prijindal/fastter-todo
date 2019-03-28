@@ -90,26 +90,6 @@ class _TodoListState extends State<_TodoList> {
     const duration = Duration(milliseconds: 150);
     return [
       Positioned(
-        bottom: 48,
-        right: 48,
-        child: AnimatedSwitcher(
-          duration: duration,
-          transitionBuilder: (Widget child, Animation<double> animation) =>
-              ScaleTransition(child: child, scale: animation),
-          child: widget.selectedTodos.isEmpty && !_showInput
-              ? FloatingActionButton(
-                  heroTag: widget.filter.toString(),
-                  child: const Icon(Icons.add),
-                  onPressed: () {
-                    setState(() {
-                      _showInput = true;
-                    });
-                  },
-                )
-              : Container(),
-        ),
-      ),
-      Positioned(
         bottom: 0,
         right: 2,
         left: 2,
@@ -228,53 +208,71 @@ class _TodoListState extends State<_TodoList> {
     );
   }
 
-  ListView _buildListView() => ListView(
-        children: [
-          _buildPendingTodos(),
-          widget.todos.items.where((todo) => todo.completed == true).isNotEmpty
-              ? ExpansionTile(
-                  title: const Text('Completed'),
-                  children: widget.todos.items
-                      .where((todo) => todo.completed == true)
-                      .map((todo) => TodoItem(
-                            todo: todo,
-                          ))
-                      .toList(),
-                )
-              : Container(),
+  List<Widget> _buildListChildren() {
+    if (widget.todos.fetching && widget.todos.items.isEmpty) {
+      return [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 20),
+          child: Center(
+            child: const CircularProgressIndicator(),
+          ),
+        )
+      ];
+    }
+    return widget.todos.items.isEmpty
+        ? [
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 20),
+                  ),
+                  const Text('No Tasks yet'),
+                  RaisedButton(
+                    child: const Text('Add a todo'),
+                    onPressed: () {
+                      setState(() {
+                        _showInput = true;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            )
+          ]
+        : [
+            _buildPendingTodos(),
+            widget.todos.items
+                    .where((todo) => todo.completed == true)
+                    .isNotEmpty
+                ? ExpansionTile(
+                    title: const Text('Completed'),
+                    children: widget.todos.items
+                        .where((todo) => todo.completed == true)
+                        .map((todo) => TodoItem(
+                              todo: todo,
+                            ))
+                        .toList(),
+                  )
+                : Container(),
+          ];
+  }
+
+  Widget _buildListView() => CustomScrollView(
+        slivers: <Widget>[
+          HomeAppBar(
+            title: widget.title,
+            filter: widget.filter,
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              _buildListChildren(),
+            ),
+          ),
         ],
       );
-
-  Widget _buildBody() {
-    if (widget.todos.fetching && widget.todos.items.isEmpty) {
-      return Center(
-        child: const CircularProgressIndicator(),
-      );
-    }
-    return Stack(
-      children: [
-        widget.todos.items.isEmpty
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text('No Tasks yet'),
-                    RaisedButton(
-                      child: const Text('Add a todo'),
-                      onPressed: () {
-                        setState(() {
-                          _showInput = true;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )
-            : _buildListView(),
-      ]..addAll(_buildBottom()),
-    );
-  }
 
   Future<void> _onRefresh() {
     final completer = widget.syncStart();
@@ -282,7 +280,12 @@ class _TodoListState extends State<_TodoList> {
   }
 
   Widget _buildChild() => RefreshIndicator(
-        child: _buildBody(),
+        displacement: kToolbarHeight + 40,
+        child: Stack(
+          children: [
+            _buildListView(),
+          ]..addAll(_buildBottom()),
+        ),
         onRefresh: _onRefresh,
       );
 
@@ -340,10 +343,17 @@ class _TodoListState extends State<_TodoList> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: HomeAppBar(
-          title: widget.title,
-          filter: widget.filter,
-        ),
+        floatingActionButton: widget.selectedTodos.isEmpty && !_showInput
+            ? FloatingActionButton(
+                heroTag: widget.filter.toString(),
+                child: const Icon(Icons.add),
+                onPressed: () {
+                  setState(() {
+                    _showInput = true;
+                  });
+                },
+              )
+            : null,
         body: _build(),
       );
 }

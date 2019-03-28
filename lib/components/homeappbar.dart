@@ -18,6 +18,7 @@ import '../helpers/navigator.dart';
 import '../helpers/theme.dart';
 import '../screens/editlabel.dart';
 import '../screens/editproject.dart';
+import '../screens/search.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({
@@ -251,23 +252,23 @@ class _HomeAppBar extends StatelessWidget {
           }
         },
         icon: const Icon(Icons.sort),
-        itemBuilder: (context) => [
+        itemBuilder: (context) => const [
               PopupMenuItem(
                 enabled: false,
-                child: const Text('Sort By'),
+                child: Text('Sort By'),
               ),
-              const PopupMenuDivider(),
+              PopupMenuDivider(),
               PopupMenuItem<_SortAction>(
                 value: _SortAction.duedate,
-                child: const Text('Due Date'),
+                child: Text('Due Date'),
               ),
               PopupMenuItem<_SortAction>(
                 value: _SortAction.priority,
-                child: const Text('Priority'),
+                child: Text('Priority'),
               ),
               PopupMenuItem<_SortAction>(
                 value: _SortAction.title,
-                child: const Text('Title'),
+                child: Text('Title'),
               )
             ],
       );
@@ -333,10 +334,21 @@ class _HomeAppBar extends StatelessWidget {
         },
       );
 
+  void _onSearch(BuildContext context) {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (context) => const SearchScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => AnimatedTheme(
         data: selectedtodos.isNotEmpty ? whiteTheme : primaryTheme,
-        child: AppBar(
+        child: SliverAppBar(
+          pinned: false,
+          floating: true,
+          snap: true,
           leading: AnimatedContainer(
             duration: const Duration(milliseconds: 350),
             child: selectedtodos.isNotEmpty
@@ -353,6 +365,10 @@ class _HomeAppBar extends StatelessWidget {
           ),
           title: _buildTitle(),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () => _onSearch(context),
+            ),
             _buildSortAction(context),
             _buildPopupAction(context),
           ],
