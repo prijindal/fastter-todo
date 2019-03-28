@@ -17,11 +17,9 @@ import 'package:fastter_dart/store/state.dart';
 class FlutterPersistor extends Persistor<AppState> {
   SharedPreferences _sharedPreferences;
 
-  FlutterPersistor() {
+  Future<void> _initSharedPreferences() async {
     if (Platform.isAndroid || Platform.isIOS) {
-      SharedPreferences.getInstance().then((sharedPreferences) {
-        _sharedPreferences = sharedPreferences;
-      });
+      _sharedPreferences = await SharedPreferences.getInstance();
     }
   }
 
@@ -52,6 +50,7 @@ class FlutterPersistor extends Persistor<AppState> {
 
   @override
   Future<AppState> load() async {
+    await _initSharedPreferences();
     return AppState(
       user: UserState.fromJson(
         json.decode(_loadKey('user')),
@@ -84,6 +83,7 @@ class FlutterPersistor extends Persistor<AppState> {
 
   @override
   Future<void> save(AppState state) async {
+    await _initSharedPreferences();
     _saveKey('user', json.encode(state.user.toJson()));
     _saveKey('todos', json.encode(state.todos.toJson()));
     _saveKey('projects', json.encode(state.projects.toJson()));
