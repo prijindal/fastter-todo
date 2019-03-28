@@ -116,11 +116,14 @@ class _EditProjectScreenState extends State<_EditProjectScreen> {
         ),
         body: ListView(
           children: [
-            TextField(
-              focusNode: titleFocusNode,
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Title',
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 5),
+              child: TextField(
+                focusNode: titleFocusNode,
+                controller: titleController,
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                ),
               ),
             ),
             ColorPicker(

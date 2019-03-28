@@ -5,7 +5,7 @@ import '../components/todolist.dart';
 class AllTodosScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const TodoList(
-        dateView: true,
+        categoryView: true,
       );
 }
 
@@ -24,7 +24,7 @@ class TodayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => TodoList(
         title: 'Today',
-        dateView: true,
+        categoryView: true,
         filter: <String, dynamic>{
           '_operators': {
             'dueDate': {
@@ -39,7 +39,7 @@ class SevenDayScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => TodoList(
         title: '7 Days',
-        dateView: true,
+        categoryView: true,
         filter: <String, dynamic>{
           '_operators': {
             'dueDate': {

@@ -64,11 +64,15 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                     route: '/',
                     title: 'Inbox',
                   ),
+              updateSortBy: (String sortBy) =>
+                  store.dispatch(SetSortBy<Todo>(sortBy)),
             ),
       );
 }
 
 enum _PopupAction { delete, deleteall, editproject, editlabel, copy, share }
+
+enum _SortAction { duedate, title, priority }
 
 class _HomeAppBar extends StatelessWidget {
   const _HomeAppBar({
@@ -81,6 +85,7 @@ class _HomeAppBar extends StatelessWidget {
     @required this.todos,
     @required this.filter,
     @required this.title,
+    @required this.updateSortBy,
     @required this.frontPage,
     Key key,
   }) : super(key: key);
@@ -94,6 +99,7 @@ class _HomeAppBar extends StatelessWidget {
   final ListState<Label> labels;
   final ListState<Todo> todos;
   final String title;
+  final void Function(String) updateSortBy;
   final FrontPage frontPage;
 
   Project get _project => projects.items
@@ -234,6 +240,38 @@ class _HomeAppBar extends StatelessWidget {
     );
   }
 
+  Widget _buildSortAction(BuildContext context) => PopupMenuButton<_SortAction>(
+        onSelected: (_SortAction action) {
+          if (action == _SortAction.duedate) {
+            updateSortBy('dueDate');
+          } else if (action == _SortAction.priority) {
+            updateSortBy('priority');
+          } else if (action == _SortAction.title) {
+            updateSortBy('title');
+          }
+        },
+        icon: const Icon(Icons.sort),
+        itemBuilder: (context) => [
+              PopupMenuItem(
+                enabled: false,
+                child: const Text('Sort By'),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem<_SortAction>(
+                value: _SortAction.duedate,
+                child: const Text('Due Date'),
+              ),
+              PopupMenuItem<_SortAction>(
+                value: _SortAction.priority,
+                child: const Text('Priority'),
+              ),
+              PopupMenuItem<_SortAction>(
+                value: _SortAction.title,
+                child: const Text('Title'),
+              )
+            ],
+      );
+
   Widget _buildPopupAction(BuildContext context) =>
       PopupMenuButton<_PopupAction>(
         onSelected: (value) {
@@ -315,6 +353,7 @@ class _HomeAppBar extends StatelessWidget {
           ),
           title: _buildTitle(),
           actions: [
+            _buildSortAction(context),
             _buildPopupAction(context),
           ],
         ),

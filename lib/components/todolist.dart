@@ -20,13 +20,13 @@ import 'todoeditbar.dart';
 class TodoList extends StatelessWidget {
   const TodoList({
     this.filter = const <String, dynamic>{},
-    this.dateView = false,
+    this.categoryView = false,
     this.title = 'Todos',
     Key key,
   }) : super(key: key);
 
   final Map<String, dynamic> filter;
-  final bool dateView;
+  final bool categoryView;
   final String title;
 
   @override
@@ -36,7 +36,7 @@ class TodoList extends StatelessWidget {
         builder: (context, store) => _TodoList(
               selectedTodos: store.state.selectedTodos,
               projects: store.state.projects,
-              dateView: dateView,
+              categoryView: categoryView,
               todos: ListState<Todo>(
                 fetching: store.state.todos.fetching,
                 adding: store.state.todos.adding,
@@ -44,7 +44,9 @@ class TodoList extends StatelessWidget {
                 deleting: store.state.todos.deleting,
                 items: store.state.todos.items
                     .where((todo) => fastterTodos.filterObject(todo, filter))
-                    .toList(),
+                    .toList()
+                      ..sort(getCompareFunction(store.state.todos.sortBy)),
+                sortBy: store.state.todos.sortBy,
               ),
               filter: filter,
               title: title,
@@ -63,7 +65,7 @@ class _TodoList extends StatefulWidget {
     @required this.projects,
     @required this.syncStart,
     @required this.selectedTodos,
-    this.dateView = false,
+    this.categoryView = false,
     this.filter = const <String, dynamic>{},
     this.title = 'Todos',
     Key key,
@@ -72,7 +74,7 @@ class _TodoList extends StatefulWidget {
   final ListState<Todo> todos;
   final ListState<Project> projects;
   final Completer Function() syncStart;
-  final bool dateView;
+  final bool categoryView;
   final String title;
   final List<String> selectedTodos;
   final Map<String, dynamic> filter;
@@ -86,10 +88,6 @@ class _TodoListState extends State<_TodoList> {
 
   List<Widget> _buildBottom() {
     const duration = Duration(milliseconds: 150);
-    final positionTween = Tween<Offset>(
-      begin: const Offset(0, 10),
-      end: const Offset(0, 0),
-    );
     return [
       Positioned(
         bottom: 48,
@@ -174,7 +172,7 @@ class _TodoListState extends State<_TodoList> {
   }
 
   Widget _buildPendingTodos() {
-    if (!widget.dateView) {
+    if (!widget.categoryView) {
       return Column(
         children: widget.todos.items
             .where((todo) => todo.completed != true)
@@ -184,33 +182,41 @@ class _TodoListState extends State<_TodoList> {
             .toList(),
       );
     }
-    final mapDueDateToList = <String, List<Todo>>{};
+    final mapCategoryToList = <String, List<Todo>>{};
 
     final items =
         widget.todos.items.where((todo) => todo.completed != true).toList();
-    items.sort((a, b) {
-      if (a.dueDate == null || b.dueDate == null) {
-        return a.createdAt.difference(b.createdAt).inDays;
-      }
-      return a.dueDate.difference(b.dueDate).inDays;
-    });
 
     for (final todo in items) {
-      final dueDateString = _dueDateCategorize(todo.dueDate);
-      if (!mapDueDateToList.containsKey(dueDateString)) {
-        mapDueDateToList[dueDateString] = [];
+      if (widget.todos.sortBy == 'priority') {
+        final priorityString = 'Priority ${todo.priority.toString()}';
+        if (!mapCategoryToList.containsKey(priorityString)) {
+          mapCategoryToList[priorityString] = [];
+        }
+        mapCategoryToList[priorityString].add(todo);
+      } else if (widget.todos.sortBy == 'title') {
+        final titleString = '${todo.title[0].toUpperCase().toString()}';
+        if (!mapCategoryToList.containsKey(titleString)) {
+          mapCategoryToList[titleString] = [];
+        }
+        mapCategoryToList[titleString].add(todo);
+      } else {
+        final dueDateString = _dueDateCategorize(todo.dueDate);
+        if (!mapCategoryToList.containsKey(dueDateString)) {
+          mapCategoryToList[dueDateString] = [];
+        }
+        mapCategoryToList[dueDateString].add(todo);
       }
-      mapDueDateToList[dueDateString].add(todo);
     }
 
     final children = <ExpansionTile>[];
 
-    for (final dueDateString in mapDueDateToList.keys) {
+    for (final categoryString in mapCategoryToList.keys) {
       children.add(
         ExpansionTile(
           initiallyExpanded: true,
-          title: Text(dueDateString),
-          children: mapDueDateToList[dueDateString]
+          title: Text(categoryString),
+          children: mapCategoryToList[categoryString]
               .map((todo) => TodoItem(todo: todo))
               .toList(),
         ),
