@@ -1,7 +1,4 @@
-import 'dart:io';
 import 'package:redux/redux.dart';
-import 'package:redux_persist/redux_persist.dart';
-import 'package:redux_persist_flutter/redux_persist_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:fastter_dart/fastter/lazyactions.dart';
@@ -16,22 +13,10 @@ import 'package:fastter_dart/store/todoreminders.dart';
 import 'package:fastter_dart/store/lazyactions.dart';
 
 import 'helpers/firebase.dart' show initMessaging;
+import 'helpers/flutter_persistor.dart' show FlutterPersistor;
 
 Future<Store<AppState>> initState() async {
-  StorageEngine storage;
-  if (Platform.isAndroid || Platform.isIOS) {
-    storage = FlutterStorage();
-  } else {
-    final homeFolder = Platform.environment['HOME'];
-    final file = File('$homeFolder/.config/fastter_todo/state.json');
-    file.createSync(recursive: true);
-    storage = FileStorage(file);
-  }
-  final _persistor = Persistor<AppState>(
-    storage: storage, // Or use other engines
-    serializer: JsonSerializer<AppState>(
-        (dynamic data) => AppState.fromJson(data)), // Or use other serializers
-  );
+  final _persistor = FlutterPersistor();
   final _store = Store<AppState>(
     appStateReducer,
     initialState: AppState(
