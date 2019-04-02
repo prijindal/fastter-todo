@@ -90,7 +90,7 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
         return IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
-            mainNavigatorKey.currentState.push<void>(
+            Navigator.of(context).push<void>(
               MaterialPageRoute<void>(
                 builder: (context) => EditLabelScreen(
                       label: label,

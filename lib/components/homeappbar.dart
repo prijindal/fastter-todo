@@ -359,7 +359,7 @@ class _HomeAppBar extends StatelessWidget {
                 : IconButton(
                     icon: const Icon(Icons.menu),
                     onPressed: () {
-                      homeScaffoldKey.currentState.openDrawer();
+                      Scaffold.of(context).openDrawer();
                     },
                   ),
           ),
@@ -373,7 +373,7 @@ class _HomeAppBar extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.notifications),
               onPressed: () {
-                homeScaffoldKey.currentState.openEndDrawer();
+                Scaffold.of(context).openEndDrawer();
               },
             ),
             _buildPopupAction(context),

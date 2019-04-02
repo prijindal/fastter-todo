@@ -1,7 +1,6 @@
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart'
     show
-        Material,
         MaterialPageRoute,
         StatelessWidget,
         Route,
@@ -14,13 +13,6 @@ import 'package:flutter/material.dart'
         StatefulWidget,
         State,
         VoidCallback,
-        MediaQueryData,
-        AnimatedTheme,
-        Flexible,
-        Row,
-        Orientation,
-        MediaQuery,
-        Navigator,
         required;
 import 'package:flutter_redux/flutter_redux.dart';
 
@@ -36,8 +28,6 @@ import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_dart/models/todoreminder.model.dart';
 import 'package:fastter_dart/models/notification.model.dart' show Notification;
 
-import '../components/homeappdrawer.dart';
-import '../components/notificationsdrawer.dart';
 import '../components/todolist.dart';
 
 import '../helpers/navigator.dart';
@@ -50,37 +40,6 @@ import '../screens/todoedit.dart';
 import '../screens/todos.dart';
 
 class HomeContainer extends StatelessWidget {
-  Route<dynamic> _onGenerateRoute(RouteSettings settings) {
-    if (settings.isInitialRoute || settings.name == '/') {
-      return MaterialPageRoute<void>(
-        builder: (context) => HomePage(),
-      );
-    } else if (settings.name == '/settings') {
-      return MaterialPageRoute<void>(builder: (context) => SettingsScreen());
-    } else if (settings.name == '/settings/account') {
-      return MaterialPageRoute<void>(builder: (context) => ProfileScreen());
-    } else if (settings.name == '/settings/general') {
-      return MaterialPageRoute<void>(
-          builder: (context) => GeneralSettingsScreen());
-    } else {
-      return MaterialPageRoute<void>(
-        builder: (context) => Scaffold(
-              body: const Text('404'),
-            ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => MaterialApp(
-        navigatorKey: mainNavigatorKey,
-        theme: primaryTheme,
-        onGenerateRoute: _onGenerateRoute,
-        initialRoute: '/',
-      );
-}
-
-class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       StoreConnector<AppState, Store<AppState>>(
@@ -198,6 +157,13 @@ class _HomePageState extends State<_HomePage> {
               todo: todo,
             ),
       );
+    } else if (settings.name == '/settings') {
+      return MaterialPageRoute<void>(builder: (context) => SettingsScreen());
+    } else if (settings.name == '/settings/account') {
+      return MaterialPageRoute<void>(builder: (context) => ProfileScreen());
+    } else if (settings.name == '/settings/general') {
+      return MaterialPageRoute<void>(
+          builder: (context) => GeneralSettingsScreen());
     }
     return MaterialPageRoute<void>(
       builder: (context) => Scaffold(
@@ -206,42 +172,11 @@ class _HomePageState extends State<_HomePage> {
     );
   }
 
-  Widget _buildHomeApp() => AnimatedTheme(
-        data: primaryTheme,
-        isMaterialAppTheme: true,
-        child: Navigator(
-          initialRoute: widget.frontPage.route,
-          onGenerateRoute: _onGenerateRoute,
-          key: navigatorKey,
-        ),
-      );
-
   @override
-  Widget build(BuildContext context) {
-    MediaQueryData queryData;
-    queryData = MediaQuery.of(context);
-    if (queryData.orientation == Orientation.landscape) {
-      return Material(
-        child: Row(
-          // direction: Axis.horizontal,
-          children: <Widget>[
-            const Flexible(
-              flex: 0,
-              child: HomeAppDrawer(
-                disablePop: true,
-              ),
-            ),
-            Flexible(child: _buildHomeApp()),
-          ],
-        ),
+  Widget build(BuildContext context) => MaterialApp(
+        navigatorKey: navigatorKey,
+        theme: primaryTheme,
+        onGenerateRoute: _onGenerateRoute,
+        initialRoute: widget.frontPage.route,
       );
-    }
-    return Scaffold(
-      key: homeScaffoldKey,
-      primary: false,
-      drawer: const HomeAppDrawer(),
-      endDrawer: NotificationsDrawer(),
-      body: _buildHomeApp(),
-    );
-  }
 }

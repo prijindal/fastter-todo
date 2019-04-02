@@ -48,7 +48,7 @@ class _NotificationItem extends StatelessWidget {
   void _onTap(BuildContext context) {
     markRead();
     Navigator.of(context).pop();
-    navigatorKey.currentState.pushNamed(notification.route);
+    Navigator.of(context).pushNamed(notification.route);
   }
 
   @override

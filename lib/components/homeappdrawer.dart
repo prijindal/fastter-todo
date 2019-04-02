@@ -64,18 +64,15 @@ class _HomeAppDrawer extends StatelessWidget {
     String routeName, {
     Object arguments,
   }) {
-    navigatorKey.currentState.pushNamed(routeName, arguments: arguments);
-    history.add(RouteInfo(routeName, arguments: arguments));
     if (!disablePop) {
       Navigator.pop(context);
     }
+    Navigator.of(context).pushNamed(routeName, arguments: arguments);
+    history.add(RouteInfo(routeName, arguments: arguments));
   }
 
   @override
   Widget build(BuildContext context) {
-    if (navigatorKey == null) {
-      return LoadingScreen();
-    }
     String routeName;
     if (history.isNotEmpty) {
       routeName = history.last.routeName;

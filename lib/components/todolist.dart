@@ -13,6 +13,8 @@ import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
 
 import '../components/homeappbar.dart';
+import '../components/homeappdrawer.dart';
+import '../components/notificationsdrawer.dart';
 import '../components/todoinput.dart';
 import '../components/todoitem.dart';
 import 'todoeditbar.dart';
@@ -343,6 +345,8 @@ class _TodoListState extends State<_TodoList> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+        drawer: const HomeAppDrawer(),
+        endDrawer: NotificationsDrawer(),
         floatingActionButton: widget.selectedTodos.isEmpty && !_showInput
             ? FloatingActionButton(
                 heroTag: widget.filter.toString(),

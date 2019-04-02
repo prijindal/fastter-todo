@@ -98,7 +98,7 @@ class _EditProjectScreenState extends State<_EditProjectScreen> {
     if (shouldDelete) {
       widget.deleteProject();
       history.add(RouteInfo('/'));
-      await navigatorKey.currentState
+      await Navigator.of(context)
           .pushNamedAndRemoveUntil('/', (route) => route.isFirst);
     }
   }

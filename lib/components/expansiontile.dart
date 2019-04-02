@@ -119,7 +119,7 @@ class _BaseExpansionTileState<T extends BaseModel>
   }
 
   void _openNewBaseModelPage() {
-    mainNavigatorKey.currentState.push<void>(widget.addRoute);
+    Navigator.of(context).push<void>(widget.addRoute);
   }
 
   void _handleTap() {

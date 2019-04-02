@@ -144,11 +144,11 @@ class _TodoEditBar extends StatelessWidget {
         onPressed: () => _showDatePicker(context),
       );
 
-  Widget _buildEditButton() {
+  Widget _buildEditButton(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.edit),
       onPressed: () {
-        mainNavigatorKey.currentState.push<void>(
+        Navigator.of(context).push<void>(
           MaterialPageRoute<void>(
             builder: (context) {
               final todoid = selectedTodos[0];
@@ -163,11 +163,11 @@ class _TodoEditBar extends StatelessWidget {
     );
   }
 
-  Widget _buildCommentButton() {
+  Widget _buildCommentButton(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.comment),
       onPressed: () {
-        mainNavigatorKey.currentState.push<void>(
+        Navigator.of(context).push<void>(
           MaterialPageRoute<void>(
             builder: (context) {
               final todoid = selectedTodos[0];
@@ -222,10 +222,10 @@ class _TodoEditBar extends StatelessWidget {
     if (selectedTodos.length <= 1) {
       return <Widget>[
         _buildChangeDateButton(context),
-        _buildEditButton(),
+        _buildEditButton(context),
         _buildChangeProjectButton(),
         _buildSelectLabelsButton(),
-        _buildCommentButton(),
+        _buildCommentButton(context),
       ];
     }
     return <Widget>[

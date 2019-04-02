@@ -151,7 +151,7 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
         return IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
-            mainNavigatorKey.currentState.push<void>(
+            Navigator.of(context).push<void>(
               MaterialPageRoute<void>(
                 builder: (context) => EditProjectScreen(
                       project: project,

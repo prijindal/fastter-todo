@@ -181,7 +181,7 @@ class _SearchProjectsResultsComponent extends StatelessWidget {
             .map(
               (project) => ListTile(
                     onTap: () {
-                      navigatorKey.currentState
+                      Navigator.of(context)
                           .pushNamed('/todos', arguments: {'project': project});
                       history.add(
                           RouteInfo('/todos', arguments: {'project': project}));

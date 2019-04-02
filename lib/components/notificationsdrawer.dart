@@ -32,9 +32,6 @@ class _NotificationsDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (navigatorKey == null) {
-      return LoadingScreen();
-    }
     return Drawer(
       child: notifications.items.isEmpty
           ? const Center(

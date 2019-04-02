@@ -85,7 +85,7 @@ class _EditLabelScreenState extends State<_EditLabelScreen> {
     if (shouldDelete) {
       widget.deleteLabel();
       history.add(RouteInfo('/'));
-      await navigatorKey.currentState
+      await Navigator.of(context)
           .pushNamedAndRemoveUntil('/', (route) => route.isFirst);
     }
   }
