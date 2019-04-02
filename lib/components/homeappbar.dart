@@ -370,6 +370,12 @@ class _HomeAppBar extends StatelessWidget {
               onPressed: () => _onSearch(context),
             ),
             _buildSortAction(context),
+            IconButton(
+              icon: const Icon(Icons.notifications),
+              onPressed: () {
+                homeScaffoldKey.currentState.openEndDrawer();
+              },
+            ),
             _buildPopupAction(context),
           ],
         ),

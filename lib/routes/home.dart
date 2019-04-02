@@ -1,5 +1,27 @@
 import 'package:redux/redux.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        Material,
+        MaterialPageRoute,
+        StatelessWidget,
+        Route,
+        RouteSettings,
+        Scaffold,
+        Text,
+        Widget,
+        MaterialApp,
+        BuildContext,
+        StatefulWidget,
+        State,
+        VoidCallback,
+        MediaQueryData,
+        AnimatedTheme,
+        Flexible,
+        Row,
+        Orientation,
+        MediaQuery,
+        Navigator,
+        required;
 import 'package:flutter_redux/flutter_redux.dart';
 
 import 'package:fastter_dart/fastter/fastter.dart';
@@ -12,8 +34,10 @@ import 'package:fastter_dart/models/todocomment.model.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_dart/models/todoreminder.model.dart';
+import 'package:fastter_dart/models/notification.model.dart' show Notification;
 
 import '../components/homeappdrawer.dart';
+import '../components/notificationsdrawer.dart';
 import '../components/todolist.dart';
 
 import '../helpers/navigator.dart';
@@ -22,8 +46,8 @@ import '../helpers/theme.dart';
 import '../screens/generalsettings.dart';
 import '../screens/profile.dart';
 import '../screens/settings.dart';
-import '../screens/todos.dart';
 import '../screens/todoedit.dart';
+import '../screens/todos.dart';
 
 class HomeContainer extends StatelessWidget {
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
@@ -69,6 +93,8 @@ class HomePage extends StatelessWidget {
                   store.dispatch(StartSync<TodoComment>()),
               todoRemindersSyncStart: () =>
                   store.dispatch(StartSync<TodoReminder>()),
+              notificationsSyncStart: () =>
+                  store.dispatch(StartSync<Notification>()),
               confirmUser: (bearer) =>
                   store.dispatch(ConfirmUserAction(bearer)),
               frontPage: store.state.user.user?.settings?.frontPage ??
@@ -87,6 +113,7 @@ class _HomePage extends StatefulWidget {
     @required this.todoSyncStart,
     @required this.todoCommentsSyncStart,
     @required this.todoRemindersSyncStart,
+    @required this.notificationsSyncStart,
     @required this.confirmUser,
     @required this.frontPage,
   });
@@ -96,6 +123,7 @@ class _HomePage extends StatefulWidget {
   final VoidCallback todoSyncStart;
   final VoidCallback todoCommentsSyncStart;
   final VoidCallback todoRemindersSyncStart;
+  final VoidCallback notificationsSyncStart;
   final void Function(String) confirmUser;
   final FrontPage frontPage;
 
@@ -112,6 +140,7 @@ class _HomePageState extends State<_HomePage> {
     widget.todoCommentsSyncStart();
     widget.labelSyncStart();
     widget.todoRemindersSyncStart();
+    widget.notificationsSyncStart();
     Fastter.instance.onConnect = () {
       widget.confirmUser(Fastter.instance.bearer);
     };
@@ -152,6 +181,13 @@ class _HomePageState extends State<_HomePage> {
         builder: (context) => TodoList(
               filter: filters,
               title: title,
+            ),
+      );
+    } else if (settings.name.startsWith('/todo/')) {
+      final todoid = settings.name.split('/todo/')[1];
+      return MaterialPageRoute<void>(
+        builder: (context) => TodoEditScreenFromId(
+              todoid: todoid,
             ),
       );
     } else if (settings.name == '/todo') {
@@ -204,6 +240,7 @@ class _HomePageState extends State<_HomePage> {
       key: homeScaffoldKey,
       primary: false,
       drawer: const HomeAppDrawer(),
+      endDrawer: NotificationsDrawer(),
       body: _buildHomeApp(),
     );
   }

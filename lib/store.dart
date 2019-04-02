@@ -10,6 +10,7 @@ import 'package:fastter_dart/store/todos.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_dart/store/todocomments.dart';
 import 'package:fastter_dart/store/todoreminders.dart';
+import 'package:fastter_dart/store/notifications.dart';
 import 'package:fastter_dart/store/lazyactions.dart';
 
 import 'helpers/firebase.dart' show initMessaging;
@@ -29,6 +30,7 @@ Future<Store<AppState>> initState() async {
       fastterTodos.middleware,
       fastterTodoComments.middleware,
       fastterTodoReminders.middleware,
+      fastterNotifications.middleware,
       LazyActionsMiddleware(),
       UserMiddleware(
         initMessaging: initMessaging,

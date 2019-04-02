@@ -20,6 +20,22 @@ import '../helpers/todouihelpers.dart';
 import 'todocomments.dart';
 import 'todoreminders.dart';
 
+class TodoEditScreenFromId extends StatelessWidget {
+  const TodoEditScreenFromId({@required this.todoid});
+
+  final String todoid;
+
+  @override
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) => TodoEditScreen(
+              todo: store.state.todos.items
+                  .singleWhere((todo) => todo.id == todoid),
+            ),
+      );
+}
+
 class TodoEditScreen extends StatelessWidget {
   const TodoEditScreen({
     @required this.todo,
