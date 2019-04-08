@@ -112,7 +112,7 @@ packages:
       name: connectivity
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.2+1"
+    version: "0.4.2+2"
   convert:
     dependency: transitive
     description:
@@ -168,7 +168,7 @@ packages:
       name: firebase_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.2"
+    version: "0.3.4"
   firebase_messaging:
     dependency: "direct main"
     description:
@@ -472,7 +472,7 @@ packages:
       name: share
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.0+1"
+    version: "0.6.1"
   shared_preferences:
     dependency: transitive
     description:
