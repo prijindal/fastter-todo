@@ -24,6 +24,12 @@ import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/settings.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
 import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/store/labels.dart';
+import 'package:fastter_dart/store/projects.dart';
+import 'package:fastter_dart/store/todocomments.dart';
+import 'package:fastter_dart/store/todoreminders.dart';
+import 'package:fastter_dart/store/todos.dart';
+import 'package:fastter_dart/store/notifications.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_dart/models/todoreminder.model.dart';
 import 'package:fastter_dart/models/notification.model.dart' show Notification;
@@ -45,9 +51,21 @@ class HomeContainer extends StatelessWidget {
       StoreConnector<AppState, Store<AppState>>(
         converter: (store) => store,
         builder: (context, store) => _HomePage(
-              projectSyncStart: () => store.dispatch(StartSync<Project>()),
-              labelSyncStart: () => store.dispatch(StartSync<Label>()),
-              todoSyncStart: () => store.dispatch(StartSync<Todo>()),
+              projectSyncStart: () {
+                final action = StartSync<Project>();
+                store.dispatch(action);
+                return action.completer.future;
+              },
+              labelSyncStart: () {
+                final action = StartSync<Label>();
+                store.dispatch(action);
+                return action.completer.future;
+              },
+              todoSyncStart: () {
+                final action = StartSync<Todo>();
+                store.dispatch(action);
+                return action.completer.future;
+              },
               todoCommentsSyncStart: () =>
                   store.dispatch(StartSync<TodoComment>()),
               todoRemindersSyncStart: () =>
@@ -56,6 +74,14 @@ class HomeContainer extends StatelessWidget {
                   store.dispatch(StartSync<Notification>()),
               confirmUser: (bearer) =>
                   store.dispatch(ConfirmUserAction(bearer)),
+              initSubscriptions: () {
+                fastterLabels.queries.initSubscriptions(store.dispatch);
+                fastterProjects.queries.initSubscriptions(store.dispatch);
+                fastterTodos.queries.initSubscriptions(store.dispatch);
+                fastterTodoComments.queries.initSubscriptions(store.dispatch);
+                fastterTodoReminders.queries.initSubscriptions(store.dispatch);
+                fastterNotifications.queries.initSubscriptions(store.dispatch);
+              },
               frontPage: store.state.user.user?.settings?.frontPage ??
                   FrontPage(
                     route: '/',
@@ -73,16 +99,18 @@ class _HomePage extends StatefulWidget {
     @required this.todoCommentsSyncStart,
     @required this.todoRemindersSyncStart,
     @required this.notificationsSyncStart,
+    @required this.initSubscriptions,
     @required this.confirmUser,
     @required this.frontPage,
   });
 
-  final VoidCallback projectSyncStart;
-  final VoidCallback labelSyncStart;
-  final VoidCallback todoSyncStart;
+  final Future<List<Project>> Function() projectSyncStart;
+  final Future<List<Label>> Function() labelSyncStart;
+  final Future<List<Todo>> Function() todoSyncStart;
   final VoidCallback todoCommentsSyncStart;
   final VoidCallback todoRemindersSyncStart;
   final VoidCallback notificationsSyncStart;
+  final VoidCallback initSubscriptions;
   final void Function(String) confirmUser;
   final FrontPage frontPage;
 
@@ -94,12 +122,17 @@ class _HomePageState extends State<_HomePage> {
   @override
   void initState() {
     super.initState();
-    widget.todoSyncStart();
-    widget.projectSyncStart();
+    _initRequests();
+  }
+
+  Future<void> _initRequests() async {
+    await widget.todoSyncStart();
+    await widget.projectSyncStart();
+    await widget.labelSyncStart();
     widget.todoCommentsSyncStart();
-    widget.labelSyncStart();
     widget.todoRemindersSyncStart();
     widget.notificationsSyncStart();
+    widget.initSubscriptions();
     Fastter.instance.onConnect = () {
       widget.confirmUser(Fastter.instance.bearer);
     };
