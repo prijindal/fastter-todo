@@ -66,7 +66,7 @@ class _EditProjectScreenState extends State<_EditProjectScreen> {
       Project(
         id: widget.project.id,
         title: titleController.text,
-        color: _currentColor.value.toRadixString(16),
+        color: _currentColor.value.toRadixString(16).substring(2),
       ),
     );
     Navigator.of(context).pop();

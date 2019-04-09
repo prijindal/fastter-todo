@@ -39,10 +39,11 @@ class _AddProjectScreenState extends State<_AddProjectScreen> {
   Color _currentColor = const Color(0xff443a49);
 
   void _onSave() {
+    _currentColor.value;
     widget.onAddProject(
       Project(
         title: titleController.text,
-        color: _currentColor.value.toRadixString(16),
+        color: _currentColor.value.toRadixString(16).substring(2),
       ),
     );
     Navigator.of(context).pop();
