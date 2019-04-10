@@ -101,44 +101,50 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
               width: min(480, MediaQuery.of(context).size.width - 20.0),
               padding: const EdgeInsets.all(4),
               child: Form(
-                child: TextField(
-                  controller: commentContentController,
-                  decoration: InputDecoration(
-                    labelText: 'Add new comment',
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        PopupMenuButton<TodoCommentInputAttachmentType>(
-                          onSelected: (selected) {
-                            if (selected ==
-                                TodoCommentInputAttachmentType.image) {
-                              _addImageComment();
-                            }
-                          },
-                          child: const Icon(Icons.attach_file),
-                          itemBuilder: (context) => [
-                                PopupMenuItem<TodoCommentInputAttachmentType>(
-                                  value: TodoCommentInputAttachmentType.image,
-                                  child: ListTile(
-                                    leading: const Icon(Icons.image),
-                                    title: const Text('Image'),
-                                  ),
-                                ),
-                              ],
+                onChanged: () {
+                  setState(() {});
+                },
+                child: Flex(
+                  direction: Axis.horizontal,
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Flexible(
+                      child: TextFormField(
+                        controller: commentContentController,
+                        decoration: InputDecoration(
+                          labelText: 'Add new comment',
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.send),
-                          onPressed: commentContentController.text.isNotEmpty
-                              ? _addComment
-                              : null,
-                        ),
-                      ],
+                        onFieldSubmitted:
+                            commentContentController.text.isNotEmpty
+                                ? (title) => _addComment()
+                                : null,
+                      ),
                     ),
-                  ),
-                  onSubmitted: commentContentController.text.isNotEmpty
-                      ? (title) => _addComment()
-                      : null,
+                    PopupMenuButton<TodoCommentInputAttachmentType>(
+                      onSelected: (selected) {
+                        if (selected == TodoCommentInputAttachmentType.image) {
+                          _addImageComment();
+                        }
+                      },
+                      child: const Icon(Icons.attach_file),
+                      itemBuilder: (context) => [
+                            PopupMenuItem<TodoCommentInputAttachmentType>(
+                              value: TodoCommentInputAttachmentType.image,
+                              child: ListTile(
+                                leading: const Icon(Icons.image),
+                                title: const Text('Image'),
+                              ),
+                            ),
+                          ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.send),
+                      onPressed: commentContentController.text.isNotEmpty
+                          ? _addComment
+                          : null,
+                    ),
+                  ],
                 ),
               ),
             ),
