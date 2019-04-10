@@ -6,8 +6,6 @@ import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
-import '../helpers/navigator.dart';
-
 class BaseExpansionTile<T extends BaseModel> extends StatelessWidget {
   const BaseExpansionTile({
     @required this.title,

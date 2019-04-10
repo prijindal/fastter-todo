@@ -129,9 +129,9 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               widget.todoReminders.items.isEmpty
-                  ? Flexible(
+                  ? const Flexible(
                       child: Center(
-                        child: const Text('No Reminders'),
+                        child: Text('No Reminders'),
                       ),
                     )
                   : Flexible(

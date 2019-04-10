@@ -11,7 +11,6 @@ import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/models/settings.model.dart';
 
 import '../helpers/navigator.dart';
-import '../screens/loading.dart';
 
 import 'labelexpansiontile.dart';
 import 'projectexpansiontile.dart';

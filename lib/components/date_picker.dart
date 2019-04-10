@@ -26,9 +26,7 @@ import 'package:flutter/material.dart'
         MaterialType,
         kMaterialEdges,
         MaterialLocalizations,
-        TextTheme,
         Theme,
-        ThemeData,
         Icons;
 
 /// Initial display mode of the date picker dialog.
@@ -71,11 +69,6 @@ const double _kDatePickerLandscapeHeight =
     _kMaxDayPickerHeight + _kDialogActionBarHeight + 12;
 
 class _DatePickerQuickPickers extends StatelessWidget {
-  final ValueChanged<DateTime> onChanged;
-  final DateTime selectedDate;
-  final DatePickerMode mode;
-  final ValueChanged<DatePickerMode> onModeChanged;
-
   _DatePickerQuickPickers({
     @required this.onChanged,
     @required this.selectedDate,
@@ -85,6 +78,11 @@ class _DatePickerQuickPickers extends StatelessWidget {
   })  : assert(selectedDate != null),
         assert(mode != null),
         super(key: key);
+
+  final ValueChanged<DateTime> onChanged;
+  final DateTime selectedDate;
+  final DatePickerMode mode;
+  final ValueChanged<DatePickerMode> onModeChanged;
 
   bool isToday() {
     final now = DateTime.now();
@@ -109,51 +107,49 @@ class _DatePickerQuickPickers extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          ListTile(
-            dense: true,
-            leading: Icon(Icons.calendar_today),
-            selected: isToday(),
-            title: Text("Today"),
-            onTap: () {
-              onChanged(DateTime.now());
-            },
-          ),
-          ListTile(
-            dense: true,
-            leading: Icon(Icons.calendar_view_day),
-            selected: isTomorrow(),
-            title: Text("Tomorrow"),
-            onTap: () {
-              onChanged(DateTime.now().add(const Duration(days: 1)));
-            },
-          ),
-          ListTile(
-            dense: true,
-            leading: Icon(Icons.cancel),
-            title: Text("Remove Date"),
-            onTap: () {
-              Navigator.pop(context, DatePickerResponse(null));
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Container(
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.calendar_today),
+              selected: isToday(),
+              title: const Text('Today'),
+              onTap: () {
+                onChanged(DateTime.now());
+              },
+            ),
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.calendar_view_day),
+              selected: isTomorrow(),
+              title: const Text('Tomorrow'),
+              onTap: () {
+                onChanged(DateTime.now().add(const Duration(days: 1)));
+              },
+            ),
+            ListTile(
+              dense: true,
+              leading: const Icon(Icons.cancel),
+              title: const Text('Remove Date'),
+              onTap: () {
+                Navigator.pop(context, DatePickerResponse(null));
+              },
+            ),
+          ],
+        ),
+      );
 }
 
 // Shows the selected date in large font and toggles between year and day mode
 class _DatePickerHeader extends StatelessWidget {
   const _DatePickerHeader({
-    Key key,
     @required this.selectedDate,
     @required this.mode,
     @required this.onModeChanged,
+    Key key,
   })  : assert(selectedDate != null),
         assert(mode != null),
         super(key: key);
@@ -163,15 +159,16 @@ class _DatePickerHeader extends StatelessWidget {
   final ValueChanged<DatePickerMode> onModeChanged;
 
   void _handleChangeMode(DatePickerMode value) {
-    if (value != mode) onModeChanged(value);
+    if (value != mode) {
+      onModeChanged(value);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
-    final ThemeData themeData = Theme.of(context);
-    final TextTheme headerTextTheme = themeData.primaryTextTheme;
+    final localizations = MaterialLocalizations.of(context);
+    final themeData = Theme.of(context);
+    final headerTextTheme = themeData.primaryTextTheme;
     Color dayColor;
     Color yearColor;
     switch (themeData.primaryColorBrightness) {
@@ -185,9 +182,9 @@ class _DatePickerHeader extends StatelessWidget {
         yearColor = mode == DatePickerMode.year ? Colors.white : Colors.white70;
         break;
     }
-    final TextStyle dayStyle =
+    final dayStyle =
         headerTextTheme.display1.copyWith(color: dayColor, height: 1.4);
-    final TextStyle yearStyle =
+    final yearStyle =
         headerTextTheme.subhead.copyWith(color: yearColor, height: 1.4);
 
     Color backgroundColor;
@@ -277,7 +274,7 @@ class _DateHeaderButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     return Material(
       type: MaterialType.button,
@@ -375,8 +372,12 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
   void _handleYearChanged(DateTime value) {
     if (value.isBefore(widget.firstDate))
       value = widget.firstDate;
-    else if (value.isAfter(widget.lastDate)) value = widget.lastDate;
-    if (value == _selectedDate) return;
+    else if (value.isAfter(widget.lastDate)) {
+      value = widget.lastDate;
+    }
+    if (value == _selectedDate) {
+      return;
+    }
 
     _vibrate();
     setState(() {
@@ -430,7 +431,7 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
     final Widget picker = Flexible(
       child: SizedBox(
         height: _kMaxDayPickerHeight,
@@ -463,7 +464,7 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
       mode: _mode,
       onModeChanged: _handleModeChanged,
     );
-    final Dialog dialog = Dialog(
+    final dialog = Dialog(
       child: mediaQueryData.orientation == Orientation.portrait
           ? SizedBox(
               width: _kMonthPickerPortraitWidth,
@@ -581,17 +582,6 @@ typedef SelectableDayPredicate = bool Function(DateTime day);
 ///
 /// The [context], [initialDate], [firstDate], and [lastDate] parameters must
 /// not be null.
-///
-/// See also:
-///
-///  * [showTimePicker], which shows a dialog that contains a material design
-///    time picker.
-///  * [DayPicker], which displays the days of a given month and allows
-///    choosing a day.
-///  * [MonthPicker], which displays a scrollable list of months to allow
-///    picking a month.
-///  * [YearPicker], which displays a scrollable list of years to allow picking
-///    a year.
 Future<DatePickerResponse> showDatePicker({
   @required BuildContext context,
   @required DateTime initialDate,
@@ -642,10 +632,9 @@ Future<DatePickerResponse> showDatePicker({
     );
   }
 
-  return await showDialog<DatePickerResponse>(
+  return showDialog<DatePickerResponse>(
     context: context,
-    builder: (BuildContext context) {
-      return builder == null ? child : builder(context, child);
-    },
+    builder: (BuildContext context) =>
+        builder == null ? child : builder(context, child),
   );
 }

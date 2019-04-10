@@ -14,8 +14,6 @@ import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/notification.model.dart';
 
-import '../helpers/navigator.dart';
-
 class NotificationItem extends StatelessWidget {
   const NotificationItem({@required this.notification});
 

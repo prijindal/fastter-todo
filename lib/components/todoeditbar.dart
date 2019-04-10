@@ -10,7 +10,6 @@ import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 
 import '../components/prioritydialog.dart';
-import '../helpers/navigator.dart';
 import '../helpers/todouihelpers.dart';
 import '../screens/todocomments.dart';
 import '../screens/todoedit.dart';
@@ -144,43 +143,41 @@ class _TodoEditBar extends StatelessWidget {
         onPressed: () => _showDatePicker(context),
       );
 
-  Widget _buildEditButton(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.edit),
-      onPressed: () {
-        Navigator.of(context).push<void>(
-          MaterialPageRoute<void>(
-            builder: (context) {
-              final todoid = selectedTodos[0];
-              final todo = todos.items.singleWhere((item) => item.id == todoid);
-              return TodoEditScreen(
-                todo: todo,
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
+  Widget _buildEditButton(BuildContext context) => IconButton(
+        icon: const Icon(Icons.edit),
+        onPressed: () {
+          Navigator.of(context).push<void>(
+            MaterialPageRoute<void>(
+              builder: (context) {
+                final todoid = selectedTodos[0];
+                final todo =
+                    todos.items.singleWhere((item) => item.id == todoid);
+                return TodoEditScreen(
+                  todo: todo,
+                );
+              },
+            ),
+          );
+        },
+      );
 
-  Widget _buildCommentButton(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.comment),
-      onPressed: () {
-        Navigator.of(context).push<void>(
-          MaterialPageRoute<void>(
-            builder: (context) {
-              final todoid = selectedTodos[0];
-              final todo = todos.items.singleWhere((item) => item.id == todoid);
-              return TodoCommentsScreen(
-                todo: todo,
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
+  Widget _buildCommentButton(BuildContext context) => IconButton(
+        icon: const Icon(Icons.comment),
+        onPressed: () {
+          Navigator.of(context).push<void>(
+            MaterialPageRoute<void>(
+              builder: (context) {
+                final todoid = selectedTodos[0];
+                final todo =
+                    todos.items.singleWhere((item) => item.id == todoid);
+                return TodoCommentsScreen(
+                  todo: todo,
+                );
+              },
+            ),
+          );
+        },
+      );
 
   void _onChangeLabels(dynamic data) {
     if (data is List<Label>) {

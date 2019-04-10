@@ -211,8 +211,8 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
               },
               icon: const Icon(Icons.more_vert),
               itemBuilder: (context) => [
-                    PopupMenuItem<_PopupAction>(
-                      child: const Text('Delete'),
+                    const PopupMenuItem<_PopupAction>(
+                      child: Text('Delete'),
                       value: _PopupAction.delete,
                     )
                   ],

@@ -8,7 +8,6 @@ import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
-import '../helpers/navigator.dart';
 import '../helpers/theme.dart';
 import 'addlabel.dart';
 import 'editlabel.dart';

@@ -13,8 +13,7 @@ class GeneralSettingsScreen extends StatelessWidget {
       StoreConnector<AppState, Store<AppState>>(
         converter: (store) => store,
         builder: (context, store) => _GeneralSettingsScreen(
-              settings: store.state.user.user.settings ??
-                  UserSettings(), // TODO(prijindal): Get it from store
+              settings: store.state.user.user.settings ?? UserSettings(),
               updateSettings: (UserSettings settings) {
                 store.dispatch(UpdateUserAction(settings: settings));
               },

@@ -6,9 +6,6 @@ import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/notification.model.dart' as notification;
 import 'package:fastter_dart/store/state.dart';
 
-import '../helpers/navigator.dart';
-import '../screens/loading.dart';
-
 import 'notificationitem.dart';
 
 class NotificationsDrawer extends StatelessWidget {
@@ -31,27 +28,25 @@ class _NotificationsDrawer extends StatelessWidget {
   final ListState<notification.Notification> notifications;
 
   @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: notifications.items.isEmpty
-          ? const Center(
-              child: Text('No Notifications Found'),
-            )
-          : ListView(
-              children: [
-                const ListTile(
-                  title: Text('Notifications'),
-                )
-              ]..addAll(
-                  notifications.items
-                      .map(
-                        (notification) => NotificationItem(
-                              notification: notification,
-                            ),
-                      )
-                      .toList(),
-                ),
-            ),
-    );
-  }
+  Widget build(BuildContext context) => Drawer(
+        child: notifications.items.isEmpty
+            ? const Center(
+                child: Text('No Notifications Found'),
+              )
+            : ListView(
+                children: [
+                  const ListTile(
+                    title: Text('Notifications'),
+                  )
+                ]..addAll(
+                    notifications.items
+                        .map(
+                          (notification) => NotificationItem(
+                                notification: notification,
+                              ),
+                        )
+                        .toList(),
+                  ),
+              ),
+      );
 }

@@ -10,7 +10,6 @@ import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
 import '../components/hexcolor.dart';
-import '../helpers/navigator.dart';
 import '../helpers/theme.dart';
 import 'addproject.dart';
 import 'editproject.dart';

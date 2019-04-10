@@ -298,37 +298,43 @@ class _HomeAppBar extends StatelessWidget {
         itemBuilder: (context) {
           if (selectedtodos.isNotEmpty) {
             return [
-              PopupMenuItem<_PopupAction>(
-                child: const Text('Copy'),
+              const PopupMenuItem<_PopupAction>(
+                child: Text('Copy'),
                 value: _PopupAction.copy,
               ),
-              PopupMenuItem<_PopupAction>(
-                child: const Text('Share'),
+              const PopupMenuItem<_PopupAction>(
+                child: Text('Share'),
                 value: _PopupAction.share,
               ),
-              PopupMenuItem<_PopupAction>(
-                child: const Text('Delete'),
+              const PopupMenuItem<_PopupAction>(
+                child: Text('Delete'),
                 value: _PopupAction.delete,
               )
             ];
           } else {
             final items = <PopupMenuItem<_PopupAction>>[];
             if (_project != null) {
-              items.add(PopupMenuItem<_PopupAction>(
-                child: const Text('Edit Project'),
-                value: _PopupAction.editproject,
-              ));
+              items.add(
+                const PopupMenuItem<_PopupAction>(
+                  child: Text('Edit Project'),
+                  value: _PopupAction.editproject,
+                ),
+              );
             }
             if (_label != null) {
-              items.add(PopupMenuItem<_PopupAction>(
-                child: const Text('Edit Label'),
-                value: _PopupAction.editlabel,
-              ));
+              items.add(
+                const PopupMenuItem<_PopupAction>(
+                  child: Text('Edit Label'),
+                  value: _PopupAction.editlabel,
+                ),
+              );
             }
-            items.add(PopupMenuItem<_PopupAction>(
-              child: const Text('Delete All'),
-              value: _PopupAction.deleteall,
-            ));
+            items.add(
+              const PopupMenuItem<_PopupAction>(
+                child: Text('Delete All'),
+                value: _PopupAction.deleteall,
+              ),
+            );
             return items;
           }
         },
