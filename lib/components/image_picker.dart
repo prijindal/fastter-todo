@@ -1,9 +1,14 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_chooser/file_chooser.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+
+import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/store/uploads.dart';
 
 class ImagePickerUploader {
   ImagePickerUploader({
@@ -19,6 +24,71 @@ class ImagePickerUploader {
   final String storagePath; // Firebase storage path
   final void Function(String) onChange;
   final void Function(dynamic) onError;
+
+  void editPicture() {
+    showDialog<void>(
+      context: context,
+      builder: (context) => _ImagePickerUploaderWidget(
+            context: context,
+            value: value,
+            storagePath: storagePath,
+            onChange: onChange,
+            onError: onError,
+          ),
+    );
+  }
+}
+
+class ImagePickerUploaderWidget extends StatelessWidget {
+  const ImagePickerUploaderWidget({
+    @required this.context,
+    @required this.value,
+    @required this.storagePath,
+    @required this.onChange,
+    @required this.onError,
+  });
+
+  final BuildContext context;
+  final String value; // Url of the image
+  final String storagePath; // Firebase storage path
+  final void Function(String) onChange;
+  final void Function(dynamic) onError;
+  @override
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) => _ImagePickerUploaderWidget(
+              context: context,
+              value: value,
+              storagePath: storagePath,
+              onChange: onChange,
+              onError: onError,
+              upload: (file, fileName) {
+                print(fileName);
+                final action = UploadStart(file, fileName);
+                store.dispatch(action);
+                return action.completer.future.then((data) => data.url);
+              },
+            ),
+      );
+}
+
+class _ImagePickerUploaderWidget extends StatelessWidget {
+  _ImagePickerUploaderWidget({
+    @required this.context,
+    @required this.value,
+    @required this.storagePath,
+    @required this.onChange,
+    @required this.onError,
+    @required this.upload,
+  });
+
+  final BuildContext context;
+  final String value; // Url of the image
+  final String storagePath; // Firebase storage path
+  final void Function(String) onChange;
+  final void Function(dynamic) onError;
+  final Future<String> Function(File, String) upload;
 
   File _image;
 
@@ -58,6 +128,8 @@ class ImagePickerUploader {
 
         onChange(downloadUrl);
       } else {
+        final url = await upload(_image, storagePath);
+        onChange(url);
         // TODO(prijindal): Implement firebase storage upload rest api
         print(_image);
       }
@@ -108,77 +180,82 @@ class ImagePickerUploader {
     }
   }
 
-  void editPicture() {
-    showDialog<void>(
-      context: context,
-      builder: (context) => SimpleDialog(
-            title: const Text('Change Profile Picture'),
-            children: (Platform.isAndroid || Platform.isIOS)
-                ? <Widget>[
-                    value == null || value.isEmpty
-                        ? const Icon(
-                            Icons.person,
-                            size: 200,
-                          )
-                        : Image.network(
-                            value,
-                            height: 200,
-                            width: 200,
-                          ),
-                    ListTile(
-                      title: const Text('Take a picture'),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        _takeAndUploadPicture();
-                      },
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialog(
+      title: const Text('Change Profile Picture'),
+      children: (Platform.isAndroid || Platform.isIOS)
+          ? <Widget>[
+              value == null || value.isEmpty
+                  ? const Icon(
+                      Icons.person,
+                      size: 200,
+                    )
+                  : Image.network(
+                      value,
+                      height: 200,
+                      width: 200,
                     ),
-                    ListTile(
-                      title: const Text('Select a picture'),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        _selectAndUploadPicture();
-                      },
+              ListTile(
+                title: const Text('Take a picture'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _takeAndUploadPicture();
+                },
+              ),
+              ListTile(
+                title: const Text('Select a picture'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _selectAndUploadPicture();
+                },
+              ),
+              ListTile(
+                title: const Text('Input a url'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _urlSelectPicture();
+                },
+              ),
+              ListTile(
+                title: const Text('Remove picture'),
+                onTap: () {
+                  onChange(null);
+                },
+              ),
+            ]
+          : [
+              value == null || value.isEmpty
+                  ? const Icon(
+                      Icons.person,
+                      size: 200,
+                    )
+                  : Image.network(
+                      value,
+                      height: 200,
+                      width: 200,
                     ),
-                    ListTile(
-                      title: const Text('Input a url'),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        _urlSelectPicture();
-                      },
-                    ),
-                    ListTile(
-                      title: const Text('Remove picture'),
-                      onTap: () {
-                        onChange(null);
-                      },
-                    ),
-                  ]
-                : [
-                    value == null || value.isEmpty
-                        ? const Icon(
-                            Icons.person,
-                            size: 200,
-                          )
-                        : Image.network(
-                            value,
-                            height: 200,
-                            width: 200,
-                          ),
-                    ListTile(
-                      title: const Text('Input a url'),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        _urlSelectPicture();
-                      },
-                    ),
-                    ListTile(
-                      title: const Text('Remove picture'),
-                      onTap: () {
-                        onChange(null);
-                      },
-                    ),
-                  ],
-          ),
+              ListTile(
+                title: const Text('Select a picture'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _selectAndUploadPicture();
+                },
+              ),
+              ListTile(
+                title: const Text('Input a url'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _urlSelectPicture();
+                },
+              ),
+              ListTile(
+                title: const Text('Remove picture'),
+                onTap: () {
+                  onChange(null);
+                },
+              ),
+            ],
     );
   }
 }

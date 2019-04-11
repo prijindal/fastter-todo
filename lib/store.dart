@@ -12,6 +12,7 @@ import 'package:fastter_dart/store/todocomments.dart';
 import 'package:fastter_dart/store/todoreminders.dart';
 import 'package:fastter_dart/store/notifications.dart';
 import 'package:fastter_dart/store/lazyactions.dart';
+import 'package:fastter_dart/store/uploads.dart';
 
 import 'helpers/firebase.dart' show initMessaging;
 import 'helpers/flutter_persistor.dart' show FlutterPersistor;
@@ -32,6 +33,7 @@ Future<Store<AppState>> initState() async {
       fastterTodoReminders.middleware,
       fastterNotifications.middleware,
       LazyActionsMiddleware(),
+      UploadMiddleware(),
       UserMiddleware(
         initMessaging: initMessaging,
         onLogout: () {
