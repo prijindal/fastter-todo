@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
@@ -58,34 +61,43 @@ class _TodoCommentItem extends StatelessWidget {
             ),
       );
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     print(todoComment.type);
     if (todoComment.type == TodoCommentType.image) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Image.network(
-            todoComment.content,
-            height: 200,
-          ),
-        ],
+      final imageProvider = NetworkImage(todoComment.content);
+      return GestureDetector(
+        child: Image(
+          image: imageProvider,
+          height: 200,
+        ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => Scaffold(
+                    body: PhotoView(
+                      imageProvider: imageProvider,
+                    ),
+                  ),
+            ),
+          );
+        },
       );
     } else if (todoComment.type == TodoCommentType.video) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Chewie(
-            controller: ChewieController(
-              videoPlayerController: VideoPlayerController.network(
-                todoComment.content,
-              ),
-              aspectRatio: 3 / 2,
-            ),
+      return Chewie(
+        controller: ChewieController(
+          videoPlayerController: VideoPlayerController.network(
+            todoComment.content,
           ),
-        ],
+          allowFullScreen: true,
+          autoInitialize: true,
+          looping: true,
+        ),
       );
     }
-    return Text(todoComment.content);
+    return Linkify(
+      onOpen: (link) => launch(link.url),
+      text: todoComment.content,
+    );
   }
 
   @override
@@ -124,7 +136,7 @@ class _TodoCommentItem extends StatelessWidget {
         ),
         child: Card(
           child: ListTile(
-            title: _buildContent(),
+            title: _buildContent(context),
             subtitle: Text(dateFromNowFormatter(todoComment.createdAt)),
           ),
         ),

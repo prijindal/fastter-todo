@@ -29,6 +29,7 @@ dependencies:
   firebase_storage: any
   font_awesome_flutter: any
   flutter_colorpicker: any
+  flutter_linkify: any
   flutter_offline: any
   flutter_redux: any
   flutter_signin_button: any
@@ -37,6 +38,7 @@ dependencies:
   intl: any
   json_annotation: any
   keyboard_visibility: any
+  photo_view: any
   redux_persist: any
   redux_persist_flutter: any
   share: any
