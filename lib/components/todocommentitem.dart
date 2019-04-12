@@ -1,6 +1,8 @@
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:chewie/chewie.dart';
+import 'package:video_player/video_player.dart';
 
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
@@ -56,6 +58,36 @@ class _TodoCommentItem extends StatelessWidget {
             ),
       );
 
+  Widget _buildContent() {
+    print(todoComment.type);
+    if (todoComment.type == TodoCommentType.image) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Image.network(
+            todoComment.content,
+            height: 200,
+          ),
+        ],
+      );
+    } else if (todoComment.type == TodoCommentType.video) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Chewie(
+            controller: ChewieController(
+              videoPlayerController: VideoPlayerController.network(
+                todoComment.content,
+              ),
+              aspectRatio: 3 / 2,
+            ),
+          ),
+        ],
+      );
+    }
+    return Text(todoComment.content);
+  }
+
   @override
   Widget build(BuildContext context) => Dismissible(
         key: Key(todoComment.id),
@@ -92,17 +124,7 @@ class _TodoCommentItem extends StatelessWidget {
         ),
         child: Card(
           child: ListTile(
-            title: todoComment.type == TodoCommentType.image
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Image.network(
-                        todoComment.content,
-                        height: 200,
-                      ),
-                    ],
-                  )
-                : Text(todoComment.content),
+            title: _buildContent(),
             subtitle: Text(dateFromNowFormatter(todoComment.createdAt)),
           ),
         ),

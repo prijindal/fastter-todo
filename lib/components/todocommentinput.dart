@@ -9,6 +9,7 @@ import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'image_picker.dart';
+import 'video_picker.dart';
 
 class TodoCommentInput extends StatelessWidget {
   const TodoCommentInput({
@@ -50,7 +51,7 @@ class _TodoCommentInput extends StatefulWidget {
   _TodoCommentInputState createState() => _TodoCommentInputState();
 }
 
-enum TodoCommentInputAttachmentType { image }
+enum TodoCommentInputAttachmentType { image, video }
 
 class _TodoCommentInputState extends State<_TodoCommentInput> {
   TextEditingController commentContentController = TextEditingController();
@@ -74,6 +75,27 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
         }
       },
     ).editPicture();
+  }
+
+  void _addVideoComment() {
+    VideoPickerUploader(
+      context: context,
+      value: null,
+      storagePath: 'todocomments/${Uuid().v1()}.mp4',
+      onError: (dynamic error) {},
+      onChange: (value) {
+        if (value != null && value.isNotEmpty) {
+          widget.addComment(
+            TodoComment(
+              content: value,
+              type: TodoCommentType.video,
+              todo: widget.todo,
+              createdAt: DateTime.now(),
+            ),
+          );
+        }
+      },
+    ).editVideo();
   }
 
   void _addComment() {
@@ -125,6 +147,9 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
                       onSelected: (selected) {
                         if (selected == TodoCommentInputAttachmentType.image) {
                           _addImageComment();
+                        } else if (selected ==
+                            TodoCommentInputAttachmentType.video) {
+                          _addVideoComment();
                         }
                       },
                       child: const Icon(Icons.attach_file),
@@ -134,6 +159,13 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
                               child: ListTile(
                                 leading: const Icon(Icons.image),
                                 title: const Text('Image'),
+                              ),
+                            ),
+                            PopupMenuItem<TodoCommentInputAttachmentType>(
+                              value: TodoCommentInputAttachmentType.video,
+                              child: ListTile(
+                                leading: const Icon(Icons.videocam),
+                                title: const Text('Video'),
                               ),
                             ),
                           ],

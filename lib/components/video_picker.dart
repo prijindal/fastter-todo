@@ -3,15 +3,17 @@ import 'dart:io';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:chewie/chewie.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_player/video_player.dart';
 import 'package:file_chooser/file_chooser.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/uploads.dart';
 
-class ImagePickerUploader {
-  ImagePickerUploader({
+class VideoPickerUploader {
+  VideoPickerUploader({
     @required this.context,
     @required this.value,
     @required this.storagePath,
@@ -25,10 +27,10 @@ class ImagePickerUploader {
   final void Function(String) onChange;
   final void Function(dynamic) onError;
 
-  void editPicture() {
+  void editVideo() {
     showDialog<void>(
       context: context,
-      builder: (context) => _ImagePickerUploaderWidget(
+      builder: (context) => _VideoPickerUploaderWidget(
             context: context,
             value: value,
             storagePath: storagePath,
@@ -39,8 +41,8 @@ class ImagePickerUploader {
   }
 }
 
-class ImagePickerUploaderWidget extends StatelessWidget {
-  const ImagePickerUploaderWidget({
+class VideoPickerUploaderWidget extends StatelessWidget {
+  const VideoPickerUploaderWidget({
     @required this.context,
     @required this.value,
     @required this.storagePath,
@@ -57,7 +59,7 @@ class ImagePickerUploaderWidget extends StatelessWidget {
   Widget build(BuildContext context) =>
       StoreConnector<AppState, Store<AppState>>(
         converter: (store) => store,
-        builder: (context, store) => _ImagePickerUploaderWidget(
+        builder: (context, store) => _VideoPickerUploaderWidget(
               context: context,
               value: value,
               storagePath: storagePath,
@@ -72,8 +74,8 @@ class ImagePickerUploaderWidget extends StatelessWidget {
       );
 }
 
-class _ImagePickerUploaderWidget extends StatelessWidget {
-  _ImagePickerUploaderWidget({
+class _VideoPickerUploaderWidget extends StatelessWidget {
+  _VideoPickerUploaderWidget({
     @required this.context,
     @required this.value,
     @required this.storagePath,
@@ -91,15 +93,15 @@ class _ImagePickerUploaderWidget extends StatelessWidget {
 
   File _image;
 
-  Future _takeProfilePicture() async {
+  Future _takeProfileVideo() async {
     if (Platform.isAndroid || Platform.isIOS) {
-      _image = await ImagePicker.pickImage(source: ImageSource.camera);
+      _image = await ImagePicker.pickVideo(source: ImageSource.camera);
     } else {}
   }
 
-  Future _selectProfilePicture() async {
+  Future _selectProfileVideo() async {
     if (Platform.isAndroid || Platform.isIOS) {
-      _image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      _image = await ImagePicker.pickVideo(source: ImageSource.gallery);
     } else {
       final completer = Completer<void>();
       showOpenPanel(
@@ -117,7 +119,7 @@ class _ImagePickerUploaderWidget extends StatelessWidget {
     }
   }
 
-  Future<void> _uploadProfilePicture() async {
+  Future<void> _uploadProfileVideo() async {
     try {
       if (Platform.isAndroid || Platform.isIOS) {
         final ref = FirebaseStorage.instance.ref().child(storagePath);
@@ -136,17 +138,17 @@ class _ImagePickerUploaderWidget extends StatelessWidget {
     }
   }
 
-  Future<void> _selectAndUploadPicture() async {
-    await _selectProfilePicture();
-    await _uploadProfilePicture();
+  Future<void> _selectAndUploadVideo() async {
+    await _selectProfileVideo();
+    await _uploadProfileVideo();
   }
 
-  Future<void> _takeAndUploadPicture() async {
-    await _takeProfilePicture();
-    await _uploadProfilePicture();
+  Future<void> _takeAndUploadVideo() async {
+    await _takeProfileVideo();
+    await _uploadProfileVideo();
   }
 
-  Future<void> _urlSelectPicture() async {
+  Future<void> _urlSelectVideo() async {
     final urlController = TextEditingController(
       text: value,
     );
@@ -181,7 +183,7 @@ class _ImagePickerUploaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
-      title: const Text('Change Profile Picture'),
+      title: const Text('Change Profile Video'),
       children: (Platform.isAndroid || Platform.isIOS)
           ? <Widget>[
               value == null || value.isEmpty
@@ -189,30 +191,33 @@ class _ImagePickerUploaderWidget extends StatelessWidget {
                       Icons.person,
                       size: 200,
                     )
-                  : Image.network(
-                      value,
-                      height: 200,
-                      width: 200,
+                  : Chewie(
+                      controller: ChewieController(
+                        videoPlayerController: VideoPlayerController.network(
+                          value,
+                        ),
+                        aspectRatio: 3 / 2,
+                      ),
                     ),
               ListTile(
                 title: const Text('Take a picture'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  _takeAndUploadPicture();
+                  _takeAndUploadVideo();
                 },
               ),
               ListTile(
                 title: const Text('Select a picture'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  _selectAndUploadPicture();
+                  _selectAndUploadVideo();
                 },
               ),
               ListTile(
                 title: const Text('Input a url'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  _urlSelectPicture();
+                  _urlSelectVideo();
                 },
               ),
               ListTile(
@@ -228,16 +233,19 @@ class _ImagePickerUploaderWidget extends StatelessWidget {
                       Icons.person,
                       size: 200,
                     )
-                  : Image.network(
-                      value,
-                      height: 200,
-                      width: 200,
+                  : Chewie(
+                      controller: ChewieController(
+                        videoPlayerController: VideoPlayerController.network(
+                          value,
+                        ),
+                        aspectRatio: 3 / 2,
+                      ),
                     ),
               ListTile(
                 title: const Text('Input a url'),
                 onTap: () {
                   Navigator.of(context).pop();
-                  _urlSelectPicture();
+                  _urlSelectVideo();
                 },
               ),
               ListTile(
