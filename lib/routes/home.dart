@@ -36,6 +36,7 @@ import 'package:fastter_dart/models/notification.model.dart' show Notification;
 
 import '../components/todolist.dart';
 
+import '../helpers/firebase.dart';
 import '../helpers/navigator.dart';
 import '../helpers/theme.dart';
 
@@ -211,5 +212,8 @@ class _HomePageState extends State<_HomePage> {
         theme: primaryTheme,
         onGenerateRoute: _onGenerateRoute,
         initialRoute: widget.frontPage.route,
+        navigatorObservers: [
+          analyticsObserver,
+        ],
       );
 }

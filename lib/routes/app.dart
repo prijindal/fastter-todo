@@ -7,6 +7,7 @@ import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 
 import '../helpers/theme.dart';
+import '../helpers/firebase.dart';
 import '../screens/loading.dart';
 import '../screens/login.dart';
 import 'home.dart';
@@ -16,13 +17,18 @@ class AppContainer extends StatelessWidget {
   Widget build(BuildContext context) =>
       StoreConnector<AppState, Store<AppState>>(
         converter: (store) => store,
-        builder: (context, store) => _AppContainer(
-              user: store.state.user,
-              confirmUser: (bearer) =>
-                  store.dispatch(ConfirmUserAction(bearer)),
-              clearAuth: () => store.dispatch(LogoutUserAction()),
-              rehydrated: store.state.rehydrated,
-            ),
+        builder: (context, store) =>
+            store.state == null || store.state.rehydrated == false
+                ? MaterialApp(
+                    theme: primaryTheme,
+                    home: LoadingScreen(),
+                  )
+                : _AppContainer(
+                    user: store.state.user,
+                    confirmUser: (bearer) =>
+                        store.dispatch(ConfirmUserAction(bearer)),
+                    clearAuth: () => store.dispatch(LogoutUserAction()),
+                  ),
       );
 }
 
@@ -31,13 +37,11 @@ class _AppContainer extends StatefulWidget {
     @required this.user,
     @required this.confirmUser,
     @required this.clearAuth,
-    @required this.rehydrated,
   });
 
   final UserState user;
   final void Function(String) confirmUser;
   final void Function() clearAuth;
-  final bool rehydrated;
 
   @override
   _AppContainerState createState() => _AppContainerState();
@@ -60,18 +64,15 @@ class _AppContainerState extends State<_AppContainer> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.rehydrated) {
-      return MaterialApp(
-        theme: primaryTheme,
-        home: LoadingScreen(),
-      );
-    }
     if (widget.user == null ||
         widget.user.user == null ||
         widget.user.user.id == null) {
       return MaterialApp(
         theme: primaryTheme,
         home: LoginScreen(),
+        navigatorObservers: [
+          analyticsObserver,
+        ],
       );
     }
     return HomeContainer();

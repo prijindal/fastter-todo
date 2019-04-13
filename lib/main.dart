@@ -10,7 +10,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:fastter_dart/store/state.dart';
 
 import 'helpers/theme.dart';
-import 'routes/root.dart';
+import 'routes/app.dart';
 import 'screens/loading.dart';
 import 'store.dart';
 
@@ -71,7 +71,7 @@ class FlutterReduxApp extends StatelessWidget {
     }
     return StoreProvider<AppState>(
       store: store,
-      child: RootContainer(),
+      child: AppContainer(),
     );
   }
 }

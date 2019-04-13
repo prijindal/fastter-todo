@@ -8,7 +8,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:352904497289:android:534998e5ea85c23a",
+        "mobilesdk_app_id": "1:352904497289:android:7f1b68954e758616",
         "android_client_info": {
           "package_name": "com.prijindal.fastter_todo"
         }
@@ -19,7 +19,7 @@
           "client_type": 1,
           "android_info": {
             "package_name": "com.prijindal.fastter_todo",
-            "certificate_hash": "e2b2dc1297e29e908e76adbe59be76ee55412c12"
+            "certificate_hash": "f3f5a21eb2bf387dcd4333ab187b464e85cdf6e7"
           }
         },
         {
