@@ -14,7 +14,7 @@ import 'package:fastter_dart/store/notifications.dart';
 import 'package:fastter_dart/store/lazyactions.dart';
 import 'package:fastter_dart/store/uploads.dart';
 
-import 'helpers/firebase.dart' show initMessaging;
+import 'helpers/firebase.dart' show initMessaging, initUserAnalytics;
 import 'helpers/flutter_persistor.dart' show FlutterPersistor;
 
 Future<Store<AppState>> initState() async {
@@ -36,6 +36,7 @@ Future<Store<AppState>> initState() async {
       UploadMiddleware(),
       UserMiddleware(
         initMessaging: initMessaging,
+        initUserAnalytics: initUserAnalytics,
         onLogout: () {
           final _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
           _googleSignIn.signOut();

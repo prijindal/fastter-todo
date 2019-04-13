@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "352904497289",
-    "firebase_url": "https://fastter-36580.firebaseio.com",
-    "project_id": "fastter",
-    "storage_bucket": "fastter.appspot.com"
+    "project_number": "1007801239517",
+    "firebase_url": "https://fastter-todo.firebaseio.com",
+    "project_id": "fastter-todo",
+    "storage_bucket": "fastter-todo.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:352904497289:android:7f1b68954e758616",
+        "mobilesdk_app_id": "1:1007801239517:android:7f1b68954e758616",
         "android_client_info": {
           "package_name": "com.prijindal.fastter_todo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "352904497289-0t2j37ni42jg49fb96oeor10ko8clls2.apps.googleusercontent.com",
+          "client_id": "1007801239517-3n2a91d098fcrm983gpp9aqnuvutoaua.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.prijindal.fastter_todo",
@@ -23,30 +23,23 @@
           }
         },
         {
-          "client_id": "352904497289-d759u1e58dg8oi20ij0okskcsdeuet67.apps.googleusercontent.com",
+          "client_id": "1007801239517-8vb0j1j3g4abuogg4sbt7k636chsvb1s.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBy9Ty7prQTVksRzxdpNU0PyJRqHi3eNiA"
+          "current_key": "AIzaSyByhhCPBw83lcarSIIzCCRBGgdnsGDnCmk"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "352904497289-d759u1e58dg8oi20ij0okskcsdeuet67.apps.googleusercontent.com",
+              "client_id": "1007801239517-8vb0j1j3g4abuogg4sbt7k636chsvb1s.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }
