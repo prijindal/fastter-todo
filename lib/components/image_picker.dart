@@ -1,14 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_chooser/file_chooser.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
-import 'package:fastter_dart/store/state.dart';
-import 'package:fastter_dart/store/uploads.dart';
+import '../helpers/storage.dart';
 
 class ImagePickerUploader {
   ImagePickerUploader({
@@ -39,8 +35,8 @@ class ImagePickerUploader {
   }
 }
 
-class ImagePickerUploaderWidget extends StatelessWidget {
-  const ImagePickerUploaderWidget({
+class _ImagePickerUploaderWidget extends StatefulWidget {
+  const _ImagePickerUploaderWidget({
     @required this.context,
     @required this.value,
     @required this.storagePath,
@@ -53,59 +49,45 @@ class ImagePickerUploaderWidget extends StatelessWidget {
   final String storagePath; // Firebase storage path
   final void Function(String) onChange;
   final void Function(dynamic) onError;
+
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _ImagePickerUploaderWidget(
-              context: context,
-              value: value,
-              storagePath: storagePath,
-              onChange: onChange,
-              onError: onError,
-              upload: (file, fileName) {
-                final action = UploadStart(file, fileName);
-                store.dispatch(action);
-                return action.completer.future.then((data) => data.url);
-              },
-            ),
-      );
+  _ImagePickerUploaderWidgetState createState() =>
+      _ImagePickerUploaderWidgetState();
 }
 
-class _ImagePickerUploaderWidget extends StatelessWidget {
-  _ImagePickerUploaderWidget({
-    @required this.context,
-    @required this.value,
-    @required this.storagePath,
-    @required this.onChange,
-    @required this.onError,
-    @required this.upload,
-  });
-
-  final BuildContext context;
-  final String value; // Url of the image
-  final String storagePath; // Firebase storage path
-  final void Function(String) onChange;
-  final void Function(dynamic) onError;
-  final Future<String> Function(File, String) upload;
-
+class _ImagePickerUploaderWidgetState
+    extends State<_ImagePickerUploaderWidget> {
   File _image;
+  StorageUploadTask _uploadTask;
+
+  void _onChange(String url) {
+    widget.onChange(url);
+    Navigator.of(widget.context).pop();
+  }
 
   Future _takeProfilePicture() async {
     if (Platform.isAndroid || Platform.isIOS) {
-      _image = await ImagePicker.pickImage(source: ImageSource.camera);
+      final image = await ImagePicker.pickImage(source: ImageSource.camera);
+      setState(() {
+        _image = image;
+      });
     } else {}
   }
 
   Future _selectProfilePicture() async {
     if (Platform.isAndroid || Platform.isIOS) {
-      _image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      final image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      setState(() {
+        _image = image;
+      });
     } else {
       final completer = Completer<void>();
       showOpenPanel(
         (FileChooserResult fileChooserResult, filepaths) {
           if (filepaths.isNotEmpty) {
-            _image = File(filepaths[0]);
+            setState(() {
+              _image = File(filepaths[0]);
+            });
             completer.complete();
           }
         },
@@ -120,19 +102,25 @@ class _ImagePickerUploaderWidget extends StatelessWidget {
   Future<void> _uploadProfilePicture() async {
     try {
       if (Platform.isAndroid || Platform.isIOS) {
-        final ref = FirebaseStorage.instance.ref().child(storagePath);
-        final uploadTask = ref.putFile(_image);
+        final ref = FirebaseStorage.instance.ref().child(widget.storagePath);
+        setState(() {
+          _uploadTask = ref.putFile(_image);
+        });
+        _uploadTask.events.listen((event) {
+          setState(() {
+            _uploadTask.lastSnapshot = event.snapshot;
+          });
+        });
         final String downloadUrl =
-            await (await uploadTask.onComplete).ref.getDownloadURL();
+            await (await _uploadTask.onComplete).ref.getDownloadURL();
 
-        onChange(downloadUrl);
+        _onChange(downloadUrl);
       } else {
-        final url = await upload(_image, storagePath);
-        onChange(url);
-        // TODO(prijindal): Implement firebase storage upload rest api
+        final url = await uploadFirebase(widget.storagePath, _image.path);
+        _onChange(url);
       }
     } catch (error) {
-      onError(error);
+      widget.onError(error);
     }
   }
 
@@ -146,9 +134,9 @@ class _ImagePickerUploaderWidget extends StatelessWidget {
     await _uploadProfilePicture();
   }
 
-  Future<void> _urlSelectPicture() async {
+  Future<void> _urlInputPicture() async {
     final urlController = TextEditingController(
-      text: value,
+      text: widget.value,
     );
     final shouldUpdate = await showDialog<bool>(
       context: context,
@@ -174,79 +162,64 @@ class _ImagePickerUploaderWidget extends StatelessWidget {
           ),
     );
     if (shouldUpdate) {
-      onChange(urlController.text);
+      _onChange(urlController.text);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final widgets = <Widget>[
+      widget.value == null || widget.value.isEmpty
+          ? const Icon(
+              Icons.person,
+              size: 200,
+            )
+          : Image.network(
+              widget.value,
+              height: 200,
+              width: 200,
+            ),
+    ];
+    if (Platform.isAndroid || Platform.isIOS) {
+      widgets.add(
+        ListTile(
+          title: const Text('Take a picture'),
+          onTap: _takeAndUploadPicture,
+        ),
+      );
+    }
+    if (_uploadTask != null &&
+        _uploadTask.isInProgress &&
+        _uploadTask.lastSnapshot != null) {
+      final percentageUploaded = (_uploadTask.lastSnapshot.bytesTransferred /
+              _uploadTask.lastSnapshot.totalByteCount) *
+          100;
+      widgets.add(
+        ListTile(
+          title: Text('Uploaded ${percentageUploaded.round()} %'),
+        ),
+      );
+    }
+    widgets.addAll(
+      [
+        ListTile(
+          title: const Text('Select a picture'),
+          onTap: _selectAndUploadPicture,
+        ),
+        ListTile(
+          title: const Text('Input a url'),
+          onTap: _urlInputPicture,
+        ),
+        ListTile(
+          title: const Text('Remove picture'),
+          onTap: () => _onChange(null),
+        ),
+      ],
+    );
+
     return SimpleDialog(
       title: const Text('Change Profile Picture'),
-      children: (Platform.isAndroid || Platform.isIOS)
-          ? <Widget>[
-              value == null || value.isEmpty
-                  ? const Icon(
-                      Icons.person,
-                      size: 200,
-                    )
-                  : Image.network(
-                      value,
-                      height: 200,
-                      width: 200,
-                    ),
-              ListTile(
-                title: const Text('Take a picture'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _takeAndUploadPicture();
-                },
-              ),
-              ListTile(
-                title: const Text('Select a picture'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _selectAndUploadPicture();
-                },
-              ),
-              ListTile(
-                title: const Text('Input a url'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _urlSelectPicture();
-                },
-              ),
-              ListTile(
-                title: const Text('Remove picture'),
-                onTap: () {
-                  onChange(null);
-                },
-              ),
-            ]
-          : [
-              value == null || value.isEmpty
-                  ? const Icon(
-                      Icons.person,
-                      size: 200,
-                    )
-                  : Image.network(
-                      value,
-                      height: 200,
-                      width: 200,
-                    ),
-              ListTile(
-                title: const Text('Input a url'),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  _urlSelectPicture();
-                },
-              ),
-              ListTile(
-                title: const Text('Remove picture'),
-                onTap: () {
-                  onChange(null);
-                },
-              ),
-            ],
+      children: widgets,
     );
   }
 }

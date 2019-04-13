@@ -62,7 +62,6 @@ class _TodoCommentItem extends StatelessWidget {
       );
 
   Widget _buildContent(BuildContext context) {
-    print(todoComment.type);
     if (todoComment.type == TodoCommentType.image) {
       final imageProvider = NetworkImage(todoComment.content);
       return GestureDetector(
