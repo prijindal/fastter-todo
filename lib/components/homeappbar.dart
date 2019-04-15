@@ -16,6 +16,7 @@ import 'package:fastter_dart/store/todos.dart';
 
 import '../helpers/navigator.dart';
 import '../helpers/theme.dart';
+import '../helpers/responsive.dart';
 import '../screens/editlabel.dart';
 import '../screens/editproject.dart';
 import '../screens/search.dart';
@@ -362,12 +363,14 @@ class _HomeAppBar extends StatelessWidget {
                     icon: const Icon(Icons.arrow_back),
                     onPressed: unSelectAll,
                   )
-                : IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                  ),
+                : getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait
+                    ? IconButton(
+                        icon: const Icon(Icons.menu),
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                      )
+                    : null,
           ),
           title: _buildTitle(),
           actions: [

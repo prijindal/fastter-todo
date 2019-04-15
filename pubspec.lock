@@ -182,7 +182,7 @@ packages:
       name: firebase_analytics
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.1+1"
+    version: "2.1.1+2"
   firebase_core:
     dependency: transitive
     description:
@@ -196,7 +196,7 @@ packages:
       name: firebase_messaging
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0+2"
+    version: "4.0.0+3"
   firebase_storage:
     dependency: "direct main"
     description:
@@ -680,7 +680,7 @@ packages:
       name: video_player
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.10.0+4"
+    version: "0.10.0+5"
   watcher:
     dependency: transitive
     description:

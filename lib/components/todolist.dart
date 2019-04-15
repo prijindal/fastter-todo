@@ -17,6 +17,7 @@ import '../components/homeappdrawer.dart';
 import '../components/notificationsdrawer.dart';
 import '../components/todoinput.dart';
 import '../components/todoitem.dart';
+import '../helpers/responsive.dart';
 import 'todoeditbar.dart';
 
 class TodoList extends StatelessWidget {
@@ -343,8 +344,7 @@ class _TodoListState extends State<_TodoList> {
     return _buildConnectivity(_buildChild(), true);
   }
 
-  @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget _buildPotrait() => Scaffold(
         drawer: const HomeAppDrawer(),
         endDrawer: NotificationsDrawer(),
         floatingActionButton: widget.selectedTodos.isEmpty && !_showInput
@@ -360,4 +360,37 @@ class _TodoListState extends State<_TodoList> {
             : null,
         body: _build(),
       );
+
+  Widget _buildLandscape() => Scaffold(
+        endDrawer: NotificationsDrawer(),
+        floatingActionButton: widget.selectedTodos.isEmpty && !_showInput
+            ? FloatingActionButton(
+                heroTag: widget.filter.toString(),
+                child: const Icon(Icons.add),
+                onPressed: () {
+                  setState(() {
+                    _showInput = true;
+                  });
+                },
+              )
+            : null,
+        body: Flex(
+          direction: Axis.horizontal,
+          children: [
+            const HomeAppDrawer(),
+            Flexible(
+              child: _build(),
+            ),
+          ],
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    if (getCurrentBreakpoint(context) == ResponsiveBreakpoints.landscape) {
+      return _buildLandscape();
+    } else {
+      return _buildPotrait();
+    }
+  }
 }

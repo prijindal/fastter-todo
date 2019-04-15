@@ -203,6 +203,15 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
                       focusNode: _titleFocusNode,
                       decoration: InputDecoration(
                         labelText: 'Add a task',
+                        suffix: IconButton(
+                          icon: const Icon(
+                            Icons.close,
+                          ),
+                          onPressed: () {
+                            titleInputController.clear();
+                            _unFocusKeyboard();
+                          },
+                        ),
                       ),
                       onFieldSubmitted: (title) {
                         _onSave();
