@@ -1,6 +1,8 @@
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:share/share.dart';
 
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/base.model.dart';
@@ -10,6 +12,7 @@ import 'package:fastter_dart/store/state.dart';
 
 import '../components/todocommentinput.dart';
 import '../components/todocommentitem.dart';
+import '../helpers/theme.dart';
 
 class TodoCommentsScreen extends StatelessWidget {
   const TodoCommentsScreen({
@@ -54,7 +57,8 @@ class _TodoCommentsScreen extends StatefulWidget {
 }
 
 class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
-  ScrollController scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
+  final List<String> _selectedComments = [];
 
   @override
   void initState() {
@@ -62,10 +66,26 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
     super.initState();
   }
 
+  void _toggleSelected(TodoComment todoComment) {
+    setState(() {
+      if (_selectedComments.contains(todoComment.id)) {
+        _selectedComments.remove(todoComment.id);
+      } else {
+        _selectedComments.add(todoComment.id);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: Text(widget.todo.title),
+        appBar: TodoCommentsAppBar(
+          selectedComments: _selectedComments,
+          todo: widget.todo,
+          onClear: () {
+            setState(() {
+              _selectedComments.clear();
+            });
+          },
         ),
         body: Container(
           color: Theme.of(context).backgroundColor,
@@ -81,12 +101,16 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
                     )
                   : Flexible(
                       child: SingleChildScrollView(
-                        controller: scrollController,
+                        controller: _scrollController,
                         child: Column(
                           children: widget.todoComments.items.reversed
                               .map(
                                 (todoComment) => TodoCommentItem(
                                       todoComment: todoComment,
+                                      onLongPress: () =>
+                                          _toggleSelected(todoComment),
+                                      selected: _selectedComments
+                                          .contains(todoComment.id),
                                     ),
                               )
                               .toList(),
@@ -96,11 +120,154 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
               TodoCommentInput(
                   todo: widget.todo,
                   onAdded: () {
-                    scrollController
-                        .jumpTo(scrollController.position.maxScrollExtent);
+                    _scrollController
+                        .jumpTo(_scrollController.position.maxScrollExtent);
                   }),
             ],
           ),
         ),
       );
+}
+
+class TodoCommentsAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  TodoCommentsAppBar({
+    @required this.onClear,
+    @required this.todo,
+    this.selectedComments = const <String>[],
+    Key key,
+    this.preferredSize = const Size.fromHeight(kToolbarHeight),
+  }) : super(key: key);
+
+  final List<String> selectedComments;
+  final VoidCallback onClear;
+  final Todo todo;
+
+  @override
+  final Size preferredSize;
+
+  @override
+  Widget build(BuildContext context) =>
+      StoreConnector<AppState, Store<AppState>>(
+        converter: (store) => store,
+        builder: (context, store) {
+          final todoComments = store.state.todoComments.items
+              .where((todocomment) =>
+                  todocomment.todo != null &&
+                  todocomment.todo.id == todo.id &&
+                  selectedComments.contains(todocomment.id))
+              .toList();
+          return _TodoCommentsAppBar(
+              onClear: onClear,
+              todo: todo,
+              todoComments: ListState<TodoComment>(
+                items: todoComments,
+              ),
+              deleteSelectedComment: () {
+                final futures = <Future<TodoComment>>[];
+                for (final todoComment in todoComments) {
+                  final action = DeleteItem<TodoComment>(todoComment.id);
+                  store.dispatch(action);
+                  futures.add(action.completer.future);
+                }
+                return Future.wait<TodoComment>(futures);
+              });
+        },
+      );
+}
+
+class _TodoCommentsAppBar extends StatelessWidget {
+  _TodoCommentsAppBar({
+    @required this.onClear,
+    @required this.todo,
+    @required this.todoComments,
+    @required this.deleteSelectedComment,
+    Key key,
+  }) : super(key: key);
+
+  final VoidCallback onClear;
+  final Todo todo;
+  final ListState<TodoComment> todoComments;
+  final Future<List<TodoComment>> Function() deleteSelectedComment;
+
+  String _commentsToString() {
+    final strBuffer = StringBuffer('');
+    for (final comment in todoComments.items) {
+      strBuffer.writeln(comment.content);
+    }
+    return strBuffer.toString();
+  }
+
+  void _shareSelectedComment() {
+    Share.share(_commentsToString());
+  }
+
+  void _copySelectedComment() {
+    Clipboard.setData(ClipboardData(text: _commentsToString()));
+  }
+
+  Future<void> _deleteSelectedComment(BuildContext context) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+            title: const Text('Are you sure'),
+            content:
+                Text('This will delete ${todoComments.items.length} comments'),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text('Cancel'),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+              FlatButton(
+                child: const Text('Yes'),
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+            ],
+          ),
+    );
+    if (shouldDelete == true) {
+      await this.deleteSelectedComment();
+      onClear();
+    }
+  }
+
+  List<Widget> _buildActions(BuildContext context) {
+    if (todoComments.items.isEmpty) {
+      return [];
+    } else {
+      return [
+        IconButton(
+          icon: const Icon(Icons.content_copy),
+          onPressed: _copySelectedComment,
+        ),
+        IconButton(
+          icon: const Icon(Icons.share),
+          onPressed: _shareSelectedComment,
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () => _deleteSelectedComment(context),
+        )
+      ];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedTheme(
+      data: todoComments.items.isEmpty ? primaryTheme : whiteTheme,
+      child: AppBar(
+        title: Text(todoComments.items.isEmpty
+            ? todo.title
+            : '${todoComments.items.length} Comments selected'),
+        leading: todoComments.items.isEmpty
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: onClear,
+              ),
+        actions: _buildActions(context),
+      ),
+    );
+  }
 }

@@ -6,8 +6,8 @@ import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 
-import '../helpers/theme.dart';
 import '../helpers/firebase.dart';
+import '../helpers/theme.dart';
 import '../screens/loading.dart';
 import '../screens/login.dart';
 import 'home.dart';

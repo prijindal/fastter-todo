@@ -51,6 +51,14 @@ class HomeContainer extends StatelessWidget {
                   store.dispatch(StartSync<NotificationModel.Notification>()),
               confirmUser: (bearer) =>
                   store.dispatch(ConfirmUserAction(bearer)),
+              addTodo: (todotitle) {
+                final action = AddItem<Todo>(Todo(
+                  title: todotitle,
+                  project: null,
+                  dueDate: null,
+                ));
+                return action.completer.future;
+              },
               initSubscriptions: () {
                 fastterLabels.queries.initSubscriptions(store.dispatch);
                 fastterProjects.queries.initSubscriptions(store.dispatch);

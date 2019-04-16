@@ -13,9 +13,11 @@ FirebaseAnalyticsObserver analyticsObserver = FirebaseAnalyticsObserver(
 );
 
 void initUserAnalytics(User user) {
-  _analytics.setUserId(user.id);
-  _analytics.setUserProperty(name: 'name', value: user.name);
-  _analytics.setUserProperty(name: 'email', value: user.email);
+  if (Platform.isAndroid || Platform.isIOS) {
+    _analytics.setUserId(user.id);
+    _analytics.setUserProperty(name: 'name', value: user.name);
+    _analytics.setUserProperty(name: 'email', value: user.email);
+  }
 }
 
 Future<String> initMessaging() async {

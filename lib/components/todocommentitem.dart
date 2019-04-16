@@ -14,9 +14,16 @@ import 'package:fastter_dart/store/state.dart';
 import '../helpers/todouihelpers.dart';
 
 class TodoCommentItem extends StatelessWidget {
-  const TodoCommentItem({Key key, this.todoComment}) : super(key: key);
+  const TodoCommentItem({
+    Key key,
+    this.todoComment,
+    this.onLongPress,
+    this.selected,
+  }) : super(key: key);
 
   final TodoComment todoComment;
+  final VoidCallback onLongPress;
+  final bool selected;
 
   @override
   Widget build(BuildContext context) =>
@@ -26,6 +33,8 @@ class TodoCommentItem extends StatelessWidget {
               todoComment: todoComment,
               deleteComment: () =>
                   store.dispatch(DeleteItem<TodoComment>(todoComment.id)),
+              onLongPress: onLongPress,
+              selected: selected,
             ),
       );
 }
@@ -34,11 +43,15 @@ class _TodoCommentItem extends StatelessWidget {
   const _TodoCommentItem({
     @required this.todoComment,
     @required this.deleteComment,
+    this.onLongPress,
+    this.selected,
     Key key,
   }) : super(key: key);
 
   final TodoComment todoComment;
   final void Function() deleteComment;
+  final VoidCallback onLongPress;
+  final bool selected;
 
   Future<bool> _confirmDelete(BuildContext context) => showDialog<bool>(
         context: context,
@@ -135,6 +148,8 @@ class _TodoCommentItem extends StatelessWidget {
         ),
         child: Card(
           child: ListTile(
+            onLongPress: onLongPress,
+            selected: selected,
             title: _buildContent(context),
             subtitle: Text(dateFromNowFormatter(todoComment.createdAt)),
           ),

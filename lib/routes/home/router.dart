@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:fastter_dart/models/project.model.dart';
@@ -9,6 +12,7 @@ import 'package:fastter_dart/models/settings.model.dart';
 import '../../helpers/firebase.dart';
 import '../../helpers/navigator.dart';
 import '../../helpers/theme.dart';
+import '../../screens/todoedit.dart';
 
 import 'generateroute.dart' show onGenerateRoute;
 
@@ -21,6 +25,7 @@ class HomePage extends StatefulWidget {
     @required this.todoRemindersSyncStart,
     @required this.notificationsSyncStart,
     @required this.initSubscriptions,
+    @required this.addTodo,
     @required this.confirmUser,
     @required this.frontPage,
   });
@@ -32,6 +37,7 @@ class HomePage extends StatefulWidget {
   final VoidCallback todoRemindersSyncStart;
   final VoidCallback notificationsSyncStart;
   final VoidCallback initSubscriptions;
+  final Future<Todo> Function(String) addTodo;
   final void Function(String) confirmUser;
   final FrontPage frontPage;
 
@@ -40,10 +46,37 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  static const MethodChannel platform =
+      MethodChannel('app.channel.shared.data');
+
   @override
   void initState() {
     super.initState();
     _initRequests();
+    _getSharedText();
+  }
+
+  Future<void> _getSharedText() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      final String sharedData = await platform.invokeMethod('getSharedText');
+      print(sharedData);
+      if (sharedData != null && sharedData.isNotEmpty) {
+        final todo = await widget.addTodo(sharedData);
+        if (navigatorKey.currentState != null) {
+          _openNewTodo(todo);
+        } else {
+          Timer(Duration(milliseconds: 500), () => _openNewTodo(todo));
+        }
+      }
+    }
+  }
+
+  void _openNewTodo(Todo todo) {
+    navigatorKey.currentState.push<void>(MaterialPageRoute<void>(
+      builder: (BuildContext context) => TodoEditScreen(
+            todo: todo,
+          ),
+    ));
   }
 
   Future<void> _initRequests() async {
