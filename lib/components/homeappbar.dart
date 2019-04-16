@@ -224,14 +224,18 @@ class _HomeAppBar extends StatelessWidget {
                     title: const Text('None'),
                     onTap: () => Navigator.of(context).pop(null),
                   ),
-                ]..addAll(todos.items
-                    .map(
-                      (todo) => ListTile(
-                            title: Text(todo.title),
-                            onTap: () => Navigator.of(context).pop(todo),
-                          ),
-                    )
-                    .toList()),
+                ]..addAll(
+                    todos.items
+                        .where(
+                            (todo) => fastterTodos.filterObject(todo, filter))
+                        .map(
+                          (todo) => ListTile(
+                                title: Text(todo.title),
+                                onTap: () => Navigator.of(context).pop(todo),
+                              ),
+                        )
+                        .toList(),
+                  ),
               ),
             ),
           ),

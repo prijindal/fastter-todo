@@ -38,6 +38,16 @@ class TodoItem extends StatelessWidget {
                   store.dispatch(UpdateItem<Todo>(todo.id, updated)),
               selected: store.state.selectedTodos.contains(todo.id),
               toggleSelected: () => store.dispatch(ToggleSelectTodo(todo.id)),
+              reminders: store.state.todoReminders.items
+                  .where((reminder) =>
+                      reminder.todo != null &&
+                      reminder.completed == false &&
+                      reminder.todo.id == todo.id)
+                  .length,
+              comments: store.state.todoComments.items
+                  .where((comment) =>
+                      comment.todo != null && comment.todo.id == todo.id)
+                  .length,
             ),
       );
 }
@@ -50,6 +60,8 @@ class _TodoItem extends StatelessWidget {
     @required this.updateTodo,
     @required this.selected,
     @required this.toggleSelected,
+    @required this.reminders,
+    @required this.comments,
     Key key,
   }) : super(key: key);
 
@@ -60,6 +72,8 @@ class _TodoItem extends StatelessWidget {
 
   final bool selected;
   final VoidCallback toggleSelected;
+  final int reminders;
+  final int comments;
 
   void _selectDate(BuildContext context) {
     todoSelectDate(context, todo.dueDate).then((dueDate) {
@@ -141,10 +155,47 @@ class _TodoItem extends StatelessWidget {
 
   Widget _buildSubtitleFirstRow(BuildContext context) {
     final children = <Widget>[];
-    if (todo.dueDate == null) {
+    if (todo.dueDate == null && reminders == 0 && comments == 0) {
       return null;
     }
-    children.add(_buildDueDate(context));
+    if (todo.dueDate != null) {
+      children.add(_buildDueDate(context));
+    }
+    if (reminders > 0) {
+      children.add(
+        Container(
+          margin: const EdgeInsets.only(left: 4),
+          child: Row(
+            children: <Widget>[
+              const Icon(
+                Icons.alarm,
+                size: 20,
+              ),
+              Text(reminders.toString()),
+            ],
+          ),
+        ),
+      );
+    }
+    if (comments > 0) {
+      children.add(
+        Container(
+          margin: const EdgeInsets.only(left: 4),
+          child: Row(
+            children: <Widget>[
+              const Icon(
+                Icons.comment,
+                size: 20,
+              ),
+              Text(comments.toString()),
+            ],
+          ),
+        ),
+      );
+    }
+    children.add(Flexible(
+      child: Container(),
+    ));
     if (todo.project != null) {
       children.add(_buildProject(context));
     }
@@ -274,7 +325,10 @@ class _TodoItem extends StatelessWidget {
               Flexible(
                 child: _buildTitle(context),
               ),
-              todo.dueDate == null && todo.project != null
+              todo.dueDate == null &&
+                      todo.project != null &&
+                      reminders == 0 &&
+                      comments == 0
                   ? _buildProject(context, flex: 0)
                   : Container(),
             ],
