@@ -46,8 +46,8 @@ class _GoogleSignInForm extends StatelessWidget {
       Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
           builder: (context) => Scaffold(
-                body: Center(
-                  child: const CircularProgressIndicator(),
+                body: const Center(
+                  child: CircularProgressIndicator(),
                 ),
               ),
         ),
@@ -100,8 +100,8 @@ class _GoogleSignInScreenState extends State<_GoogleSignInScreen> {
           title: const Text('Sign in with google'),
         ),
         body: widget.user.isLoading
-            ? Center(
-                child: const CircularProgressIndicator(),
+            ? const Center(
+                child: CircularProgressIndicator(),
               )
             : Container(
                 child: Column(

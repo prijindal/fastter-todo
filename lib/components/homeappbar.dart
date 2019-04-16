@@ -15,8 +15,8 @@ import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
 
 import '../helpers/navigator.dart';
-import '../helpers/theme.dart';
 import '../helpers/responsive.dart';
+import '../helpers/theme.dart';
 import '../screens/editlabel.dart';
 import '../screens/editproject.dart';
 import '../screens/search.dart';
@@ -189,8 +189,8 @@ class _HomeAppBar extends StatelessWidget {
   Future<void> _copySelected(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: _tasksToString()));
     Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Copied to clipboard'),
+      const SnackBar(
+        content: Text('Copied to clipboard'),
       ),
     );
   }

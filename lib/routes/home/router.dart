@@ -65,7 +65,7 @@ class _HomePageState extends State<HomePage> {
         if (navigatorKey.currentState != null) {
           _openNewTodo(todo);
         } else {
-          Timer(Duration(milliseconds: 500), () => _openNewTodo(todo));
+          Timer(const Duration(milliseconds: 500), () => _openNewTodo(todo));
         }
       }
     }

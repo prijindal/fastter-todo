@@ -109,6 +109,9 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
                                       todoComment: todoComment,
                                       onLongPress: () =>
                                           _toggleSelected(todoComment),
+                                      onTap: _selectedComments.isEmpty
+                                          ? null
+                                          : () => _toggleSelected(todoComment),
                                       selected: _selectedComments
                                           .contains(todoComment.id),
                                     ),
@@ -158,20 +161,30 @@ class TodoCommentsAppBar extends StatelessWidget
                   selectedComments.contains(todocomment.id))
               .toList();
           return _TodoCommentsAppBar(
-              onClear: onClear,
-              todo: todo,
-              todoComments: ListState<TodoComment>(
-                items: todoComments,
-              ),
-              deleteSelectedComment: () {
-                final futures = <Future<TodoComment>>[];
-                for (final todoComment in todoComments) {
-                  final action = DeleteItem<TodoComment>(todoComment.id);
-                  store.dispatch(action);
-                  futures.add(action.completer.future);
-                }
-                return Future.wait<TodoComment>(futures);
-              });
+            onClear: onClear,
+            todo: todo,
+            todoComments: ListState<TodoComment>(
+              items: todoComments,
+            ),
+            deleteSelectedComment: () {
+              final futures = <Future<TodoComment>>[];
+              for (final todoComment in todoComments) {
+                final action = DeleteItem<TodoComment>(todoComment.id);
+                store.dispatch(action);
+                futures.add(action.completer.future);
+              }
+              return Future.wait<TodoComment>(futures);
+            },
+            addComments: (List<TodoComment> comments) {
+              final futures = <Future<TodoComment>>[];
+              for (final todoComment in comments) {
+                final action = AddItem<TodoComment>(todoComment);
+                store.dispatch(action);
+                futures.add(action.completer.future);
+              }
+              return Future.wait<TodoComment>(futures);
+            },
+          );
         },
       );
 }
@@ -182,6 +195,7 @@ class _TodoCommentsAppBar extends StatelessWidget {
     @required this.todo,
     @required this.todoComments,
     @required this.deleteSelectedComment,
+    @required this.addComments,
     Key key,
   }) : super(key: key);
 
@@ -189,6 +203,7 @@ class _TodoCommentsAppBar extends StatelessWidget {
   final Todo todo;
   final ListState<TodoComment> todoComments;
   final Future<List<TodoComment>> Function() deleteSelectedComment;
+  final Future<List<TodoComment>> Function(List<TodoComment>) addComments;
 
   String _commentsToString() {
     final strBuffer = StringBuffer('');
@@ -202,8 +217,13 @@ class _TodoCommentsAppBar extends StatelessWidget {
     Share.share(_commentsToString());
   }
 
-  void _copySelectedComment() {
-    Clipboard.setData(ClipboardData(text: _commentsToString()));
+  Future<void> _copySelectedComment(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: _commentsToString()));
+    Scaffold.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Copied to clipboard'),
+      ),
+    );
   }
 
   Future<void> _deleteSelectedComment(BuildContext context) async {
@@ -226,8 +246,23 @@ class _TodoCommentsAppBar extends StatelessWidget {
           ),
     );
     if (shouldDelete == true) {
-      await this.deleteSelectedComment();
+      final deletedComments = await this.deleteSelectedComment();
       onClear();
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${deletedComments.length} Comments Deleted'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () => addComments(deletedComments
+                .map((comment) => TodoComment(
+                      type: comment.type,
+                      content: comment.content,
+                      todo: comment.todo,
+                    ))
+                .toList()),
+          ),
+        ),
+      );
     }
   }
 
@@ -238,7 +273,7 @@ class _TodoCommentsAppBar extends StatelessWidget {
       return [
         IconButton(
           icon: const Icon(Icons.content_copy),
-          onPressed: _copySelectedComment,
+          onPressed: () => _copySelectedComment(context),
         ),
         IconButton(
           icon: const Icon(Icons.share),
@@ -253,21 +288,19 @@ class _TodoCommentsAppBar extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedTheme(
-      data: todoComments.items.isEmpty ? primaryTheme : whiteTheme,
-      child: AppBar(
-        title: Text(todoComments.items.isEmpty
-            ? todo.title
-            : '${todoComments.items.length} Comments selected'),
-        leading: todoComments.items.isEmpty
-            ? null
-            : IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: onClear,
-              ),
-        actions: _buildActions(context),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => AnimatedTheme(
+        data: todoComments.items.isEmpty ? primaryTheme : whiteTheme,
+        child: AppBar(
+          title: Text(todoComments.items.isEmpty
+              ? todo.title
+              : '${todoComments.items.length} Comments selected'),
+          leading: todoComments.items.isEmpty
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: onClear,
+                ),
+          actions: _buildActions(context),
+        ),
+      );
 }

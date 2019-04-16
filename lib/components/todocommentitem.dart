@@ -18,11 +18,13 @@ class TodoCommentItem extends StatelessWidget {
     Key key,
     this.todoComment,
     this.onLongPress,
+    this.onTap,
     this.selected,
   }) : super(key: key);
 
   final TodoComment todoComment;
   final VoidCallback onLongPress;
+  final VoidCallback onTap;
   final bool selected;
 
   @override
@@ -31,9 +33,15 @@ class TodoCommentItem extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _TodoCommentItem(
               todoComment: todoComment,
-              deleteComment: () =>
-                  store.dispatch(DeleteItem<TodoComment>(todoComment.id)),
+              deleteComment: () {
+                final action = DeleteItem<TodoComment>(todoComment.id);
+                store.dispatch(action);
+                return action.completer.future;
+              },
+              addComment: (TodoComment comment) =>
+                  store.dispatch(AddItem<TodoComment>(comment)),
               onLongPress: onLongPress,
+              onTap: onTap,
               selected: selected,
             ),
       );
@@ -43,14 +51,18 @@ class _TodoCommentItem extends StatelessWidget {
   const _TodoCommentItem({
     @required this.todoComment,
     @required this.deleteComment,
+    @required this.addComment,
     this.onLongPress,
+    this.onTap,
     this.selected,
     Key key,
   }) : super(key: key);
 
   final TodoComment todoComment;
-  final void Function() deleteComment;
+  final Future<TodoComment> Function() deleteComment;
+  final void Function(TodoComment) addComment;
   final VoidCallback onLongPress;
+  final VoidCallback onTap;
   final bool selected;
 
   Future<bool> _confirmDelete(BuildContext context) => showDialog<bool>(
@@ -116,11 +128,26 @@ class _TodoCommentItem extends StatelessWidget {
   Widget build(BuildContext context) => Dismissible(
         key: Key(todoComment.id),
         confirmDismiss: (direction) => _confirmDelete(context),
-        onDismissed: (direction) {
-          deleteComment();
+        onDismissed: (direction) async {
+          final deletedComment = await deleteComment();
           Scaffold.of(context).removeCurrentSnackBar();
           Scaffold.of(context).showSnackBar(
-              SnackBar(content: Text('${todoComment.content} deleted')));
+            SnackBar(
+              content: Text('${todoComment.content} deleted'),
+              action: SnackBarAction(
+                label: 'Undo',
+                onPressed: () {
+                  this.addComment(
+                    TodoComment(
+                      type: deletedComment.type,
+                      content: deletedComment.content,
+                      todo: deletedComment.todo,
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
         },
         background: Flex(
           direction: Axis.horizontal,
@@ -149,6 +176,7 @@ class _TodoCommentItem extends StatelessWidget {
         child: Card(
           child: ListTile(
             onLongPress: onLongPress,
+            onTap: onTap,
             selected: selected,
             title: _buildContent(context),
             subtitle: Text(dateFromNowFormatter(todoComment.createdAt)),
