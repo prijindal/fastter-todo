@@ -155,10 +155,21 @@ class _TodoListState extends State<_TodoList> {
   }
 
   Widget _buildPendingTodos() {
+    final items = widget.todos.items.toList();
+    for (final todo in items) {
+      final children = items.where((pTodo) {
+        if (pTodo.parent != null) {
+          return pTodo.parent.id == todo.id;
+        } else {
+          return false;
+        }
+      }).toList();
+      todo.children = children;
+    }
     if (!widget.categoryView) {
       return Column(
-        children: widget.todos.items
-            .where((todo) => todo.completed != true)
+        children: items
+            .where((todo) => todo.completed != true && todo.parent == null)
             .map((todo) => TodoItem(
                   todo: todo,
                 ))
@@ -167,10 +178,8 @@ class _TodoListState extends State<_TodoList> {
     }
     final mapCategoryToList = <String, List<Todo>>{};
 
-    final items =
-        widget.todos.items.where((todo) => todo.completed != true).toList();
-
-    for (final todo in items) {
+    for (final todo in items
+        .where((todo) => todo.completed != true && todo.parent == null)) {
       if (widget.todos.sortBy == 'priority') {
         final priorityString = 'Priority ${todo.priority.toString()}';
         if (!mapCategoryToList.containsKey(priorityString)) {
@@ -200,7 +209,9 @@ class _TodoListState extends State<_TodoList> {
           initiallyExpanded: true,
           title: Text(categoryString),
           children: mapCategoryToList[categoryString]
-              .map((todo) => TodoItem(todo: todo))
+              .map((todo) => TodoItem(
+                    todo: todo,
+                  ))
               .toList(),
         ),
       );

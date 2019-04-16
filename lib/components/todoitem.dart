@@ -292,6 +292,20 @@ class _TodoItem extends StatelessWidget {
             ),
           ),
         ),
-        child: _buildBody(context),
+        child: Column(
+          children: [
+            _buildBody(context),
+            Container(
+              margin: const EdgeInsets.only(left: 24),
+              child: Column(
+                children: todo.children
+                    .map((child) => TodoItem(
+                          todo: child,
+                        ))
+                    .toList(),
+              ),
+            )
+          ],
+        ),
       );
 }

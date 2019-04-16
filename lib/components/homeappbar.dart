@@ -49,6 +49,8 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
               projects: store.state.projects,
               labels: store.state.labels,
               todos: store.state.todos,
+              updateTodo: (id, updated) =>
+                  store.dispatch(UpdateItem<Todo>(id, updated)),
               deleteSelected: () {
                 for (final todoid in store.state.selectedTodos) {
                   store.dispatch(DeleteItem<Todo>(todoid));
@@ -72,7 +74,15 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       );
 }
 
-enum _PopupAction { delete, deleteall, editproject, editlabel, copy, share }
+enum _PopupAction {
+  delete,
+  deleteall,
+  editproject,
+  editlabel,
+  copy,
+  share,
+  attach
+}
 
 enum _SortAction { duedate, title, priority }
 
@@ -87,6 +97,7 @@ class _HomeAppBar extends StatelessWidget {
     @required this.todos,
     @required this.filter,
     @required this.title,
+    @required this.updateTodo,
     @required this.updateSortBy,
     @required this.frontPage,
     Key key,
@@ -101,6 +112,7 @@ class _HomeAppBar extends StatelessWidget {
   final ListState<Label> labels;
   final ListState<Todo> todos;
   final String title;
+  final void Function(String, Todo) updateTodo;
   final void Function(String) updateSortBy;
   final FrontPage frontPage;
 
@@ -199,6 +211,38 @@ class _HomeAppBar extends StatelessWidget {
     Share.share(_tasksToString());
   }
 
+  Future<void> _attachSelected(BuildContext context) async {
+    final parent = await showDialog<Todo>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+            title: const Text('Select a parent'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ListTile(
+                    title: const Text('None'),
+                    onTap: () => Navigator.of(context).pop(null),
+                  ),
+                ]..addAll(todos.items
+                    .map(
+                      (todo) => ListTile(
+                            title: Text(todo.title),
+                            onTap: () => Navigator.of(context).pop(todo),
+                          ),
+                    )
+                    .toList()),
+              ),
+            ),
+          ),
+    );
+    for (final todo
+        in todos.items.where((todo) => selectedtodos.contains(todo.id))) {
+      todo.parent = parent;
+      updateTodo(todo.id, todo);
+    }
+  }
+
   void _deleteAll(BuildContext context) {
     showDialog<void>(
       context: context,
@@ -284,6 +328,8 @@ class _HomeAppBar extends StatelessWidget {
               _copySelected(context);
             } else if (value == _PopupAction.share) {
               _shareSelected(context);
+            } else if (value == _PopupAction.attach) {
+              _attachSelected(context);
             }
           } else {
             if (value == _PopupAction.deleteall) {
@@ -306,6 +352,10 @@ class _HomeAppBar extends StatelessWidget {
               const PopupMenuItem<_PopupAction>(
                 child: Text('Share'),
                 value: _PopupAction.share,
+              ),
+              const PopupMenuItem<_PopupAction>(
+                child: Text('Attach To'),
+                value: _PopupAction.attach,
               ),
               const PopupMenuItem<_PopupAction>(
                 child: Text('Delete'),
