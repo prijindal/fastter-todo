@@ -82,9 +82,7 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
           selectedComments: _selectedComments,
           todo: widget.todo,
           onClear: () {
-            setState(() {
-              _selectedComments.clear();
-            });
+            setState(_selectedComments.clear);
           },
         ),
         body: Container(
@@ -93,33 +91,34 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
             direction: Axis.vertical,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              widget.todoComments.items.isEmpty
-                  ? Flexible(
-                      child: Center(
-                        child: const Text('No Comments'),
-                      ),
-                    )
-                  : Flexible(
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        child: Column(
-                          children: widget.todoComments.items.reversed
-                              .map(
-                                (todoComment) => TodoCommentItem(
-                                      todoComment: todoComment,
-                                      onLongPress: () =>
-                                          _toggleSelected(todoComment),
-                                      onTap: _selectedComments.isEmpty
-                                          ? null
-                                          : () => _toggleSelected(todoComment),
-                                      selected: _selectedComments
-                                          .contains(todoComment.id),
-                                    ),
-                              )
-                              .toList(),
-                        ),
-                      ),
+              if (widget.todoComments.items.isEmpty)
+                const Flexible(
+                  child: Center(
+                    child: Text('No Comments'),
+                  ),
+                )
+              else
+                Flexible(
+                  child: SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      children: widget.todoComments.items.reversed
+                          .map(
+                            (todoComment) => TodoCommentItem(
+                                  todoComment: todoComment,
+                                  onLongPress: () =>
+                                      _toggleSelected(todoComment),
+                                  onTap: _selectedComments.isEmpty
+                                      ? null
+                                      : () => _toggleSelected(todoComment),
+                                  selected: _selectedComments
+                                      .contains(todoComment.id),
+                                ),
+                          )
+                          .toList(),
                     ),
+                  ),
+                ),
               TodoCommentInput(
                   todo: widget.todo,
                   onAdded: () {
@@ -175,7 +174,7 @@ class TodoCommentsAppBar extends StatelessWidget
               }
               return Future.wait<TodoComment>(futures);
             },
-            addComments: (List<TodoComment> comments) {
+            addComments: (comments) {
               final futures = <Future<TodoComment>>[];
               for (final todoComment in comments) {
                 final action = AddItem<TodoComment>(todoComment);

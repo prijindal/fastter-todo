@@ -27,7 +27,7 @@ class TodoCommentInput extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _TodoCommentInput(
               todo: todo,
-              addComment: (TodoComment comment) {
+              addComment: (comment) {
                 store.dispatch(AddItem<TodoComment>(comment));
                 if (onAdded != null) {
                   onAdded();

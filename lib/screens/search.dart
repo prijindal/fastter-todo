@@ -131,7 +131,7 @@ class _SearchTodosResultsComponent extends StatelessWidget {
             left: 2,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 350),
-              transitionBuilder: (Widget child, Animation<double> animation) =>
+              transitionBuilder: (child, animation) =>
                   SizeTransition(child: child, sizeFactor: animation),
               child: selectedTodos.isNotEmpty ? TodoEditBar() : Container(),
             ),

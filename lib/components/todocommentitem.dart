@@ -38,7 +38,7 @@ class TodoCommentItem extends StatelessWidget {
                 store.dispatch(action);
                 return action.completer.future;
               },
-              addComment: (TodoComment comment) =>
+              addComment: (comment) =>
                   store.dispatch(AddItem<TodoComment>(comment)),
               onLongPress: onLongPress,
               onTap: onTap,
@@ -97,7 +97,7 @@ class _TodoCommentItem extends StatelessWidget {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
-              builder: (BuildContext context) => Scaffold(
+              builder: (context) => Scaffold(
                     body: PhotoView(
                       imageProvider: imageProvider,
                     ),

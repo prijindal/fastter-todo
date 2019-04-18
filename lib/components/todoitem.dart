@@ -325,12 +325,13 @@ class _TodoItem extends StatelessWidget {
               Flexible(
                 child: _buildTitle(context),
               ),
-              todo.dueDate == null &&
-                      todo.project != null &&
-                      reminders == 0 &&
-                      comments == 0
-                  ? _buildProject(context, flex: 0)
-                  : Container(),
+              if (todo.dueDate == null &&
+                  todo.project != null &&
+                  reminders == 0 &&
+                  comments == 0)
+                _buildProject(context, flex: 0)
+              else
+                Container(),
             ],
           ),
           subtitle: _buildSubtitle(context),

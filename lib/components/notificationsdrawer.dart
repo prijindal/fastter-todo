@@ -37,16 +37,15 @@ class _NotificationsDrawer extends StatelessWidget {
                 children: [
                   const ListTile(
                     title: Text('Notifications'),
-                  )
-                ]..addAll(
-                    notifications.items
-                        .map(
-                          (notification) => NotificationItem(
-                                notification: notification,
-                              ),
-                        )
-                        .toList(),
                   ),
+                  ...notifications.items
+                      .map(
+                        (notification) => NotificationItem(
+                              notification: notification,
+                            ),
+                      )
+                      .toList(),
+                ],
               ),
       );
 }

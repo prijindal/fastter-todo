@@ -83,7 +83,7 @@ class _ImagePickerUploaderWidgetState
     } else {
       final completer = Completer<void>();
       showOpenPanel(
-        (FileChooserResult fileChooserResult, filepaths) {
+        (fileChooserResult, filepaths) {
           if (filepaths.isNotEmpty) {
             setState(() {
               _image = File(filepaths[0]);
@@ -169,16 +169,17 @@ class _ImagePickerUploaderWidgetState
   @override
   Widget build(BuildContext context) {
     final widgets = <Widget>[
-      widget.value == null || widget.value.isEmpty
-          ? const Icon(
-              Icons.person,
-              size: 200,
-            )
-          : Image.network(
-              widget.value,
-              height: 200,
-              width: 200,
-            ),
+      if (widget.value == null || widget.value.isEmpty)
+        const Icon(
+          Icons.person,
+          size: 200,
+        )
+      else
+        Image.network(
+          widget.value,
+          height: 200,
+          width: 200,
+        ),
     ];
     if (Platform.isAndroid || Platform.isIOS) {
       widgets.add(

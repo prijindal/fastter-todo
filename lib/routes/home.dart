@@ -18,7 +18,7 @@ import 'package:fastter_dart/store/notifications.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_dart/models/todoreminder.model.dart';
 import 'package:fastter_dart/models/notification.model.dart'
-    as NotificationModel;
+    as notification_model;
 
 import 'home/router.dart';
 
@@ -48,7 +48,7 @@ class HomeContainer extends StatelessWidget {
               todoRemindersSyncStart: () =>
                   store.dispatch(StartSync<TodoReminder>()),
               notificationsSyncStart: () =>
-                  store.dispatch(StartSync<NotificationModel.Notification>()),
+                  store.dispatch(StartSync<notification_model.Notification>()),
               confirmUser: (bearer) =>
                   store.dispatch(ConfirmUserAction(bearer)),
               addTodo: (todotitle) {

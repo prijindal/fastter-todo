@@ -34,12 +34,12 @@ class TodoRemindersScreen extends StatelessWidget {
                     .toList(),
               ),
               syncStart: () => store.dispatch(StartSync<TodoReminder>()),
-              addReminder: (TodoReminder reminder) {
+              addReminder: (reminder) {
                 final action = AddItem<TodoReminder>(reminder);
                 store.dispatch(action);
                 return action.completer.future;
               },
-              deleteReminder: (String reminderid) {
+              deleteReminder: (reminderid) {
                 final action = DeleteItem<TodoReminder>(reminderid);
                 store.dispatch(action);
                 return action.completer.future;
@@ -128,28 +128,29 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
             direction: Axis.vertical,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              widget.todoReminders.items.isEmpty
-                  ? const Flexible(
-                      child: Center(
-                        child: Text('No Reminders'),
-                      ),
-                    )
-                  : Flexible(
-                      child: SingleChildScrollView(
-                        controller: scrollController,
-                        child: Column(
-                          children: widget.todoReminders.items.reversed
-                              .map(
-                                (todoReminder) => ListTile(
-                                      title: Text(todoReminder.title),
-                                      subtitle: Text(
-                                          dueDateFormatter(todoReminder.time)),
-                                    ),
-                              )
-                              .toList(),
-                        ),
-                      ),
+              if (widget.todoReminders.items.isEmpty)
+                const Flexible(
+                  child: Center(
+                    child: Text('No Reminders'),
+                  ),
+                )
+              else
+                Flexible(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Column(
+                      children: widget.todoReminders.items.reversed
+                          .map(
+                            (todoReminder) => ListTile(
+                                  title: Text(todoReminder.title),
+                                  subtitle:
+                                      Text(dueDateFormatter(todoReminder.time)),
+                                ),
+                          )
+                          .toList(),
                     ),
+                  ),
+                ),
             ],
           ),
         ),

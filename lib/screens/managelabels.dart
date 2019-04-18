@@ -19,7 +19,7 @@ class ManageLabelsScreen extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _ManageLabelsScreen(
               labels: store.state.labels,
-              deleteLabel: (Label label) {
+              deleteLabel: (label) {
                 store.dispatch(DeleteItem<Label>(label.id));
                 store.dispatch(StartSync<Todo>());
               },

@@ -26,13 +26,13 @@ Future<String> initMessaging() async {
     _firebaseMessaging.configure(
       onLaunch: (message) {
         if (message.containsKey('data') &&
-            (message['data'] as Map<String, dynamic>).containsKey('route')) {
+            (message['data']).containsKey('route')) {
           navigatorKey.currentState.pushNamed(message['data']['route']);
         }
       },
       onResume: (message) {
         if (message.containsKey('data') &&
-            (message['data'] as Map<String, dynamic>).containsKey('route')) {
+            (message['data']).containsKey('route')) {
           navigatorKey.currentState.pushNamed(message['data']['route']);
         }
       },

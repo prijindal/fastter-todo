@@ -10,6 +10,10 @@ import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/settings.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/models/todocomment.model.dart';
+import 'package:fastter_dart/models/todoreminder.model.dart';
+import 'package:fastter_dart/models/notification.model.dart'
+    as notification_model;
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
@@ -38,6 +42,21 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       StoreConnector<AppState, Store<AppState>>(
         converter: (store) => store,
         builder: (context, store) => _HomeAppBar(
+              projectSyncStart: () => store.dispatch(StartSync<Project>()),
+              labelSyncStart: () => store.dispatch(StartSync<Label>()),
+              todoSyncStart: () => store.dispatch(StartSync<Todo>()),
+              todoCommentsSyncStart: () =>
+                  store.dispatch(StartSync<TodoComment>()),
+              todoRemindersSyncStart: () =>
+                  store.dispatch(StartSync<TodoReminder>()),
+              notificationsSyncStart: () =>
+                  store.dispatch(StartSync<notification_model.Notification>()),
+              fetching: store.state.todos.fetching ||
+                  store.state.projects.fetching ||
+                  store.state.labels.fetching ||
+                  store.state.todoComments.fetching ||
+                  store.state.todoReminders.fetching ||
+                  store.state.notifications.fetching,
               selectedtodos: store.state.selectedTodos,
               filter: filter,
               title: title,
@@ -68,8 +87,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                     route: '/',
                     title: 'Inbox',
                   ),
-              updateSortBy: (String sortBy) =>
-                  store.dispatch(SetSortBy<Todo>(sortBy)),
+              updateSortBy: (sortBy) => store.dispatch(SetSortBy<Todo>(sortBy)),
             ),
       );
 }
@@ -81,13 +99,21 @@ enum _PopupAction {
   editlabel,
   copy,
   share,
-  attach
+  attach,
+  refresh
 }
 
 enum _SortAction { duedate, title, priority }
 
 class _HomeAppBar extends StatelessWidget {
   const _HomeAppBar({
+    @required this.labelSyncStart,
+    @required this.projectSyncStart,
+    @required this.todoSyncStart,
+    @required this.todoCommentsSyncStart,
+    @required this.todoRemindersSyncStart,
+    @required this.notificationsSyncStart,
+    @required this.fetching,
     @required this.selectedtodos,
     @required this.deleteSelected,
     @required this.unSelectAll,
@@ -103,6 +129,13 @@ class _HomeAppBar extends StatelessWidget {
     Key key,
   }) : super(key: key);
 
+  final VoidCallback projectSyncStart;
+  final VoidCallback labelSyncStart;
+  final VoidCallback todoSyncStart;
+  final VoidCallback todoCommentsSyncStart;
+  final VoidCallback todoRemindersSyncStart;
+  final VoidCallback notificationsSyncStart;
+  final bool fetching;
   final Map<String, dynamic> filter;
   final List<String> selectedtodos;
   final VoidCallback deleteSelected;
@@ -154,9 +187,10 @@ class _HomeAppBar extends StatelessWidget {
         if (_project != null) {
           title = _project.title;
         } else {
-          final map = history.last.arguments as Map;
+          final Map map = history.last.arguments;
           if (map.containsKey('project')) {
-            title = (map['project'] as Project).title;
+            final Project project = map['project'];
+            title = project.title;
           }
         }
         break;
@@ -214,7 +248,7 @@ class _HomeAppBar extends StatelessWidget {
   Future<void> _attachSelected(BuildContext context) async {
     final parent = await showDialog<Todo>(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
+      builder: (context) => AlertDialog(
             title: const Text('Select a parent'),
             content: SingleChildScrollView(
               child: Column(
@@ -224,18 +258,16 @@ class _HomeAppBar extends StatelessWidget {
                     title: const Text('None'),
                     onTap: () => Navigator.of(context).pop(null),
                   ),
-                ]..addAll(
-                    todos.items
-                        .where(
-                            (todo) => fastterTodos.filterObject(todo, filter))
-                        .map(
-                          (todo) => ListTile(
-                                title: Text(todo.title),
-                                onTap: () => Navigator.of(context).pop(todo),
-                              ),
-                        )
-                        .toList(),
-                  ),
+                  ...todos.items
+                      .where((todo) => fastterTodos.filterObject(todo, filter))
+                      .map(
+                        (todo) => ListTile(
+                              title: Text(todo.title),
+                              onTap: () => Navigator.of(context).pop(todo),
+                            ),
+                      )
+                      .toList(),
+                ],
               ),
             ),
           ),
@@ -245,6 +277,15 @@ class _HomeAppBar extends StatelessWidget {
       todo.parent = parent;
       updateTodo(todo.id, todo);
     }
+  }
+
+  Future<void> _refresh() async {
+    todoSyncStart();
+    projectSyncStart();
+    labelSyncStart();
+    todoCommentsSyncStart();
+    todoRemindersSyncStart();
+    notificationsSyncStart();
   }
 
   void _deleteAll(BuildContext context) {
@@ -291,7 +332,7 @@ class _HomeAppBar extends StatelessWidget {
   }
 
   Widget _buildSortAction(BuildContext context) => PopupMenuButton<_SortAction>(
-        onSelected: (_SortAction action) {
+        onSelected: (action) {
           if (action == _SortAction.duedate) {
             updateSortBy('dueDate');
           } else if (action == _SortAction.priority) {
@@ -342,6 +383,8 @@ class _HomeAppBar extends StatelessWidget {
               _editProject(context);
             } else if (value == _PopupAction.editlabel) {
               _editLabel(context);
+            } else if (value == _PopupAction.refresh) {
+              _refresh();
             }
           }
         },
@@ -384,6 +427,13 @@ class _HomeAppBar extends StatelessWidget {
                 ),
               );
             }
+            items.add(
+              PopupMenuItem<_PopupAction>(
+                child: const Text('Refresh'),
+                value: _PopupAction.refresh,
+                enabled: !fetching,
+              ),
+            );
             items.add(
               const PopupMenuItem<_PopupAction>(
                 child: Text('Delete All'),

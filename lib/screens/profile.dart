@@ -16,13 +16,13 @@ class ProfileScreen extends StatelessWidget {
         builder: (context, store) => _ProfileScreen(
             user: store.state.user,
             deleteUser: () => store.dispatch(DeleteUserAction()),
-            updateUser: ({String name, String email, String picture}) {
+            updateUser: ({name, email, picture}) {
               final action =
                   UpdateUserAction(name: name, email: email, picture: picture);
               store.dispatch(action);
               return action.completer.future;
             },
-            updatePassword: (String password) {
+            updatePassword: (password) {
               final action = UpdateUserPasswordAction(password);
               store.dispatch(action);
               return action.completer.future;
@@ -61,8 +61,8 @@ class _ProfileScreenState extends State<_ProfileScreen> {
       onChange: (value) {
         widget.updateUser(picture: value);
         scaffoldKey.currentState.showSnackBar(
-          SnackBar(
-            content: const Text('Picture Updated Succefully'),
+          const SnackBar(
+            content: Text('Picture Updated Succefully'),
           ),
         );
       },
@@ -98,8 +98,8 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     if (shouldUpdate) {
       await widget.updateUser(name: nameController.text);
       scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: const Text('Name updated Succesfully'),
+        const SnackBar(
+          content: Text('Name updated Succesfully'),
         ),
       );
     }
@@ -135,8 +135,8 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     if (shouldUpdate) {
       await widget.updateUser(email: emailController.text);
       scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: const Text('Email updated Succesfully'),
+        const SnackBar(
+          content: Text('Email updated Succesfully'),
         ),
       );
     }
@@ -173,8 +173,8 @@ class _ProfileScreenState extends State<_ProfileScreen> {
     if (shouldChangePassword == true) {
       await widget.updatePassword(passwordController.text);
       scaffoldKey.currentState.showSnackBar(
-        SnackBar(
-          content: const Text('Password Updated Succesfully'),
+        const SnackBar(
+          content: Text('Password Updated Succesfully'),
         ),
       );
     }

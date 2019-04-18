@@ -14,7 +14,7 @@ class GeneralSettingsScreen extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _GeneralSettingsScreen(
               settings: store.state.user.user.settings ?? UserSettings(),
-              updateSettings: (UserSettings settings) {
+              updateSettings: (settings) {
                 store.dispatch(UpdateUserAction(settings: settings));
               },
             ),

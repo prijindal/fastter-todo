@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _getSharedText() async {
     if (Platform.isAndroid || Platform.isIOS) {
-      final String sharedData = await platform.invokeMethod('getSharedText');
+      final sharedData = await platform.invokeMethod<String>('getSharedText');
       print(sharedData);
       if (sharedData != null && sharedData.isNotEmpty) {
         final todo = await widget.addTodo(sharedData);
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
 
   void _openNewTodo(Todo todo) {
     navigatorKey.currentState.push<void>(MaterialPageRoute<void>(
-      builder: (BuildContext context) => TodoEditScreen(
+      builder: (context) => TodoEditScreen(
             todo: todo,
           ),
     ));

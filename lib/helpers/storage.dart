@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart';
 
 Future<String> uploadFirebase(String uploadPath, String filePath) async {
-  const URL =
+  const urlPath =
       'https://firebasestorage.googleapis.com/v0/b/fastter-todo.appspot.com';
-  final uri = Uri.parse('$URL/o?name=$uploadPath');
+  final uri = Uri.parse('$urlPath/o?name=$uploadPath');
   final request = MultipartRequest('POST', uri);
   request.files.add(await MultipartFile.fromPath('picture', filePath));
 
@@ -12,6 +12,6 @@ Future<String> uploadFirebase(String uploadPath, String filePath) async {
   final resp = await Response.fromStream(response);
   final Map<String, dynamic> respJson = json.decode(resp.body);
   final url =
-      '$URL/o/${uploadPath.replaceAll("/", "%2F")}?alt=media&token=${respJson["downloadTokens"]}';
+      '$urlPath/o/${uploadPath.replaceAll("/", "%2F")}?alt=media&token=${respJson["downloadTokens"]}';
   return url;
 }

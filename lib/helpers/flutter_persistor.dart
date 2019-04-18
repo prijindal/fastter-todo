@@ -48,6 +48,11 @@ class FlutterPersistor extends Persistor<AppState> {
     }
   }
 
+  List<LazyAction> get _decodeLazyActions {
+    final List<dynamic> list = json.decode(_loadKey('lazyActions'));
+    return list.map((dynamic t) => LazyAction.fromJson(t)).toList();
+  }
+
   @override
   Future<AppState> load() async {
     await _initSharedPreferences();
@@ -75,9 +80,7 @@ class FlutterPersistor extends Persistor<AppState> {
         json.decode(_loadKey('todoReminders')),
         (dynamic t) => TodoReminder.fromJson(t),
       ),
-      lazyActions: (json.decode(_loadKey('lazyActions')) as List<dynamic>)
-          .map((dynamic t) => LazyAction.fromJson(t))
-          .toList(),
+      lazyActions: _decodeLazyActions,
     );
   }
 

@@ -70,138 +70,149 @@ class _HomeAppDrawer extends StatelessWidget {
     history.add(RouteInfo(routeName, arguments: arguments));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    String routeName;
-    if (history.isNotEmpty) {
-      routeName = history.last.routeName;
+  String get routeName =>
+      history.isNotEmpty ? history.last.routeName : frontPage.route;
+
+  Project get _project {
+    if (routeName == '/todos') {
+      final Map map = history.last.arguments;
+      final Project project = map['project'];
+      return project;
     } else {
-      routeName = frontPage.route;
+      return null;
     }
-    return Drawer(
-      child: ListView(
-        children: <Widget>[
-          user != null && user.user != null
-              ? ListTile(
-                  onTap: () =>
-                      Navigator.of(context).pushNamed('/settings/account'),
-                  leading:
-                      user.user.picture == null || user.user.picture.isEmpty
-                          ? const Icon(
-                              Icons.person,
-                            )
-                          : CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                user.user.picture,
-                              ),
-                            ),
-                  title: Text(user.user.name),
-                  subtitle: Text(user.user.email),
-                )
-              : Container(),
-          ListTile(
-            dense: true,
-            enabled: routeName != '/',
-            selected: routeName == '/',
-            leading: const Icon(Icons.inbox),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Inbox'),
-                Text(todos.items
-                    .where((todo) => todo.project == null)
-                    .length
-                    .toString()),
-              ],
-            ),
-            onTap: () {
-              _pushRouteNamed(context, '/');
-            },
-          ),
-          ListTile(
-            dense: true,
-            enabled: routeName != '/all',
-            selected: routeName == '/all',
-            leading: const Icon(Icons.select_all),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('All Tasks'),
-                Text(todos.items.length.toString()),
-              ],
-            ),
-            onTap: () {
-              _pushRouteNamed(context, '/all');
-            },
-          ),
-          ListTile(
-            dense: true,
-            enabled: routeName != '/today',
-            selected: routeName == '/today',
-            leading: const Icon(Icons.calendar_today),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Today'),
-                Text(todos.items
-                    .where((todo) =>
-                        todo.dueDate != null &&
-                        todo.dueDate.difference(DateTime.now()).inDays >= 0 &&
-                        todo.dueDate.day == DateTime.now().day)
-                    .length
-                    .toString()),
-              ],
-            ),
-            onTap: () {
-              _pushRouteNamed(context, '/today');
-            },
-          ),
-          ListTile(
-            dense: true,
-            enabled: routeName != '/7days',
-            selected: routeName == '/7days',
-            leading: const Icon(Icons.calendar_view_day),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('7 Days'),
-                Text(todos.items
-                    .where((todo) =>
-                        todo.dueDate != null &&
-                        todo.dueDate.difference(DateTime.now()).inDays >= 0 &&
-                        todo.dueDate.difference(DateTime.now()).inDays < 7)
-                    .length
-                    .toString()),
-              ],
-            ),
-            onTap: () {
-              _pushRouteNamed(context, '/7days');
-            },
-          ),
-          ProjectExpansionTile(
-            selectedProject: routeName == '/todos'
-                ? ((history.last.arguments as Map)['project'] as Project)
-                : null,
-            onChildSelected: (project) {
-              _pushRouteNamed(context, '/todos',
-                  arguments: {'project': project});
-            },
-          ),
-          LabelExpansionTile(
-            selectedLabel: routeName == '/todos'
-                ? ((history.last.arguments as Map)['label'] as Label)
-                : null,
-            onChildSelected: (label) {
-              _pushRouteNamed(context, '/todos', arguments: {'label': label});
-            },
-          ),
-          ListTile(
-            dense: true,
-            title: const Text('Settings'),
-            onTap: () => Navigator.of(context).pushNamed('/settings'),
-          ),
-        ],
-      ),
-    );
   }
+
+  Label get _label {
+    if (routeName == '/todos') {
+      final Map map = history.last.arguments;
+      final Label label = map['label'];
+      return label;
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Drawer(
+        child: ListView(
+          children: <Widget>[
+            if (user != null && user.user != null)
+              ListTile(
+                onTap: () =>
+                    Navigator.of(context).pushNamed('/settings/account'),
+                leading: user.user.picture == null || user.user.picture.isEmpty
+                    ? const Icon(
+                        Icons.person,
+                      )
+                    : CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          user.user.picture,
+                        ),
+                      ),
+                title: Text(user.user.name),
+                subtitle: Text(user.user.email),
+              )
+            else
+              Container(),
+            ListTile(
+              dense: true,
+              enabled: routeName != '/',
+              selected: routeName == '/',
+              leading: const Icon(Icons.inbox),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Inbox'),
+                  Text(todos.items
+                      .where((todo) => todo.project == null)
+                      .length
+                      .toString()),
+                ],
+              ),
+              onTap: () {
+                _pushRouteNamed(context, '/');
+              },
+            ),
+            ListTile(
+              dense: true,
+              enabled: routeName != '/all',
+              selected: routeName == '/all',
+              leading: const Icon(Icons.select_all),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('All Tasks'),
+                  Text(todos.items.length.toString()),
+                ],
+              ),
+              onTap: () {
+                _pushRouteNamed(context, '/all');
+              },
+            ),
+            ListTile(
+              dense: true,
+              enabled: routeName != '/today',
+              selected: routeName == '/today',
+              leading: const Icon(Icons.calendar_today),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Today'),
+                  Text(todos.items
+                      .where((todo) =>
+                          todo.dueDate != null &&
+                          todo.dueDate.difference(DateTime.now()).inDays >= 0 &&
+                          todo.dueDate.day == DateTime.now().day)
+                      .length
+                      .toString()),
+                ],
+              ),
+              onTap: () {
+                _pushRouteNamed(context, '/today');
+              },
+            ),
+            ListTile(
+              dense: true,
+              enabled: routeName != '/7days',
+              selected: routeName == '/7days',
+              leading: const Icon(Icons.calendar_view_day),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('7 Days'),
+                  Text(todos.items
+                      .where((todo) =>
+                          todo.dueDate != null &&
+                          todo.dueDate.difference(DateTime.now()).inDays >= 0 &&
+                          todo.dueDate.difference(DateTime.now()).inDays < 7)
+                      .length
+                      .toString()),
+                ],
+              ),
+              onTap: () {
+                _pushRouteNamed(context, '/7days');
+              },
+            ),
+            ProjectExpansionTile(
+              selectedProject: _project,
+              onChildSelected: (project) {
+                _pushRouteNamed(context, '/todos',
+                    arguments: {'project': project});
+              },
+            ),
+            LabelExpansionTile(
+              selectedLabel: _label,
+              onChildSelected: (label) {
+                _pushRouteNamed(context, '/todos', arguments: {'label': label});
+              },
+            ),
+            ListTile(
+              dense: true,
+              title: const Text('Settings'),
+              onTap: () => Navigator.of(context).pushNamed('/settings'),
+            ),
+          ],
+        ),
+      );
 }

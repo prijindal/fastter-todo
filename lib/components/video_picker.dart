@@ -85,7 +85,7 @@ class _VideoPickerUploaderWidgetState
     } else {
       final completer = Completer<void>();
       showOpenPanel(
-        (FileChooserResult fileChooserResult, filepaths) {
+        (fileChooserResult, filepaths) {
           if (filepaths.isNotEmpty) {
             setState(() {
               _image = File(filepaths[0]);
@@ -171,19 +171,20 @@ class _VideoPickerUploaderWidgetState
   @override
   Widget build(BuildContext context) {
     final widgets = <Widget>[
-      widget.value == null || widget.value.isEmpty
-          ? const Icon(
-              Icons.person,
-              size: 200,
-            )
-          : Chewie(
-              controller: ChewieController(
-                videoPlayerController: VideoPlayerController.network(
-                  widget.value,
-                ),
-                aspectRatio: 3 / 2,
-              ),
+      if (widget.value == null || widget.value.isEmpty)
+        const Icon(
+          Icons.person,
+          size: 200,
+        )
+      else
+        Chewie(
+          controller: ChewieController(
+            videoPlayerController: VideoPlayerController.network(
+              widget.value,
             ),
+            aspectRatio: 3 / 2,
+          ),
+        ),
     ];
     if (Platform.isAndroid || Platform.isIOS) {
       widgets.add(

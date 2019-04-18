@@ -21,11 +21,11 @@ class ManageProjectsScreen extends StatelessWidget {
         converter: (store) => store,
         builder: (context, store) => _ManageProjectsScreen(
               projects: store.state.projects,
-              deleteProject: (Project project) {
+              deleteProject: (project) {
                 store.dispatch(DeleteItem<Project>(project.id));
                 store.dispatch(StartSync<Todo>());
               },
-              updateColor: (Project project, Color color) {
+              updateColor: (project, color) {
                 store.dispatch(
                   UpdateItem<Project>(
                     project.id,

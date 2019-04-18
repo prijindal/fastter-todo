@@ -52,19 +52,19 @@ class DatePickerResponse {
   DateTime dateTime;
 }
 
-const double _kDatePickerHeaderPortraitHeight = 100.0;
-const double _kDatePickerHeaderLandscapeWidth = 168.0;
+const double _kDatePickerHeaderPortraitHeight = 100;
+const double _kDatePickerHeaderLandscapeWidth = 168;
 
-const double _kDayPickerRowHeight = 42.0;
+const double _kDayPickerRowHeight = 42;
 const int _kMaxDayPickerRowCount = 6; // A 31 day month that starts on Saturday.
 // Two extra rows: one for the day-of-week header and one for the month header.
 const double _kMaxDayPickerHeight =
     _kDayPickerRowHeight * (_kMaxDayPickerRowCount + 2);
 
-const double _kMonthPickerPortraitWidth = 330.0;
-const double _kMonthPickerLandscapeWidth = 344.0;
+const double _kMonthPickerPortraitWidth = 330;
+const double _kMonthPickerLandscapeWidth = 344;
 
-const double _kDialogActionBarHeight = 52.0;
+const double _kDialogActionBarHeight = 52;
 const double _kDatePickerLandscapeHeight =
     _kMaxDayPickerHeight + _kDialogActionBarHeight + 12;
 
@@ -75,8 +75,8 @@ class _DatePickerQuickPickers extends StatelessWidget {
     @required this.mode,
     @required this.onModeChanged,
     Key key,
-  })  : assert(selectedDate != null),
-        assert(mode != null),
+  })  : assert(selectedDate != null, 'selectedDate must not be null'),
+        assert(mode != null, 'mode must not be null'),
         super(key: key);
 
   final ValueChanged<DateTime> onChanged;
@@ -150,8 +150,8 @@ class _DatePickerHeader extends StatelessWidget {
     @required this.mode,
     @required this.onModeChanged,
     Key key,
-  })  : assert(selectedDate != null),
-        assert(mode != null),
+  })  : assert(selectedDate != null, 'selectedDate must not be null'),
+        assert(mode != null, 'mode must not be null'),
         super(key: key);
 
   final DateTime selectedDate;
@@ -204,12 +204,12 @@ class _DatePickerHeader extends StatelessWidget {
     switch (MediaQuery.of(context).orientation) {
       case Orientation.portrait:
         height = _kDatePickerHeaderPortraitHeight;
-        padding = const EdgeInsets.symmetric(horizontal: 16.0);
+        padding = const EdgeInsets.symmetric(horizontal: 16);
         mainAxisAlignment = MainAxisAlignment.center;
         break;
       case Orientation.landscape:
         width = _kDatePickerHeaderLandscapeWidth;
-        padding = const EdgeInsets.all(8.0);
+        padding = const EdgeInsets.all(8);
         mainAxisAlignment = MainAxisAlignment.start;
         break;
     }
@@ -285,7 +285,7 @@ class _DateHeaderButton extends StatelessWidget {
         splashColor: theme.splashColor,
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
           child: child,
         ),
       ),
@@ -369,7 +369,8 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
     });
   }
 
-  void _handleYearChanged(DateTime value) {
+  void _handleYearChanged(DateTime origValue) {
+    var value = origValue;
     if (value.isBefore(widget.firstDate))
       value = widget.firstDate;
     else if (value.isAfter(widget.lastDate)) {
@@ -402,7 +403,7 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
   }
 
   Widget _buildPicker() {
-    assert(_mode != null);
+    assert(_mode != null, 'mode must not be null');
     switch (_mode) {
       case DatePickerMode.day:
         return Column(
@@ -593,9 +594,9 @@ Future<DatePickerResponse> showDatePicker({
   TextDirection textDirection,
   TransitionBuilder builder,
 }) async {
-  assert(initialDate != null);
-  assert(firstDate != null);
-  assert(lastDate != null);
+  assert(initialDate != null, 'initialDate must not be null');
+  assert(firstDate != null, 'firstDate must not be null');
+  assert(lastDate != null, 'lastDate must not be null');
   assert(!initialDate.isBefore(firstDate),
       'initialDate must be on or after firstDate');
   assert(!initialDate.isAfter(lastDate),
@@ -606,8 +607,9 @@ Future<DatePickerResponse> showDatePicker({
       'Provided initialDate must satisfy provided selectableDayPredicate');
   assert(
       initialDatePickerMode != null, 'initialDatePickerMode must not be null');
-  assert(context != null);
-  assert(debugCheckHasMaterialLocalizations(context));
+  assert(context != null, 'context must not be null');
+  assert(debugCheckHasMaterialLocalizations(context),
+      'context must have localization');
 
   Widget child = _DatePickerDialog(
     initialDate: initialDate,
@@ -634,7 +636,6 @@ Future<DatePickerResponse> showDatePicker({
 
   return showDialog<DatePickerResponse>(
     context: context,
-    builder: (BuildContext context) =>
-        builder == null ? child : builder(context, child),
+    builder: (context) => builder == null ? child : builder(context, child),
   );
 }

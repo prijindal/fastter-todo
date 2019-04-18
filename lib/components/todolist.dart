@@ -98,7 +98,7 @@ class _TodoListState extends State<_TodoList> {
         left: 2,
         child: AnimatedSwitcher(
           duration: duration,
-          transitionBuilder: (Widget child, Animation<double> animation) =>
+          transitionBuilder: (child, animation) =>
               SizeTransition(child: child, sizeFactor: animation),
           child: widget.selectedTodos.isEmpty && _showInput
               ? TodoInput(
@@ -123,7 +123,7 @@ class _TodoListState extends State<_TodoList> {
         left: 2,
         child: AnimatedSwitcher(
           duration: duration,
-          transitionBuilder: (Widget child, Animation<double> animation) =>
+          transitionBuilder: (child, animation) =>
               SizeTransition(child: child, sizeFactor: animation),
           child: widget.selectedTodos.isNotEmpty ? TodoEditBar() : Container(),
         ),
@@ -227,8 +227,8 @@ class _TodoListState extends State<_TodoList> {
       return [
         Container(
           margin: const EdgeInsets.symmetric(vertical: 20),
-          child: Center(
-            child: const CircularProgressIndicator(),
+          child: const Center(
+            child: CircularProgressIndicator(),
           ),
         )
       ];
@@ -258,19 +258,20 @@ class _TodoListState extends State<_TodoList> {
           ]
         : [
             _buildPendingTodos(),
-            widget.todos.items
+            if (widget.todos.items
+                .where((todo) => todo.completed == true)
+                .isNotEmpty)
+              ExpansionTile(
+                title: const Text('Completed'),
+                children: widget.todos.items
                     .where((todo) => todo.completed == true)
-                    .isNotEmpty
-                ? ExpansionTile(
-                    title: const Text('Completed'),
-                    children: widget.todos.items
-                        .where((todo) => todo.completed == true)
-                        .map((todo) => TodoItem(
-                              todo: todo,
-                            ))
-                        .toList(),
-                  )
-                : Container(),
+                    .map((todo) => TodoItem(
+                          todo: todo,
+                        ))
+                    .toList(),
+              )
+            else
+              Container(),
           ];
   }
 
@@ -298,7 +299,8 @@ class _TodoListState extends State<_TodoList> {
         child: Stack(
           children: [
             _buildListView(),
-          ]..addAll(_buildBottom()),
+            ..._buildBottom(),
+          ],
         ),
         onRefresh: _onRefresh,
       );

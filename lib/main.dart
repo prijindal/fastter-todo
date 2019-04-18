@@ -48,7 +48,7 @@ Future<void> main() async {
 
   await runZoned<Future<void>>(() async {
     runApp(FlutterReduxApp(store));
-  }, onError: (Object error, StackTrace stackTrace) async {
+  }, onError: (dynamic error, dynamic stackTrace) async {
     debugPrint(error.toString());
   });
 }
