@@ -119,7 +119,7 @@ class _ImagePickerUploaderWidgetState
         final url = await uploadFirebase(widget.storagePath, _image.path);
         _onChange(url);
       }
-    } catch (error) {
+    } on Exception catch (error) {
       widget.onError(error);
     }
   }

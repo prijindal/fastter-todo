@@ -35,6 +35,7 @@ dependencies:
   flutter_redux: any
   flutter_signin_button: any
   google_sign_in: any
+  http: any
   image_picker: any
   intl: any
   json_annotation: any

@@ -63,7 +63,7 @@ Future<Store<AppState>> initState() async {
     } else {
       _store.dispatch(ClearAll());
     }
-  } catch (error) {
+  } on Exception {
     _store.dispatch(ClearAll());
   }
 
