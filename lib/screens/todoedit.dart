@@ -148,6 +148,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
       completed: widget.todo.completed,
       createdAt: widget.todo.createdAt,
       updatedAt: widget.todo.updatedAt,
+      parent: widget.todo.parent,
       priority: _priority,
     );
     widget.updateTodo(todo);

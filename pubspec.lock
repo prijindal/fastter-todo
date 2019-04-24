@@ -112,7 +112,7 @@ packages:
       name: firebase_messaging
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0+3"
+    version: "4.0.0+4"
   firebase_storage:
     dependency: "direct main"
     description:
@@ -199,7 +199,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.4"
+    version: "0.5.4+3"
   intl:
     dependency: "direct main"
     description:
@@ -283,7 +283,7 @@ packages:
       name: photo_view
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.1"
   platform:
     dependency: transitive
     description:
