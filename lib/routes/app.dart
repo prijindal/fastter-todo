@@ -6,10 +6,9 @@ import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 
-import '../helpers/firebase.dart';
 import '../helpers/theme.dart';
 import '../screens/loading.dart';
-import '../screens/login.dart';
+import '../screens/loginsplash.dart';
 import 'home.dart';
 
 class AppContainer extends StatelessWidget {
@@ -69,10 +68,7 @@ class _AppContainerState extends State<_AppContainer> {
         widget.user.user.id == null) {
       return MaterialApp(
         theme: primaryTheme,
-        home: LoginScreen(),
-        navigatorObservers: [
-          analyticsObserver,
-        ],
+        home: LoginSplashScreen(),
       );
     }
     return HomeContainer();
