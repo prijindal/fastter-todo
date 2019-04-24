@@ -269,9 +269,7 @@ class _TodoListState extends State<_TodoList> {
                           todo: todo,
                         ))
                     .toList(),
-              )
-            else
-              Container(),
+              ),
           ];
   }
 

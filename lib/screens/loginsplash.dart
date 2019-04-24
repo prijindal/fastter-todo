@@ -14,7 +14,7 @@ class _LoginSplashScreenState extends State<LoginSplashScreen> {
   static const Duration duration = Duration(milliseconds: 300);
   static const Curve curve = Curves.easeIn;
 
-  ThemeData get _theme => (_pageIndex == 1) ? primaryTheme : darkTheme;
+  ThemeData get _theme => (_pageIndex == 2) ? primaryTheme : darkTheme;
 
   Widget _buildFirstPage() => AnimatedTheme(
         duration: duration,
@@ -51,6 +51,45 @@ class _LoginSplashScreenState extends State<LoginSplashScreen> {
         ),
       );
 
+  Widget _buildSecondPage() => AnimatedTheme(
+        duration: duration,
+        data: _theme,
+        child: AnimatedContainer(
+          duration: duration,
+          color: _theme.scaffoldBackgroundColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                'You can create',
+                style: _theme.textTheme.title.copyWith(
+                  fontSize: 24,
+                ),
+              ),
+              Text(
+                'Tasks, Projects',
+                style: _theme.textTheme.title.copyWith(
+                  fontSize: 24,
+                ),
+              ),
+              Text(
+                'Labels, Comments',
+                style: _theme.textTheme.title.copyWith(
+                  fontSize: 24,
+                ),
+              ),
+              Text(
+                'And much more',
+                style: _theme.textTheme.title.copyWith(
+                  fontSize: 24,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) => Scaffold(
         body: SlidingPageScreen(
@@ -61,6 +100,7 @@ class _LoginSplashScreenState extends State<LoginSplashScreen> {
           },
           children: [
             _buildFirstPage(),
+            _buildSecondPage(),
             LoginScreen(),
           ],
         ),

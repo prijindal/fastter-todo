@@ -329,9 +329,7 @@ class _TodoItem extends StatelessWidget {
                   todo.project != null &&
                   reminders == 0 &&
                   comments == 0)
-                _buildProject(context, flex: 0)
-              else
-                Container(),
+                _buildProject(context, flex: 0),
             ],
           ),
           subtitle: _buildSubtitle(context),

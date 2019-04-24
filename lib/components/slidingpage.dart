@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
@@ -21,7 +22,10 @@ class _SlidingPageScreenState extends State<SlidingPageScreen> {
   static const Duration duration = Duration(milliseconds: 300);
   static const Curve curve = Curves.easeIn;
 
-  ThemeData get _theme => (_pageIndex == 1) ? primaryTheme : darkTheme;
+  int get _length => widget.children.length;
+  ThemeData get _theme =>
+      (_pageIndex == _length - 1) ? primaryTheme : darkTheme;
+  bool get _shouldDisplayIcons => MediaQuery.of(context).size.width > 600;
 
   Widget _buildPageDot(int pageIndex) => GestureDetector(
         onTap: () {
@@ -98,25 +102,44 @@ class _SlidingPageScreenState extends State<SlidingPageScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildPageDot(0),
-                  _buildPageDot(1),
-                ],
+                children: List<int>.generate(_length, (index) => index)
+                    .map(_buildPageDot)
+                    .toList(),
               ),
             ),
           ),
-          _buildSlidingIcon(
-            left: math.min(MediaQuery.of(context).size.width * 0.1, 20.0),
-            icon: const Icon(Icons.arrow_left),
-            nextPage: _pageIndex - 1,
-            disabled: _pageIndex == 0,
-          ),
-          _buildSlidingIcon(
-            right: math.min(MediaQuery.of(context).size.width * 0.1, 20.0),
-            icon: const Icon(Icons.arrow_right),
-            nextPage: _pageIndex + 1,
-            disabled: _pageIndex == 1,
-          ),
+          if (_shouldDisplayIcons)
+            _buildSlidingIcon(
+              left: math.min(MediaQuery.of(context).size.width * 0.1, 20),
+              icon: const Icon(Icons.arrow_left),
+              nextPage: _pageIndex - 1,
+              disabled: _pageIndex == 0,
+            ),
+          if (_shouldDisplayIcons)
+            _buildSlidingIcon(
+              right: math.min(MediaQuery.of(context).size.width * 0.1, 20),
+              icon: const Icon(Icons.arrow_right),
+              nextPage: _pageIndex + 1,
+              disabled: _pageIndex == _length - 1,
+            ),
+          if (_pageIndex != _length - 1)
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: AnimatedTheme(
+                data: _theme,
+                child: FlatButton(
+                  child: Text('Skip'),
+                  onPressed: () {
+                    _pageController.animateToPage(
+                      _length - 1,
+                      duration: duration,
+                      curve: curve,
+                    );
+                  },
+                ),
+              ),
+            ),
         ],
       );
 }

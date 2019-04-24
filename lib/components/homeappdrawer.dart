@@ -112,9 +112,7 @@ class _HomeAppDrawer extends StatelessWidget {
                       ),
                 title: Text(user.user.name),
                 subtitle: Text(user.user.email),
-              )
-            else
-              Container(),
+              ),
             ListTile(
               dense: true,
               enabled: routeName != '/',
