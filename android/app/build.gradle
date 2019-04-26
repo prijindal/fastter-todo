@@ -46,8 +46,11 @@ android {
         value = 1;
     }
     def code = Integer.parseInt(versionProps['VERSION_CODE']  ?: "0" ).intValue() + value
-    versionProps['VERSION_CODE']=code.toString()
-    versionProps.store(versionPropsFile.newWriter(), null)
+    for (String item : runTasks)
+    if ( item.contains("bundleRelease")) {
+        versionProps['VERSION_CODE']=code.toString()
+        versionProps.store(versionPropsFile.newWriter(), null)
+    }
 
     defaultConfig {
         applicationId "com.prijindal.fastter_todo"
@@ -75,10 +78,13 @@ android {
         release {
             signingConfig signingConfigs.release
 
-            // minifyEnabled true
-            // useProguard true
+            for (String item : runTasks)
+            if ( item.contains("bundleRelease")) {
+                minifyEnabled true
+                useProguard true
 
-            // proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' 
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' 
+            }
         }
     }
 }
