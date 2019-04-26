@@ -25,7 +25,11 @@ class FlutterPersistor extends Persistor<AppState> {
 
   String _loadKey(String key) {
     if (Platform.isAndroid || Platform.isIOS) {
-      return _sharedPreferences.getString(key);
+      final string = _sharedPreferences.getString(key);
+      if (string == null) {
+        return '';
+      }
+      return string;
     } else {
       final homeFolder = Platform.environment['HOME'];
       final file = File('$homeFolder/.config/fastter_todo/$key.json');
