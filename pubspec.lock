@@ -199,7 +199,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.4+3"
+    version: "0.6.0+1"
   intl:
     dependency: "direct main"
     description:
@@ -365,7 +365,7 @@ packages:
       name: socket_io_common
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.0+3"
+    version: "0.9.0+5"
   source_span:
     dependency: transitive
     description:
