@@ -333,15 +333,12 @@ class _TodoEditBar extends StatelessWidget {
             child: Container(
               height: 60,
               padding: const EdgeInsets.symmetric(vertical: 4),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 350),
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  // crossAxisAlignment: CrossAxisAlignment.center,
-                  children: _buildButtons(context),
-                ),
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                // crossAxisAlignment: CrossAxisAlignment.center,
+                children: _buildButtons(context),
               ),
             ),
           ),

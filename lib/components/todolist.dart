@@ -92,44 +92,33 @@ class _TodoListState extends State<_TodoList> {
   bool _showInput = false;
 
   List<Widget> _buildBottom() {
-    const duration = Duration(milliseconds: 150);
     return [
-      Positioned(
-        bottom: 0,
-        right: 2,
-        left: 2,
-        child: AnimatedSwitcher(
-          duration: duration,
-          transitionBuilder: (child, animation) =>
-              SizeTransition(child: child, sizeFactor: animation),
-          child: widget.selectedTodos.isEmpty && _showInput
-              ? TodoInput(
-                  project: (widget.filter.containsKey('project') &&
-                          widget.projects.items.isNotEmpty)
-                      ? widget.projects.items.singleWhere(
-                          (project) => project.id == widget.filter['project'],
-                          orElse: () => null)
-                      : null,
-                  onBackButton: () {
-                    setState(() {
-                      _showInput = false;
-                    });
-                  },
-                )
-              : Container(),
+      if (widget.selectedTodos.isEmpty && _showInput)
+        Positioned(
+          bottom: 0,
+          right: 2,
+          left: 2,
+          child: TodoInput(
+            project: (widget.filter.containsKey('project') &&
+                    widget.projects.items.isNotEmpty)
+                ? widget.projects.items.singleWhere(
+                    (project) => project.id == widget.filter['project'],
+                    orElse: () => null)
+                : null,
+            onBackButton: () {
+              setState(() {
+                _showInput = false;
+              });
+            },
+          ),
         ),
-      ),
-      Positioned(
-        bottom: 0,
-        right: 2,
-        left: 2,
-        child: AnimatedSwitcher(
-          duration: duration,
-          transitionBuilder: (child, animation) =>
-              SizeTransition(child: child, sizeFactor: animation),
-          child: widget.selectedTodos.isNotEmpty ? TodoEditBar() : Container(),
+      if (widget.selectedTodos.isNotEmpty)
+        Positioned(
+          bottom: 0,
+          right: 2,
+          left: 2,
+          child: TodoEditBar(),
         ),
-      ),
     ];
   }
 
@@ -297,8 +286,7 @@ class _TodoListState extends State<_TodoList> {
   Widget _buildConnectivity(Widget child, bool connected) => Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 350),
+          Container(
             padding: EdgeInsets.only(top: connected ? 0 : 24.0),
             child: child,
           ),
@@ -306,30 +294,26 @@ class _TodoListState extends State<_TodoList> {
             height: 32,
             left: 0,
             right: 0,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 350),
+            child: Container(
               color: connected ? Colors.transparent : const Color(0xFFEE4400),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 350),
-                child: connected
-                    ? Container()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const <Widget>[
-                          Text('OFFLINE'),
-                          SizedBox(width: 8),
-                          SizedBox(
-                            width: 12,
-                            height: 12,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
+              child: connected
+                  ? Container()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const <Widget>[
+                        Text('OFFLINE'),
+                        SizedBox(width: 8),
+                        SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
-                        ],
-                      ),
-              ),
+                        ),
+                      ],
+                    ),
             ),
           ),
         ],

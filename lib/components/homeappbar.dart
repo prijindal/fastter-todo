@@ -460,8 +460,7 @@ class _HomeAppBar extends StatelessWidget {
           pinned: false,
           floating: true,
           snap: true,
-          leading: AnimatedContainer(
-            duration: const Duration(milliseconds: 350),
+          leading: Container(
             child: selectedtodos.isNotEmpty
                 ? IconButton(
                     icon: const Icon(Icons.arrow_back),
@@ -478,17 +477,19 @@ class _HomeAppBar extends StatelessWidget {
           ),
           title: _buildTitle(),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.search),
-              onPressed: () => _onSearch(context),
-            ),
-            _buildSortAction(context),
-            IconButton(
-              icon: const Icon(Icons.notifications),
-              onPressed: () {
-                Scaffold.of(context).openEndDrawer();
-              },
-            ),
+            if (selectedtodos.isEmpty)
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () => _onSearch(context),
+              ),
+            if (selectedtodos.isEmpty) _buildSortAction(context),
+            if (selectedtodos.isEmpty)
+              IconButton(
+                icon: const Icon(Icons.notifications),
+                onPressed: () {
+                  Scaffold.of(context).openEndDrawer();
+                },
+              ),
             _buildPopupAction(context),
           ],
         ),
