@@ -91,36 +91,34 @@ class _TodoList extends StatefulWidget {
 class _TodoListState extends State<_TodoList> {
   bool _showInput = false;
 
-  List<Widget> _buildBottom() {
-    return [
-      if (widget.selectedTodos.isEmpty && _showInput)
-        Positioned(
-          bottom: 0,
-          right: 2,
-          left: 2,
-          child: TodoInput(
-            project: (widget.filter.containsKey('project') &&
-                    widget.projects.items.isNotEmpty)
-                ? widget.projects.items.singleWhere(
-                    (project) => project.id == widget.filter['project'],
-                    orElse: () => null)
-                : null,
-            onBackButton: () {
-              setState(() {
-                _showInput = false;
-              });
-            },
+  List<Widget> _buildBottom() => [
+        if (widget.selectedTodos.isEmpty && _showInput)
+          Positioned(
+            bottom: 0,
+            right: 2,
+            left: 2,
+            child: TodoInput(
+              project: (widget.filter.containsKey('project') &&
+                      widget.projects.items.isNotEmpty)
+                  ? widget.projects.items.singleWhere(
+                      (project) => project.id == widget.filter['project'],
+                      orElse: () => null)
+                  : null,
+              onBackButton: () {
+                setState(() {
+                  _showInput = false;
+                });
+              },
+            ),
           ),
-        ),
-      if (widget.selectedTodos.isNotEmpty)
-        Positioned(
-          bottom: 0,
-          right: 2,
-          left: 2,
-          child: TodoEditBar(),
-        ),
-    ];
-  }
+        if (widget.selectedTodos.isNotEmpty)
+          Positioned(
+            bottom: 0,
+            right: 2,
+            left: 2,
+            child: TodoEditBar(),
+          ),
+      ];
 
   String _dueDateCategorize(DateTime dueDate) {
     if (dueDate == null) {

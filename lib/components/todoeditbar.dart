@@ -318,11 +318,6 @@ class _TodoEditBar extends StatelessWidget {
     ];
   }
 
-  double _width(BuildContext context) => MediaQuery.of(context).orientation ==
-          Orientation.portrait
-      ? MediaQuery.of(context).size.width
-      : MediaQuery.of(context).size.width - 304; // 304 is the _kWidth of drawer
-
   @override
   Widget build(BuildContext context) => Container(
         height: 60,
