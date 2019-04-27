@@ -19,6 +19,7 @@ import '../helpers/theme.dart';
 import '../helpers/todouihelpers.dart';
 import 'todocomments.dart';
 import 'todoreminders.dart';
+import 'todosubtasks.dart';
 
 class TodoEditScreenFromId extends StatelessWidget {
   const TodoEditScreenFromId({@required this.todoid});
@@ -67,6 +68,10 @@ class TodoEditScreen extends StatelessWidget {
                         todoreminder.completed == false)
                     .toList(),
               ),
+              children: store.state.todos.items
+                  .where((todo) =>
+                      todo.parent != null && todo.parent.id == this.todo.id)
+                  .toList(),
               updateTodo: (updated) =>
                   store.dispatch(UpdateItem<Todo>(todo.id, updated)),
               deleteTodo: () {
@@ -86,6 +91,7 @@ class _TodoEditScreen extends StatefulWidget {
     @required this.todoReminders,
     @required this.updateTodo,
     @required this.deleteTodo,
+    @required this.children,
     Key key,
   }) : super(key: key);
 
@@ -96,6 +102,7 @@ class _TodoEditScreen extends StatefulWidget {
   final ListState<TodoReminder> todoReminders;
   final void Function(Todo) updateTodo;
   final VoidCallback deleteTodo;
+  final List<Todo> children;
 
   @override
   __TodoEditScreenState createState() => __TodoEditScreenState();
@@ -184,6 +191,16 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
     );
   }
 
+  void _openSubtasks() {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (context) => TodoSubtasks(
+              todo: widget.todo,
+            ),
+      ),
+    );
+  }
+
   void _openReminders() {
     Navigator.of(context).push<void>(
       MaterialPageRoute(
@@ -247,6 +264,14 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                       ],
                     ),
                   ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.format_strikethrough),
+                  title: const Text('Subtasks'),
+                  subtitle: widget.children.isEmpty
+                      ? const Text('No Subtasks')
+                      : Text('${widget.children.length} Subtasks'),
+                  onTap: _openSubtasks,
                 ),
                 ProjectDropdown(
                   expanded: true,

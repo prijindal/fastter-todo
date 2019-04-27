@@ -46,7 +46,9 @@ class TodoList extends StatelessWidget {
                 updating: store.state.todos.updating,
                 deleting: store.state.todos.deleting,
                 items: store.state.todos.items
-                    .where((todo) => fastterTodos.filterObject(todo, filter))
+                    .where((todo) =>
+                        todo.parent == null &&
+                        fastterTodos.filterObject(todo, filter))
                     .toList()
                       ..sort(getCompareFunction(store.state.todos.sortBy)),
                 sortBy: store.state.todos.sortBy,
@@ -156,20 +158,10 @@ class _TodoListState extends State<_TodoList> {
 
   Widget _buildPendingTodos() {
     final items = widget.todos.items.toList();
-    for (final todo in items) {
-      final children = items.where((pTodo) {
-        if (pTodo.parent != null) {
-          return pTodo.parent.id == todo.id;
-        } else {
-          return false;
-        }
-      }).toList();
-      todo.children = children;
-    }
     if (!widget.categoryView) {
       return Column(
         children: items
-            .where((todo) => todo.completed != true && todo.parent == null)
+            .where((todo) => todo.completed != true)
             .map((todo) => TodoItem(
                   todo: todo,
                 ))
@@ -178,8 +170,7 @@ class _TodoListState extends State<_TodoList> {
     }
     final mapCategoryToList = <String, List<Todo>>{};
 
-    for (final todo in items
-        .where((todo) => todo.completed != true && todo.parent == null)) {
+    for (final todo in items.where((todo) => todo.completed != true)) {
       if (widget.todos.sortBy == 'priority') {
         final priorityString = 'Priority ${todo.priority.toString()}';
         if (!mapCategoryToList.containsKey(priorityString)) {

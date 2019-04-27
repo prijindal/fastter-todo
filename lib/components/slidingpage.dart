@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
@@ -129,7 +128,7 @@ class _SlidingPageScreenState extends State<SlidingPageScreen> {
               child: AnimatedTheme(
                 data: _theme,
                 child: FlatButton(
-                  child: Text('Skip'),
+                  child: const Text('Skip'),
                   onPressed: () {
                     _pageController.animateToPage(
                       _length - 1,
