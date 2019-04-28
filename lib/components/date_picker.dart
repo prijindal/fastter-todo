@@ -70,7 +70,6 @@ const double _kDatePickerLandscapeHeight =
 
 class _DatePickerQuickPickers extends StatelessWidget {
   _DatePickerQuickPickers({
-    @required this.onChanged,
     @required this.selectedDate,
     @required this.mode,
     @required this.onModeChanged,
@@ -79,7 +78,6 @@ class _DatePickerQuickPickers extends StatelessWidget {
         assert(mode != null, 'mode must not be null'),
         super(key: key);
 
-  final ValueChanged<DateTime> onChanged;
   final DateTime selectedDate;
   final DatePickerMode mode;
   final ValueChanged<DatePickerMode> onModeChanged;
@@ -118,7 +116,7 @@ class _DatePickerQuickPickers extends StatelessWidget {
               selected: isToday(),
               title: const Text('Today'),
               onTap: () {
-                onChanged(DateTime.now());
+                Navigator.pop(context, DatePickerResponse(DateTime.now()));
               },
             ),
             ListTile(
@@ -127,7 +125,10 @@ class _DatePickerQuickPickers extends StatelessWidget {
               selected: isTomorrow(),
               title: const Text('Tomorrow'),
               onTap: () {
-                onChanged(DateTime.now().add(const Duration(days: 1)));
+                Navigator.pop(
+                    context,
+                    DatePickerResponse(
+                        DateTime.now().add(const Duration(days: 1))));
               },
             ),
             ListTile(
@@ -389,17 +390,11 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
 
   void _handleDayChanged(DateTime value) {
     _vibrate();
-    setState(() {
-      _selectedDate = value;
-    });
+    Navigator.pop(context, DatePickerResponse(value));
   }
 
   void _handleCancel() {
     Navigator.pop(context);
-  }
-
-  void _handleOk() {
-    Navigator.pop(context, DatePickerResponse(_selectedDate));
   }
 
   Widget _buildPicker() {
@@ -446,10 +441,6 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
             child: Text(localizations.cancelButtonLabel),
             onPressed: _handleCancel,
           ),
-          FlatButton(
-            child: Text(localizations.okButtonLabel),
-            onPressed: _handleOk,
-          ),
         ],
       ),
     );
@@ -460,7 +451,6 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
       onModeChanged: _handleModeChanged,
     );
     final Widget quickPickers = _DatePickerQuickPickers(
-      onChanged: _handleDayChanged,
       selectedDate: _selectedDate,
       mode: _mode,
       onModeChanged: _handleModeChanged,

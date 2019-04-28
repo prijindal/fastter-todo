@@ -460,21 +460,19 @@ class _HomeAppBar extends StatelessWidget {
           pinned: false,
           floating: true,
           snap: true,
-          leading: Container(
-            child: selectedtodos.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: unSelectAll,
-                  )
-                : getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait
-                    ? IconButton(
-                        icon: const Icon(Icons.menu),
-                        onPressed: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                      )
-                    : null,
-          ),
+          leading: selectedtodos.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: unSelectAll,
+                )
+              : getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait
+                  ? IconButton(
+                      icon: const Icon(Icons.menu),
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                    )
+                  : null,
           title: _buildTitle(),
           actions: [
             if (selectedtodos.isEmpty)

@@ -221,6 +221,7 @@ class _TodoSubTaskItemState extends State<_TodoSubTaskItemComponent> {
               onChanged: (title) => setState(() {
                     this.title = title;
                   }),
+              onSubmitted: (_) => _addSubtask(),
             ),
           Container(
             margin: const EdgeInsets.only(left: 24),
