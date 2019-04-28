@@ -345,19 +345,7 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
     }
   }
 
-  void _vibrate() {
-    switch (Theme.of(context).platform) {
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-        HapticFeedback.vibrate();
-        break;
-      case TargetPlatform.iOS:
-        break;
-    }
-  }
-
   void _handleModeChanged(DatePickerMode mode) {
-    _vibrate();
     setState(() {
       _mode = mode;
       if (_mode == DatePickerMode.day) {
@@ -381,7 +369,6 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
       return;
     }
 
-    _vibrate();
     setState(() {
       _mode = DatePickerMode.day;
       _selectedDate = value;
@@ -389,7 +376,6 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
   }
 
   void _handleDayChanged(DateTime value) {
-    _vibrate();
     Navigator.pop(context, DatePickerResponse(value));
   }
 
