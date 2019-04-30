@@ -14,19 +14,18 @@ Future<DatePickerResponse> todoSelectDate(BuildContext context,
   return selectedDate;
 }
 
-String dueDateFormatter(DateTime dueDate) {
-  final now = DateTime.now();
+String dueDateFormatter(DateTime dateUtc) {
+  final dueDate = DateTime(dateUtc.year, dateUtc.month, dateUtc.day);
+  final nowTime = DateTime.now();
+  final now = DateTime(nowTime.year, nowTime.month, nowTime.day);
   final diff = dueDate.difference(now);
-  if (diff.inDays > -2 && diff.inDays < 2) {
-    if (dueDate.day == now.day) {
-      return 'Today';
-    } else if (dueDate.day == now.day + 1) {
-      return 'Tomorrow';
-    } else if (dueDate.day == now.day - 1) {
-      return 'Yesterday';
-    }
-  }
-  if (diff.inDays < 7 && diff.inDays > 0) {
+  if (diff.inDays == 0) {
+    return 'Today';
+  } else if (diff.inDays == 1) {
+    return 'Tomorrow';
+  } else if (diff.inDays == -1) {
+    return 'Yesterday';
+  } else if (diff.inDays < 7 && diff.inDays > 0) {
     return DateFormat.EEEE().format(dueDate);
   } else if (now.year == dueDate.year) {
     return DateFormat.MMMd().format(dueDate);
@@ -35,8 +34,9 @@ String dueDateFormatter(DateTime dueDate) {
 }
 
 String dateFromNowFormatter(DateTime dateUtc) {
-  final date = dateUtc.toLocal();
-  final now = DateTime.now();
+  final date = DateTime(dateUtc.year, dateUtc.month, dateUtc.day);
+  final nowTime = DateTime.now();
+  final now = DateTime(nowTime.year, nowTime.month, nowTime.day);
   final diff = date.difference(now);
   if (diff.inMinutes <= 1) {
     if (diff.inDays > 30) {
