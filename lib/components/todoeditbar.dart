@@ -33,6 +33,7 @@ class TodoEditBar extends StatelessWidget {
                 if (todo != null) {
                   todo.completed = true;
                   store.dispatch(UpdateItem<Todo>(todoid, todo));
+                  store.dispatch(UnSelectTodo(todo.id));
                 }
               }
             }
@@ -46,6 +47,7 @@ class TodoEditBar extends StatelessWidget {
                 if (todo != null) {
                   todo.dueDate = date;
                   store.dispatch(UpdateItem<Todo>(todoid, todo));
+                  store.dispatch(UnSelectTodo(todo.id));
                 }
               }
             }
@@ -59,6 +61,7 @@ class TodoEditBar extends StatelessWidget {
                 if (todo != null) {
                   todo.project = project;
                   store.dispatch(UpdateItem<Todo>(todoid, todo));
+                  store.dispatch(UnSelectTodo(todo.id));
                 }
               }
             }
@@ -72,6 +75,7 @@ class TodoEditBar extends StatelessWidget {
                 if (todo != null) {
                   todo.labels = labels;
                   store.dispatch(UpdateItem<Todo>(todoid, todo));
+                  store.dispatch(UnSelectTodo(todo.id));
                 }
               }
             }
@@ -85,6 +89,7 @@ class TodoEditBar extends StatelessWidget {
                 if (todo != null) {
                   todo.priority = priority;
                   store.dispatch(UpdateItem<Todo>(todoid, todo));
+                  store.dispatch(UnSelectTodo(todo.id));
                 }
               }
             }
