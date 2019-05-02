@@ -65,10 +65,15 @@ class _SettingsScreen extends StatelessWidget {
               title: const Text('Account'),
               onTap: () => Navigator.of(context).pushNamed('/settings/account'),
             ),
-            const AboutListTile(
-              icon: Icon(Icons.info),
-              applicationName: 'Fastter Todo App',
-              applicationVersion: '0.0.1',
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('About'),
+              onTap: () => Navigator.of(context).pushNamed('/about'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text('Privacy Policy'),
+              onTap: () => Navigator.of(context).pushNamed('/privacypolicy'),
             ),
             ListTile(
               leading: const Icon(Icons.exit_to_app),

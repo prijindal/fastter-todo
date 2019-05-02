@@ -5,7 +5,9 @@ import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 
 import '../../components/todolist.dart';
+import '../../screens/about.dart';
 import '../../screens/generalsettings.dart';
+import '../../screens/privacypolicy.dart';
 import '../../screens/profile.dart';
 import '../../screens/settings.dart';
 import '../../screens/todoedit.dart';
@@ -71,6 +73,10 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     return HomePageRoute<void>(builder: (context) => ProfileScreen());
   } else if (settings.name == '/settings/general') {
     return HomePageRoute<void>(builder: (context) => GeneralSettingsScreen());
+  } else if (settings.name == '/about') {
+    return HomePageRoute<void>(builder: (context) => AboutScreen());
+  } else if (settings.name == '/privacypolicy') {
+    return HomePageRoute<void>(builder: (context) => PrivacyPolicyScreen());
   }
   return HomePageRoute<void>(
     builder: (context) => Scaffold(

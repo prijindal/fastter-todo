@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../components/googlesigninform.dart';
 import '../components/loginform.dart';
+import 'about.dart';
+import 'privacypolicy.dart';
 import 'signup.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -23,6 +25,28 @@ class LoginScreen extends StatelessWidget {
                 Navigator.of(context).push<void>(
                   MaterialPageRoute<void>(
                     builder: (context) => SignupScreen(),
+                  ),
+                );
+              },
+            ),
+            RaisedButton(
+              child: const Text('Read About Us'),
+              color: Colors.grey[300],
+              onPressed: () {
+                Navigator.of(context).push<void>(
+                  MaterialPageRoute<void>(
+                    builder: (context) => AboutScreen(),
+                  ),
+                );
+              },
+            ),
+            RaisedButton(
+              child: const Text('Read Our Privacy Policy'),
+              color: Colors.grey[300],
+              onPressed: () {
+                Navigator.of(context).push<void>(
+                  MaterialPageRoute<void>(
+                    builder: (context) => PrivacyPolicyScreen(),
                   ),
                 );
               },
