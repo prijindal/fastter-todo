@@ -168,6 +168,7 @@ class _TodoSubTaskItemState extends State<_TodoSubTaskItemComponent> {
   Widget build(BuildContext context) => Column(
         children: [
           ListTile(
+            dense: true,
             leading: TodoItemToggle(
               todo: widget.todo,
               toggleCompleted: (newvalue) {
@@ -177,12 +178,19 @@ class _TodoSubTaskItemState extends State<_TodoSubTaskItemComponent> {
             ),
             title: Row(
               children: [
-                Text(
-                  widget.todo.title,
-                  style: TextStyle(
-                    decoration: widget.todo.completed == true
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width - 300,
+                    maxHeight: 40,
+                  ),
+                  child: Text(
+                    widget.todo.title,
+                    style: TextStyle(
+                      decoration: widget.todo.completed == true
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
+                    ),
                   ),
                 ),
                 IconButton(

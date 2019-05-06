@@ -179,18 +179,25 @@ class _TodoListState extends State<_TodoList> {
       }
     }
 
-    final children = <ExpansionTile>[];
+    final children = <Widget>[];
 
     for (final categoryString in mapCategoryToList.keys) {
       children.add(
-        ExpansionTile(
-          initiallyExpanded: true,
-          title: Text(categoryString),
-          children: mapCategoryToList[categoryString]
-              .map((todo) => TodoItem(
-                    todo: todo,
-                  ))
-              .toList(),
+        ListTileTheme.merge(
+          dense: true,
+          child: ExpansionTile(
+            initiallyExpanded: true,
+            title: Text(categoryString),
+            children: mapCategoryToList[categoryString]
+                .map(
+                  (todo) => ListTileTheme.merge(
+                      dense: false,
+                      child: TodoItem(
+                        todo: todo,
+                      )),
+                )
+                .toList(),
+          ),
         ),
       );
     }
@@ -239,14 +246,21 @@ class _TodoListState extends State<_TodoList> {
             if (widget.todos.items
                 .where((todo) => todo.completed == true)
                 .isNotEmpty)
-              ExpansionTile(
-                title: const Text('Completed'),
-                children: widget.todos.items
-                    .where((todo) => todo.completed == true)
-                    .map((todo) => TodoItem(
-                          todo: todo,
-                        ))
-                    .toList(),
+              ListTileTheme.merge(
+                dense: true,
+                child: ExpansionTile(
+                  title: const Text('Completed'),
+                  children: widget.todos.items
+                      .where((todo) => todo.completed == true)
+                      .map(
+                        (todo) => ListTileTheme.merge(
+                            dense: false,
+                            child: TodoItem(
+                              todo: todo,
+                            )),
+                      )
+                      .toList(),
+                ),
               ),
           ];
   }

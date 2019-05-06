@@ -342,23 +342,26 @@ class _HomeAppBar extends StatelessWidget {
           }
         },
         icon: const Icon(Icons.sort),
-        itemBuilder: (context) => const [
-              PopupMenuItem(
+        itemBuilder: (context) => [
+              const PopupMenuItem(
                 enabled: false,
                 child: Text('Sort By'),
               ),
-              PopupMenuDivider(),
+              const PopupMenuDivider(),
               PopupMenuItem<_SortAction>(
+                enabled: todos.sortBy != 'dueDate',
                 value: _SortAction.duedate,
-                child: Text('Due Date'),
+                child: const Text('Due Date'),
               ),
               PopupMenuItem<_SortAction>(
+                enabled: todos.sortBy != 'priority',
                 value: _SortAction.priority,
-                child: Text('Priority'),
+                child: const Text('Priority'),
               ),
               PopupMenuItem<_SortAction>(
+                enabled: todos.sortBy != 'title',
                 value: _SortAction.title,
-                child: Text('Title'),
+                child: const Text('Title'),
               )
             ],
       );

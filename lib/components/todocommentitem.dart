@@ -124,31 +124,38 @@ class _TodoCommentItem extends StatelessWidget {
     );
   }
 
+  Future<void> _onDismissed(
+      BuildContext context, DismissDirection direction) async {
+    final deletedComment = await deleteComment();
+    try {
+      Scaffold.of(context).removeCurrentSnackBar();
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${todoComment.content} deleted'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () {
+              this.addComment(
+                TodoComment(
+                  type: deletedComment.type,
+                  content: deletedComment.content,
+                  todo: deletedComment.todo,
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    } on Exception catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Dismissible(
         key: Key(todoComment.id),
         confirmDismiss: (direction) => _confirmDelete(context),
-        onDismissed: (direction) async {
-          final deletedComment = await deleteComment();
-          Scaffold.of(context).removeCurrentSnackBar();
-          Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${todoComment.content} deleted'),
-              action: SnackBarAction(
-                label: 'Undo',
-                onPressed: () {
-                  this.addComment(
-                    TodoComment(
-                      type: deletedComment.type,
-                      content: deletedComment.content,
-                      todo: deletedComment.todo,
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        },
+        onDismissed: (direction) => _onDismissed(context, direction),
         background: Flex(
           direction: Axis.horizontal,
           children: [
