@@ -6,7 +6,7 @@ import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
-import '../components/todoitem.dart';
+import '../components/todoitemtoggle.dart';
 import 'todoedit.dart';
 
 class TodoSubtasks extends StatelessWidget {
