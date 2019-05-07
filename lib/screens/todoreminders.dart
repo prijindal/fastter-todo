@@ -34,7 +34,6 @@ class TodoRemindersScreen extends StatelessWidget {
                         todoreminder.completed == false)
                     .toList(),
               ),
-              syncStart: () => store.dispatch(StartSync<TodoReminder>()),
               addReminder: (reminder) {
                 final action = AddItem<TodoReminder>(reminder);
                 store.dispatch(action);
@@ -49,13 +48,12 @@ class TodoRemindersScreen extends StatelessWidget {
       );
 }
 
-class _TodoRemindersScreen extends StatefulWidget {
-  const _TodoRemindersScreen({
+class _TodoRemindersScreen extends StatelessWidget {
+  _TodoRemindersScreen({
     @required this.todo,
     @required this.todoReminders,
     @required this.addReminder,
     @required this.deleteReminder,
-    @required this.syncStart,
     Key key,
   }) : super(key: key);
 
@@ -63,23 +61,11 @@ class _TodoRemindersScreen extends StatefulWidget {
   final ListState<TodoReminder> todoReminders;
   final Future<TodoReminder> Function(TodoReminder) addReminder;
   final Future<TodoReminder> Function(String) deleteReminder;
-  final VoidCallback syncStart;
 
-  @override
-  _TodoRemindersScreenState createState() => _TodoRemindersScreenState();
-}
-
-class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
   ScrollController scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  @override
-  void initState() {
-    widget.syncStart();
-    super.initState();
-  }
-
-  Future<void> _newReminder() async {
+  Future<void> _newReminder(BuildContext context) async {
     final now = DateTime.now();
     final dateResponse = await todoSelectDate(context, now, false);
     if (dateResponse != null) {
@@ -91,11 +77,11 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
       if (time != null) {
         final newTime =
             DateTime(date.year, date.month, date.day, time.hour, time.minute);
-        final newReminder = await widget.addReminder(
+        final newReminder = await addReminder(
           TodoReminder(
             time: newTime.toUtc(),
             title: 'New Reminder',
-            todo: widget.todo,
+            todo: todo,
             completed: false,
           ),
         );
@@ -105,7 +91,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
               content: const Text('New Reminder Created'),
               action: SnackBarAction(
                 label: 'Undo',
-                onPressed: () => widget.deleteReminder(newReminder.id),
+                onPressed: () => deleteReminder(newReminder.id),
               ),
             ),
           );
@@ -121,10 +107,10 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
   Widget build(BuildContext context) => Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: Text(widget.todo.title),
+          title: Text(todo.title),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: _newReminder,
+          onPressed: () => _newReminder(context),
           child: const Icon(Icons.add),
         ),
         body: Container(
@@ -132,7 +118,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
             direction: Axis.vertical,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              if (widget.todoReminders.items.isEmpty)
+              if (todoReminders.items.isEmpty)
                 const Flexible(
                   child: Center(
                     child: Text('No Reminders'),
@@ -143,7 +129,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
                   child: SingleChildScrollView(
                     controller: scrollController,
                     child: Column(
-                      children: widget.todoReminders.items.reversed
+                      children: todoReminders.items.reversed
                           .map(
                             (todoReminder) => ListTile(
                                   title: Text(todoReminder.title),

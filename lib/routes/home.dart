@@ -46,7 +46,9 @@ class HomeContainer extends StatelessWidget {
               todoCommentsSyncStart: () =>
                   store.dispatch(StartSync<TodoComment>()),
               todoRemindersSyncStart: () =>
-                  store.dispatch(StartSync<TodoReminder>()),
+                  store.dispatch(StartSync<TodoReminder>(<String, dynamic>{
+                    'completed': false,
+                  })),
               notificationsSyncStart: () =>
                   store.dispatch(StartSync<notification_model.Notification>()),
               confirmUser: (bearer) =>

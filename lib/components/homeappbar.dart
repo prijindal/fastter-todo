@@ -48,7 +48,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
               todoCommentsSyncStart: () =>
                   store.dispatch(StartSync<TodoComment>()),
               todoRemindersSyncStart: () =>
-                  store.dispatch(StartSync<TodoReminder>()),
+                  store.dispatch(StartSync<TodoReminder>(<String, dynamic>{
+                    'completed': false,
+                  })),
               notificationsSyncStart: () =>
                   store.dispatch(StartSync<notification_model.Notification>()),
               fetching: store.state.todos.fetching ||
