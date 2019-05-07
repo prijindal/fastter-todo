@@ -33,7 +33,7 @@ FLUTTER_APP_DIR=$(CURDIR)/..
 FLUTTER_APP_BUILD_DIR=$(FLUTTER_APP_DIR)/build
 FLUTTER_ROOT:=$(shell cat $(CURDIR)/.generated_flutter_root)
 FLUTTER_ARTIFACT_CACHE_DIR=$(FLUTTER_ROOT)/bin/cache/artifacts/engine/linux-x64
-	
+
 OUT_DIR=$(FLUTTER_APP_BUILD_DIR)/linux
 CACHE_DIR=$(OUT_DIR)/cache
 FLUTTER_LIBRARY_COPY_DIR=$(CACHE_DIR)/flutter_library

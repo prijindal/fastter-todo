@@ -308,6 +308,7 @@ class _TodoEditBar extends StatelessWidget {
         _buildEditButton(context),
         _buildChangeProjectButton(),
         _buildSelectLabelsButton(),
+        _buildChangePriorityButton(context),
         _buildCommentButton(context),
         _buildSubtaskButton(context),
         _buildDeleteButton(context),
