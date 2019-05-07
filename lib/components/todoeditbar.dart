@@ -14,6 +14,7 @@ import '../components/prioritydialog.dart';
 import '../helpers/todouihelpers.dart';
 import '../screens/todocomments.dart';
 import '../screens/todoedit.dart';
+import '../screens/todoreminders.dart';
 import '../screens/todosubtasks.dart';
 
 import 'labelselector.dart';
@@ -206,6 +207,27 @@ class _TodoEditBar extends StatelessWidget {
         ),
       );
 
+  Widget _buildReminderButton(BuildContext context) => Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12),
+        child: IconButton(
+          icon: const Icon(Icons.alarm),
+          onPressed: () {
+            Navigator.of(context).push<void>(
+              MaterialPageRoute<void>(
+                builder: (context) {
+                  final todoid = selectedTodos[0];
+                  final todo =
+                      todos.items.singleWhere((item) => item.id == todoid);
+                  return TodoRemindersScreen(
+                    todo: todo,
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      );
+
   Widget _buildSubtaskButton(BuildContext context) => Container(
         margin: const EdgeInsets.symmetric(horizontal: 12),
         child: IconButton(
@@ -310,6 +332,7 @@ class _TodoEditBar extends StatelessWidget {
         _buildSelectLabelsButton(),
         _buildChangePriorityButton(context),
         _buildCommentButton(context),
+        _buildReminderButton(context),
         _buildSubtaskButton(context),
         _buildDeleteButton(context),
       ];
