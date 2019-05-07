@@ -11,6 +11,7 @@ import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/models/settings.model.dart';
 
 import '../helpers/navigator.dart';
+import '../helpers/todofilters.dart';
 
 import 'labelexpansiontile.dart';
 import 'projectexpansiontile.dart';
@@ -57,6 +58,10 @@ class _HomeAppDrawer extends StatelessWidget {
   final ListState<Todo> todos;
   final bool disablePop;
   final FrontPage frontPage;
+
+  static DateTime now = DateTime.now();
+  static DateTime startOfToday =
+      DateTime(now.year, now.month, now.day, 0, 0, 0, 0);
 
   void _pushRouteNamed(
     BuildContext context,
@@ -122,9 +127,7 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Inbox'),
-                  Text(todos.items
-                      .where((todo) => todo.project == null)
-                      .length
+                  Text(filterToCount(<String, dynamic>{'project': null}, todos)
                       .toString()),
                 ],
               ),
@@ -141,7 +144,7 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('All Tasks'),
-                  Text(todos.items.length.toString()),
+                  Text(filterToCount(<String, dynamic>{}, todos).toString()),
                 ],
               ),
               onTap: () {
@@ -157,13 +160,16 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Today'),
-                  Text(todos.items
-                      .where((todo) =>
-                          todo.dueDate != null &&
-                          todo.dueDate.difference(DateTime.now()).inDays >= 0 &&
-                          todo.dueDate.day == DateTime.now().day)
-                      .length
-                      .toString()),
+                  Text(filterToCount(
+                    <String, dynamic>{
+                      '_operators': {
+                        'dueDate': {
+                          'lte': startOfToday.add(const Duration(days: 1)),
+                        },
+                      },
+                    },
+                    todos,
+                  ).toString()),
                 ],
               ),
               onTap: () {
@@ -179,13 +185,16 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('7 Days'),
-                  Text(todos.items
-                      .where((todo) =>
-                          todo.dueDate != null &&
-                          todo.dueDate.difference(DateTime.now()).inDays >= 0 &&
-                          todo.dueDate.difference(DateTime.now()).inDays < 7)
-                      .length
-                      .toString()),
+                  Text(filterToCount(
+                    <String, dynamic>{
+                      '_operators': {
+                        'dueDate': {
+                          'lte': startOfToday.add(const Duration(days: 7)),
+                        },
+                      },
+                    },
+                    todos,
+                  ).toString()),
                 ],
               ),
               onTap: () {

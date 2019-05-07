@@ -6,6 +6,7 @@ import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
 import '../components/hexcolor.dart';
+import '../helpers/todofilters.dart';
 import '../screens/addproject.dart';
 import '../screens/manageprojects.dart';
 import 'expansiontile.dart';
@@ -55,13 +56,12 @@ class ProjectExpansionTile extends StatelessWidget {
                             const BoxConstraints(maxWidth: 200, maxHeight: 40),
                         child: Text(project.title),
                       ),
-                      Text(todos.items
-                          .where((todo) =>
-                              todo.completed != true &&
-                              todo.project != null &&
-                              todo.project.id == project.id)
-                          .length
-                          .toString()),
+                      Text(filterToCount(
+                        <String, dynamic>{
+                          'project': project.id,
+                        },
+                        todos,
+                      ).toString()),
                     ],
                   ),
                   onTap: () => onChildSelected(project),
