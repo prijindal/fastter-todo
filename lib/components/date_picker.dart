@@ -73,6 +73,7 @@ class _DatePickerQuickPickers extends StatelessWidget {
     @required this.selectedDate,
     @required this.mode,
     @required this.onModeChanged,
+    @required this.allowNull,
     Key key,
   })  : assert(selectedDate != null, 'selectedDate must not be null'),
         assert(mode != null, 'mode must not be null'),
@@ -81,6 +82,7 @@ class _DatePickerQuickPickers extends StatelessWidget {
   final DateTime selectedDate;
   final DatePickerMode mode;
   final ValueChanged<DatePickerMode> onModeChanged;
+  final bool allowNull;
 
   bool isToday() {
     final now = DateTime.now();
@@ -131,14 +133,15 @@ class _DatePickerQuickPickers extends StatelessWidget {
                         DateTime.now().add(const Duration(days: 1))));
               },
             ),
-            ListTile(
-              dense: true,
-              leading: const Icon(Icons.cancel),
-              title: const Text('Remove Date'),
-              onTap: () {
-                Navigator.pop(context, DatePickerResponse(null));
-              },
-            ),
+            if (allowNull)
+              ListTile(
+                dense: true,
+                leading: const Icon(Icons.cancel),
+                title: const Text('Remove Date'),
+                onTap: () {
+                  Navigator.pop(context, DatePickerResponse(null));
+                },
+              ),
           ],
         ),
       );
@@ -302,6 +305,7 @@ class _DatePickerDialog extends StatefulWidget {
     this.lastDate,
     this.selectableDayPredicate,
     this.initialDatePickerMode,
+    this.allowNull,
   }) : super(key: key);
 
   final DateTime initialDate;
@@ -309,6 +313,7 @@ class _DatePickerDialog extends StatefulWidget {
   final DateTime lastDate;
   final SelectableDayPredicate selectableDayPredicate;
   final DatePickerMode initialDatePickerMode;
+  final bool allowNull;
 
   @override
   _DatePickerDialogState createState() => _DatePickerDialogState();
@@ -440,6 +445,7 @@ class _DatePickerDialogState extends State<_DatePickerDialog> {
       selectedDate: _selectedDate,
       mode: _mode,
       onModeChanged: _handleModeChanged,
+      allowNull: widget.allowNull,
     );
     final dialog = Dialog(
       child: mediaQueryData.orientation == Orientation.portrait
@@ -564,6 +570,7 @@ Future<DatePickerResponse> showDatePicker({
   @required DateTime initialDate,
   @required DateTime firstDate,
   @required DateTime lastDate,
+  bool allowNull = true,
   SelectableDayPredicate selectableDayPredicate,
   DatePickerMode initialDatePickerMode = DatePickerMode.day,
   Locale locale,
@@ -593,6 +600,7 @@ Future<DatePickerResponse> showDatePicker({
     lastDate: lastDate,
     selectableDayPredicate: selectableDayPredicate,
     initialDatePickerMode: initialDatePickerMode,
+    allowNull: allowNull,
   );
 
   if (textDirection != null) {

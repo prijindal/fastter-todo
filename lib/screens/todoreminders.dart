@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -80,7 +81,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
 
   Future<void> _newReminder() async {
     final now = DateTime.now();
-    final dateResponse = await todoSelectDate(context, now);
+    final dateResponse = await todoSelectDate(context, now, false);
     if (dateResponse != null) {
       final date = dateResponse.dateTime;
       final time = await showTimePicker(
@@ -113,6 +114,9 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
     }
   }
 
+  String _formattedTime(TodoReminder todoReminder) =>
+      DateFormat('EEE dd MMM y, hh:mm a').format(todoReminder.time.toLocal());
+
   @override
   Widget build(BuildContext context) => Scaffold(
         key: _scaffoldKey,
@@ -143,8 +147,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
                           .map(
                             (todoReminder) => ListTile(
                                   title: Text(todoReminder.title),
-                                  subtitle:
-                                      Text(dueDateFormatter(todoReminder.time)),
+                                  subtitle: Text(_formattedTime(todoReminder)),
                                 ),
                           )
                           .toList(),
