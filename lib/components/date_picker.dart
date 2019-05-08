@@ -73,10 +73,11 @@ class _DatePickerQuickPickers extends StatelessWidget {
     @required this.selectedDate,
     @required this.mode,
     @required this.onModeChanged,
-    @required this.allowNull,
+    bool allowNull,
     Key key,
   })  : assert(selectedDate != null, 'selectedDate must not be null'),
         assert(mode != null, 'mode must not be null'),
+        this.allowNull = allowNull ?? true,
         super(key: key);
 
   final DateTime selectedDate;
@@ -305,7 +306,7 @@ class _DatePickerDialog extends StatefulWidget {
     this.lastDate,
     this.selectableDayPredicate,
     this.initialDatePickerMode,
-    this.allowNull,
+    this.allowNull = true,
   }) : super(key: key);
 
   final DateTime initialDate;
