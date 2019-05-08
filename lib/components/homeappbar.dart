@@ -465,6 +465,8 @@ class _HomeAppBar extends StatelessWidget {
           pinned: false,
           floating: true,
           snap: true,
+          automaticallyImplyLeading:
+              getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait,
           leading: selectedtodos.isNotEmpty
               ? IconButton(
                   icon: const Icon(Icons.arrow_back),

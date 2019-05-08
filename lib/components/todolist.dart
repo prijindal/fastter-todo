@@ -90,34 +90,50 @@ class _TodoList extends StatefulWidget {
 
 class _TodoListState extends State<_TodoList> {
   bool _showInput = false;
+  static const Duration duration = Duration(milliseconds: 150);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _showInput =
+        getCurrentBreakpoint(context) == ResponsiveBreakpoints.landscape;
+  }
 
   List<Widget> _buildBottom() => [
-        if (widget.selectedTodos.isEmpty && _showInput)
-          Positioned(
-            bottom: 0,
-            right: 2,
-            left: 2,
-            child: TodoInput(
-              project: (widget.filter.containsKey('project') &&
-                      widget.projects.items.isNotEmpty)
-                  ? widget.projects.items.singleWhere(
-                      (project) => project.id == widget.filter['project'],
-                      orElse: () => null)
-                  : null,
-              onBackButton: () {
-                setState(() {
-                  _showInput = false;
-                });
-              },
-            ),
+        Positioned(
+          bottom: 0,
+          right: 2,
+          left: 2,
+          child: AnimatedSwitcher(
+            duration: duration,
+            child: (widget.selectedTodos.isEmpty && _showInput)
+                ? TodoInput(
+                    project: (widget.filter.containsKey('project') &&
+                            widget.projects.items.isNotEmpty)
+                        ? widget.projects.items.singleWhere(
+                            (project) => project.id == widget.filter['project'],
+                            orElse: () => null)
+                        : null,
+                    onBackButton: () {
+                      setState(() {
+                        _showInput = false;
+                      });
+                    },
+                  )
+                : Container(),
           ),
-        if (widget.selectedTodos.isNotEmpty)
-          Positioned(
-            bottom: 0,
-            right: 2,
-            left: 2,
-            child: TodoEditBar(),
+        ),
+        Positioned(
+          bottom: 0,
+          right: 2,
+          left: 2,
+          child: AnimatedSwitcher(
+            duration: duration,
+            child:
+                widget.selectedTodos.isNotEmpty ? TodoEditBar() : Container(),
           ),
+        ),
       ];
 
   String _dueDateCategorize(DateTime dueDate) {

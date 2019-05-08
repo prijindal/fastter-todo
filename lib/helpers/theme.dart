@@ -9,6 +9,8 @@ ThemeData primaryTheme = ThemeData(
     ),
   ),
   inputDecorationTheme: InputDecorationTheme(
+    isDense: true,
+    contentPadding: const EdgeInsets.only(left: 10, bottom: 10),
     border: const OutlineInputBorder(
       borderSide: BorderSide(),
       borderRadius: BorderRadius.all(Radius.circular(10)),

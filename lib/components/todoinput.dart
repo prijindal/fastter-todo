@@ -10,6 +10,7 @@ import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
 
+import '../helpers/responsive.dart';
 import '../helpers/todouihelpers.dart';
 import 'projectdropdown.dart';
 
@@ -185,6 +186,56 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
       ? MediaQuery.of(context).size.width
       : MediaQuery.of(context).size.width - 304; // 304 is the _kWidth of drawer
 
+  Widget _buildInput() => TextFormField(
+        controller: titleInputController,
+        focusNode: _titleFocusNode,
+        decoration: InputDecoration(
+          labelText: 'Add a task',
+          suffix: IconButton(
+            icon: const Icon(
+              Icons.close,
+            ),
+            onPressed: () {
+              titleInputController.clear();
+              _unFocusKeyboard();
+            },
+          ),
+        ),
+        onFieldSubmitted: (title) {
+          _onSave();
+        },
+      );
+
+  Widget _buildButtons() => Flex(
+        direction: Axis.horizontal,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.calendar_today,
+              color: dueDate == null ? null : Colors.redAccent,
+            ),
+            onPressed: _showDatePicker,
+          ),
+          ProjectDropdown(
+            selectedProject: project,
+            onSelected: _onSelectProject,
+            onOpening: () {
+              setState(() {
+                _isPreventClose = true;
+              });
+            },
+          ),
+          Flexible(
+            child: Container(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.send),
+            onPressed: _onSave,
+          )
+        ],
+      );
+
   @override
   Widget build(BuildContext context) => Card(
         elevation: 8,
@@ -198,54 +249,8 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
               child: Form(
                 child: Column(
                   children: [
-                    TextFormField(
-                      controller: titleInputController,
-                      focusNode: _titleFocusNode,
-                      decoration: InputDecoration(
-                        labelText: 'Add a task',
-                        suffix: IconButton(
-                          icon: const Icon(
-                            Icons.close,
-                          ),
-                          onPressed: () {
-                            titleInputController.clear();
-                            _unFocusKeyboard();
-                          },
-                        ),
-                      ),
-                      onFieldSubmitted: (title) {
-                        _onSave();
-                      },
-                    ),
-                    Flex(
-                      direction: Axis.horizontal,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        IconButton(
-                          icon: Icon(
-                            Icons.calendar_today,
-                            color: dueDate == null ? null : Colors.redAccent,
-                          ),
-                          onPressed: _showDatePicker,
-                        ),
-                        ProjectDropdown(
-                          selectedProject: project,
-                          onSelected: _onSelectProject,
-                          onOpening: () {
-                            setState(() {
-                              _isPreventClose = true;
-                            });
-                          },
-                        ),
-                        Flexible(
-                          child: Container(),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.send),
-                          onPressed: _onSave,
-                        )
-                      ],
-                    ),
+                    _buildInput(),
+                    _buildButtons(),
                   ],
                 ),
               ),
