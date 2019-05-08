@@ -91,14 +91,6 @@ class _TodoList extends StatefulWidget {
 class _TodoListState extends State<_TodoList> {
   bool _showInput = false;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    _showInput =
-        getCurrentBreakpoint(context) == ResponsiveBreakpoints.landscape;
-  }
-
   List<Widget> _buildBottom() => [
         if (widget.selectedTodos.isEmpty && _showInput)
           Positioned(
