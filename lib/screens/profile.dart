@@ -242,10 +242,6 @@ class _ProfileScreenState extends State<_ProfileScreen> {
               subtitle: const Text('Change your password'),
               onTap: _changePassword,
             ),
-            ListTile(
-              title: const Text('Delete your account'),
-              onTap: _deleteAccount,
-            )
           ],
         ),
       );
