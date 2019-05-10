@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fastter_dart/models/user.model.dart';
+import 'package:package_info/package_info.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -17,6 +18,11 @@ void initUserAnalytics(User user) {
     _analytics.setUserId(user.id);
     _analytics.setUserProperty(name: 'name', value: user.name);
     _analytics.setUserProperty(name: 'email', value: user.email);
+    PackageInfo.fromPlatform().then((packageInfo) {
+      _analytics.setUserProperty(name: 'version', value: packageInfo.version);
+      _analytics.setUserProperty(
+          name: 'buildNumber', value: packageInfo.buildNumber);
+    });
   }
 }
 

@@ -40,6 +40,7 @@ dependencies:
   intl: any
   json_annotation: any
   keyboard_visibility: any
+  package_info: any
   photo_view: any
   redux_persist: any
   redux_persist_flutter: any
