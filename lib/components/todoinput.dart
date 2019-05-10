@@ -191,6 +191,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
         focusNode: _titleFocusNode,
         decoration: InputDecoration(
           labelText: 'Add a task',
+          contentPadding: const EdgeInsets.only(left: 10, bottom: 10),
           suffix: IconButton(
             icon: const Icon(
               Icons.close,
