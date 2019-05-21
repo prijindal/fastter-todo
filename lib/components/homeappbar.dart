@@ -25,6 +25,9 @@ import '../screens/editlabel.dart';
 import '../screens/editproject.dart';
 import '../screens/search.dart';
 
+bool _isLoading<T extends BaseModel>(ListState<T> state) =>
+    state.adding || state.deleting || state.fetching || state.updating;
+
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({
     @required this.filter,
@@ -59,6 +62,12 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   store.state.todoComments.fetching ||
                   store.state.todoReminders.fetching ||
                   store.state.notifications.fetching,
+              loading: _isLoading(store.state.todos) ||
+                  _isLoading(store.state.projects) ||
+                  _isLoading(store.state.labels) ||
+                  _isLoading(store.state.todoComments) ||
+                  _isLoading(store.state.todoReminders) ||
+                  _isLoading(store.state.notifications),
               selectedtodos: store.state.selectedTodos,
               filter: filter,
               title: title,
@@ -116,6 +125,7 @@ class _HomeAppBar extends StatelessWidget {
     @required this.todoRemindersSyncStart,
     @required this.notificationsSyncStart,
     @required this.fetching,
+    @required this.loading,
     @required this.selectedtodos,
     @required this.deleteSelected,
     @required this.unSelectAll,
@@ -138,6 +148,7 @@ class _HomeAppBar extends StatelessWidget {
   final VoidCallback todoRemindersSyncStart;
   final VoidCallback notificationsSyncStart;
   final bool fetching;
+  final bool loading;
   final Map<String, dynamic> filter;
   final List<String> selectedtodos;
   final VoidCallback deleteSelected;
@@ -488,6 +499,7 @@ class _HomeAppBar extends StatelessWidget {
                 onPressed: () => _onSearch(context),
               ),
             if (selectedtodos.isEmpty) _buildSortAction(context),
+            if (selectedtodos.isNotEmpty && loading) Icon(Icons.refresh),
             if (selectedtodos.isEmpty)
               IconButton(
                 icon: const Icon(Icons.notifications),

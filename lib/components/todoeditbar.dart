@@ -26,90 +26,109 @@ class TodoEditBar extends StatelessWidget {
       StoreConnector<AppState, Store<AppState>>(
         converter: (store) => store,
         builder: (context, store) {
-          void onMarkCompleted() {
+          void _unSelectAllTodos() {
+            for (final todoid in store.state.selectedTodos) {
+              store.dispatch(UnSelectTodo(todoid));
+            }
+          }
+
+          Future<void> _onMarkCompleted() async {
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.completed = true;
-                  store.dispatch(UpdateItem<Todo>(todoid, todo));
-                  store.dispatch(UnSelectTodo(todo.id));
+                  final action = UpdateItem<Todo>(todoid, todo);
+                  store.dispatch(action);
+                  await action.completer.future;
                 }
               }
             }
+            _unSelectAllTodos();
           }
 
-          void onChangeDate(DateTime date) {
+          Future<void> _onChangeDate(DateTime date) async {
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.dueDate = date;
-                  store.dispatch(UpdateItem<Todo>(todoid, todo));
-                  store.dispatch(UnSelectTodo(todo.id));
+                  final action = UpdateItem<Todo>(todoid, todo);
+                  store.dispatch(action);
+                  await action.completer.future;
                 }
               }
             }
+            _unSelectAllTodos();
           }
 
-          void onChangeProject(Project project) {
+          Future<void> _onChangeProject(Project project) async {
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.project = project;
-                  store.dispatch(UpdateItem<Todo>(todoid, todo));
-                  store.dispatch(UnSelectTodo(todo.id));
+                  final action = UpdateItem<Todo>(todoid, todo);
+                  store.dispatch(action);
+                  await action.completer.future;
                 }
               }
             }
+            _unSelectAllTodos();
           }
 
-          void onChangeLabels(List<Label> labels) {
+          Future<void> _onChangeLabels(List<Label> labels) async {
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.labels = labels;
-                  store.dispatch(UpdateItem<Todo>(todoid, todo));
-                  store.dispatch(UnSelectTodo(todo.id));
+                  final action = UpdateItem<Todo>(todoid, todo);
+                  store.dispatch(action);
+                  await action.completer.future;
                 }
               }
             }
+            _unSelectAllTodos();
           }
 
-          void onChangePriority(int priority) {
+          Future<void> _onChangePriority(int priority) async {
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.priority = priority;
-                  store.dispatch(UpdateItem<Todo>(todoid, todo));
-                  store.dispatch(UnSelectTodo(todo.id));
+                  final action = UpdateItem<Todo>(todoid, todo);
+                  store.dispatch(action);
+                  await action.completer.future;
                 }
               }
             }
+            _unSelectAllTodos();
+          }
+
+          Future<void> _deleteSelected() async {
+            for (final todoid in store.state.selectedTodos) {
+              final action = DeleteItem<Todo>(todoid);
+              store.dispatch(action);
+            }
+            _unSelectAllTodos();
           }
 
           return _TodoEditBar(
             selectedTodos: store.state.selectedTodos,
-            onMarkCompleted: onMarkCompleted,
             todos: store.state.todos,
-            onChangeDate: onChangeDate,
-            onChangeProject: onChangeProject,
-            onChangeLabels: onChangeLabels,
-            onChangePriority: onChangePriority,
-            deleteSelected: () {
-              for (final todoid in store.state.selectedTodos) {
-                store.dispatch(DeleteItem<Todo>(todoid));
-                store.dispatch(UnSelectTodo(todoid));
-              }
-            },
+            onMarkCompleted: _onMarkCompleted,
+            onChangeDate: _onChangeDate,
+            onChangeProject: _onChangeProject,
+            onChangeLabels: _onChangeLabels,
+            onChangePriority: _onChangePriority,
+            deleteSelected: _deleteSelected,
           );
         },
       );
