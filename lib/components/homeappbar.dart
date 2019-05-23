@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -354,7 +357,10 @@ class _HomeAppBar extends StatelessWidget {
             updateSortBy('title');
           }
         },
-        icon: const Icon(Icons.sort),
+        icon: const Icon(
+          Icons.sort,
+          color: Colors.white,
+        ),
         itemBuilder: (context) => [
               const PopupMenuItem(
                 enabled: false,
@@ -469,9 +475,20 @@ class _HomeAppBar extends StatelessWidget {
     );
   }
 
+  bool get _isConnecting =>
+      Fastter.getInstance().socket == null ||
+      Fastter.getInstance().socket.readyState != WebSocket.open;
+
   @override
   Widget build(BuildContext context) => AnimatedTheme(
-        data: selectedtodos.isNotEmpty ? whiteTheme : primaryTheme,
+        isMaterialAppTheme: true,
+        data: selectedtodos.isNotEmpty
+            ? whiteTheme
+            : _isConnecting
+                ? primaryTheme.copyWith(
+                    primaryColor: Colors.red,
+                  )
+                : primaryTheme,
         child: SliverAppBar(
           pinned: false,
           floating: true,
@@ -491,21 +508,49 @@ class _HomeAppBar extends StatelessWidget {
                       },
                     )
                   : null,
-          title: _buildTitle(),
+          title: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTitle(),
+              AnimatedCrossFade(
+                duration: kThemeAnimationDuration,
+                firstChild: Text(
+                  'Connecting...',
+                  style: Theme.of(context)
+                      .textTheme
+                      .body1
+                      .apply(color: Colors.white),
+                ),
+                secondChild: Container(),
+                crossFadeState: _isConnecting
+                    ? CrossFadeState.showFirst
+                    : CrossFadeState.showSecond,
+              ),
+            ],
+          ),
           actions: [
             if (selectedtodos.isEmpty)
               IconButton(
-                icon: const Icon(Icons.search),
+                icon: const Icon(
+                  Icons.search,
+                  color: Colors.white,
+                ),
                 onPressed: () => _onSearch(context),
               ),
             if (selectedtodos.isEmpty) _buildSortAction(context),
-            if (selectedtodos.isNotEmpty && loading) Icon(Icons.refresh),
+            if (selectedtodos.isNotEmpty && loading)
+              Icon(
+                Icons.refresh,
+                color: Colors.white,
+              ),
             if (selectedtodos.isEmpty)
               IconButton(
                 icon: const Icon(Icons.notifications),
                 onPressed: () {
                   Scaffold.of(context).openEndDrawer();
                 },
+                color: Colors.white,
               ),
             _buildPopupAction(context),
           ],
