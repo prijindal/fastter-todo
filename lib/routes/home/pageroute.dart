@@ -18,7 +18,6 @@ class HomePageRoute<T> extends MaterialPageRoute<T> {
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
     if (settings.isInitialRoute ||
-        history.isEmpty ||
         Fastter.getInstance().socket == null ||
         Fastter.getInstance().socket.readyState != WebSocket.open) {
       return child;
