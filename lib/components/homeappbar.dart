@@ -1,10 +1,10 @@
-import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:share/share.dart';
 
+import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
@@ -476,9 +476,7 @@ class _HomeAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AnimatedTheme(
         isMaterialAppTheme: true,
-        data: selectedtodos.isNotEmpty
-            ? whiteTheme
-            : primaryTheme,
+        data: selectedtodos.isNotEmpty ? whiteTheme : primaryTheme,
         child: SliverAppBar(
           pinned: false,
           floating: true,
