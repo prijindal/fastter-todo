@@ -17,9 +17,7 @@ class HomePageRoute<T> extends MaterialPageRoute<T> {
   @override
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
-    if (settings.isInitialRoute ||
-        Fastter.getInstance().socket == null ||
-        Fastter.getInstance().socket.readyState != WebSocket.open) {
+    if (settings.isInitialRoute || !Fastter.getInstance().isSocketConnected) {
       return child;
     }
     if (getCurrentBreakpoint(context) == ResponsiveBreakpoints.landscape) {

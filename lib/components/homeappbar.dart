@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
@@ -475,20 +473,16 @@ class _HomeAppBar extends StatelessWidget {
     );
   }
 
-  bool get _isConnecting =>
-      Fastter.getInstance().socket == null ||
-      Fastter.getInstance().socket.readyState != WebSocket.open;
-
   @override
   Widget build(BuildContext context) => AnimatedTheme(
         isMaterialAppTheme: true,
         data: selectedtodos.isNotEmpty
             ? whiteTheme
-            : _isConnecting
-                ? primaryTheme.copyWith(
+            : Fastter.getInstance().isSocketConnected
+                ? primaryTheme
+                : primaryTheme.copyWith(
                     primaryColor: Colors.red,
-                  )
-                : primaryTheme,
+                  ),
         child: SliverAppBar(
           pinned: false,
           floating: true,
@@ -523,9 +517,9 @@ class _HomeAppBar extends StatelessWidget {
                       .apply(color: Colors.white),
                 ),
                 secondChild: Container(),
-                crossFadeState: _isConnecting
-                    ? CrossFadeState.showFirst
-                    : CrossFadeState.showSecond,
+                crossFadeState: Fastter.getInstance().isSocketConnected
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
               ),
             ],
           ),
