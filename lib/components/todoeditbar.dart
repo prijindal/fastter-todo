@@ -41,7 +41,6 @@ class TodoEditBar extends StatelessWidget {
                   todo.completed = true;
                   final action = UpdateItem<Todo>(todoid, todo);
                   store.dispatch(action);
-                  await action.completer.future;
                 }
               }
             }
@@ -57,7 +56,6 @@ class TodoEditBar extends StatelessWidget {
                   todo.dueDate = date;
                   final action = UpdateItem<Todo>(todoid, todo);
                   store.dispatch(action);
-                  await action.completer.future;
                 }
               }
             }
@@ -73,7 +71,6 @@ class TodoEditBar extends StatelessWidget {
                   todo.project = project;
                   final action = UpdateItem<Todo>(todoid, todo);
                   store.dispatch(action);
-                  await action.completer.future;
                 }
               }
             }
@@ -89,7 +86,6 @@ class TodoEditBar extends StatelessWidget {
                   todo.labels = labels;
                   final action = UpdateItem<Todo>(todoid, todo);
                   store.dispatch(action);
-                  await action.completer.future;
                 }
               }
             }
@@ -105,7 +101,6 @@ class TodoEditBar extends StatelessWidget {
                   todo.priority = priority;
                   final action = UpdateItem<Todo>(todoid, todo);
                   store.dispatch(action);
-                  await action.completer.future;
                 }
               }
             }
