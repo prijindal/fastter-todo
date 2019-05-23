@@ -45,12 +45,10 @@ dependencies:
   redux_persist: any
   redux_persist_flutter: any
   share: any
-  socket_io_client: any
   redux_logging: any
   tuple: any
   url_launcher: any
   uuid: any
-  web_socket_channel: any
   webview_flutter: any
 
   # The following adds the Cupertino Icons font to your application.
