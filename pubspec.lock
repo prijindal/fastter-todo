@@ -7,7 +7,7 @@ packages:
       name: after_layout
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.7"
+    version: "1.0.7+1"
   async:
     dependency: transitive
     description:
@@ -131,7 +131,7 @@ packages:
       name: flutter_colorpicker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.3"
+    version: "0.2.4"
   flutter_linkify:
     dependency: "direct main"
     description:
@@ -199,7 +199,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.0+3"
+    version: "0.6.0+7"
   intl:
     dependency: "direct main"
     description:
@@ -213,7 +213,7 @@ packages:
       name: json_annotation
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.0"
+    version: "2.4.0"
   keyboard_visibility:
     dependency: "direct main"
     description:
@@ -353,7 +353,7 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.2"
+    version: "0.5.2+1"
   sky_engine:
     dependency: transitive
     description: flutter

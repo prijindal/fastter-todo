@@ -478,11 +478,7 @@ class _HomeAppBar extends StatelessWidget {
         isMaterialAppTheme: true,
         data: selectedtodos.isNotEmpty
             ? whiteTheme
-            : Fastter.getInstance().isSocketConnected
-                ? primaryTheme
-                : primaryTheme.copyWith(
-                    primaryColor: Colors.red,
-                  ),
+            : primaryTheme
         child: SliverAppBar(
           pinned: false,
           floating: true,
