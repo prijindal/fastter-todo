@@ -478,7 +478,7 @@ class _HomeAppBar extends StatelessWidget {
         isMaterialAppTheme: true,
         data: selectedtodos.isNotEmpty
             ? whiteTheme
-            : primaryTheme
+            : primaryTheme,
         child: SliverAppBar(
           pinned: false,
           floating: true,
