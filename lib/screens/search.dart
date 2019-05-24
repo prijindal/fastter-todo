@@ -6,7 +6,7 @@ import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
-import 'package:fastter_dart/store/projects.dart';
+import 'package:fastter_dart/store/projects.dart' show fastterProjects;
 
 import '../components/hexcolor.dart';
 import '../components/todoeditbar.dart';

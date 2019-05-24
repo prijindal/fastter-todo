@@ -1,3 +1,4 @@
+import 'package:fastter_dart/store/projects.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -28,7 +29,10 @@ class ProjectExpansionTile extends StatelessWidget {
         builder: (context, store) {
           final todos = store.state.todos;
           return BaseExpansionTile<Project>(
-            liststate: store.state.projects,
+            liststate: store.state.projects.copyWith(
+              items: store.state.projects.items
+                ..sort(getCompareFunction('index')),
+            ),
             addRoute: MaterialPageRoute<void>(
               builder: (context) => AddProjectScreen(),
             ),
