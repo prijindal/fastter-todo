@@ -33,77 +33,82 @@ class TodoEditBar extends StatelessWidget {
           }
 
           Future<void> _onMarkCompleted() async {
+            final body = <String, Todo>{};
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.completed = true;
-                  final action = UpdateItem<Todo>(todoid, todo);
-                  store.dispatch(action);
+                  body[todoid] = todo;
                 }
               }
             }
+            store.dispatch(UpdateManyItem<Todo>(body));
             _unSelectAllTodos();
           }
 
           Future<void> _onChangeDate(DateTime date) async {
+            final body = <String, Todo>{};
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.dueDate = date;
-                  final action = UpdateItem<Todo>(todoid, todo);
-                  store.dispatch(action);
+                  body[todoid] = todo;
                 }
               }
             }
+            store.dispatch(UpdateManyItem<Todo>(body));
             _unSelectAllTodos();
           }
 
           Future<void> _onChangeProject(Project project) async {
+            final body = <String, Todo>{};
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.project = project;
-                  final action = UpdateItem<Todo>(todoid, todo);
-                  store.dispatch(action);
+                  body[todoid] = todo;
                 }
               }
             }
+            store.dispatch(UpdateManyItem<Todo>(body));
             _unSelectAllTodos();
           }
 
           Future<void> _onChangeLabels(List<Label> labels) async {
+            final body = <String, Todo>{};
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.labels = labels;
-                  final action = UpdateItem<Todo>(todoid, todo);
-                  store.dispatch(action);
+                  body[todoid] = todo;
                 }
               }
             }
+            store.dispatch(UpdateManyItem<Todo>(body));
             _unSelectAllTodos();
           }
 
           Future<void> _onChangePriority(int priority) async {
+            final body = <String, Todo>{};
             for (final todoid in store.state.selectedTodos) {
               if (store.state.todos.items.isNotEmpty) {
                 final todo = store.state.todos.items
                     .singleWhere((item) => item.id == todoid);
                 if (todo != null) {
                   todo.priority = priority;
-                  final action = UpdateItem<Todo>(todoid, todo);
-                  store.dispatch(action);
+                  body[todoid] = todo;
                 }
               }
             }
+            store.dispatch(UpdateManyItem<Todo>(body));
             _unSelectAllTodos();
           }
 
