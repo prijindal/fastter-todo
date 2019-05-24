@@ -4,7 +4,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:fastter_dart/fastter/fastter_action.dart';
@@ -98,8 +97,8 @@ class _TodoCommentItem extends StatelessWidget {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
               builder: (context) => Scaffold(
-                    body: PhotoView(
-                      imageProvider: imageProvider,
+                    body: Image(
+                      image: imageProvider,
                     ),
                   ),
             ),
