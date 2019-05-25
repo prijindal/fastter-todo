@@ -109,6 +109,9 @@ class _SearchTodosResultsComponent extends StatelessWidget {
   Widget build(BuildContext context) => Stack(
         children: [
           ListView.builder(
+            addAutomaticKeepAlives: false,
+            addRepaintBoundaries: false,
+            physics: const AlwaysScrollableScrollPhysics(),
             itemCount: todos.items.length,
             itemBuilder: (context, index) => TodoItem(
                   todo: todos.items[index],

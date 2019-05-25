@@ -259,6 +259,9 @@ class _TodoListState extends State<_TodoList> {
             ),
           )
         : ListView.builder(
+            addAutomaticKeepAlives: false,
+            addRepaintBoundaries: false,
+            physics: const AlwaysScrollableScrollPhysics(),
             itemBuilder: (context, index) => _renderIthItem(index),
             itemCount: _renderItemsCount,
           );
