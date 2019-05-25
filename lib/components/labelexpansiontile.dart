@@ -1,9 +1,11 @@
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/store/labels.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../screens/addlabel.dart';
 import '../screens/managelabels.dart';
@@ -21,10 +23,10 @@ class LabelExpansionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => BaseExpansionTile<Label>(
-              liststate: store.state.labels,
+      BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+        bloc: fastterLabels,
+        builder: (context, state) => BaseExpansionTile<Label>(
+              liststate: state,
               addRoute: MaterialPageRoute<void>(
                 builder: (context) => AddLabelScreen(),
               ),

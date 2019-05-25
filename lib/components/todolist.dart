@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:fastter_dart/store/projects.dart' show fastterProjects;
+import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_offline/flutter_offline.dart';
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
 
 import '../components/homeappbar.dart';
@@ -35,30 +35,25 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoList(
-              selectedTodos: store.state.selectedTodos,
-              projects: store.state.projects,
+      BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+        bloc: fastterTodos,
+        builder: (context, todosState) => _TodoList(
+              selectedTodos: selectedTodosBloc.currentState,
+              projects: fastterProjects.currentState,
               categoryView: categoryView,
-              todos: ListState<Todo>(
-                fetching: store.state.todos.fetching,
-                adding: store.state.todos.adding,
-                updating: store.state.todos.updating,
-                deleting: store.state.todos.deleting,
-                items: store.state.todos.items
+              todos: todosState.copyWith(
+                items: todosState.items
                     .where((todo) =>
                         todo.parent == null &&
                         fastterTodos.filterObject(todo, filter))
                     .toList()
-                      ..sort(getCompareFunction(store.state.todos.sortBy)),
-                sortBy: store.state.todos.sortBy,
+                      ..sort(getCompareFunction(todosState.sortBy)),
               ),
               filter: filter,
               title: title,
               syncStart: () {
-                final action = StartSync<Todo>();
-                store.dispatch(action);
+                final action = SyncEvent<Todo>();
+                fastterTodos.dispatch(action);
                 return action.completer;
               },
             ),
@@ -209,16 +204,6 @@ class _TodoListState extends State<_TodoList> {
   }
 
   List<Widget> _buildListChildren() {
-    if (widget.todos.fetching && widget.todos.items.isEmpty) {
-      return [
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 20),
-          child: const Center(
-            child: CircularProgressIndicator(),
-          ),
-        )
-      ];
-    }
     return widget.todos.items.isEmpty
         ? [
             Center(

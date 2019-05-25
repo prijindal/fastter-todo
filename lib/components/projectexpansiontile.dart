@@ -1,10 +1,11 @@
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/store/projects.dart';
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/store/todos.dart' show fastterTodos;
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../components/hexcolor.dart';
 import '../helpers/todofilters.dart';
@@ -24,14 +25,13 @@ class ProjectExpansionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) {
-          final todos = store.state.todos;
+      BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+        bloc: fastterProjects,
+        builder: (context, state) {
+          final todos = fastterTodos.currentState;
           return BaseExpansionTile<Project>(
-            liststate: store.state.projects.copyWith(
-              items: store.state.projects.items
-                ..sort(getCompareFunction('index')),
+            liststate: state.copyWith(
+              items: state.items..sort(getCompareFunction('index')),
             ),
             addRoute: MaterialPageRoute<void>(
               builder: (context) => AddProjectScreen(),

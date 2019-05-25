@@ -1,10 +1,11 @@
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import 'package:fastter_dart/store/labels.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 class LabelsList extends StatelessWidget {
   const LabelsList({
@@ -42,11 +43,11 @@ class LabelItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _LabelItem(
+      BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+        bloc: fastterLabels,
+        builder: (context, state) => _LabelItem(
               label: label,
-              labels: store.state.labels,
+              labels: state.items,
             ),
       );
 }
@@ -57,12 +58,12 @@ class _LabelItem extends StatelessWidget {
     @required this.label,
   });
 
-  final ListState<Label> labels;
+  final List<Label> labels;
   final Label label;
 
   @override
   Widget build(BuildContext context) {
-    final filteredLabel = labels.items.singleWhere((l) => l.id == label.id);
+    final filteredLabel = labels.singleWhere((l) => l.id == label.id);
     return Container(
       color: Theme.of(context).primaryColor,
       margin: const EdgeInsets.symmetric(horizontal: 2),

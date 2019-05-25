@@ -1,10 +1,11 @@
+import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/store/todos.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../components/todoitemtoggle.dart';
 import 'todoedit.dart';
@@ -34,17 +35,17 @@ class _TodoSubTaskList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoSubTaskListComponent(
+      BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+        bloc: fastterTodos,
+        builder: (context, state) => _TodoSubTaskListComponent(
               todo: todo,
-              children: store.state.todos.items
+              children: state.items
                   .where((todo) =>
                       todo.parent != null && todo.parent.id == this.todo.id)
                   .toList()
                     ..sort((a, b) => a.createdAt.compareTo(b.createdAt)),
               updateTodo: (id, updated) =>
-                  store.dispatch(UpdateItem<Todo>(id, updated)),
+                  fastterTodos.dispatch(UpdateEvent<Todo>(id, updated)),
             ),
       );
 }
@@ -78,16 +79,12 @@ class _TodoSubTaskItem extends StatelessWidget {
 
   final Todo todo;
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoSubTaskItemComponent(
-              todo: todo,
-              updateTodo: (updated) =>
-                  store.dispatch(UpdateItem<Todo>(todo.id, updated)),
-              addTodo: (newtodo) => store.dispatch(AddItem<Todo>(newtodo)),
-              deleteTodo: () => store.dispatch(DeleteItem<Todo>(todo.id)),
-            ),
+  Widget build(BuildContext context) => _TodoSubTaskItemComponent(
+        todo: todo,
+        updateTodo: (updated) =>
+            fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
+        addTodo: (newtodo) => fastterTodos.dispatch(AddEvent<Todo>(newtodo)),
+        deleteTodo: () => fastterTodos.dispatch(DeleteEvent<Todo>(todo.id)),
       );
 }
 

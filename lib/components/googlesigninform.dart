@@ -1,27 +1,23 @@
 import 'dart:io';
+import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 
 class GoogleSignInForm extends StatelessWidget {
   @protected
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, void Function(String)>(
-        converter: (store) =>
-            (idToken) => store.dispatch(GoogleLoginUserAction(idToken)),
-        builder: (context, fn) => StoreConnector<AppState, UserState>(
-              converter: (store) => store.state.user,
-              builder: (context, userState) => _GoogleSignInForm(
-                    loginWithGoogle: (idToken) => fn(idToken),
-                    user: userState,
-                  ),
+  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+        bloc: fastterUser,
+        builder: (context, state) => _GoogleSignInForm(
+              user: state,
+              loginWithGoogle: (idToken) =>
+                  fastterUser.dispatch(GoogleLoginUserEvent(idToken)),
             ),
       );
 }

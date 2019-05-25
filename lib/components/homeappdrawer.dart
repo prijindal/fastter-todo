@@ -1,12 +1,15 @@
+import 'package:fastter_dart/store/projects.dart';
+import 'package:fastter_dart/store/todos.dart';
+import 'package:fastter_dart/store/user.dart';
+import 'package:fastter_todo/bloc.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/models/settings.model.dart';
 
@@ -22,19 +25,18 @@ class HomeAppDrawer extends StatelessWidget {
   final bool disablePop;
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _HomeAppDrawer(
-              user: store.state.user,
-              projects: store.state.projects,
+  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+        bloc: fastterUser,
+        builder: (context, userState) => _HomeAppDrawer(
+              user: userState,
+              projects: fastterProjects.currentState,
               todos: ListState<Todo>(
-                items: store.state.todos.items
+                items: fastterTodos.currentState.items
                     .where((todo) => todo.completed != true)
                     .toList(),
               ),
               disablePop: disablePop,
-              frontPage: store.state.user.user?.settings?.frontPage ??
+              frontPage: userState.user?.settings?.frontPage ??
                   FrontPage(
                     route: '/',
                     title: 'Inbox',

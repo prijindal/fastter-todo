@@ -29,10 +29,10 @@ dependencies:
   firebase_messaging: any
   firebase_storage: any
   font_awesome_flutter: any
+  flutter_bloc: any
   flutter_colorpicker: any
   flutter_linkify: any
   flutter_offline: any
-  flutter_redux: any
   flutter_signin_button: any
   google_sign_in: any
   http: any
@@ -41,10 +41,7 @@ dependencies:
   json_annotation: any
   keyboard_visibility: any
   package_info: any
-  redux_persist: any
-  redux_persist_flutter: any
   share: any
-  redux_logging: any
   tuple: any
   url_launcher: any
   uuid: any

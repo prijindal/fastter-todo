@@ -1,12 +1,15 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/models/base.model.dart';
+import 'package:fastter_dart/store/labels.dart';
+import 'package:fastter_dart/store/todocomments.dart';
+import 'package:fastter_dart/store/todoreminders.dart';
+import 'package:fastter_dart/store/todos.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
-import 'package:fastter_dart/store/state.dart';
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 
 import '../components/hexcolor.dart';
 import '../helpers/todouihelpers.dart';
@@ -23,28 +26,30 @@ class TodoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoItem(
+      BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+        bloc: fastterLabels,
+        builder: (context, labelsState) => _TodoItem(
               todo: todo,
-              labels: store.state.labels.items
+              labels: labelsState.items
                   .where((label) => todo.labels
                       .map<String>((todolabel) => todolabel.id)
                       .toList()
                       .contains(label.id))
                   .toList(),
-              deleteTodo: () => store.dispatch(DeleteItem<Todo>(todo.id)),
+              deleteTodo: () =>
+                  fastterTodos.dispatch(DeleteEvent<Todo>(todo.id)),
               updateTodo: (updated) =>
-                  store.dispatch(UpdateItem<Todo>(todo.id, updated)),
-              selected: store.state.selectedTodos.contains(todo.id),
-              toggleSelected: () => store.dispatch(ToggleSelectTodo(todo.id)),
-              reminders: store.state.todoReminders.items
+                  fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
+              selected: selectedTodosBloc.currentState.contains(todo.id),
+              toggleSelected: () =>
+                  selectedTodosBloc.dispatch(ToggleSelectTodoEvent(todo.id)),
+              reminders: fastterTodoReminders.currentState.items
                   .where((reminder) =>
                       reminder.todo != null &&
                       reminder.completed == false &&
                       reminder.todo.id == todo.id)
                   .length,
-              comments: store.state.todoComments.items
+              comments: fastterTodoComments.currentState.items
                   .where((comment) =>
                       comment.todo != null && comment.todo.id == todo.id)
                   .length,

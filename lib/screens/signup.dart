@@ -1,21 +1,20 @@
 import 'dart:math';
+import 'package:fastter_todo/bloc.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 
 class SignupScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _SignupScreen(
+  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+        bloc: fastterUser,
+        builder: (context, state) => _SignupScreen(
               signup: (email, password) =>
-                  store.dispatch(SignupUserAction(email, password)),
-              user: store.state.user,
+                  fastterUser.dispatch(SignupUserEvent(email, password)),
+              user: state,
             ),
       );
 }

@@ -2,17 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:fastter_dart/store/state.dart';
-
-import 'helpers/theme.dart';
 import 'routes/app.dart';
-import 'screens/loading.dart';
-import 'store.dart';
 
 /// If the current platform is desktop, override the default platform to
 /// a supported platform (iOS for macOS, Android for Linux and Windows).
@@ -44,34 +37,21 @@ Future<void> main() async {
     }
   };
 
-  final store = await initState();
-
   await runZoned<Future<void>>(() async {
-    runApp(FlutterReduxApp(store));
+    runApp(FlutterReduxApp());
   }, onError: (dynamic error, dynamic stackTrace) async {
     debugPrint(error.toString());
   });
 }
 
 class FlutterReduxApp extends StatelessWidget {
-  const FlutterReduxApp(this.store, {Key key}) : super(key: key);
+  const FlutterReduxApp({Key key}) : super(key: key);
 
-  @required
-  final Store<AppState> store;
   // @required
   // final Persistor<AppState> persistor;
 
   @override
   Widget build(BuildContext context) {
-    if (store == null) {
-      return MaterialApp(
-        theme: primaryTheme,
-        home: LoadingScreen(),
-      );
-    }
-    return StoreProvider<AppState>(
-      store: store,
-      child: AppContainer(),
-    );
+    return AppContainer();
   }
 }

@@ -1,19 +1,17 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _SettingsScreen(
-              user: store.state.user,
-              onLogout: () => store.dispatch(LogoutUserAction()),
+  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+        bloc: fastterUser,
+        builder: (context, state) => _SettingsScreen(
+              user: state,
+              onLogout: () => fastterUser.dispatch(LogoutUserEvent()),
             ),
       );
 }

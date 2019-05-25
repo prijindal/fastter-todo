@@ -1,8 +1,12 @@
+import 'package:fastter_dart/store/labels.dart';
+import 'package:fastter_dart/store/todocomments.dart';
+import 'package:fastter_dart/store/todoreminders.dart';
+import 'package:fastter_dart/store/todos.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
@@ -10,7 +14,6 @@ import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
 import 'package:fastter_dart/models/todoreminder.model.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../components/labelselector.dart';
 import '../components/prioritydialog.dart';
@@ -28,11 +31,10 @@ class TodoEditScreenFromId extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => TodoEditScreen(
-              todo: store.state.todos.items
-                  .singleWhere((todo) => todo.id == todoid),
+      BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+        bloc: fastterTodos,
+        builder: (context, state) => TodoEditScreen(
+              todo: state.items.singleWhere((todo) => todo.id == todoid),
             ),
       );
 }
@@ -47,36 +49,35 @@ class TodoEditScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoEditScreen(
+      BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+        bloc: fastterLabels,
+        builder: (context, state) => _TodoEditScreen(
               todo: todo,
-              projects: store.state.projects,
-              labels: store.state.labels,
+              labels: state,
               todoComments: ListState<TodoComment>(
-                items: store.state.todoComments.items
+                items: fastterTodoComments.currentState.items
                     .where((todocomment) =>
                         todocomment.todo != null &&
                         todocomment.todo.id == todo.id)
                     .toList(),
               ),
               todoReminders: ListState<TodoReminder>(
-                items: store.state.todoReminders.items
+                items: fastterTodoReminders.currentState.items
                     .where((todoreminder) =>
                         todoreminder.todo != null &&
                         todoreminder.todo.id == todo.id &&
                         todoreminder.completed == false)
                     .toList(),
               ),
-              children: store.state.todos.items
+              children: fastterTodos.currentState.items
                   .where((todo) =>
                       todo.parent != null && todo.parent.id == this.todo.id)
                   .toList(),
               updateTodo: (updated) =>
-                  store.dispatch(UpdateItem<Todo>(todo.id, updated)),
+                  fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
               deleteTodo: () {
-                store.dispatch(UnSelectTodo(todo.id));
-                store.dispatch(DeleteItem<Todo>(todo.id));
+                selectedTodosBloc.dispatch(UnSelectTodoEvent(todo.id));
+                fastterTodos.dispatch(DeleteEvent<Todo>(todo.id));
               },
             ),
       );
@@ -85,7 +86,6 @@ class TodoEditScreen extends StatelessWidget {
 class _TodoEditScreen extends StatefulWidget {
   const _TodoEditScreen({
     @required this.todo,
-    @required this.projects,
     @required this.labels,
     @required this.todoComments,
     @required this.todoReminders,
@@ -96,7 +96,6 @@ class _TodoEditScreen extends StatefulWidget {
   }) : super(key: key);
 
   final Todo todo;
-  final ListState<Project> projects;
   final ListState<Label> labels;
   final ListState<TodoComment> todoComments;
   final ListState<TodoReminder> todoReminders;

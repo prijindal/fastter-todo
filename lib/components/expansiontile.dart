@@ -1,10 +1,10 @@
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import 'package:fastter_dart/store/todos.dart';
 
 class BaseExpansionTile<T extends BaseModel> extends StatelessWidget {
   const BaseExpansionTile({
@@ -26,20 +26,17 @@ class BaseExpansionTile<T extends BaseModel> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _BaseExpansionTile<T>(
+      BlocBuilder<FastterEvent, ListState<Todo>>(
+        bloc: fastterTodos,
+        builder: (context, state) => _BaseExpansionTile<T>(
               addRoute: addRoute,
               manageRoute: manageRoute,
               liststate: liststate,
               title: title,
               icon: icon,
               buildChild: buildChild,
-              todos: ListState<Todo>(
-                items: store.state.todos.items
-                    .where((todo) => todo.completed != true)
-                    .toList(),
-              ),
+              todos:
+                  state.items.where((todo) => todo.completed != true).toList(),
             ),
       );
 }
@@ -57,7 +54,7 @@ class _BaseExpansionTile<T extends BaseModel> extends StatefulWidget {
 
   final String title;
   final ListState<T> liststate;
-  final ListState<Todo> todos;
+  final List<Todo> todos;
   final Route<void> manageRoute;
   final Route<void> addRoute;
   final Widget Function(T) buildChild;

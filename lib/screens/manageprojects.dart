@@ -1,13 +1,14 @@
+import 'package:fastter_dart/store/projects.dart';
+import 'package:fastter_dart/store/todos.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/block_picker.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../components/hexcolor.dart';
 import '../helpers/theme.dart';
@@ -17,17 +18,17 @@ import 'editproject.dart';
 class ManageProjectsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _ManageProjectsScreen(
-              projects: store.state.projects,
+      BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+        bloc: fastterProjects,
+        builder: (context, state) => _ManageProjectsScreen(
+              projects: state,
               deleteProject: (project) {
-                store.dispatch(DeleteItem<Project>(project.id));
-                store.dispatch(StartSync<Todo>());
+                fastterProjects.dispatch(DeleteEvent<Project>(project.id));
+                fastterTodos.dispatch(SyncEvent<Todo>());
               },
               updateColor: (project, color) {
-                store.dispatch(
-                  UpdateItem<Project>(
+                fastterProjects.dispatch(
+                  UpdateEvent<Project>(
                     project.id,
                     Project(
                       id: project.id,

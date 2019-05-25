@@ -1,14 +1,14 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:fastter_dart/store/todos.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../helpers/responsive.dart';
 import '../helpers/todouihelpers.dart';
@@ -25,14 +25,10 @@ class TodoInput extends StatelessWidget {
   final Project project;
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoInput(
-              addTodo: (todo) => store.dispatch(AddItem<Todo>(todo)),
-              onBackButton: onBackButton,
-              project: project,
-            ),
+  Widget build(BuildContext context) => _TodoInput(
+        addTodo: (todo) => fastterTodos.dispatch(AddEvent<Todo>(todo)),
+        onBackButton: onBackButton,
+        project: project,
       );
 }
 

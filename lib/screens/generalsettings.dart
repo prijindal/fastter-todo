@@ -1,21 +1,20 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/models/user.model.dart';
+import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/settings.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 
 class GeneralSettingsScreen extends StatelessWidget {
   @override
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _GeneralSettingsScreen(
-              settings: store.state.user.user.settings ?? UserSettings(),
+  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+        bloc: fastterUser,
+        builder: (context, userState) => _GeneralSettingsScreen(
+              settings: userState.user.settings ?? UserSettings(),
               updateSettings: (settings) {
-                store.dispatch(UpdateUserAction(settings: settings));
+                fastterUser.dispatch(UpdateUserEvent(settings: settings));
               },
             ),
       );

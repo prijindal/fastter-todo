@@ -1,30 +1,28 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 
 import '../components/image_picker.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _ProfileScreen(
-            user: store.state.user,
-            deleteUser: () => store.dispatch(DeleteUserAction()),
+  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+        bloc: fastterUser,
+        builder: (context, userState) => _ProfileScreen(
+            user: userState,
+            deleteUser: () => fastterUser.dispatch(DeleteUserEvent()),
             updateUser: ({name, email, picture}) {
               final action =
-                  UpdateUserAction(name: name, email: email, picture: picture);
-              store.dispatch(action);
+                  UpdateUserEvent(name: name, email: email, picture: picture);
+              fastterUser.dispatch(action);
               return action.completer.future;
             },
             updatePassword: (password) {
-              final action = UpdateUserPasswordAction(password);
-              store.dispatch(action);
+              final action = UpdateUserPasswordEvent(password);
+              fastterUser.dispatch(action);
               return action.completer.future;
             }),
       );

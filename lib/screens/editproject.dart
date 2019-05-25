@@ -1,54 +1,26 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/store/projects.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../components/colorpicker.dart';
 import '../components/hexcolor.dart';
 import '../helpers/navigator.dart';
 
-class EditProjectScreen extends StatelessWidget {
+class EditProjectScreen extends StatefulWidget {
   const EditProjectScreen({
     @required this.project,
-  });
-
-  final Project project;
-  @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _EditProjectScreen(
-            project: project,
-            onEditProject: (updatedproject) =>
-                store.dispatch(UpdateItem<Project>(project.id, updatedproject)),
-            deleteProject: () {
-              store.dispatch(DeleteItem<Project>(project.id));
-              store.dispatch(StartSync<Todo>());
-            }),
-      );
-}
-
-class _EditProjectScreen extends StatefulWidget {
-  const _EditProjectScreen({
-    @required this.project,
-    @required this.onEditProject,
-    @required this.deleteProject,
     Key key,
   }) : super(key: key);
 
   final Project project;
-  final void Function(Project) onEditProject;
-  final VoidCallback deleteProject;
 
   @override
   _EditProjectScreenState createState() => _EditProjectScreenState();
 }
 
-class _EditProjectScreenState extends State<_EditProjectScreen> {
+class _EditProjectScreenState extends State<EditProjectScreen> {
   TextEditingController titleController;
   FocusNode titleFocusNode = FocusNode();
 
@@ -62,13 +34,14 @@ class _EditProjectScreenState extends State<_EditProjectScreen> {
   }
 
   void _onSave() {
-    widget.onEditProject(
+    fastterProjects.dispatch(UpdateEvent<Project>(
+      widget.project.id,
       Project(
         id: widget.project.id,
         title: titleController.text,
         color: _currentColor.value.toRadixString(16).substring(2),
       ),
-    );
+    ));
     Navigator.of(context).pop();
   }
 
@@ -96,7 +69,9 @@ class _EditProjectScreenState extends State<_EditProjectScreen> {
               ],
             ));
     if (shouldDelete) {
-      widget.deleteProject();
+      fastterProjects.dispatch(DeleteEvent<Project>(
+        widget.project.id,
+      ));
       history.add(RouteInfo('/'));
       await Navigator.of(context)
           .pushNamedAndRemoveUntil('/', (route) => route.isFirst);

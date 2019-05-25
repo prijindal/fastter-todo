@@ -1,14 +1,14 @@
+import 'package:fastter_dart/store/todocomments.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share/share.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../components/todocommentinput.dart';
 import '../components/todocommentitem.dart';
@@ -24,18 +24,19 @@ class TodoCommentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoCommentsScreen(
+      BlocBuilder<FastterEvent<TodoComment>, ListState<TodoComment>>(
+        bloc: fastterTodoComments,
+        builder: (context, state) => _TodoCommentsScreen(
               todo: todo,
               todoComments: ListState<TodoComment>(
-                items: store.state.todoComments.items
+                items: state.items
                     .where((todocomment) =>
                         todocomment.todo != null &&
                         todocomment.todo.id == todo.id)
                     .toList(),
               ),
-              syncStart: () => store.dispatch(StartSync<TodoComment>()),
+              syncStart: () =>
+                  fastterTodoComments.dispatch(SyncEvent<TodoComment>()),
             ),
       );
 }
@@ -150,10 +151,10 @@ class TodoCommentsAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) {
-          final todoComments = store.state.todoComments.items
+      BlocBuilder<FastterEvent<TodoComment>, ListState<TodoComment>>(
+        bloc: fastterTodoComments,
+        builder: (context, state) {
+          final todoComments = state.items
               .where((todocomment) =>
                   todocomment.todo != null &&
                   todocomment.todo.id == todo.id &&
@@ -168,8 +169,8 @@ class TodoCommentsAppBar extends StatelessWidget
             deleteSelectedComment: () {
               final futures = <Future<TodoComment>>[];
               for (final todoComment in todoComments) {
-                final action = DeleteItem<TodoComment>(todoComment.id);
-                store.dispatch(action);
+                final action = DeleteEvent<TodoComment>(todoComment.id);
+                fastterTodoComments.dispatch(action);
                 futures.add(action.completer.future);
               }
               return Future.wait<TodoComment>(futures);
@@ -177,8 +178,8 @@ class TodoCommentsAppBar extends StatelessWidget
             addComments: (comments) {
               final futures = <Future<TodoComment>>[];
               for (final todoComment in comments) {
-                final action = AddItem<TodoComment>(todoComment);
-                store.dispatch(action);
+                final action = AddEvent<TodoComment>(todoComment);
+                fastterTodoComments.dispatch(action);
                 futures.add(action.completer.future);
               }
               return Future.wait<TodoComment>(futures);

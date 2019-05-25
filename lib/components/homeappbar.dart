@@ -1,11 +1,19 @@
+import 'package:fastter_dart/models/user.model.dart';
+import 'package:fastter_dart/store/labels.dart';
+import 'package:fastter_dart/store/notifications.dart';
+import 'package:fastter_dart/store/projects.dart';
+import 'package:fastter_dart/store/todocomments.dart';
+import 'package:fastter_dart/store/todoreminders.dart';
+import 'package:fastter_dart/store/user.dart';
+import 'package:fastter_todo/bloc.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share/share.dart';
 
 import 'package:fastter_dart/fastter/fastter.dart';
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
@@ -16,7 +24,6 @@ import 'package:fastter_dart/models/todoreminder.model.dart';
 import 'package:fastter_dart/models/notification.model.dart'
     as notification_model;
 import 'package:fastter_dart/store/selectedtodos.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
 
 import '../helpers/navigator.dart';
@@ -25,9 +32,6 @@ import '../helpers/theme.dart';
 import '../screens/editlabel.dart';
 import '../screens/editproject.dart';
 import '../screens/search.dart';
-
-bool _isLoading<T extends BaseModel>(ListState<T> state) =>
-    state.adding || state.deleting || state.fetching || state.updating;
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({
@@ -42,64 +46,53 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _HomeAppBar(
-              projectSyncStart: () => store.dispatch(StartSync<Project>()),
-              labelSyncStart: () => store.dispatch(StartSync<Label>()),
-              todoSyncStart: () => store.dispatch(StartSync<Todo>()),
+  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+        bloc: fastterUser,
+        builder: (context, userState) => _HomeAppBar(
+              projectSyncStart: () =>
+                  fastterProjects.dispatch(SyncEvent<Project>()),
+              labelSyncStart: () => fastterLabels.dispatch(SyncEvent<Label>()),
+              todoSyncStart: () => fastterTodos.dispatch(SyncEvent<Todo>()),
               todoCommentsSyncStart: () =>
-                  store.dispatch(StartSync<TodoComment>()),
-              todoRemindersSyncStart: () =>
-                  store.dispatch(StartSync<TodoReminder>(<String, dynamic>{
+                  fastterTodoComments.dispatch(SyncEvent<TodoComment>()),
+              todoRemindersSyncStart: () => fastterTodoReminders
+                      .dispatch(SyncEvent<TodoReminder>(<String, dynamic>{
                     'completed': false,
                   })),
-              notificationsSyncStart: () =>
-                  store.dispatch(StartSync<notification_model.Notification>()),
-              fetching: store.state.todos.fetching ||
-                  store.state.projects.fetching ||
-                  store.state.labels.fetching ||
-                  store.state.todoComments.fetching ||
-                  store.state.todoReminders.fetching ||
-                  store.state.notifications.fetching,
-              loading: _isLoading(store.state.todos) ||
-                  _isLoading(store.state.projects) ||
-                  _isLoading(store.state.labels) ||
-                  _isLoading(store.state.todoComments) ||
-                  _isLoading(store.state.todoReminders) ||
-                  _isLoading(store.state.notifications),
-              selectedtodos: store.state.selectedTodos,
+              notificationsSyncStart: () => fastterNotifications
+                  .dispatch(SyncEvent<notification_model.Notification>()),
               filter: filter,
               title: title,
               unSelectAll: () {
-                for (final todoid in store.state.selectedTodos) {
-                  store.dispatch(UnSelectTodo(todoid));
+                for (final todoid in selectedTodosBloc.currentState) {
+                  selectedTodosBloc.dispatch(UnSelectTodoEvent(todoid));
                 }
               },
-              projects: store.state.projects,
-              labels: store.state.labels,
-              todos: store.state.todos,
+              projects: fastterProjects.currentState,
+              labels: fastterLabels.currentState,
+              todos: fastterTodos.currentState,
               updateTodo: (id, updated) =>
-                  store.dispatch(UpdateItem<Todo>(id, updated)),
+                  fastterTodos.dispatch(UpdateEvent<Todo>(id, updated)),
               deleteSelected: () {
-                for (final todoid in store.state.selectedTodos) {
-                  store.dispatch(DeleteItem<Todo>(todoid));
-                  store.dispatch(UnSelectTodo(todoid));
+                for (final todoid in selectedTodosBloc.currentState) {
+                  fastterTodos.dispatch(DeleteEvent<Todo>(todoid));
+                  selectedTodosBloc.dispatch(UnSelectTodoEvent(todoid));
                 }
               },
               deleteAll: () {
-                for (final todo in store.state.todos.items
+                for (final todo in fastterTodos.currentState.items
                     .where((todo) => fastterTodos.filterObject(todo, filter))) {
-                  store.dispatch(DeleteItem<Todo>(todo.id));
+                  fastterTodos.dispatch(DeleteEvent<Todo>(todo.id));
                 }
               },
-              frontPage: store.state.user.user?.settings?.frontPage ??
+              selectedtodos: selectedTodosBloc.currentState,
+              frontPage: userState.user?.settings?.frontPage ??
                   FrontPage(
                     route: '/',
                     title: 'Inbox',
                   ),
-              updateSortBy: (sortBy) => store.dispatch(SetSortBy<Todo>(sortBy)),
+              updateSortBy: (sortBy) =>
+                  fastterTodos.dispatch(SetSortByEvent<Todo>(sortBy)),
             ),
       );
 }
@@ -125,8 +118,6 @@ class _HomeAppBar extends StatelessWidget {
     @required this.todoCommentsSyncStart,
     @required this.todoRemindersSyncStart,
     @required this.notificationsSyncStart,
-    @required this.fetching,
-    @required this.loading,
     @required this.selectedtodos,
     @required this.deleteSelected,
     @required this.unSelectAll,
@@ -148,8 +139,6 @@ class _HomeAppBar extends StatelessWidget {
   final VoidCallback todoCommentsSyncStart;
   final VoidCallback todoRemindersSyncStart;
   final VoidCallback notificationsSyncStart;
-  final bool fetching;
-  final bool loading;
   final Map<String, dynamic> filter;
   final List<String> selectedtodos;
   final VoidCallback deleteSelected;
@@ -448,10 +437,9 @@ class _HomeAppBar extends StatelessWidget {
               );
             }
             items.add(
-              PopupMenuItem<_PopupAction>(
-                child: const Text('Refresh'),
+              const PopupMenuItem<_PopupAction>(
+                child: Text('Refresh'),
                 value: _PopupAction.refresh,
-                enabled: !fetching,
               ),
             );
             items.add(
@@ -527,11 +515,6 @@ class _HomeAppBar extends StatelessWidget {
                 onPressed: () => _onSearch(context),
               ),
             if (selectedtodos.isEmpty) _buildSortAction(context),
-            if (selectedtodos.isNotEmpty && loading)
-              Icon(
-                Icons.refresh,
-                color: Colors.white,
-              ),
             if (selectedtodos.isEmpty)
               IconButton(
                 icon: const Icon(Icons.notifications),

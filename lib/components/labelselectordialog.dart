@@ -1,11 +1,11 @@
+import 'package:fastter_dart/store/labels.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 class LabelSelectorDialog extends StatelessWidget {
   const LabelSelectorDialog({
@@ -16,12 +16,13 @@ class LabelSelectorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _LabelSelectorDialog(
-              labels: store.state.labels,
+      BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+        bloc: fastterLabels,
+        builder: (context, state) => _LabelSelectorDialog(
+              labels: state,
               selectedLabels: selectedLabels,
-              createLabel: (label) => store.dispatch(AddItem<Label>(label)),
+              createLabel: (label) =>
+                  fastterLabels.dispatch(AddEvent<Label>(label)),
             ),
       );
 }

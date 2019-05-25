@@ -1,50 +1,33 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/store/projects.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
 import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../components/colorpicker.dart';
 
-class AddProjectScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _AddProjectScreen(
-              onAddProject: (project) =>
-                  store.dispatch(AddItem<Project>(project)),
-            ),
-      );
-}
-
-class _AddProjectScreen extends StatefulWidget {
-  const _AddProjectScreen({
-    @required this.onAddProject,
+class AddProjectScreen extends StatefulWidget {
+  const AddProjectScreen({
     Key key,
   }) : super(key: key);
-
-  final void Function(Project) onAddProject;
 
   @override
   _AddProjectScreenState createState() => _AddProjectScreenState();
 }
 
-class _AddProjectScreenState extends State<_AddProjectScreen> {
+class _AddProjectScreenState extends State<AddProjectScreen> {
   TextEditingController titleController = TextEditingController();
   FocusNode titleFocusNode = FocusNode();
 
   Color _currentColor = const Color(0xff443a49);
 
   void _onSave() {
-    widget.onAddProject(
+    fastterProjects.dispatch(AddEvent<Project>(
       Project(
         title: titleController.text,
         color: _currentColor.value.toRadixString(16).substring(2),
       ),
-    );
+    ));
     Navigator.of(context).pop();
   }
 

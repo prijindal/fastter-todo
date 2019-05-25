@@ -1,12 +1,15 @@
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import 'package:fastter_dart/store/projects.dart' as prefix0;
+import 'package:fastter_dart/store/selectedtodos.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/todos.dart';
-import 'package:fastter_dart/store/projects.dart' show fastterProjects;
+import 'package:fastter_dart/store/projects.dart' show blocProjects;
 
 import '../components/hexcolor.dart';
 import '../components/todoeditbar.dart';
@@ -82,23 +85,18 @@ class _SearchTodosResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _SearchTodosResultsComponent(
-              selectedTodos: store.state.selectedTodos,
-              todos: ListState<Todo>(
-                fetching: store.state.todos.fetching,
-                adding: store.state.todos.adding,
-                updating: store.state.todos.updating,
-                deleting: store.state.todos.deleting,
-                items: store.state.todos.items
+      BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+        bloc: fastterTodos,
+        builder: (context, state) => _SearchTodosResultsComponent(
+              selectedTodos: selectedTodosBloc.currentState,
+              todos: state.copyWith(
+                items: state.items
                     .where((todo) =>
                         fastterTodos.filterObject(todo, <String, dynamic>{
                           'query': query,
                         }))
                     .toList()
-                      ..sort(getCompareFunction(store.state.todos.sortBy)),
-                sortBy: store.state.todos.sortBy,
+                      ..sort(getCompareFunction(state.sortBy)),
               ),
             ),
       );
@@ -148,22 +146,10 @@ class _SearchProjectsResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _SearchProjectsResultsComponent(
-              projects: ListState<Project>(
-                fetching: store.state.todos.fetching,
-                adding: store.state.todos.adding,
-                updating: store.state.todos.updating,
-                deleting: store.state.todos.deleting,
-                items: store.state.projects.items
-                    .where((project) =>
-                        fastterProjects.filterObject(project, <String, dynamic>{
-                          'query': query,
-                        }))
-                    .toList(),
-                sortBy: store.state.todos.sortBy,
-              ),
+      BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+        bloc: prefix0.fastterProjects,
+        builder: (context, state) => _SearchProjectsResultsComponent(
+              projects: state.items,
             ),
       );
 }
@@ -173,11 +159,11 @@ class _SearchProjectsResultsComponent extends StatelessWidget {
     @required this.projects,
   });
 
-  final ListState<Project> projects;
+  final List<Project> projects;
 
   @override
   Widget build(BuildContext context) => ListView(
-        children: projects.items
+        children: projects
             .map(
               (project) => ListTile(
                     onTap: () {
