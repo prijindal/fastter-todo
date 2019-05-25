@@ -273,7 +273,6 @@ class _TodoListState extends State<_TodoList> {
   }
 
   Widget _build() => RefreshIndicator(
-        displacement: kToolbarHeight + 40,
         child: Stack(
           children: [
             _buildListView(),
