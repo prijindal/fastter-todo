@@ -1,6 +1,7 @@
 import 'package:fastter_dart/store/notifications.dart';
 import 'package:flutter/material.dart'
     show
+        Key,
         StatelessWidget,
         required,
         Widget,
@@ -13,7 +14,8 @@ import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/notification.model.dart';
 
 class NotificationItem extends StatelessWidget {
-  const NotificationItem({@required this.notification});
+  const NotificationItem({@required this.notification, Key key})
+      : super(key: key);
 
   final Notification notification;
 

@@ -108,14 +108,11 @@ class _SearchTodosResultsComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Stack(
         children: [
-          ListView(
-            children: todos.items
-                .map(
-                  (item) => TodoItem(
-                        todo: item,
-                      ),
-                )
-                .toList(),
+          ListView.builder(
+            itemCount: todos.items.length,
+            itemBuilder: (context, index) => TodoItem(
+                  todo: todos.items[index],
+                ),
           ),
           Positioned(
             bottom: 0,
@@ -160,25 +157,22 @@ class _SearchProjectsResultsComponent extends StatelessWidget {
   final List<Project> projects;
 
   @override
-  Widget build(BuildContext context) => ListView(
-        children: projects
-            .map(
-              (project) => ListTile(
-                    onTap: () {
-                      Navigator.of(context)
-                          .pushNamed('/todos', arguments: {'project': project});
-                      history.add(
-                          RouteInfo('/todos', arguments: {'project': project}));
-                    },
-                    leading: Icon(
-                      Icons.group_work,
-                      color: project.color == null
-                          ? null
-                          : HexColor(project.color),
-                    ),
-                    title: Text(project.title),
-                  ),
-            )
-            .toList(),
+  Widget build(BuildContext context) => ListView.builder(
+        itemCount: projects.length,
+        itemBuilder: (context, index) => ListTile(
+              onTap: () {
+                Navigator.of(context).pushNamed('/todos',
+                    arguments: {'project': projects[index]});
+                history.add(RouteInfo('/todos',
+                    arguments: {'project': projects[index]}));
+              },
+              leading: Icon(
+                Icons.group_work,
+                color: projects[index].color == null
+                    ? null
+                    : HexColor(projects[index].color),
+              ),
+              title: Text(projects[index].title),
+            ),
       );
 }

@@ -28,48 +28,47 @@ class ProjectExpansionTile extends StatelessWidget {
   Widget build(BuildContext context) =>
       BlocBuilder<FastterEvent<Project>, ListState<Project>>(
         bloc: fastterProjects,
-        builder: (context, state) {
-          return BaseExpansionTile<Project>(
-            liststate: state.copyWith(
-              items: state.items..sort(getCompareFunction('index')),
-            ),
-            addRoute: MaterialPageRoute<void>(
-              builder: (context) => AddProjectScreen(),
-            ),
-            manageRoute: MaterialPageRoute(
-              builder: (context) => ManageProjectsScreen(),
-            ),
-            icon: const Icon(Icons.group_work),
-            title: 'Projects',
-            buildChild: (project) => ListTile(
-                  dense: true,
-                  enabled: selectedProject == null ||
-                      selectedProject.id != project.id,
-                  selected: selectedProject != null &&
-                      selectedProject.id == project.id,
-                  leading: Icon(
-                    Icons.group_work,
-                    color:
-                        project.color == null ? null : HexColor(project.color),
+        builder: (context, state) => BaseExpansionTile<Project>(
+              liststate: state.copyWith(
+                items: state.items..sort(getCompareFunction('index')),
+              ),
+              addRoute: MaterialPageRoute<void>(
+                builder: (context) => AddProjectScreen(),
+              ),
+              manageRoute: MaterialPageRoute(
+                builder: (context) => ManageProjectsScreen(),
+              ),
+              icon: const Icon(Icons.group_work),
+              title: 'Projects',
+              buildChild: (project) => ListTile(
+                    dense: true,
+                    enabled: selectedProject == null ||
+                        selectedProject.id != project.id,
+                    selected: selectedProject != null &&
+                        selectedProject.id == project.id,
+                    leading: Icon(
+                      Icons.group_work,
+                      color: project.color == null
+                          ? null
+                          : HexColor(project.color),
+                    ),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          constraints: const BoxConstraints(
+                              maxWidth: 200, maxHeight: 40),
+                          child: Text(project.title),
+                        ),
+                        FilterCountText(
+                          <String, dynamic>{
+                            'project': project.id,
+                          },
+                        ),
+                      ],
+                    ),
+                    onTap: () => onChildSelected(project),
                   ),
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        constraints:
-                            const BoxConstraints(maxWidth: 200, maxHeight: 40),
-                        child: Text(project.title),
-                      ),
-                      FilterCountText(
-                        <String, dynamic>{
-                          'project': project.id,
-                        },
-                      ),
-                    ],
-                  ),
-                  onTap: () => onChildSelected(project),
-                ),
-          );
-        },
+            ),
       );
 }

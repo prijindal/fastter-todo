@@ -20,9 +20,6 @@ import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/user.model.dart';
 
 class FlutterPersistor {
-  FlutterPersistor() {
-    _initSharedPreferences();
-  }
   SharedPreferences _sharedPreferences;
 
   Future<void> _initSharedPreferences() async {
@@ -86,6 +83,7 @@ class FlutterPersistor {
   }
 
   Future<void> load() async {
+    await _initSharedPreferences();
     final user = UserState.fromJson(
       _loadKey('user'),
     );

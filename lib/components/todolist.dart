@@ -143,28 +143,19 @@ class _TodoListState extends State<_TodoList> {
     return DateFormat.yMMM().format(dueDate);
   }
 
-  Widget _buildPendingTodos() {
-    final items = widget.todos.items.toList();
-    if (!widget.categoryView) {
-      return Column(
-        children: items
-            .where((todo) => todo.completed != true)
-            .map((todo) => TodoItem(
-                  todo: todo,
-                ))
-            .toList(),
-      );
-    }
+  Map<String, List<Todo>> get _mapCategoryToList {
+    final items =
+        widget.todos.items.where((todo) => todo.completed != true).toList();
+    final sortBy = widget.todos.sortBy;
     final mapCategoryToList = <String, List<Todo>>{};
-
-    for (final todo in items.where((todo) => todo.completed != true)) {
-      if (widget.todos.sortBy == 'priority') {
+    for (final todo in items) {
+      if (sortBy == 'priority') {
         final priorityString = 'Priority ${todo.priority.toString()}';
         if (!mapCategoryToList.containsKey(priorityString)) {
           mapCategoryToList[priorityString] = [];
         }
         mapCategoryToList[priorityString].add(todo);
-      } else if (widget.todos.sortBy == 'title') {
+      } else if (sortBy == 'title') {
         final titleString = '${todo.title[0].toUpperCase().toString()}';
         if (!mapCategoryToList.containsKey(titleString)) {
           mapCategoryToList[titleString] = [];
@@ -178,91 +169,104 @@ class _TodoListState extends State<_TodoList> {
         mapCategoryToList[dueDateString].add(todo);
       }
     }
+    final completedItems =
+        widget.todos.items.where((todo) => todo.completed == true).toList();
+    if (completedItems.isNotEmpty) {
+      mapCategoryToList['Completed'] =
+          widget.todos.items.where((todo) => todo.completed == true).toList();
+    }
+    return mapCategoryToList;
+  }
 
-    final children = <Widget>[];
-
-    for (final categoryString in mapCategoryToList.keys) {
-      children.add(
-        ListTileTheme.merge(
-          dense: true,
-          child: ExpansionTile(
-            initiallyExpanded: true,
-            title: Text(categoryString),
-            children: mapCategoryToList[categoryString]
-                .map(
-                  (todo) => ListTileTheme.merge(
-                      dense: false,
-                      child: TodoItem(
-                        todo: todo,
-                      )),
-                )
-                .toList(),
-          ),
-        ),
+  Widget _renderIthItem(int index) {
+    final items =
+        widget.todos.items.where((todo) => todo.completed != true).toList();
+    if (!widget.categoryView) {
+      return TodoItem(
+        todo: items[index],
       );
     }
-
-    return Column(
-      children: children,
+    final categoryString = _mapCategoryToList.keys.elementAt(index);
+    return ListTileTheme.merge(
+      key: Key('${categoryString}_listitletheme'),
+      dense: true,
+      child: ExpansionTile(
+        key: Key(categoryString),
+        initiallyExpanded: _mapCategoryToList[categoryString]
+            .where((todo) => todo.completed != true)
+            .isNotEmpty,
+        title: Text(
+          categoryString,
+          style: Theme.of(context).textTheme.body1,
+        ),
+        children: _mapCategoryToList[categoryString]
+            .map(
+              (todo) => ListTileTheme.merge(
+                  key: Key('${todo.id}_listitletheme'),
+                  dense: false,
+                  child: TodoItem(
+                    todo: todo,
+                    key: Key(todo.id),
+                  )),
+            )
+            .toList(),
+      ),
     );
   }
 
-  List<Widget> _buildListChildren() {
-    if (widget.todos.fetching && widget.todos.items.isEmpty) {
-      return [
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 20),
-          child: const Center(
-            child: CircularProgressIndicator(),
-          ),
-        )
-      ];
+  int get _renderItemsCount {
+    if (!widget.categoryView) {
+      return widget.todos.items.where((todo) => todo.completed != true).length;
     }
-    return widget.todos.items.isEmpty
-        ? [
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 20),
-                  ),
-                  const Text('No Tasks yet'),
-                  RaisedButton(
-                    child: const Text('Add a todo'),
-                    onPressed: () {
-                      setState(() {
-                        _showInput = true;
-                      });
-                    },
-                  ),
-                ],
+    return _mapCategoryToList.length;
+  }
+
+  Widget _buildSliverList() {
+    if (widget.todos.fetching && widget.todos.items.isEmpty) {
+      return SliverList(
+        delegate: SliverChildListDelegate(
+          [
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 20),
+              child: const Center(
+                child: CircularProgressIndicator(),
               ),
             )
-          ]
-        : [
-            _buildPendingTodos(),
-            if (widget.todos.items
-                .where((todo) => todo.completed == true)
-                .isNotEmpty)
-              ListTileTheme.merge(
-                dense: true,
-                child: ExpansionTile(
-                  title: const Text('Completed'),
-                  children: widget.todos.items
-                      .where((todo) => todo.completed == true)
-                      .map(
-                        (todo) => ListTileTheme.merge(
-                            dense: false,
-                            child: TodoItem(
-                              todo: todo,
-                            )),
-                      )
-                      .toList(),
+          ],
+        ),
+      );
+    }
+    return widget.todos.items.isEmpty
+        ? SliverList(
+            delegate: SliverChildListDelegate([
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 20),
+                    ),
+                    const Text('No Tasks yet'),
+                    RaisedButton(
+                      child: const Text('Add a todo'),
+                      onPressed: () {
+                        setState(() {
+                          _showInput = true;
+                        });
+                      },
+                    ),
+                  ],
                 ),
-              ),
-          ];
+              )
+            ]),
+          )
+        : SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _renderIthItem(index),
+              childCount: _renderItemsCount,
+            ),
+          );
   }
 
   Widget _buildListView() => CustomScrollView(
@@ -271,11 +275,7 @@ class _TodoListState extends State<_TodoList> {
             title: widget.title,
             filter: widget.filter,
           ),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              _buildListChildren(),
-            ),
-          ),
+          _buildSliverList(),
         ],
       );
 
@@ -284,7 +284,7 @@ class _TodoListState extends State<_TodoList> {
     return completer.future;
   }
 
-  Widget _buildChild() => RefreshIndicator(
+  Widget _build() => RefreshIndicator(
         displacement: kToolbarHeight + 40,
         child: Stack(
           children: [
@@ -294,53 +294,6 @@ class _TodoListState extends State<_TodoList> {
         ),
         onRefresh: _onRefresh,
       );
-
-  Widget _buildConnectivity(Widget child, bool connected) => Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.only(top: connected ? 0 : 24.0),
-            child: child,
-          ),
-          Positioned(
-            height: 32,
-            left: 0,
-            right: 0,
-            child: Container(
-              color: connected ? Colors.transparent : const Color(0xFFEE4400),
-              child: connected
-                  ? Container()
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const <Widget>[
-                        Text('OFFLINE'),
-                        SizedBox(width: 8),
-                        SizedBox(
-                          width: 12,
-                          height: 12,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-        ],
-      );
-
-  Widget _build() {
-    if (Platform.isAndroid || Platform.isIOS) {
-      return OfflineBuilder(
-        connectivityBuilder: (context, connectivity, child) =>
-            _buildConnectivity(child, connectivity != ConnectivityResult.none),
-        child: _buildChild(),
-      );
-    }
-    return _buildConnectivity(_buildChild(), true);
-  }
 
   Widget _buildPotrait() => Scaffold(
         drawer: const HomeAppDrawer(),

@@ -34,19 +34,12 @@ class _NotificationsDrawer extends StatelessWidget {
             ? const Center(
                 child: Text('No Notifications Found'),
               )
-            : ListView(
-                children: [
-                  const ListTile(
-                    title: Text('Notifications'),
-                  ),
-                  ...notifications.items
-                      .map(
-                        (notification) => NotificationItem(
-                              notification: notification,
-                            ),
-                      )
-                      .toList(),
-                ],
+            : ListView.builder(
+                itemCount: notifications.items.length,
+                itemBuilder: (context, index) => NotificationItem(
+                      key: Key(notifications.items[index].id),
+                      notification: notifications.items[index],
+                    ),
               ),
       );
 }

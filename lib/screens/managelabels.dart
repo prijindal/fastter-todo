@@ -171,35 +171,34 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
         ),
         body: Stack(
           children: [
-            ListView(
-              children: widget.labels.items
-                  .map(
-                    (label) => ListTile(
-                          onTap: () {
-                            if (selectedLabels.contains(label.id)) {
-                              setState(() {
-                                selectedLabels.remove(label.id);
-                              });
-                            } else {
-                              setState(() {
-                                selectedLabels.add(label.id);
-                              });
-                            }
-                          },
-                          selected: selectedLabels.contains(label.id),
-                          title: Text(label.title),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () async {
-                              if (await _deleteLabel(
-                                  'Delete ${label.title}?')) {
-                                widget.deleteLabel(label);
-                              }
-                            },
-                          ),
-                        ),
-                  )
-                  .toList(),
+            ListView.builder(
+              itemCount: widget.labels.items.length,
+              itemBuilder: (context, index) {
+                final label = widget.labels.items[index];
+                return ListTile(
+                  onTap: () {
+                    if (selectedLabels.contains(label.id)) {
+                      setState(() {
+                        selectedLabels.remove(label.id);
+                      });
+                    } else {
+                      setState(() {
+                        selectedLabels.add(label.id);
+                      });
+                    }
+                  },
+                  selected: selectedLabels.contains(label.id),
+                  title: Text(label.title),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () async {
+                      if (await _deleteLabel('Delete ${label.title}?')) {
+                        widget.deleteLabel(label);
+                      }
+                    },
+                  ),
+                );
+              },
             ),
             _buildBottom(),
           ],

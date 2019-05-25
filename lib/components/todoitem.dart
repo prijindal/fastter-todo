@@ -1,5 +1,3 @@
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/store/labels.dart';
 import 'package:fastter_dart/store/todocomments.dart';
 import 'package:fastter_dart/store/todoreminders.dart';
 import 'package:fastter_dart/store/todos.dart';
@@ -7,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
 
@@ -25,41 +22,29 @@ class TodoItem extends StatelessWidget {
   final Todo todo;
 
   @override
-  Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Label>, ListState<Label>>(
-        bloc: fastterLabels,
-        builder: (context, labelsState) => _TodoItem(
-              todo: todo,
-              labels: labelsState.items
-                  .where((label) => todo.labels
-                      .map<String>((todolabel) => todolabel.id)
-                      .toList()
-                      .contains(label.id))
-                  .toList(),
-              deleteTodo: () =>
-                  fastterTodos.dispatch(DeleteEvent<Todo>(todo.id)),
-              updateTodo: (updated) =>
-                  fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
-              toggleSelected: () =>
-                  selectedTodosBloc.dispatch(ToggleSelectTodoEvent(todo.id)),
-              reminders: fastterTodoReminders.currentState.items
-                  .where((reminder) =>
-                      reminder.todo != null &&
-                      reminder.completed == false &&
-                      reminder.todo.id == todo.id)
-                  .length,
-              comments: fastterTodoComments.currentState.items
-                  .where((comment) =>
-                      comment.todo != null && comment.todo.id == todo.id)
-                  .length,
-            ),
+  Widget build(BuildContext context) => _TodoItem(
+        todo: todo,
+        deleteTodo: () => fastterTodos.dispatch(DeleteEvent<Todo>(todo.id)),
+        updateTodo: (updated) =>
+            fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
+        toggleSelected: () =>
+            selectedTodosBloc.dispatch(ToggleSelectTodoEvent(todo.id)),
+        reminders: fastterTodoReminders.currentState.items
+            .where((reminder) =>
+                reminder.todo != null &&
+                reminder.completed == false &&
+                reminder.todo.id == todo.id)
+            .length,
+        comments: fastterTodoComments.currentState.items
+            .where(
+                (comment) => comment.todo != null && comment.todo.id == todo.id)
+            .length,
       );
 }
 
 class _TodoItem extends StatelessWidget {
   const _TodoItem({
     @required this.todo,
-    @required this.labels,
     @required this.deleteTodo,
     @required this.updateTodo,
     @required this.toggleSelected,
@@ -69,7 +54,6 @@ class _TodoItem extends StatelessWidget {
   }) : super(key: key);
 
   final Todo todo;
-  final List<Label> labels;
   final VoidCallback deleteTodo;
   final void Function(Todo) updateTodo;
 
@@ -214,7 +198,7 @@ class _TodoItem extends StatelessWidget {
 
   Widget _buildSubtitle(BuildContext context) {
     final firstRow = _buildSubtitleFirstRow(context);
-    if (labels.isEmpty) {
+    if (todo.labels.isEmpty) {
       return firstRow;
     } else {
       return Column(
@@ -289,12 +273,12 @@ class _TodoItem extends StatelessWidget {
         ),
         child: BlocBuilder<SelectedTodoEvent, List<String>>(
           bloc: selectedTodosBloc,
-          builder: (context, selectedList) => ListTile(
+          builder: (context, selectedTodos) => ListTile(
                 leading: TodoItemToggle(
                   todo: todo,
                   toggleCompleted: _toggleCompleted,
                 ),
-                selected: selectedList.contains(todo.id),
+                selected: selectedTodos.contains(todo.id),
                 onTap: toggleSelected,
                 title: Flex(
                   direction: Axis.horizontal,

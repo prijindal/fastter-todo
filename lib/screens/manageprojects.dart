@@ -237,41 +237,39 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
         ),
         body: Stack(
           children: [
-            ListView(
-              children: widget.projects.items
-                  .map(
-                    (project) => ListTile(
-                          onTap: () {
-                            if (selectedProjects.contains(project.id)) {
-                              setState(() {
-                                selectedProjects.remove(project.id);
-                              });
-                            } else {
-                              setState(() {
-                                selectedProjects.add(project.id);
-                              });
-                            }
-                          },
-                          selected: selectedProjects.contains(project.id),
-                          leading: Icon(
-                            Icons.group_work,
-                            color: project.color == null
-                                ? null
-                                : HexColor(project.color),
-                          ),
-                          title: Text(project.title),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () async {
-                              if (await _deleteProject(
-                                  'Delete ${project.title}?')) {
-                                widget.deleteProject(project);
-                              }
-                            },
-                          ),
-                        ),
-                  )
-                  .toList(),
+            ListView.builder(
+              itemCount: widget.projects.items.length,
+              itemBuilder: (context, index) {
+                final project = widget.projects.items[index];
+                return ListTile(
+                  onTap: () {
+                    if (selectedProjects.contains(project.id)) {
+                      setState(() {
+                        selectedProjects.remove(project.id);
+                      });
+                    } else {
+                      setState(() {
+                        selectedProjects.add(project.id);
+                      });
+                    }
+                  },
+                  selected: selectedProjects.contains(project.id),
+                  leading: Icon(
+                    Icons.group_work,
+                    color:
+                        project.color == null ? null : HexColor(project.color),
+                  ),
+                  title: Text(project.title),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () async {
+                      if (await _deleteProject('Delete ${project.title}?')) {
+                        widget.deleteProject(project);
+                      }
+                    },
+                  ),
+                );
+              },
             ),
             _buildBottom(),
           ],
