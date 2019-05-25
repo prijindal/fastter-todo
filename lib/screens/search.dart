@@ -85,7 +85,6 @@ class _SearchTodosResults extends StatelessWidget {
       BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
         builder: (context, state) => _SearchTodosResultsComponent(
-              selectedTodos: selectedTodosBloc.currentState,
               todos: state.copyWith(
                 items: state.items
                     .where((todo) =>
@@ -102,10 +101,8 @@ class _SearchTodosResults extends StatelessWidget {
 class _SearchTodosResultsComponent extends StatelessWidget {
   const _SearchTodosResultsComponent({
     @required this.todos,
-    @required this.selectedTodos,
   });
 
-  final List<String> selectedTodos;
   final ListState<Todo> todos;
 
   @override
@@ -124,11 +121,15 @@ class _SearchTodosResultsComponent extends StatelessWidget {
             bottom: 0,
             right: 2,
             left: 2,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 350),
-              transitionBuilder: (child, animation) =>
-                  SizeTransition(child: child, sizeFactor: animation),
-              child: selectedTodos.isNotEmpty ? TodoEditBar() : Container(),
+            child: BlocBuilder<SelectedTodoEvent, List<String>>(
+              bloc: selectedTodosBloc,
+              builder: (context, selectedTodos) => AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 350),
+                    transitionBuilder: (child, animation) =>
+                        SizeTransition(child: child, sizeFactor: animation),
+                    child:
+                        selectedTodos.isNotEmpty ? TodoEditBar() : Container(),
+                  ),
             ),
           ),
         ],

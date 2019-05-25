@@ -40,7 +40,6 @@ class TodoItem extends StatelessWidget {
                   fastterTodos.dispatch(DeleteEvent<Todo>(todo.id)),
               updateTodo: (updated) =>
                   fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
-              selected: selectedTodosBloc.currentState.contains(todo.id),
               toggleSelected: () =>
                   selectedTodosBloc.dispatch(ToggleSelectTodoEvent(todo.id)),
               reminders: fastterTodoReminders.currentState.items
@@ -63,7 +62,6 @@ class _TodoItem extends StatelessWidget {
     @required this.labels,
     @required this.deleteTodo,
     @required this.updateTodo,
-    @required this.selected,
     @required this.toggleSelected,
     @required this.reminders,
     @required this.comments,
@@ -75,7 +73,6 @@ class _TodoItem extends StatelessWidget {
   final VoidCallback deleteTodo;
   final void Function(Todo) updateTodo;
 
-  final bool selected;
   final VoidCallback toggleSelected;
   final int reminders;
   final int comments;
@@ -290,28 +287,31 @@ class _TodoItem extends StatelessWidget {
             ),
           ],
         ),
-        child: ListTile(
-          leading: TodoItemToggle(
-            todo: todo,
-            toggleCompleted: _toggleCompleted,
-          ),
-          selected: selected,
-          onTap: toggleSelected,
-          title: Flex(
-            direction: Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Flexible(
-                child: _buildTitle(context),
+        child: BlocBuilder<SelectedTodoEvent, List<String>>(
+          bloc: selectedTodosBloc,
+          builder: (context, selectedList) => ListTile(
+                leading: TodoItemToggle(
+                  todo: todo,
+                  toggleCompleted: _toggleCompleted,
+                ),
+                selected: selectedList.contains(todo.id),
+                onTap: toggleSelected,
+                title: Flex(
+                  direction: Axis.horizontal,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Flexible(
+                      child: _buildTitle(context),
+                    ),
+                    if (todo.dueDate == null &&
+                        todo.project != null &&
+                        reminders == 0 &&
+                        comments == 0)
+                      _buildProject(context, flex: 0),
+                  ],
+                ),
+                subtitle: _buildSubtitle(context),
               ),
-              if (todo.dueDate == null &&
-                  todo.project != null &&
-                  reminders == 0 &&
-                  comments == 0)
-                _buildProject(context, flex: 0),
-            ],
-          ),
-          subtitle: _buildSubtitle(context),
         ),
       );
 

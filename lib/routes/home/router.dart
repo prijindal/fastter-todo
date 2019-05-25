@@ -82,12 +82,14 @@ class _HomePageState extends State<HomePage> {
     fastterTodoComments.dispatch(SyncEvent<TodoComment>());
     fastterTodoReminders.dispatch(SyncEvent<TodoReminder>());
     fastterNotifications.dispatch(SyncEvent<notification.Notification>());
-    fastterLabels.queries.initSubscriptions();
-    fastterProjects.queries.initSubscriptions();
-    fastterTodos.queries.initSubscriptions();
-    fastterTodoComments.queries.initSubscriptions();
-    fastterTodoReminders.queries.initSubscriptions();
-    fastterNotifications.queries.initSubscriptions();
+    fastterLabels.queries.initSubscriptions(fastterLabels.dispatch);
+    fastterProjects.queries.initSubscriptions(fastterProjects.dispatch);
+    fastterTodos.queries.initSubscriptions(fastterTodos.dispatch);
+    fastterTodoComments.queries.initSubscriptions(fastterTodoComments.dispatch);
+    fastterTodoReminders.queries
+        .initSubscriptions(fastterTodoReminders.dispatch);
+    fastterNotifications.queries
+        .initSubscriptions(fastterNotifications.dispatch);
     Fastter.instance.onConnect = () {
       fastterUser.dispatch(ConfirmUserEvent(Fastter.instance.bearer));
     };

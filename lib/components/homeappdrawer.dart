@@ -1,4 +1,4 @@
-import 'package:fastter_dart/store/projects.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/store/todos.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_todo/bloc.dart';
@@ -17,6 +17,7 @@ import '../helpers/todofilters.dart';
 
 import 'labelexpansiontile.dart';
 import 'projectexpansiontile.dart';
+import 'filtercountext.dart';
 
 class HomeAppDrawer extends StatelessWidget {
   const HomeAppDrawer({Key key, this.disablePop = false}) : super(key: key);
@@ -28,12 +29,6 @@ class HomeAppDrawer extends StatelessWidget {
         bloc: fastterUser,
         builder: (context, userState) => _HomeAppDrawer(
               user: userState,
-              projects: fastterProjects.currentState,
-              todos: ListState<Todo>(
-                items: fastterTodos.currentState.items
-                    .where((todo) => todo.completed != true)
-                    .toList(),
-              ),
               disablePop: disablePop,
               frontPage: userState.user?.settings?.frontPage ??
                   FrontPage(
@@ -47,16 +42,12 @@ class HomeAppDrawer extends StatelessWidget {
 class _HomeAppDrawer extends StatelessWidget {
   const _HomeAppDrawer({
     @required this.user,
-    @required this.projects,
-    @required this.todos,
     @required this.frontPage,
     this.disablePop = false,
     Key key,
   }) : super(key: key);
 
   final UserState user;
-  final ListState<Project> projects;
-  final ListState<Todo> todos;
   final bool disablePop;
   final FrontPage frontPage;
 
@@ -128,8 +119,7 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Inbox'),
-                  Text(filterToCount(<String, dynamic>{'project': null}, todos)
-                      .toString()),
+                  const FilterCountText(<String, dynamic>{'project': null}),
                 ],
               ),
               onTap: () {
@@ -145,7 +135,7 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('All Tasks'),
-                  Text(filterToCount(<String, dynamic>{}, todos).toString()),
+                  const FilterCountText(<String, dynamic>{}),
                 ],
               ),
               onTap: () {
@@ -161,7 +151,7 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Today'),
-                  Text(filterToCount(
+                  FilterCountText(
                     <String, dynamic>{
                       '_operators': {
                         'dueDate': {
@@ -169,8 +159,7 @@ class _HomeAppDrawer extends StatelessWidget {
                         },
                       },
                     },
-                    todos,
-                  ).toString()),
+                  ),
                 ],
               ),
               onTap: () {
@@ -186,7 +175,7 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('7 Days'),
-                  Text(filterToCount(
+                  FilterCountText(
                     <String, dynamic>{
                       '_operators': {
                         'dueDate': {
@@ -194,8 +183,7 @@ class _HomeAppDrawer extends StatelessWidget {
                         },
                       },
                     },
-                    todos,
-                  ).toString()),
+                  ),
                 ],
               ),
               onTap: () {

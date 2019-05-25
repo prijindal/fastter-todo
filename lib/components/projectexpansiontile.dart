@@ -12,6 +12,7 @@ import '../helpers/todofilters.dart';
 import '../screens/addproject.dart';
 import '../screens/manageprojects.dart';
 import 'expansiontile.dart';
+import 'filtercountext.dart';
 
 class ProjectExpansionTile extends StatelessWidget {
   const ProjectExpansionTile({
@@ -28,7 +29,6 @@ class ProjectExpansionTile extends StatelessWidget {
       BlocBuilder<FastterEvent<Project>, ListState<Project>>(
         bloc: fastterProjects,
         builder: (context, state) {
-          final todos = fastterTodos.currentState;
           return BaseExpansionTile<Project>(
             liststate: state.copyWith(
               items: state.items..sort(getCompareFunction('index')),
@@ -60,12 +60,11 @@ class ProjectExpansionTile extends StatelessWidget {
                             const BoxConstraints(maxWidth: 200, maxHeight: 40),
                         child: Text(project.title),
                       ),
-                      Text(filterToCount(
+                      FilterCountText(
                         <String, dynamic>{
                           'project': project.id,
                         },
-                        todos,
-                      ).toString()),
+                      ),
                     ],
                   ),
                   onTap: () => onChildSelected(project),

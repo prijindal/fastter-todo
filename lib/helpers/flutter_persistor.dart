@@ -49,7 +49,6 @@ class FlutterPersistor {
         }
       }
     } on Exception catch (e) {
-      print(e);
       return <String, dynamic>{};
     }
   }
@@ -67,7 +66,6 @@ class FlutterPersistor {
 
   void initListeners() {
     fastterUser.state.listen((data) {
-      print(data.toJson());
       _saveKey('user', data.toJson());
     });
     fastterTodos.state.listen((data) {

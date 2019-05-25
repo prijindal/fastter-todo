@@ -47,60 +47,28 @@ class TodoEditScreen extends StatelessWidget {
   final Todo todo;
 
   @override
-  Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Label>, ListState<Label>>(
-        bloc: fastterLabels,
-        builder: (context, state) => _TodoEditScreen(
-              todo: todo,
-              labels: state,
-              todoComments: ListState<TodoComment>(
-                items: fastterTodoComments.currentState.items
-                    .where((todocomment) =>
-                        todocomment.todo != null &&
-                        todocomment.todo.id == todo.id)
-                    .toList(),
-              ),
-              todoReminders: ListState<TodoReminder>(
-                items: fastterTodoReminders.currentState.items
-                    .where((todoreminder) =>
-                        todoreminder.todo != null &&
-                        todoreminder.todo.id == todo.id &&
-                        todoreminder.completed == false)
-                    .toList(),
-              ),
-              children: fastterTodos.currentState.items
-                  .where((todo) =>
-                      todo.parent != null && todo.parent.id == this.todo.id)
-                  .toList(),
-              updateTodo: (updated) =>
-                  fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
-              deleteTodo: () {
-                selectedTodosBloc.dispatch(UnSelectTodoEvent(todo.id));
-                fastterTodos.dispatch(DeleteEvent<Todo>(todo.id));
-              },
-            ),
+  Widget build(BuildContext context) => _TodoEditScreen(
+        todo: todo,
+        updateTodo: (updated) =>
+            fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
+        deleteTodo: () {
+          selectedTodosBloc.dispatch(UnSelectTodoEvent(todo.id));
+          fastterTodos.dispatch(DeleteEvent<Todo>(todo.id));
+        },
       );
 }
 
 class _TodoEditScreen extends StatefulWidget {
   const _TodoEditScreen({
     @required this.todo,
-    @required this.labels,
-    @required this.todoComments,
-    @required this.todoReminders,
     @required this.updateTodo,
     @required this.deleteTodo,
-    @required this.children,
     Key key,
   }) : super(key: key);
 
   final Todo todo;
-  final ListState<Label> labels;
-  final ListState<TodoComment> todoComments;
-  final ListState<TodoReminder> todoReminders;
   final void Function(Todo) updateTodo;
   final VoidCallback deleteTodo;
-  final List<Todo> children;
 
   @override
   __TodoEditScreenState createState() => __TodoEditScreenState();
@@ -263,13 +231,21 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                     ),
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.format_strikethrough),
-                  title: const Text('Subtasks'),
-                  subtitle: widget.children.isEmpty
-                      ? const Text('No Subtasks')
-                      : Text('${widget.children.length} Subtasks'),
-                  onTap: _openSubtasks,
+                BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+                  bloc: fastterTodos,
+                  builder: (context, todosState) {
+                    final children = todosState.items.where((todo) =>
+                        todo.parent != null &&
+                        todo.parent.id == widget.todo.id);
+                    return ListTile(
+                      leading: const Icon(Icons.format_strikethrough),
+                      title: const Text('Subtasks'),
+                      subtitle: children.isEmpty
+                          ? const Text('No Subtasks')
+                          : Text('${children.length} Subtasks'),
+                      onTap: _openSubtasks,
+                    );
+                  },
                 ),
                 ProjectDropdown(
                   expanded: true,
@@ -297,22 +273,44 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                       : Text(dueDateFormatter(_dueDate)),
                   onTap: _selectDate,
                 ),
-                ListTile(
-                  leading: const Icon(Icons.comment),
-                  title: const Text('Comments'),
-                  subtitle: widget.todoComments.items.isEmpty
-                      ? const Text('No Comments')
-                      : Text('${widget.todoComments.items.length} Comments'),
-                  onTap: _openComments,
+                BlocBuilder<FastterEvent<TodoComment>, ListState<TodoComment>>(
+                  bloc: fastterTodoComments,
+                  builder: (context, commentsState) {
+                    final todoComments = commentsState.items
+                        .where((todocomment) =>
+                            todocomment.todo != null &&
+                            todocomment.todo.id == widget.todo.id)
+                        .toList();
+                    ListTile(
+                      leading: const Icon(Icons.comment),
+                      title: const Text('Comments'),
+                      subtitle: todoComments.isEmpty
+                          ? const Text('No Comments')
+                          : Text('${todoComments.length} Comments'),
+                      onTap: _openComments,
+                    );
+                  },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.alarm),
-                  title: const Text('Reminders'),
-                  subtitle: widget.todoReminders.items.isEmpty
-                      ? const Text('No Reminders')
-                      : Text('${widget.todoReminders.items.length} Reminders'),
-                  onTap: _openReminders,
-                )
+                BlocBuilder<FastterEvent<TodoReminder>,
+                    ListState<TodoReminder>>(
+                  bloc: fastterTodoReminders,
+                  builder: (context, remindersState) {
+                    final todoReminders = remindersState.items
+                        .where((todoreminder) =>
+                            todoreminder.todo != null &&
+                            todoreminder.todo.id == widget.todo.id &&
+                            todoreminder.completed == false)
+                        .toList();
+                    return ListTile(
+                      leading: const Icon(Icons.alarm),
+                      title: const Text('Reminders'),
+                      subtitle: todoReminders.isEmpty
+                          ? const Text('No Reminders')
+                          : Text('${todoReminders.length} Reminders'),
+                      onTap: _openReminders,
+                    );
+                  },
+                ),
               ],
             ),
             Positioned(

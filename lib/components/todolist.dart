@@ -37,25 +37,28 @@ class TodoList extends StatelessWidget {
   Widget build(BuildContext context) =>
       BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
-        builder: (context, todosState) => _TodoList(
-              selectedTodos: selectedTodosBloc.currentState,
-              projects: fastterProjects.currentState,
-              categoryView: categoryView,
-              todos: todosState.copyWith(
-                items: todosState.items
-                    .where((todo) =>
-                        todo.parent == null &&
-                        fastterTodos.filterObject(todo, filter))
-                    .toList()
-                      ..sort(getCompareFunction(todosState.sortBy)),
-              ),
-              filter: filter,
-              title: title,
-              syncStart: () {
-                final action = SyncEvent<Todo>();
-                fastterTodos.dispatch(action);
-                return action.completer;
-              },
+        builder: (context, todosState) =>
+            BlocBuilder<SelectedTodoEvent, List<String>>(
+              bloc: selectedTodosBloc,
+              builder: (context, selectedTodos) => _TodoList(
+                    selectedTodos: selectedTodos,
+                    categoryView: categoryView,
+                    todos: todosState.copyWith(
+                      items: todosState.items
+                          .where((todo) =>
+                              todo.parent == null &&
+                              fastterTodos.filterObject(todo, filter))
+                          .toList()
+                            ..sort(getCompareFunction(todosState.sortBy)),
+                    ),
+                    filter: filter,
+                    title: title,
+                    syncStart: () {
+                      final action = SyncEvent<Todo>();
+                      fastterTodos.dispatch(action);
+                      return action.completer;
+                    },
+                  ),
             ),
       );
 }
@@ -63,7 +66,6 @@ class TodoList extends StatelessWidget {
 class _TodoList extends StatefulWidget {
   const _TodoList({
     @required this.todos,
-    @required this.projects,
     @required this.syncStart,
     @required this.selectedTodos,
     this.categoryView = false,
@@ -73,7 +75,6 @@ class _TodoList extends StatefulWidget {
   }) : super(key: key);
 
   final ListState<Todo> todos;
-  final ListState<Project> projects;
   final Completer Function() syncStart;
   final bool categoryView;
   final String title;
@@ -93,18 +94,21 @@ class _TodoListState extends State<_TodoList> {
             bottom: 0,
             right: 2,
             left: 2,
-            child: TodoInput(
-              project: (widget.filter.containsKey('project') &&
-                      widget.projects.items.isNotEmpty)
-                  ? widget.projects.items.singleWhere(
-                      (project) => project.id == widget.filter['project'],
-                      orElse: () => null)
-                  : null,
-              onBackButton: () {
-                setState(() {
-                  _showInput = false;
-                });
-              },
+            child: BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+              bloc: fastterProjects,
+              builder: (context, projects) => TodoInput(
+                    project: (widget.filter.containsKey('project') &&
+                            projects.items.isNotEmpty)
+                        ? projects.items.singleWhere(
+                            (project) => project.id == widget.filter['project'],
+                            orElse: () => null)
+                        : null,
+                    onBackButton: () {
+                      setState(() {
+                        _showInput = false;
+                      });
+                    },
+                  ),
             ),
           ),
         if (widget.selectedTodos.isNotEmpty)
@@ -204,6 +208,16 @@ class _TodoListState extends State<_TodoList> {
   }
 
   List<Widget> _buildListChildren() {
+    if (widget.todos.fetching && widget.todos.items.isEmpty) {
+      return [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 20),
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        )
+      ];
+    }
     return widget.todos.items.isEmpty
         ? [
             Center(

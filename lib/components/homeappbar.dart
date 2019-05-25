@@ -47,51 +47,78 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
         bloc: fastterUser,
-        builder: (context, userState) => _HomeAppBar(
-              projectSyncStart: () =>
-                  fastterProjects.dispatch(SyncEvent<Project>()),
-              labelSyncStart: () => fastterLabels.dispatch(SyncEvent<Label>()),
-              todoSyncStart: () => fastterTodos.dispatch(SyncEvent<Todo>()),
-              todoCommentsSyncStart: () =>
-                  fastterTodoComments.dispatch(SyncEvent<TodoComment>()),
-              todoRemindersSyncStart: () => fastterTodoReminders
-                      .dispatch(SyncEvent<TodoReminder>(<String, dynamic>{
-                    'completed': false,
-                  })),
-              notificationsSyncStart: () => fastterNotifications
-                  .dispatch(SyncEvent<notification_model.Notification>()),
-              filter: filter,
-              title: title,
-              unSelectAll: () {
-                for (final todoid in selectedTodosBloc.currentState) {
-                  selectedTodosBloc.dispatch(UnSelectTodoEvent(todoid));
-                }
-              },
-              projects: fastterProjects.currentState,
-              labels: fastterLabels.currentState,
-              todos: fastterTodos.currentState,
-              updateTodo: (id, updated) =>
-                  fastterTodos.dispatch(UpdateEvent<Todo>(id, updated)),
-              deleteSelected: () {
-                for (final todoid in selectedTodosBloc.currentState) {
-                  fastterTodos.dispatch(DeleteEvent<Todo>(todoid));
-                  selectedTodosBloc.dispatch(UnSelectTodoEvent(todoid));
-                }
-              },
-              deleteAll: () {
-                for (final todo in fastterTodos.currentState.items
-                    .where((todo) => fastterTodos.filterObject(todo, filter))) {
-                  fastterTodos.dispatch(DeleteEvent<Todo>(todo.id));
-                }
-              },
-              selectedtodos: selectedTodosBloc.currentState,
-              frontPage: userState.user?.settings?.frontPage ??
-                  FrontPage(
-                    route: '/',
-                    title: 'Inbox',
+        builder: (context, userState) =>
+            BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+              bloc: fastterProjects,
+              builder: (context, projectsState) =>
+                  BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+                    bloc: fastterLabels,
+                    builder: (context, labelsState) =>
+                        BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+                          bloc: fastterTodos,
+                          builder: (context, todosState) =>
+                              BlocBuilder<SelectedTodoEvent, List<String>>(
+                                bloc: selectedTodosBloc,
+                                builder: (context, selectedtodos) =>
+                                    _HomeAppBar(
+                                      projectSyncStart: () => fastterProjects
+                                          .dispatch(SyncEvent<Project>()),
+                                      labelSyncStart: () => fastterLabels
+                                          .dispatch(SyncEvent<Label>()),
+                                      todoSyncStart: () => fastterTodos
+                                          .dispatch(SyncEvent<Todo>()),
+                                      todoCommentsSyncStart: () =>
+                                          fastterTodoComments.dispatch(
+                                              SyncEvent<TodoComment>()),
+                                      todoRemindersSyncStart: () =>
+                                          fastterTodoReminders.dispatch(
+                                              SyncEvent<TodoReminder>(<String,
+                                                  dynamic>{
+                                            'completed': false,
+                                          })),
+                                      notificationsSyncStart: () =>
+                                          fastterNotifications.dispatch(
+                                              SyncEvent<
+                                                  notification_model
+                                                      .Notification>()),
+                                      filter: filter,
+                                      title: title,
+                                      projects: projectsState,
+                                      labels: labelsState,
+                                      todos: todosState,
+                                      updateTodo: (id, updated) =>
+                                          fastterTodos.dispatch(
+                                              UpdateEvent<Todo>(id, updated)),
+                                      deleteSelected: () {
+                                        for (final todoid in selectedtodos) {
+                                          fastterTodos.dispatch(
+                                              DeleteEvent<Todo>(todoid));
+                                          selectedTodosBloc.dispatch(
+                                              UnSelectTodoEvent(todoid));
+                                        }
+                                      },
+                                      deleteAll: () {
+                                        for (final todo in todosState.items
+                                            .where((todo) => fastterTodos
+                                                .filterObject(todo, filter))) {
+                                          fastterTodos.dispatch(
+                                              DeleteEvent<Todo>(todo.id));
+                                        }
+                                      },
+                                      selectedtodos: selectedtodos,
+                                      frontPage:
+                                          userState.user?.settings?.frontPage ??
+                                              FrontPage(
+                                                route: '/',
+                                                title: 'Inbox',
+                                              ),
+                                      updateSortBy: (sortBy) =>
+                                          fastterTodos.dispatch(
+                                              SetSortByEvent<Todo>(sortBy)),
+                                    ),
+                              ),
+                        ),
                   ),
-              updateSortBy: (sortBy) =>
-                  fastterTodos.dispatch(SetSortByEvent<Todo>(sortBy)),
             ),
       );
 }
@@ -119,7 +146,6 @@ class _HomeAppBar extends StatelessWidget {
     @required this.notificationsSyncStart,
     @required this.selectedtodos,
     @required this.deleteSelected,
-    @required this.unSelectAll,
     @required this.deleteAll,
     @required this.projects,
     @required this.labels,
@@ -142,7 +168,6 @@ class _HomeAppBar extends StatelessWidget {
   final List<String> selectedtodos;
   final VoidCallback deleteSelected;
   final VoidCallback deleteAll;
-  final VoidCallback unSelectAll;
   final ListState<Project> projects;
   final ListState<Label> labels;
   final ListState<Todo> todos;
@@ -471,9 +496,16 @@ class _HomeAppBar extends StatelessWidget {
           automaticallyImplyLeading:
               getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait,
           leading: selectedtodos.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: unSelectAll,
+              ? BlocBuilder<SelectedTodoEvent, List<String>>(
+                  bloc: selectedTodosBloc,
+                  builder: (context, state) => IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () {
+                          for (final id in state) {
+                            selectedTodosBloc.dispatch(UnSelectTodoEvent(id));
+                          }
+                        },
+                      ),
                 )
               : getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait
                   ? IconButton(
