@@ -45,7 +45,7 @@ class FlutterPersistor {
           return <String, dynamic>{};
         }
       }
-    } on Exception catch (e) {
+    } on Exception {
       return <String, dynamic>{};
     }
   }

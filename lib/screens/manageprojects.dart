@@ -191,7 +191,7 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
               child: const Icon(Icons.add),
               onPressed: () => Navigator.of(context).push<void>(
                     MaterialPageRoute<void>(
-                      builder: (context) => AddProjectScreen(),
+                      builder: (context) => const AddProjectScreen(),
                     ),
                   ),
             )

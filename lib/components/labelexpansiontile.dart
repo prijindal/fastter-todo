@@ -27,7 +27,7 @@ class LabelExpansionTile extends StatelessWidget {
         builder: (context, state) => BaseExpansionTile<Label>(
               liststate: state,
               addRoute: MaterialPageRoute<void>(
-                builder: (context) => AddLabelScreen(),
+                builder: (context) => const AddLabelScreen(),
               ),
               manageRoute: MaterialPageRoute(
                 builder: (context) => ManageLabelsScreen(),

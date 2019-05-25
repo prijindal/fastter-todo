@@ -133,7 +133,7 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
 
 class TodoCommentsAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  TodoCommentsAppBar({
+  const TodoCommentsAppBar({
     @required this.onClear,
     @required this.todo,
     this.selectedComments = const <String>[],
@@ -189,7 +189,7 @@ class TodoCommentsAppBar extends StatelessWidget
 }
 
 class _TodoCommentsAppBar extends StatelessWidget {
-  _TodoCommentsAppBar({
+  const _TodoCommentsAppBar({
     @required this.onClear,
     @required this.todo,
     @required this.todoComments,

@@ -61,7 +61,7 @@ class _TodoRemindersScreen extends StatelessWidget {
   final Future<TodoReminder> Function(TodoReminder) addReminder;
   final Future<TodoReminder> Function(String) deleteReminder;
 
-  ScrollController scrollController = ScrollController();
+  final ScrollController scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> _newReminder(BuildContext context) async {

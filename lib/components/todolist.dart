@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:fastter_dart/store/projects.dart' show fastterProjects;
 import 'package:fastter_dart/store/selectedtodos.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_offline/flutter_offline.dart';
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';

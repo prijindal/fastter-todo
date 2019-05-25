@@ -125,7 +125,7 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
               child: const Icon(Icons.add),
               onPressed: () => Navigator.of(context).push<void>(
                     MaterialPageRoute<void>(
-                      builder: (context) => AddLabelScreen(),
+                      builder: (context) => const AddLabelScreen(),
                     ),
                   ),
             )

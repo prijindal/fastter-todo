@@ -1,14 +1,12 @@
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/store/projects.dart';
-import 'package:fastter_dart/store/todos.dart' show fastterTodos;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/project.model.dart';
 
 import '../components/hexcolor.dart';
-import '../helpers/todofilters.dart';
 import '../screens/addproject.dart';
 import '../screens/manageprojects.dart';
 import 'expansiontile.dart';
@@ -33,7 +31,7 @@ class ProjectExpansionTile extends StatelessWidget {
                 items: state.items..sort(getCompareFunction('index')),
               ),
               addRoute: MaterialPageRoute<void>(
-                builder: (context) => AddProjectScreen(),
+                builder: (context) => const AddProjectScreen(),
               ),
               manageRoute: MaterialPageRoute(
                 builder: (context) => ManageProjectsScreen(),

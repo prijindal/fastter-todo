@@ -1,23 +1,18 @@
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/store/todos.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/models/settings.model.dart';
 
 import '../helpers/navigator.dart';
-import '../helpers/todofilters.dart';
 
+import 'filtercountext.dart';
 import 'labelexpansiontile.dart';
 import 'projectexpansiontile.dart';
-import 'filtercountext.dart';
 
 class HomeAppDrawer extends StatelessWidget {
   const HomeAppDrawer({Key key, this.disablePop = false}) : super(key: key);
@@ -117,9 +112,9 @@ class _HomeAppDrawer extends StatelessWidget {
               leading: const Icon(Icons.inbox),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Inbox'),
-                  const FilterCountText(<String, dynamic>{'project': null}),
+                children: const [
+                  Text('Inbox'),
+                  FilterCountText(<String, dynamic>{'project': null}),
                 ],
               ),
               onTap: () {
@@ -133,9 +128,9 @@ class _HomeAppDrawer extends StatelessWidget {
               leading: const Icon(Icons.select_all),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('All Tasks'),
-                  const FilterCountText(<String, dynamic>{}),
+                children: const [
+                  Text('All Tasks'),
+                  FilterCountText(<String, dynamic>{}),
                 ],
               ),
               onTap: () {

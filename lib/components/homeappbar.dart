@@ -520,19 +520,22 @@ class _HomeAppBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildTitle(),
-              AnimatedCrossFade(
-                duration: kThemeAnimationDuration,
-                firstChild: Text(
-                  'Connecting...',
-                  style: Theme.of(context)
-                      .textTheme
-                      .body1
-                      .apply(color: Colors.white),
-                ),
-                secondChild: Container(),
-                crossFadeState: Fastter.getInstance().isSocketConnected
-                    ? CrossFadeState.showSecond
-                    : CrossFadeState.showFirst,
+              BlocBuilder<FastterConnectEvent, bool>(
+                bloc: Fastter.instance,
+                builder: (context, isConnected) => AnimatedCrossFade(
+                      duration: kThemeAnimationDuration,
+                      firstChild: Text(
+                        'Connecting...',
+                        style: Theme.of(context)
+                            .textTheme
+                            .body1
+                            .apply(color: Colors.white),
+                      ),
+                      secondChild: Container(),
+                      crossFadeState: isConnected
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                    ),
               ),
             ],
           ),

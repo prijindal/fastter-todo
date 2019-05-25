@@ -52,7 +52,7 @@ class _AppContainerState extends State<_AppContainer> {
   Future<void> _init() async {
     await _flutterPersistor.load();
     _flutterPersistor.initListeners();
-    await Future<void>.delayed(Duration(milliseconds: 100));
+    await Future<void>.delayed(const Duration(milliseconds: 200));
     setState(() {
       isLoading = false;
     });
