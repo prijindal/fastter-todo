@@ -489,10 +489,7 @@ class _HomeAppBar extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedTheme(
         isMaterialAppTheme: true,
         data: selectedtodos.isNotEmpty ? whiteTheme : primaryTheme,
-        child: SliverAppBar(
-          pinned: false,
-          floating: true,
-          snap: true,
+        child: AppBar(
           automaticallyImplyLeading:
               getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait,
           leading: selectedtodos.isNotEmpty

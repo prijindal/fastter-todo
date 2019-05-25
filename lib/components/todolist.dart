@@ -179,6 +179,11 @@ class _TodoListState extends State<_TodoList> {
     final items =
         widget.todos.items.where((todo) => todo.completed != true).toList();
     if (!widget.categoryView) {
+      if (items.isEmpty) {
+        return TodoItem(
+          todo: widget.todos.items[index],
+        );
+      }
       return TodoItem(
         todo: items[index],
       );
@@ -212,69 +217,52 @@ class _TodoListState extends State<_TodoList> {
   }
 
   int get _renderItemsCount {
+    final items =
+        widget.todos.items.where((todo) => todo.completed != true).toList();
     if (!widget.categoryView) {
-      return widget.todos.items.where((todo) => todo.completed != true).length;
+      if (items.isEmpty) {
+        return widget.todos.items.length;
+      }
+      return items.length;
     }
     return _mapCategoryToList.length;
   }
 
-  Widget _buildSliverList() {
+  Widget _buildListView() {
     if (widget.todos.fetching && widget.todos.items.isEmpty) {
-      return SliverList(
-        delegate: SliverChildListDelegate(
-          [
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 20),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
-          ],
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 20),
+        child: const Center(
+          child: CircularProgressIndicator(),
         ),
       );
     }
     return widget.todos.items.isEmpty
-        ? SliverList(
-            delegate: SliverChildListDelegate([
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 20),
-                    ),
-                    const Text('No Tasks yet'),
-                    RaisedButton(
-                      child: const Text('Add a todo'),
-                      onPressed: () {
-                        setState(() {
-                          _showInput = true;
-                        });
-                      },
-                    ),
-                  ],
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 20),
                 ),
-              )
-            ]),
-          )
-        : SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => _renderIthItem(index),
-              childCount: _renderItemsCount,
+                const Text('No Tasks yet'),
+                RaisedButton(
+                  child: const Text('Add a todo'),
+                  onPressed: () {
+                    setState(() {
+                      _showInput = true;
+                    });
+                  },
+                ),
+              ],
             ),
+          )
+        : ListView.builder(
+            itemBuilder: (context, index) => _renderIthItem(index),
+            itemCount: _renderItemsCount,
           );
   }
-
-  Widget _buildListView() => CustomScrollView(
-        slivers: <Widget>[
-          HomeAppBar(
-            title: widget.title,
-            filter: widget.filter,
-          ),
-          _buildSliverList(),
-        ],
-      );
 
   Future<void> _onRefresh() {
     final completer = widget.syncStart();
@@ -293,6 +281,10 @@ class _TodoListState extends State<_TodoList> {
       );
 
   Widget _buildPotrait() => Scaffold(
+        appBar: HomeAppBar(
+          title: widget.title,
+          filter: widget.filter,
+        ),
         drawer: const HomeAppDrawer(),
         endDrawer: NotificationsDrawer(),
         floatingActionButton: widget.selectedTodos.isEmpty && !_showInput
@@ -310,6 +302,10 @@ class _TodoListState extends State<_TodoList> {
       );
 
   Widget _buildLandscape() => Scaffold(
+        appBar: HomeAppBar(
+          title: widget.title,
+          filter: widget.filter,
+        ),
         endDrawer: NotificationsDrawer(),
         floatingActionButton: widget.selectedTodos.isEmpty && !_showInput
             ? FloatingActionButton(
