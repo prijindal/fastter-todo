@@ -1,10 +1,10 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import 'package:fastter_dart/store/projects.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../components/hexcolor.dart';
 
@@ -22,10 +22,10 @@ class ProjectDropdown extends StatelessWidget {
   final void Function() onOpening;
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _ProjectDropdown(
-              projects: store.state.projects,
+      BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+        bloc: fastterProjects,
+        builder: (context, state) => _ProjectDropdown(
+              projects: state,
               onSelected: onSelected,
               selectedProject: selectedProject,
               onOpening: onOpening,

@@ -1,52 +1,24 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/store/labels.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../helpers/navigator.dart';
 
-class EditLabelScreen extends StatelessWidget {
+class EditLabelScreen extends StatefulWidget {
   const EditLabelScreen({
     @required this.label,
-  });
-
-  final Label label;
-  @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _EditLabelScreen(
-            label: label,
-            onEditLabel: (updatedlabel) =>
-                store.dispatch(UpdateItem<Label>(label.id, updatedlabel)),
-            deleteLabel: () {
-              store.dispatch(DeleteItem<Label>(label.id));
-              store.dispatch(StartSync<Todo>());
-            }),
-      );
-}
-
-class _EditLabelScreen extends StatefulWidget {
-  const _EditLabelScreen({
-    @required this.label,
-    @required this.onEditLabel,
-    @required this.deleteLabel,
     Key key,
   }) : super(key: key);
 
   final Label label;
-  final void Function(Label) onEditLabel;
-  final VoidCallback deleteLabel;
 
   @override
   _EditLabelScreenState createState() => _EditLabelScreenState();
 }
 
-class _EditLabelScreenState extends State<_EditLabelScreen> {
+class _EditLabelScreenState extends State<EditLabelScreen> {
   TextEditingController titleController;
   FocusNode titleFocusNode = FocusNode();
 
@@ -57,12 +29,13 @@ class _EditLabelScreenState extends State<_EditLabelScreen> {
   }
 
   void _onSave() {
-    widget.onEditLabel(
+    fastterLabels.dispatch(UpdateEvent<Label>(
+      widget.label.id,
       Label(
         id: widget.label.id,
         title: titleController.text,
       ),
-    );
+    ));
     Navigator.of(context).pop();
   }
 
@@ -83,7 +56,9 @@ class _EditLabelScreenState extends State<_EditLabelScreen> {
               ],
             ));
     if (shouldDelete) {
-      widget.deleteLabel();
+      fastterLabels.dispatch(DeleteEvent<Label>(
+        widget.label.id,
+      ));
       history.add(RouteInfo('/'));
       await Navigator.of(context)
           .pushNamedAndRemoveUntil('/', (route) => route.isFirst);

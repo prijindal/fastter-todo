@@ -1,12 +1,10 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/store/labels.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../helpers/theme.dart';
 import 'addlabel.dart';
@@ -15,13 +13,12 @@ import 'editlabel.dart';
 class ManageLabelsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _ManageLabelsScreen(
-              labels: store.state.labels,
+      BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+        bloc: fastterLabels,
+        builder: (context, state) => _ManageLabelsScreen(
+              labels: state,
               deleteLabel: (label) {
-                store.dispatch(DeleteItem<Label>(label.id));
-                store.dispatch(StartSync<Todo>());
+                fastterLabels.dispatch(DeleteEvent<Label>(label.id));
               },
             ),
       );
@@ -128,7 +125,7 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
               child: const Icon(Icons.add),
               onPressed: () => Navigator.of(context).push<void>(
                     MaterialPageRoute<void>(
-                      builder: (context) => AddLabelScreen(),
+                      builder: (context) => const AddLabelScreen(),
                     ),
                   ),
             )
@@ -174,35 +171,34 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
         ),
         body: Stack(
           children: [
-            ListView(
-              children: widget.labels.items
-                  .map(
-                    (label) => ListTile(
-                          onTap: () {
-                            if (selectedLabels.contains(label.id)) {
-                              setState(() {
-                                selectedLabels.remove(label.id);
-                              });
-                            } else {
-                              setState(() {
-                                selectedLabels.add(label.id);
-                              });
-                            }
-                          },
-                          selected: selectedLabels.contains(label.id),
-                          title: Text(label.title),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () async {
-                              if (await _deleteLabel(
-                                  'Delete ${label.title}?')) {
-                                widget.deleteLabel(label);
-                              }
-                            },
-                          ),
-                        ),
-                  )
-                  .toList(),
+            ListView.builder(
+              itemCount: widget.labels.items.length,
+              itemBuilder: (context, index) {
+                final label = widget.labels.items[index];
+                return ListTile(
+                  onTap: () {
+                    if (selectedLabels.contains(label.id)) {
+                      setState(() {
+                        selectedLabels.remove(label.id);
+                      });
+                    } else {
+                      setState(() {
+                        selectedLabels.add(label.id);
+                      });
+                    }
+                  },
+                  selected: selectedLabels.contains(label.id),
+                  title: Text(label.title),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () async {
+                      if (await _deleteLabel('Delete ${label.title}?')) {
+                        widget.deleteLabel(label);
+                      }
+                    },
+                  ),
+                );
+              },
             ),
             _buildBottom(),
           ],

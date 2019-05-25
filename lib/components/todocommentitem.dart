@@ -1,14 +1,12 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/store/todocomments.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../helpers/todouihelpers.dart';
 
@@ -27,22 +25,18 @@ class TodoCommentItem extends StatelessWidget {
   final bool selected;
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoCommentItem(
-              todoComment: todoComment,
-              deleteComment: () {
-                final action = DeleteItem<TodoComment>(todoComment.id);
-                store.dispatch(action);
-                return action.completer.future;
-              },
-              addComment: (comment) =>
-                  store.dispatch(AddItem<TodoComment>(comment)),
-              onLongPress: onLongPress,
-              onTap: onTap,
-              selected: selected,
-            ),
+  Widget build(BuildContext context) => _TodoCommentItem(
+        todoComment: todoComment,
+        deleteComment: () {
+          final action = DeleteEvent<TodoComment>(todoComment.id);
+          fastterTodoComments.dispatch(action);
+          return action.completer.future;
+        },
+        addComment: (comment) =>
+            fastterTodoComments.dispatch(AddEvent<TodoComment>(comment)),
+        onLongPress: onLongPress,
+        onTap: onTap,
+        selected: selected,
       );
 }
 

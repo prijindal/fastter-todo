@@ -1,13 +1,11 @@
 import 'dart:math';
+import 'package:fastter_dart/store/todocomments.dart';
 import 'package:uuid/uuid.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'image_picker.dart';
 import 'video_picker.dart';
 
@@ -22,18 +20,14 @@ class TodoCommentInput extends StatelessWidget {
   final VoidCallback onAdded;
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoCommentInput(
-              todo: todo,
-              addComment: (comment) {
-                store.dispatch(AddItem<TodoComment>(comment));
-                if (onAdded != null) {
-                  onAdded();
-                }
-              },
-            ),
+  Widget build(BuildContext context) => _TodoCommentInput(
+        todo: todo,
+        addComment: (comment) {
+          fastterTodoComments.dispatch(AddEvent<TodoComment>(comment));
+          if (onAdded != null) {
+            onAdded();
+          }
+        },
       );
 }
 

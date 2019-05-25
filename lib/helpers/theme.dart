@@ -5,7 +5,7 @@ ThemeData primaryTheme = ThemeData(
   accentColor: Colors.orangeAccent,
   buttonTheme: ButtonThemeData(
     shape: RoundedRectangleBorder(
-      borderRadius: const BorderRadius.all(Radius.circular(7.0)),
+      borderRadius: const BorderRadius.all(Radius.circular(7)),
     ),
   ),
   inputDecorationTheme: InputDecorationTheme(

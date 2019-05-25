@@ -1,33 +1,26 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_todo/bloc.dart';
+import 'package:fastter_todo/screens/loading.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/store/user.dart';
 
+import '../helpers/flutter_persistor.dart';
 import '../helpers/theme.dart';
-import '../screens/loading.dart';
 import '../screens/loginsplash.dart';
 import 'home.dart';
 
 class AppContainer extends StatelessWidget {
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) =>
-            store.state == null || store.state.rehydrated == false
-                ? MaterialApp(
-                    theme: primaryTheme,
-                    home: LoadingScreen(),
-                  )
-                : _AppContainer(
-                    user: store.state.user,
-                    confirmUser: (bearer) =>
-                        store.dispatch(ConfirmUserAction(bearer)),
-                    clearAuth: () => store.dispatch(LogoutUserAction()),
-                  ),
+  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+        bloc: fastterUser,
+        builder: (context, state) => _AppContainer(
+              user: state,
+              confirmUser: (bearer) =>
+                  fastterUser.dispatch(ConfirmUserEvent(bearer)),
+              clearAuth: () => fastterUser.dispatch(LogoutUserEvent()),
+            ),
       );
 }
 
@@ -47,9 +40,22 @@ class _AppContainer extends StatefulWidget {
 }
 
 class _AppContainerState extends State<_AppContainer> {
+  final FlutterPersistor _flutterPersistor = FlutterPersistor();
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    await _flutterPersistor.load();
+    _flutterPersistor.initListeners();
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+    setState(() {
+      isLoading = false;
+    });
     _tryLogin();
   }
 
@@ -63,6 +69,12 @@ class _AppContainerState extends State<_AppContainer> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return MaterialApp(
+        theme: primaryTheme,
+        home: LoadingScreen(),
+      );
+    }
     if (widget.user == null ||
         widget.user.user == null ||
         widget.user.user.id == null) {

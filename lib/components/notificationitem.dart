@@ -1,5 +1,7 @@
+import 'package:fastter_dart/store/notifications.dart';
 import 'package:flutter/material.dart'
     show
+        Key,
         StatelessWidget,
         required,
         Widget,
@@ -7,30 +9,24 @@ import 'package:flutter/material.dart'
         ListTile,
         Text,
         Navigator;
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:fastter_dart/store/state.dart';
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/notification.model.dart';
 
 class NotificationItem extends StatelessWidget {
-  const NotificationItem({@required this.notification});
+  const NotificationItem({@required this.notification, Key key})
+      : super(key: key);
 
   final Notification notification;
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _NotificationItem(
-              markRead: () {
-                notification.read = true;
-                store.dispatch(
-                    UpdateItem<Notification>(notification.id, notification));
-              },
-              notification: notification,
-            ),
+  Widget build(BuildContext context) => _NotificationItem(
+        markRead: () {
+          notification.read = true;
+          fastterNotifications.dispatch(
+              UpdateEvent<Notification>(notification.id, notification));
+        },
+        notification: notification,
       );
 }
 

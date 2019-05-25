@@ -1,14 +1,13 @@
 import 'dart:async';
+import 'package:fastter_dart/store/todoreminders.dart';
 import 'package:intl/intl.dart';
-import 'package:redux/redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/models/todoreminder.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../helpers/todouihelpers.dart';
 
@@ -22,12 +21,12 @@ class TodoRemindersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _TodoRemindersScreen(
+      BlocBuilder<FastterEvent<TodoReminder>, ListState<TodoReminder>>(
+        bloc: fastterTodoReminders,
+        builder: (context, state) => _TodoRemindersScreen(
               todo: todo,
               todoReminders: ListState<TodoReminder>(
-                items: store.state.todoReminders.items
+                items: state.items
                     .where((todoreminder) =>
                         todoreminder.todo != null &&
                         todoreminder.todo.id == todo.id &&
@@ -35,13 +34,13 @@ class TodoRemindersScreen extends StatelessWidget {
                     .toList(),
               ),
               addReminder: (reminder) {
-                final action = AddItem<TodoReminder>(reminder);
-                store.dispatch(action);
+                final action = AddEvent<TodoReminder>(reminder);
+                fastterTodoReminders.dispatch(action);
                 return action.completer.future;
               },
               deleteReminder: (reminderid) {
-                final action = DeleteItem<TodoReminder>(reminderid);
-                store.dispatch(action);
+                final action = DeleteEvent<TodoReminder>(reminderid);
+                fastterTodoReminders.dispatch(action);
                 return action.completer.future;
               },
             ),
@@ -62,7 +61,7 @@ class _TodoRemindersScreen extends StatelessWidget {
   final Future<TodoReminder> Function(TodoReminder) addReminder;
   final Future<TodoReminder> Function(String) deleteReminder;
 
-  ScrollController scrollController = ScrollController();
+  final ScrollController scrollController = ScrollController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<void> _newReminder(BuildContext context) async {

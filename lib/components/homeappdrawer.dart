@@ -1,18 +1,16 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/store/user.dart';
+import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/models/settings.model.dart';
 
 import '../helpers/navigator.dart';
-import '../helpers/todofilters.dart';
 
+import 'filtercountext.dart';
 import 'labelexpansiontile.dart';
 import 'projectexpansiontile.dart';
 
@@ -22,19 +20,12 @@ class HomeAppDrawer extends StatelessWidget {
   final bool disablePop;
 
   @override
-  Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _HomeAppDrawer(
-              user: store.state.user,
-              projects: store.state.projects,
-              todos: ListState<Todo>(
-                items: store.state.todos.items
-                    .where((todo) => todo.completed != true)
-                    .toList(),
-              ),
+  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+        bloc: fastterUser,
+        builder: (context, userState) => _HomeAppDrawer(
+              user: userState,
               disablePop: disablePop,
-              frontPage: store.state.user.user?.settings?.frontPage ??
+              frontPage: userState.user?.settings?.frontPage ??
                   FrontPage(
                     route: '/',
                     title: 'Inbox',
@@ -46,16 +37,12 @@ class HomeAppDrawer extends StatelessWidget {
 class _HomeAppDrawer extends StatelessWidget {
   const _HomeAppDrawer({
     @required this.user,
-    @required this.projects,
-    @required this.todos,
     @required this.frontPage,
     this.disablePop = false,
     Key key,
   }) : super(key: key);
 
   final UserState user;
-  final ListState<Project> projects;
-  final ListState<Todo> todos;
   final bool disablePop;
   final FrontPage frontPage;
 
@@ -125,10 +112,9 @@ class _HomeAppDrawer extends StatelessWidget {
               leading: const Icon(Icons.inbox),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Inbox'),
-                  Text(filterToCount(<String, dynamic>{'project': null}, todos)
-                      .toString()),
+                children: const [
+                  Text('Inbox'),
+                  FilterCountText(<String, dynamic>{'project': null}),
                 ],
               ),
               onTap: () {
@@ -142,9 +128,9 @@ class _HomeAppDrawer extends StatelessWidget {
               leading: const Icon(Icons.select_all),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('All Tasks'),
-                  Text(filterToCount(<String, dynamic>{}, todos).toString()),
+                children: const [
+                  Text('All Tasks'),
+                  FilterCountText(<String, dynamic>{}),
                 ],
               ),
               onTap: () {
@@ -160,7 +146,7 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Today'),
-                  Text(filterToCount(
+                  FilterCountText(
                     <String, dynamic>{
                       '_operators': {
                         'dueDate': {
@@ -168,8 +154,7 @@ class _HomeAppDrawer extends StatelessWidget {
                         },
                       },
                     },
-                    todos,
-                  ).toString()),
+                  ),
                 ],
               ),
               onTap: () {
@@ -185,7 +170,7 @@ class _HomeAppDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('7 Days'),
-                  Text(filterToCount(
+                  FilterCountText(
                     <String, dynamic>{
                       '_operators': {
                         'dueDate': {
@@ -193,8 +178,7 @@ class _HomeAppDrawer extends StatelessWidget {
                         },
                       },
                     },
-                    todos,
-                  ).toString()),
+                  ),
                 ],
               ),
               onTap: () {

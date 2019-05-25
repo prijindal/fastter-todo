@@ -1,13 +1,13 @@
-import 'package:redux/redux.dart';
+import 'package:fastter_dart/store/projects.dart';
+import 'package:fastter_dart/store/todos.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_colorpicker/block_picker.dart';
 
-import 'package:fastter_dart/fastter/fastter_action.dart';
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/state.dart';
 
 import '../components/hexcolor.dart';
 import '../helpers/theme.dart';
@@ -17,17 +17,17 @@ import 'editproject.dart';
 class ManageProjectsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
-      StoreConnector<AppState, Store<AppState>>(
-        converter: (store) => store,
-        builder: (context, store) => _ManageProjectsScreen(
-              projects: store.state.projects,
+      BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+        bloc: fastterProjects,
+        builder: (context, state) => _ManageProjectsScreen(
+              projects: state,
               deleteProject: (project) {
-                store.dispatch(DeleteItem<Project>(project.id));
-                store.dispatch(StartSync<Todo>());
+                fastterProjects.dispatch(DeleteEvent<Project>(project.id));
+                fastterTodos.dispatch(SyncEvent<Todo>());
               },
               updateColor: (project, color) {
-                store.dispatch(
-                  UpdateItem<Project>(
+                fastterProjects.dispatch(
+                  UpdateEvent<Project>(
                     project.id,
                     Project(
                       id: project.id,
@@ -191,7 +191,7 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
               child: const Icon(Icons.add),
               onPressed: () => Navigator.of(context).push<void>(
                     MaterialPageRoute<void>(
-                      builder: (context) => AddProjectScreen(),
+                      builder: (context) => const AddProjectScreen(),
                     ),
                   ),
             )
@@ -237,41 +237,39 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
         ),
         body: Stack(
           children: [
-            ListView(
-              children: widget.projects.items
-                  .map(
-                    (project) => ListTile(
-                          onTap: () {
-                            if (selectedProjects.contains(project.id)) {
-                              setState(() {
-                                selectedProjects.remove(project.id);
-                              });
-                            } else {
-                              setState(() {
-                                selectedProjects.add(project.id);
-                              });
-                            }
-                          },
-                          selected: selectedProjects.contains(project.id),
-                          leading: Icon(
-                            Icons.group_work,
-                            color: project.color == null
-                                ? null
-                                : HexColor(project.color),
-                          ),
-                          title: Text(project.title),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () async {
-                              if (await _deleteProject(
-                                  'Delete ${project.title}?')) {
-                                widget.deleteProject(project);
-                              }
-                            },
-                          ),
-                        ),
-                  )
-                  .toList(),
+            ListView.builder(
+              itemCount: widget.projects.items.length,
+              itemBuilder: (context, index) {
+                final project = widget.projects.items[index];
+                return ListTile(
+                  onTap: () {
+                    if (selectedProjects.contains(project.id)) {
+                      setState(() {
+                        selectedProjects.remove(project.id);
+                      });
+                    } else {
+                      setState(() {
+                        selectedProjects.add(project.id);
+                      });
+                    }
+                  },
+                  selected: selectedProjects.contains(project.id),
+                  leading: Icon(
+                    Icons.group_work,
+                    color:
+                        project.color == null ? null : HexColor(project.color),
+                  ),
+                  title: Text(project.title),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () async {
+                      if (await _deleteProject('Delete ${project.title}?')) {
+                        widget.deleteProject(project);
+                      }
+                    },
+                  ),
+                );
+              },
             ),
             _buildBottom(),
           ],
