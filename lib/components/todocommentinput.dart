@@ -1,10 +1,7 @@
 import 'dart:math';
 import 'package:fastter_dart/store/todocomments.dart';
-import 'package:fastter_dart/store/todos.dart';
 import 'package:uuid/uuid.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/todo.model.dart';

@@ -1,16 +1,13 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:fastter_dart/store/todos.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 
-import '../helpers/responsive.dart';
 import '../helpers/todouihelpers.dart';
 import 'projectdropdown.dart';
 

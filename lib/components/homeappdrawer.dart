@@ -2,7 +2,6 @@ import 'package:fastter_dart/store/projects.dart';
 import 'package:fastter_dart/store/todos.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_todo/bloc.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

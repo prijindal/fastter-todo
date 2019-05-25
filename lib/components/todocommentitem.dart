@@ -1,7 +1,5 @@
 import 'package:fastter_dart/store/todocomments.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';

@@ -1,10 +1,12 @@
 import 'package:fastter_todo/bloc.dart';
+import 'package:fastter_todo/screens/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/store/user.dart';
 
+import '../helpers/flutter_persistor.dart';
 import '../helpers/theme.dart';
 import '../screens/loginsplash.dart';
 import 'home.dart';
@@ -38,9 +40,22 @@ class _AppContainer extends StatefulWidget {
 }
 
 class _AppContainerState extends State<_AppContainer> {
+  final FlutterPersistor _flutterPersistor = FlutterPersistor();
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    await _flutterPersistor.load();
+    _flutterPersistor.initListeners();
+    await Future<void>.delayed(Duration(milliseconds: 100));
+    setState(() {
+      isLoading = false;
+    });
     _tryLogin();
   }
 
@@ -54,6 +69,12 @@ class _AppContainerState extends State<_AppContainer> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return MaterialApp(
+        theme: primaryTheme,
+        home: LoadingScreen(),
+      );
+    }
     if (widget.user == null ||
         widget.user.user == null ||
         widget.user.user.id == null) {

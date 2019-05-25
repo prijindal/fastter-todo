@@ -38,20 +38,8 @@ Future<void> main() async {
   };
 
   await runZoned<Future<void>>(() async {
-    runApp(FlutterReduxApp());
+    runApp(AppContainer());
   }, onError: (dynamic error, dynamic stackTrace) async {
     debugPrint(error.toString());
   });
-}
-
-class FlutterReduxApp extends StatelessWidget {
-  const FlutterReduxApp({Key key}) : super(key: key);
-
-  // @required
-  // final Persistor<AppState> persistor;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppContainer();
-  }
 }

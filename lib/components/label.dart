@@ -1,6 +1,5 @@
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/store/labels.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

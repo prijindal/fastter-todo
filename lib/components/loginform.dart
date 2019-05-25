@@ -74,7 +74,7 @@ class _LoginFormState extends State<_LoginForm> {
                   ),
                   RaisedButton(
                     child: const Text('Login'),
-                    onPressed: widget.user.isLoading ? null : _login,
+                    onPressed: _login,
                   ),
                   Text(widget.user.errorMessage == null
                       ? ''
