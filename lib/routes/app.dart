@@ -1,3 +1,10 @@
+import 'dart:async';
+
+import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import 'package:fastter_dart/models/project.model.dart';
+import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_dart/store/projects.dart';
+import 'package:fastter_dart/store/todos.dart';
 import 'package:fastter_todo/bloc.dart';
 import 'package:fastter_todo/screens/loading.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +48,9 @@ class _AppContainer extends StatefulWidget {
 
 class _AppContainerState extends State<_AppContainer> {
   final FlutterPersistor _flutterPersistor = FlutterPersistor();
-  bool isLoading = true;
+  bool _isUserLoading = true;
+  bool _isTodosLoading = true;
+  bool _isProjectsLoading = true;
 
   @override
   void initState() {
@@ -49,17 +58,48 @@ class _AppContainerState extends State<_AppContainer> {
     _init();
   }
 
+  bool get _isLoading =>
+      _isUserLoading || _isTodosLoading || _isProjectsLoading;
+
   Future<void> _init() async {
+    fastterUser.event.listen((event) {
+      if (event is InitStateUserEvent) {
+        Timer.run(() {
+          setState(() {
+            _isUserLoading = false;
+          });
+          _tryLogin();
+        });
+      }
+    });
+    fastterTodos.event.listen((event) {
+      if (event is InitStateEvent<Todo>) {
+        Timer.run(() {
+          setState(() {
+            _isTodosLoading = false;
+          });
+          _tryLogin();
+        });
+      }
+    });
+    fastterProjects.event.listen((event) {
+      if (event is InitStateEvent<Project>) {
+        Timer.run(() {
+          setState(() {
+            _isProjectsLoading = false;
+          });
+          _tryLogin();
+        });
+      }
+    });
     await _flutterPersistor.load();
     _flutterPersistor.initListeners();
-    await Future<void>.delayed(const Duration(milliseconds: 100));
-    setState(() {
-      isLoading = false;
-    });
-    _tryLogin();
   }
 
   void _tryLogin() {
+    if (_isLoading) {
+      return;
+    }
     if (widget.user == null || widget.user.bearer == null) {
       widget.clearAuth();
     } else {
@@ -69,7 +109,7 @@ class _AppContainerState extends State<_AppContainer> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (_isLoading) {
       return MaterialApp(
         theme: primaryTheme,
         home: LoadingScreen(),
