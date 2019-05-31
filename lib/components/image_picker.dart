@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:file_chooser/file_chooser.dart';
+// import 'package:file_chooser/file_chooser.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../helpers/storage.dart';
 
@@ -82,19 +82,19 @@ class _ImagePickerUploaderWidgetState
       });
     } else {
       final completer = Completer<void>();
-      showOpenPanel(
-        (fileChooserResult, filepaths) {
-          if (filepaths.isNotEmpty) {
-            setState(() {
-              _image = File(filepaths[0]);
-            });
-            completer.complete();
-          }
-        },
-        allowedFileTypes: ['jpg', 'png'],
-        allowsMultipleSelection: false,
-        canSelectDirectories: false,
-      );
+      // showOpenPanel(
+      //   (fileChooserResult, filepaths) {
+      //     if (filepaths.isNotEmpty) {
+      //       setState(() {
+      //         _image = File(filepaths[0]);
+      //       });
+      //       completer.complete();
+      //     }
+      //   },
+      //   allowedFileTypes: ['jpg', 'png'],
+      //   allowsMultipleSelection: false,
+      //   canSelectDirectories: false,
+      // );
       return completer.future;
     }
   }

@@ -23,8 +23,6 @@ dependencies:
   event_bus: any
   fastter_dart: 
     path: /home/prijindal/projects/fastter_dart
-  file_chooser:
-    path: /home/prijindal/softwares/flutter-desktop-embedding/plugins/file_chooser
   firebase_analytics: any
   firebase_messaging: any
   firebase_storage: any
@@ -32,7 +30,6 @@ dependencies:
   flutter_bloc: any
   flutter_colorpicker: any
   flutter_linkify: any
-  flutter_offline: any
   flutter_signin_button: any
   google_sign_in: any
   http: any
