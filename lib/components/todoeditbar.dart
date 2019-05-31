@@ -173,6 +173,7 @@ class _TodoEditBar extends StatelessWidget {
         child: IconButton(
           icon: const Icon(Icons.check),
           onPressed: onMarkCompleted,
+          tooltip: 'Completed',
         ),
       );
 
@@ -184,6 +185,7 @@ class _TodoEditBar extends StatelessWidget {
             color: Theme.of(context).accentColor,
           ),
           onPressed: () => _showDatePicker(context),
+          tooltip: 'Due Date',
         ),
       );
 
@@ -205,6 +207,7 @@ class _TodoEditBar extends StatelessWidget {
               ),
             );
           },
+          tooltip: 'Edit',
         ),
       );
 
@@ -226,6 +229,7 @@ class _TodoEditBar extends StatelessWidget {
               ),
             );
           },
+          tooltip: 'Comments',
         ),
       );
 
@@ -247,6 +251,7 @@ class _TodoEditBar extends StatelessWidget {
               ),
             );
           },
+          tooltip: 'Reminders',
         ),
       );
 
@@ -268,6 +273,7 @@ class _TodoEditBar extends StatelessWidget {
               ),
             );
           },
+          tooltip: 'Subtasks',
         ),
       );
   Widget _buildDeleteButton(BuildContext context) => Container(
@@ -297,6 +303,7 @@ class _TodoEditBar extends StatelessWidget {
                   ),
             );
           },
+          tooltip: 'Delete',
         ),
       );
 
@@ -342,6 +349,7 @@ class _TodoEditBar extends StatelessWidget {
         child: IconButton(
           icon: const Icon(Icons.priority_high),
           onPressed: () => _selectPriority(context),
+          tooltip: 'Priority',
         ),
       );
 
@@ -369,22 +377,35 @@ class _TodoEditBar extends StatelessWidget {
     ];
   }
 
+  Future<bool> _onWillPop() async {
+    if (selectedTodos.isEmpty) {
+      return true;
+    }
+    for (final id in selectedTodos) {
+      selectedTodosBloc.dispatch(UnSelectTodoEvent(id));
+    }
+    return false;
+  }
+
   @override
-  Widget build(BuildContext context) => Container(
-        height: 60,
-        // width: _width(context) - 4.0,
-        child: Center(
-          child: Card(
-            elevation: 20,
-            child: Container(
-              height: 60,
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                // crossAxisAlignment: CrossAxisAlignment.center,
-                children: _buildButtons(context),
+  Widget build(BuildContext context) => WillPopScope(
+        onWillPop: _onWillPop,
+        child: Container(
+          height: 60,
+          // width: _width(context) - 4.0,
+          child: Center(
+            child: Card(
+              elevation: 20,
+              child: Container(
+                height: 60,
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
+                  children: _buildButtons(context),
+                ),
               ),
             ),
           ),

@@ -125,6 +125,7 @@ class _ProjectDropdown extends StatelessWidget {
       key: _menuKey,
       icon: _buildIcon(),
       onPressed: () => _showMenu(context),
+      tooltip: 'Project',
     );
   }
 }

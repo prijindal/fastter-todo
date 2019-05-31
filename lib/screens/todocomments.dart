@@ -273,33 +273,48 @@ class _TodoCommentsAppBar extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.content_copy),
           onPressed: () => _copySelectedComment(context),
+          tooltip: 'Copy',
         ),
         IconButton(
           icon: const Icon(Icons.share),
           onPressed: _shareSelectedComment,
+          tooltip: 'Share',
         ),
         IconButton(
           icon: const Icon(Icons.delete),
           onPressed: () => _deleteSelectedComment(context),
+          tooltip: 'Delete',
         )
       ];
     }
   }
 
+  Future<bool> _onWillPop() async {
+    if (todoComments.items.isEmpty) {
+      return true;
+    }
+    onClear();
+    return false;
+  }
+
   @override
-  Widget build(BuildContext context) => AnimatedTheme(
-        data: todoComments.items.isEmpty ? primaryTheme : whiteTheme,
-        child: AppBar(
-          title: Text(todoComments.items.isEmpty
-              ? todo.title
-              : '${todoComments.items.length} Comments selected'),
-          leading: todoComments.items.isEmpty
-              ? null
-              : IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: onClear,
-                ),
-          actions: _buildActions(context),
+  Widget build(BuildContext context) => WillPopScope(
+        onWillPop: _onWillPop,
+        child: AnimatedTheme(
+          data: todoComments.items.isEmpty ? primaryTheme : whiteTheme,
+          child: AppBar(
+            title: Text(todoComments.items.isEmpty
+                ? todo.title
+                : '${todoComments.items.length} Comments selected'),
+            leading: todoComments.items.isEmpty
+                ? null
+                : IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: onClear,
+                    tooltip: 'Back',
+                  ),
+            actions: _buildActions(context),
+          ),
         ),
       );
 }

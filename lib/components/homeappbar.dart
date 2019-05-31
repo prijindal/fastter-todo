@@ -394,6 +394,7 @@ class _HomeAppBar extends StatelessWidget {
                 child: const Text('Title'),
               )
             ],
+        tooltip: 'Due Date',
       );
 
   Widget _buildPopupAction(BuildContext context) =>
@@ -475,6 +476,7 @@ class _HomeAppBar extends StatelessWidget {
             return items;
           }
         },
+        tooltip: 'More',
       );
 
   void _onSearch(BuildContext context) {
@@ -502,6 +504,7 @@ class _HomeAppBar extends StatelessWidget {
                             selectedTodosBloc.dispatch(UnSelectTodoEvent(id));
                           }
                         },
+                        tooltip: 'Unselect',
                       ),
                 )
               : getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait
@@ -510,6 +513,7 @@ class _HomeAppBar extends StatelessWidget {
                       onPressed: () {
                         Scaffold.of(context).openDrawer();
                       },
+                      tooltip: 'Drawer',
                     )
                   : null,
           title: Column(
@@ -544,6 +548,7 @@ class _HomeAppBar extends StatelessWidget {
                   color: Colors.white,
                 ),
                 onPressed: () => _onSearch(context),
+                tooltip: 'Search',
               ),
             if (selectedtodos.isEmpty) _buildSortAction(context),
             if (selectedtodos.isEmpty)
@@ -553,6 +558,7 @@ class _HomeAppBar extends StatelessWidget {
                   Scaffold.of(context).openEndDrawer();
                 },
                 color: Colors.white,
+                tooltip: 'Notifications',
               ),
             _buildPopupAction(context),
           ],

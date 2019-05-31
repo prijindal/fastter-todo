@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:flutter/material.dart';
-import '../../helpers/navigator.dart';
 import '../../helpers/responsive.dart';
 
 class HomePageRoute<T> extends MaterialPageRoute<T> {

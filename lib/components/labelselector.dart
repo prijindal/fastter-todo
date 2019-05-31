@@ -48,6 +48,7 @@ class LabelSelector extends StatelessWidget {
       key: _menuKey,
       icon: _buildIcon(context),
       onPressed: () => _showMenu(context),
+      tooltip: 'Labels',
     );
   }
 }

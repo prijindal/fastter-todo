@@ -280,7 +280,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                             todocomment.todo != null &&
                             todocomment.todo.id == widget.todo.id)
                         .toList();
-                    ListTile(
+                    return ListTile(
                       leading: const Icon(Icons.comment),
                       title: const Text('Comments'),
                       subtitle: todoComments.isEmpty
