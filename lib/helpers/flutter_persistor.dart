@@ -50,36 +50,64 @@ class FlutterPersistor {
     }
   }
 
-  void _saveKey(String key, Map<String, dynamic> value) {
+  Future<void> _saveKey(String key, Map<String, dynamic> value) async {
     if (Platform.isAndroid || Platform.isIOS) {
-      _sharedPreferences.setString(key, json.encode(value));
+      try {
+        await _sharedPreferences.setString(key, json.encode(value));
+      } on Exception catch (e) {
+        print(e);
+      }
     } else {
       final homeFolder = Platform.environment['HOME'];
       final file = File('$homeFolder/.config/fastter_todo/$key.json');
       file.createSync(recursive: true);
-      file.writeAsString(json.encode(value));
+      await file.writeAsString(json.encode(value));
     }
   }
 
   void initListeners() {
     fastterUser.state.listen((data) {
-      _saveKey('user', data.toJson());
+      if (data != null && data.bearer != null) {
+        _saveKey('user', data.toJson());
+      }
     });
     fastterTodos.state.listen((data) {
-      _saveKey('todos', data.toJson());
+      if (data != null && data.items != null && data.items.isNotEmpty) {
+        _saveKey('todos', data.toJson());
+      }
     });
     fastterProjects.state.listen((data) {
-      _saveKey('projects', data.toJson());
+      if (data != null && data.items != null && data.items.isNotEmpty) {
+        _saveKey('projects', data.toJson());
+      }
     });
     fastterLabels.state.listen((data) {
-      _saveKey('labels', data.toJson());
+      if (data != null && data.items != null && data.items.isNotEmpty) {
+        _saveKey('labels', data.toJson());
+      }
     });
     fastterTodoComments.state.listen((data) {
-      _saveKey('todoComments', data.toJson());
+      if (data != null && data.items != null && data.items.isNotEmpty) {
+        _saveKey('todoComments', data.toJson());
+      }
     });
     fastterTodoReminders.state.listen((data) {
-      _saveKey('todoReminders', data.toJson());
+      if (data != null && data.items != null && data.items.isNotEmpty) {
+        _saveKey('todoReminders', data.toJson());
+      }
     });
+  }
+
+  void _loadState<T extends BaseModel>(
+    FastterBloc<T> bloc,
+    String key,
+    T Function(Map<String, dynamic> json) fromJson,
+  ) {
+    final todos = ListState<T>.fromJson(
+      _loadKey(key),
+      (dynamic t) => fromJson(t),
+    );
+    bloc.dispatch(InitStateEvent<T>(todos));
   }
 
   Future<void> load() async {
@@ -88,30 +116,13 @@ class FlutterPersistor {
       _loadKey('user'),
     );
     fastterUser.dispatch(InitStateUserEvent(user));
-    final todos = ListState<Todo>.fromJson(
-      _loadKey('todos'),
-      (dynamic t) => Todo.fromJson(t),
-    );
-    fastterTodos.dispatch(InitStateEvent<Todo>(todos));
-    final projects = ListState<Project>.fromJson(
-      _loadKey('projects'),
-      (dynamic t) => Project.fromJson(t),
-    );
-    fastterProjects.dispatch(InitStateEvent<Project>(projects));
-    final labels = ListState<Label>.fromJson(
-      _loadKey('labels'),
-      (dynamic t) => Label.fromJson(t),
-    );
-    fastterLabels.dispatch(InitStateEvent<Label>(labels));
-    final todoComments = ListState<TodoComment>.fromJson(
-      _loadKey('todoComments'),
-      (dynamic t) => TodoComment.fromJson(t),
-    );
-    fastterTodoComments.dispatch(InitStateEvent<TodoComment>(todoComments));
-    final todoReminders = ListState<TodoReminder>.fromJson(
-      _loadKey('todoReminders'),
-      (dynamic t) => TodoReminder.fromJson(t),
-    );
-    fastterTodoReminders.dispatch(InitStateEvent<TodoReminder>(todoReminders));
+    _loadState<Todo>(fastterTodos, 'todos', (a) => Todo.fromJson(a));
+    _loadState<Project>(
+        fastterProjects, 'projects', (a) => Project.fromJson(a));
+    _loadState<Label>(fastterLabels, 'labels', (a) => Label.fromJson(a));
+    _loadState<TodoComment>(
+        fastterTodoComments, 'todoComments', (a) => TodoComment.fromJson(a));
+    _loadState<TodoReminder>(
+        fastterTodoReminders, 'todoReminders', (a) => TodoReminder.fromJson(a));
   }
 }

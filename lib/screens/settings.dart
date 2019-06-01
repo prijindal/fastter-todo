@@ -4,15 +4,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/store/user.dart';
+import 'package:fastter_todo/screens/loading.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
         bloc: fastterUser,
-        builder: (context, state) => _SettingsScreen(
-              user: state,
-              onLogout: () => fastterUser.dispatch(LogoutUserEvent()),
-            ),
+        builder: (context, state) => state != null && state.user != null
+            ? _SettingsScreen(
+                user: state,
+                onLogout: () => fastterUser.dispatch(LogoutUserEvent()),
+              )
+            : LoadingScreen(),
       );
 }
 

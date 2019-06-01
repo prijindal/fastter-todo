@@ -17,7 +17,7 @@
 # that are mostly likely to need to be changed.
 
 # Executable name.
-BINARY_NAME=flutter_desktop_example
+BINARY_NAME=flutter_todo
 # The C++ code for the embedder application.
 SOURCES=flutter_embedder_example.cc
 
