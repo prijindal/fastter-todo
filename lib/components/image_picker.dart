@@ -13,6 +13,8 @@ class ImagePickerUploader {
     @required this.storagePath,
     @required this.onChange,
     @required this.onError,
+    @required this.text,
+    this.allowPreview = false,
   });
 
   final BuildContext context;
@@ -20,6 +22,8 @@ class ImagePickerUploader {
   final String storagePath; // Firebase storage path
   final void Function(String) onChange;
   final void Function(dynamic) onError;
+  final String text;
+  final bool allowPreview;
 
   void editPicture() {
     showDialog<void>(
@@ -30,6 +34,8 @@ class ImagePickerUploader {
             storagePath: storagePath,
             onChange: onChange,
             onError: onError,
+            text: text,
+            allowPreview: allowPreview,
           ),
     );
   }
@@ -42,6 +48,8 @@ class _ImagePickerUploaderWidget extends StatefulWidget {
     @required this.storagePath,
     @required this.onChange,
     @required this.onError,
+    @required this.text,
+    this.allowPreview,
   });
 
   final BuildContext context;
@@ -49,6 +57,8 @@ class _ImagePickerUploaderWidget extends StatefulWidget {
   final String storagePath; // Firebase storage path
   final void Function(String) onChange;
   final void Function(dynamic) onError;
+  final String text;
+  final bool allowPreview;
 
   @override
   _ImagePickerUploaderWidgetState createState() =>
@@ -169,17 +179,18 @@ class _ImagePickerUploaderWidgetState
   @override
   Widget build(BuildContext context) {
     final widgets = <Widget>[
-      if (widget.value == null || widget.value.isEmpty)
-        const Icon(
-          Icons.person,
-          size: 200,
-        )
-      else
-        Image.network(
-          widget.value,
-          height: 200,
-          width: 200,
-        ),
+      if (widget.allowPreview)
+        if (widget.value == null || widget.value.isEmpty)
+          const Icon(
+            Icons.person,
+            size: 200,
+          )
+        else
+          Image.network(
+            widget.value,
+            height: 200,
+            width: 200,
+          ),
     ];
     if (Platform.isAndroid || Platform.isIOS) {
       widgets.add(
@@ -211,15 +222,16 @@ class _ImagePickerUploaderWidgetState
           title: const Text('Input a url'),
           onTap: _urlInputPicture,
         ),
-        ListTile(
-          title: const Text('Remove picture'),
-          onTap: () => _onChange(null),
-        ),
+        if (widget.allowPreview)
+          ListTile(
+            title: const Text('Remove picture'),
+            onTap: () => _onChange(null),
+          ),
       ],
     );
 
     return SimpleDialog(
-      title: const Text('Change Profile Picture'),
+      title: Text(widget.text),
       children: widgets,
     );
   }

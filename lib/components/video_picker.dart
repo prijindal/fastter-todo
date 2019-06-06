@@ -2,23 +2,18 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-// import 'package:file_chooser/file_chooser.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:chewie/chewie.dart';
-import 'package:video_player/video_player.dart';
 import '../helpers/storage.dart';
 
 class VideoPickerUploader {
   VideoPickerUploader({
     @required this.context,
-    @required this.value,
     @required this.storagePath,
     @required this.onChange,
     @required this.onError,
   });
 
   final BuildContext context;
-  final String value; // Url of the image
   final String storagePath; // Firebase storage path
   final void Function(String) onChange;
   final void Function(dynamic) onError;
@@ -28,7 +23,6 @@ class VideoPickerUploader {
       context: context,
       builder: (context) => _VideoPickerUploaderWidget(
             context: context,
-            value: value,
             storagePath: storagePath,
             onChange: onChange,
             onError: onError,
@@ -40,14 +34,12 @@ class VideoPickerUploader {
 class _VideoPickerUploaderWidget extends StatefulWidget {
   const _VideoPickerUploaderWidget({
     @required this.context,
-    @required this.value,
     @required this.storagePath,
     @required this.onChange,
     @required this.onError,
   });
 
   final BuildContext context;
-  final String value; // Url of the image
   final String storagePath; // Firebase storage path
   final void Function(String) onChange;
   final void Function(dynamic) onError;
@@ -137,9 +129,7 @@ class _VideoPickerUploaderWidgetState
   }
 
   Future<void> _urlInputVideo() async {
-    final urlController = TextEditingController(
-      text: widget.value,
-    );
+    final urlController = TextEditingController(text: '');
     final shouldUpdate = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -170,22 +160,7 @@ class _VideoPickerUploaderWidgetState
 
   @override
   Widget build(BuildContext context) {
-    final widgets = <Widget>[
-      if (widget.value == null || widget.value.isEmpty)
-        const Icon(
-          Icons.person,
-          size: 200,
-        )
-      else
-        Chewie(
-          controller: ChewieController(
-            videoPlayerController: VideoPlayerController.network(
-              widget.value,
-            ),
-            aspectRatio: 3 / 2,
-          ),
-        ),
-    ];
+    final widgets = <Widget>[];
     if (Platform.isAndroid || Platform.isIOS) {
       widgets.add(
         ListTile(
@@ -216,15 +191,11 @@ class _VideoPickerUploaderWidgetState
           title: const Text('Input a url'),
           onTap: _urlInputVideo,
         ),
-        ListTile(
-          title: const Text('Remove video'),
-          onTap: () => _onChange(null),
-        ),
       ],
     );
 
     return SimpleDialog(
-      title: const Text('Change Profile Video'),
+      title: const Text('Upload Video'),
       children: widgets,
     );
   }

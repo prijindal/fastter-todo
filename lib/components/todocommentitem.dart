@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:fastter_dart/store/todocomments.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
@@ -100,6 +102,49 @@ class _TodoCommentItem extends StatelessWidget {
         },
       );
     } else if (todoComment.type == TodoCommentType.video) {
+      const videoEmbedders = <Map<String, dynamic>>[
+        <String, dynamic>{
+          'startsWith': 'https://vimeo.com/',
+          'link': 'https://player.vimeo.com/video/{{id}}',
+        },
+        <String, dynamic>{
+          'startsWith': 'https://www.youtube.com/watch?v=',
+          'link': 'https://www.youtube.com/embed/{{id}}',
+        },
+      ];
+      for (final videoEmbedder in videoEmbedders) {
+        if (todoComment.content.startsWith(videoEmbedder['startsWith'])) {
+          final id = todoComment.content.split(videoEmbedder['startsWith'])[1];
+          if (Platform.isAndroid || Platform.isIOS) {
+            final width = MediaQuery.of(context).size.width;
+            final height = (width * 9) / 16;
+            final String initialUrl =
+                videoEmbedder['link'].replaceAll('{{id}}', id);
+            return Container(
+              width: width,
+              height: height,
+              child: WebView(
+                navigationDelegate: (navigationRequest) {
+                  if (navigationRequest.url.startsWith(
+                      videoEmbedder['link'].replaceAll('{{id}}', ''))) {
+                    return NavigationDecision.navigate;
+                  } else {
+                    launch(navigationRequest.url);
+                    return NavigationDecision.prevent;
+                  }
+                },
+                javascriptMode: JavascriptMode.unrestricted,
+                initialUrl: initialUrl,
+              ),
+            );
+          } else {
+            return Linkify(
+              onOpen: (link) => launch(link.url),
+              text: todoComment.content,
+            );
+          }
+        }
+      }
       return Chewie(
         controller: ChewieController(
           videoPlayerController: VideoPlayerController.network(

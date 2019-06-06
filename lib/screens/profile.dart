@@ -54,6 +54,7 @@ class _ProfileScreenState extends State<_ProfileScreen> {
   void _editPicture() {
     ImagePickerUploader(
       context: context,
+      text: 'Upload Profile Picture',
       value: user.picture,
       storagePath: 'profilepictures/${user.id}.jpg',
       onChange: (value) {

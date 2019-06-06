@@ -53,6 +53,7 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
   void _addImageComment() {
     ImagePickerUploader(
       context: context,
+      text: 'Upload Image',
       value: null,
       storagePath: 'todocomments/${Uuid().v1()}.jpg',
       onError: (dynamic error) {},
@@ -74,7 +75,6 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
   void _addVideoComment() {
     VideoPickerUploader(
       context: context,
-      value: null,
       storagePath: 'todocomments/${Uuid().v1()}.mp4',
       onError: (dynamic error) {},
       onChange: (value) {
