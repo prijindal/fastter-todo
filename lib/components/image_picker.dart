@@ -212,12 +212,16 @@ class _ImagePickerUploaderWidgetState
         ),
       );
     }
-    widgets.addAll(
-      [
+    if (Platform.isAndroid || Platform.isIOS) {
+      widgets.add(
         ListTile(
           title: const Text('Select a picture'),
           onTap: _selectAndUploadPicture,
         ),
+      );
+    }
+    widgets.addAll(
+      [
         ListTile(
           title: const Text('Input a url'),
           onTap: _urlInputPicture,

@@ -304,6 +304,11 @@ class _TodoListState extends State<_TodoList> {
       );
 
   Widget _buildLandscape() => Scaffold(
+        key: Key(
+          widget.title +
+              widget.filter.toString() +
+              widget.categoryView.toString(),
+        ),
         appBar: HomeAppBar(
           title: widget.title,
           filter: widget.filter,

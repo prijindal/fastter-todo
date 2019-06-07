@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/store/labels.dart';
 import 'package:fastter_dart/store/notifications.dart';
@@ -426,14 +427,16 @@ class _HomeAppBar extends StatelessWidget {
         itemBuilder: (context) {
           if (selectedtodos.isNotEmpty) {
             return [
-              const PopupMenuItem<_PopupAction>(
-                child: Text('Copy'),
-                value: _PopupAction.copy,
-              ),
-              const PopupMenuItem<_PopupAction>(
-                child: Text('Share'),
-                value: _PopupAction.share,
-              ),
+              if (Platform.isAndroid || Platform.isIOS)
+                const PopupMenuItem<_PopupAction>(
+                  child: Text('Copy'),
+                  value: _PopupAction.copy,
+                ),
+              if (Platform.isAndroid || Platform.isIOS)
+                const PopupMenuItem<_PopupAction>(
+                  child: Text('Share'),
+                  value: _PopupAction.share,
+                ),
               const PopupMenuItem<_PopupAction>(
                 child: Text('Attach To'),
                 value: _PopupAction.attach,

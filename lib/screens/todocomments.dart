@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:fastter_dart/store/todocomments.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -270,16 +271,18 @@ class _TodoCommentsAppBar extends StatelessWidget {
       return [];
     } else {
       return [
-        IconButton(
-          icon: const Icon(Icons.content_copy),
-          onPressed: () => _copySelectedComment(context),
-          tooltip: 'Copy',
-        ),
-        IconButton(
-          icon: const Icon(Icons.share),
-          onPressed: _shareSelectedComment,
-          tooltip: 'Share',
-        ),
+        if (Platform.isAndroid || Platform.isIOS)
+          IconButton(
+            icon: const Icon(Icons.content_copy),
+            onPressed: () => _copySelectedComment(context),
+            tooltip: 'Copy',
+          ),
+        if (Platform.isAndroid || Platform.isIOS)
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: _shareSelectedComment,
+            tooltip: 'Share',
+          ),
         IconButton(
           icon: const Icon(Icons.delete),
           onPressed: () => _deleteSelectedComment(context),

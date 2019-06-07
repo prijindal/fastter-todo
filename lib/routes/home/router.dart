@@ -100,6 +100,6 @@ class _HomePageState extends State<HomePage> {
         navigatorKey: navigatorKey,
         theme: primaryTheme,
         onGenerateRoute: onGenerateRoute,
-        initialRoute: "/about",
+        initialRoute: widget.frontPage.route,
       );
 }

@@ -28,13 +28,19 @@ class ImageViewer extends StatelessWidget {
               builder: (context) => Scaffold(
                     body: Stack(
                       children: [
-                        FadeInImage(
-                          image: fullImageProvider ?? imageProvider,
-                          width: MediaQuery.of(context).size.width,
-                          fit: BoxFit.contain,
-                          placeholder: imageProvider,
-                          fadeOutDuration: const Duration(milliseconds: 1),
-                          fadeInDuration: const Duration(milliseconds: 1),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            FadeInImage(
+                              image: fullImageProvider ?? imageProvider,
+                              width: MediaQuery.of(context).size.width,
+                              fit: BoxFit.contain,
+                              placeholder: imageProvider,
+                              fadeOutDuration: const Duration(milliseconds: 1),
+                              fadeInDuration: const Duration(milliseconds: 1),
+                            ),
+                          ],
                         ),
                         Positioned(
                           top: 0,

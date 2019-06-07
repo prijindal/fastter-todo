@@ -11,8 +11,8 @@ class AboutScreen extends StatefulWidget {
 class _AboutScreen extends State<AboutScreen> {
   var _applicationName = 'Fastter Todo';
   var _applicationVersion = '0.0.1';
-  final Widget applicationIcon = ImageViewer(
-    AssetImage('assets/icon/ic_launcher.png'),
+  final Widget applicationIcon = Image.asset(
+    'assets/icon/ic_launcher.png',
     width: 48,
   );
 
