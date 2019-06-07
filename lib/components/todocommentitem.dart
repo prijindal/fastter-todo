@@ -11,6 +11,7 @@ import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/todocomment.model.dart';
 
 import '../helpers/todouihelpers.dart';
+import 'imageviewer.dart';
 
 class TodoCommentItem extends StatelessWidget {
   const TodoCommentItem({
@@ -84,22 +85,8 @@ class _TodoCommentItem extends StatelessWidget {
   Widget _buildContent(BuildContext context) {
     if (todoComment.type == TodoCommentType.image) {
       final imageProvider = NetworkImage(todoComment.content);
-      return GestureDetector(
-        child: Image(
-          image: imageProvider,
-          height: 200,
-        ),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (context) => Scaffold(
-                    body: Image(
-                      image: imageProvider,
-                    ),
-                  ),
-            ),
-          );
-        },
+      return ImageViewer(
+        imageProvider,
       );
     } else if (todoComment.type == TodoCommentType.video) {
       const videoEmbedders = <Map<String, dynamic>>[
