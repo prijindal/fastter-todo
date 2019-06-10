@@ -1,6 +1,7 @@
 import 'package:fastter_dart/store/todocomments.dart';
 import 'package:fastter_dart/store/todoreminders.dart';
 import 'package:fastter_dart/store/todos.dart';
+import 'package:fastter_todo/components/todoitemtitle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -220,13 +221,8 @@ class _TodoItem extends StatelessWidget {
     }
   }
 
-  Widget _buildTitle(BuildContext context) => Text(
-        todo.title,
-        style: TextStyle(
-          decoration: todo.completed == true
-              ? TextDecoration.lineThrough
-              : TextDecoration.none,
-        ),
+  Widget _buildTitle(BuildContext context) => TodoItemTitle(
+        todo: todo,
       );
 
   Widget _buildBody(BuildContext context) => Dismissible(
