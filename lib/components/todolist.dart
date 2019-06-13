@@ -158,6 +158,13 @@ class _TodoListState extends State<_TodoList> {
           mapCategoryToList[titleString] = [];
         }
         mapCategoryToList[titleString].add(todo);
+      } else if (sortBy == 'project') {
+        final projectString =
+            todo.project == null ? 'Inbox' : '${todo.project.title}';
+        if (!mapCategoryToList.containsKey(projectString)) {
+          mapCategoryToList[projectString] = [];
+        }
+        mapCategoryToList[projectString].add(todo);
       } else {
         final dueDateString = _dueDateCategorize(todo.dueDate);
         if (!mapCategoryToList.containsKey(dueDateString)) {

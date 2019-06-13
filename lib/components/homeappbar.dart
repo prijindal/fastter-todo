@@ -135,7 +135,7 @@ enum _PopupAction {
   refresh
 }
 
-enum _SortAction { duedate, title, priority }
+enum _SortAction { duedate, title, priority, project }
 
 class _HomeAppBar extends StatelessWidget {
   const _HomeAppBar({
@@ -367,6 +367,8 @@ class _HomeAppBar extends StatelessWidget {
             updateSortBy('priority');
           } else if (action == _SortAction.title) {
             updateSortBy('title');
+          } else if (action == _SortAction.project) {
+            updateSortBy('project');
           }
         },
         icon: const Icon(
@@ -393,6 +395,11 @@ class _HomeAppBar extends StatelessWidget {
                 enabled: todos.sortBy != 'title',
                 value: _SortAction.title,
                 child: const Text('Title'),
+              ),
+              PopupMenuItem<_SortAction>(
+                enabled: todos.sortBy != 'project',
+                value: _SortAction.project,
+                child: const Text('Project'),
               )
             ],
         tooltip: 'Due Date',
