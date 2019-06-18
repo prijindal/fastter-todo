@@ -42,12 +42,12 @@ android {
     List<String> runTasks = gradle.startParameter.getTaskNames();
     def value = 0
     for (String item : runTasks)
-    if ( item.contains("assembleRelease")) {
+    if ( item.contains("assembleRelease") || item.contains("bundleRelease")) {
         value = 1;
     }
     def code = Integer.parseInt(versionProps['VERSION_CODE']  ?: "0" ).intValue() + value
     for (String item : runTasks)
-    if ( item.contains("assembleRelease")) {
+    if ( item.contains("assembleRelease") || item.contains("bundleRelease")) {
         versionProps['VERSION_CODE']=code.toString()
         versionProps.store(versionPropsFile.newWriter(), null)
     }
@@ -79,7 +79,7 @@ android {
             signingConfig signingConfigs.release
 
             for (String item : runTasks)
-            if ( item.contains("assembleRelease")) {
+            if ( item.contains("assembleRelease") || item.contains("bundleRelease")) {
                 minifyEnabled true
                 useProguard true
 
