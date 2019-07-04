@@ -1,10 +1,7 @@
 import 'dart:io';
 import 'package:fastter_dart/models/user.model.dart';
 import 'package:fastter_dart/store/labels.dart';
-import 'package:fastter_dart/store/notifications.dart';
 import 'package:fastter_dart/store/projects.dart';
-import 'package:fastter_dart/store/todocomments.dart';
-import 'package:fastter_dart/store/todoreminders.dart';
 import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
@@ -19,13 +16,10 @@ import 'package:fastter_dart/models/label.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/settings.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/models/todocomment.model.dart';
-import 'package:fastter_dart/models/todoreminder.model.dart';
-import 'package:fastter_dart/models/notification.model.dart'
-    as notification_model;
 import 'package:fastter_dart/store/selectedtodos.dart';
 import 'package:fastter_dart/store/todos.dart';
 
+import '../helpers/fastter_helper.dart';
 import '../helpers/navigator.dart';
 import '../helpers/responsive.dart';
 import '../helpers/theme.dart';
@@ -50,77 +44,49 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         bloc: fastterUser,
         builder: (context, userState) =>
             BlocBuilder<FastterEvent<Project>, ListState<Project>>(
-              bloc: fastterProjects,
-              builder: (context, projectsState) =>
-                  BlocBuilder<FastterEvent<Label>, ListState<Label>>(
-                    bloc: fastterLabels,
-                    builder: (context, labelsState) =>
-                        BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
-                          bloc: fastterTodos,
-                          builder: (context, todosState) =>
-                              BlocBuilder<SelectedTodoEvent, List<String>>(
-                                bloc: selectedTodosBloc,
-                                builder: (context, selectedtodos) =>
-                                    _HomeAppBar(
-                                      projectSyncStart: () => fastterProjects
-                                          .dispatch(SyncEvent<Project>()),
-                                      labelSyncStart: () => fastterLabels
-                                          .dispatch(SyncEvent<Label>()),
-                                      todoSyncStart: () => fastterTodos
-                                          .dispatch(SyncEvent<Todo>()),
-                                      todoCommentsSyncStart: () =>
-                                          fastterTodoComments.dispatch(
-                                              SyncEvent<TodoComment>()),
-                                      todoRemindersSyncStart: () =>
-                                          fastterTodoReminders.dispatch(
-                                              SyncEvent<TodoReminder>(<String,
-                                                  dynamic>{
-                                            'completed': false,
-                                          })),
-                                      notificationsSyncStart: () =>
-                                          fastterNotifications.dispatch(
-                                              SyncEvent<
-                                                  notification_model
-                                                      .Notification>()),
-                                      filter: filter,
-                                      title: title,
-                                      projects: projectsState,
-                                      labels: labelsState,
-                                      todos: todosState,
-                                      updateTodo: (id, updated) =>
-                                          fastterTodos.dispatch(
-                                              UpdateEvent<Todo>(id, updated)),
-                                      deleteSelected: () {
-                                        for (final todoid in selectedtodos) {
-                                          fastterTodos.dispatch(
-                                              DeleteEvent<Todo>(todoid));
-                                          selectedTodosBloc.dispatch(
-                                              UnSelectTodoEvent(todoid));
-                                        }
-                                      },
-                                      deleteAll: () {
-                                        for (final todo in todosState.items
-                                            .where((todo) => fastterTodos
-                                                .filterObject(todo, filter))) {
-                                          fastterTodos.dispatch(
-                                              DeleteEvent<Todo>(todo.id));
-                                        }
-                                      },
-                                      selectedtodos: selectedtodos,
-                                      frontPage:
-                                          userState.user?.settings?.frontPage ??
-                                              FrontPage(
-                                                route: '/',
-                                                title: 'Inbox',
-                                              ),
-                                      updateSortBy: (sortBy) =>
-                                          fastterTodos.dispatch(
-                                              SetSortByEvent<Todo>(sortBy)),
-                                    ),
-                              ),
-                        ),
-                  ),
+          bloc: fastterProjects,
+          builder: (context, projectsState) =>
+              BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+            bloc: fastterLabels,
+            builder: (context, labelsState) =>
+                BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+              bloc: fastterTodos,
+              builder: (context, todosState) =>
+                  BlocBuilder<SelectedTodoEvent, List<String>>(
+                bloc: selectedTodosBloc,
+                builder: (context, selectedtodos) => _HomeAppBar(
+                  filter: filter,
+                  title: title,
+                  projects: projectsState,
+                  labels: labelsState,
+                  todos: todosState,
+                  updateTodo: (id, updated) =>
+                      fastterTodos.dispatch(UpdateEvent<Todo>(id, updated)),
+                  deleteSelected: () {
+                    for (final todoid in selectedtodos) {
+                      fastterTodos.dispatch(DeleteEvent<Todo>(todoid));
+                      selectedTodosBloc.dispatch(UnSelectTodoEvent(todoid));
+                    }
+                  },
+                  deleteAll: () {
+                    for (final todo in todosState.items.where(
+                        (todo) => fastterTodos.filterObject(todo, filter))) {
+                      fastterTodos.dispatch(DeleteEvent<Todo>(todo.id));
+                    }
+                  },
+                  selectedtodos: selectedtodos,
+                  frontPage: userState.user?.settings?.frontPage ??
+                      FrontPage(
+                        route: '/',
+                        title: 'Inbox',
+                      ),
+                  updateSortBy: (sortBy) =>
+                      fastterTodos.dispatch(SetSortByEvent<Todo>(sortBy)),
+                ),
+              ),
             ),
+          ),
+        ),
       );
 }
 
@@ -139,12 +105,6 @@ enum _SortAction { duedate, title, priority, project }
 
 class _HomeAppBar extends StatelessWidget {
   const _HomeAppBar({
-    @required this.labelSyncStart,
-    @required this.projectSyncStart,
-    @required this.todoSyncStart,
-    @required this.todoCommentsSyncStart,
-    @required this.todoRemindersSyncStart,
-    @required this.notificationsSyncStart,
     @required this.selectedtodos,
     @required this.deleteSelected,
     @required this.deleteAll,
@@ -159,12 +119,6 @@ class _HomeAppBar extends StatelessWidget {
     Key key,
   }) : super(key: key);
 
-  final VoidCallback projectSyncStart;
-  final VoidCallback labelSyncStart;
-  final VoidCallback todoSyncStart;
-  final VoidCallback todoCommentsSyncStart;
-  final VoidCallback todoRemindersSyncStart;
-  final VoidCallback notificationsSyncStart;
   final Map<String, dynamic> filter;
   final List<String> selectedtodos;
   final VoidCallback deleteSelected;
@@ -232,22 +186,22 @@ class _HomeAppBar extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Are you sure'),
-            content: Text('This will delete ${selectedtodos.length} tasks'),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text('Cancel'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              FlatButton(
-                child: const Text('Yes'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  deleteSelected();
-                },
-              ),
-            ],
+        title: const Text('Are you sure'),
+        content: Text('This will delete ${selectedtodos.length} tasks'),
+        actions: <Widget>[
+          FlatButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
           ),
+          FlatButton(
+            child: const Text('Yes'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              deleteSelected();
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -277,28 +231,28 @@ class _HomeAppBar extends StatelessWidget {
     final parent = await showDialog<Todo>(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Select a parent'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  ListTile(
-                    title: const Text('None'),
-                    onTap: () => Navigator.of(context).pop(null),
-                  ),
-                  ...todos.items
-                      .where((todo) => fastterTodos.filterObject(todo, filter))
-                      .map(
-                        (todo) => ListTile(
-                              title: Text(todo.title),
-                              onTap: () => Navigator.of(context).pop(todo),
-                            ),
-                      )
-                      .toList(),
-                ],
+        title: const Text('Select a parent'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: const Text('None'),
+                onTap: () => Navigator.of(context).pop(null),
               ),
-            ),
+              ...todos.items
+                  .where((todo) => fastterTodos.filterObject(todo, filter))
+                  .map(
+                    (todo) => ListTile(
+                      title: Text(todo.title),
+                      onTap: () => Navigator.of(context).pop(todo),
+                    ),
+                  )
+                  .toList(),
+            ],
           ),
+        ),
+      ),
     );
     for (final todo
         in todos.items.where((todo) => selectedtodos.contains(todo.id))) {
@@ -308,34 +262,29 @@ class _HomeAppBar extends StatelessWidget {
   }
 
   Future<void> _refresh() async {
-    todoSyncStart();
-    projectSyncStart();
-    labelSyncStart();
-    todoCommentsSyncStart();
-    todoRemindersSyncStart();
-    notificationsSyncStart();
+    startSyncAll();
   }
 
   void _deleteAll(BuildContext context) {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Are you sure'),
-            content: const Text('This will delete all tasks'),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text('Cancel'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              FlatButton(
-                child: const Text('Yes'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  deleteAll();
-                },
-              ),
-            ],
+        title: const Text('Are you sure'),
+        content: const Text('This will delete all tasks'),
+        actions: <Widget>[
+          FlatButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
           ),
+          FlatButton(
+            child: const Text('Yes'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              deleteAll();
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -343,8 +292,8 @@ class _HomeAppBar extends StatelessWidget {
     Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (context) => EditLabelScreen(
-              label: _label,
-            ),
+          label: _label,
+        ),
       ),
     );
   }
@@ -353,8 +302,8 @@ class _HomeAppBar extends StatelessWidget {
     Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (context) => EditProjectScreen(
-              project: _project,
-            ),
+          project: _project,
+        ),
       ),
     );
   }
@@ -376,32 +325,32 @@ class _HomeAppBar extends StatelessWidget {
           color: Colors.white,
         ),
         itemBuilder: (context) => [
-              const PopupMenuItem(
-                enabled: false,
-                child: Text('Sort By'),
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem<_SortAction>(
-                enabled: todos.sortBy != 'dueDate',
-                value: _SortAction.duedate,
-                child: const Text('Due Date'),
-              ),
-              PopupMenuItem<_SortAction>(
-                enabled: todos.sortBy != 'priority',
-                value: _SortAction.priority,
-                child: const Text('Priority'),
-              ),
-              PopupMenuItem<_SortAction>(
-                enabled: todos.sortBy != 'title',
-                value: _SortAction.title,
-                child: const Text('Title'),
-              ),
-              PopupMenuItem<_SortAction>(
-                enabled: todos.sortBy != 'project',
-                value: _SortAction.project,
-                child: const Text('Project'),
-              )
-            ],
+          const PopupMenuItem(
+            enabled: false,
+            child: Text('Sort By'),
+          ),
+          const PopupMenuDivider(),
+          PopupMenuItem<_SortAction>(
+            enabled: todos.sortBy != 'dueDate',
+            value: _SortAction.duedate,
+            child: const Text('Due Date'),
+          ),
+          PopupMenuItem<_SortAction>(
+            enabled: todos.sortBy != 'priority',
+            value: _SortAction.priority,
+            child: const Text('Priority'),
+          ),
+          PopupMenuItem<_SortAction>(
+            enabled: todos.sortBy != 'title',
+            value: _SortAction.title,
+            child: const Text('Title'),
+          ),
+          PopupMenuItem<_SortAction>(
+            enabled: todos.sortBy != 'project',
+            value: _SortAction.project,
+            child: const Text('Project'),
+          )
+        ],
         tooltip: 'Due Date',
       );
 
@@ -508,14 +457,14 @@ class _HomeAppBar extends StatelessWidget {
               ? BlocBuilder<SelectedTodoEvent, List<String>>(
                   bloc: selectedTodosBloc,
                   builder: (context, state) => IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: () {
-                          for (final id in state) {
-                            selectedTodosBloc.dispatch(UnSelectTodoEvent(id));
-                          }
-                        },
-                        tooltip: 'Unselect',
-                      ),
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      for (final id in state) {
+                        selectedTodosBloc.dispatch(UnSelectTodoEvent(id));
+                      }
+                    },
+                    tooltip: 'Unselect',
+                  ),
                 )
               : getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait
                   ? IconButton(
@@ -534,19 +483,19 @@ class _HomeAppBar extends StatelessWidget {
               BlocBuilder<FastterConnectEvent, bool>(
                 bloc: Fastter.instance,
                 builder: (context, isConnected) => AnimatedCrossFade(
-                      duration: kThemeAnimationDuration,
-                      firstChild: Text(
-                        'Connecting...',
-                        style: Theme.of(context)
-                            .textTheme
-                            .body1
-                            .apply(color: Colors.white),
-                      ),
-                      secondChild: Container(),
-                      crossFadeState: isConnected
-                          ? CrossFadeState.showSecond
-                          : CrossFadeState.showFirst,
-                    ),
+                  duration: kThemeAnimationDuration,
+                  firstChild: Text(
+                    'Connecting...',
+                    style: Theme.of(context)
+                        .textTheme
+                        .body1
+                        .apply(color: Colors.white),
+                  ),
+                  secondChild: Container(),
+                  crossFadeState: isConnected
+                      ? CrossFadeState.showSecond
+                      : CrossFadeState.showFirst,
+                ),
               ),
             ],
           ),

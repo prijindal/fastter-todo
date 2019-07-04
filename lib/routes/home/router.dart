@@ -2,11 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/store/user.dart';
-import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todocomment.model.dart';
-import 'package:fastter_dart/models/todoreminder.model.dart';
-import 'package:fastter_dart/models/notification.model.dart' as notification;
 import 'package:fastter_dart/store/labels.dart';
 import 'package:fastter_dart/store/notifications.dart';
 import 'package:fastter_dart/store/projects.dart';
@@ -14,6 +9,7 @@ import 'package:fastter_dart/store/todocomments.dart';
 import 'package:fastter_dart/store/todoreminders.dart';
 import 'package:fastter_dart/store/todos.dart';
 import 'package:fastter_todo/bloc.dart';
+import 'package:fastter_todo/helpers/fastter_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -70,18 +66,13 @@ class _HomePageState extends State<HomePage> {
   void _openNewTodo(Todo todo) {
     navigatorKey.currentState.push<void>(MaterialPageRoute<void>(
       builder: (context) => TodoEditScreen(
-            todo: todo,
-          ),
+        todo: todo,
+      ),
     ));
   }
 
   Future<void> _initRequests() async {
-    fastterTodos.dispatch(SyncEvent<Todo>());
-    fastterProjects.dispatch(SyncEvent<Project>());
-    fastterLabels.dispatch(SyncEvent<Label>());
-    fastterTodoComments.dispatch(SyncEvent<TodoComment>());
-    fastterTodoReminders.dispatch(SyncEvent<TodoReminder>());
-    fastterNotifications.dispatch(SyncEvent<notification.Notification>());
+    startSyncAll();
     fastterLabels.queries.initSubscriptions(fastterLabels.dispatch);
     fastterProjects.queries.initSubscriptions(fastterProjects.dispatch);
     fastterTodos.queries.initSubscriptions(fastterTodos.dispatch);
