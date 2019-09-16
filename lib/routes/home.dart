@@ -10,7 +10,7 @@ import 'home/router.dart';
 
 class HomeContainer extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, state) => HomePage(
               frontPage: state.user?.settings?.frontPage ??

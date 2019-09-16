@@ -26,7 +26,7 @@ class BaseExpansionTile<T extends BaseModel> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent, ListState<Todo>>(
+      BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
         builder: (context, state) => _BaseExpansionTile<T>(
               addRoute: addRoute,

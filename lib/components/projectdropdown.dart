@@ -22,7 +22,7 @@ class ProjectDropdown extends StatelessWidget {
   final void Function() onOpening;
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+      BlocBuilder<FastterBloc<Project>, ListState<Project>>(
         bloc: fastterProjects,
         builder: (context, state) => _ProjectDropdown(
               projects: state,

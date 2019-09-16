@@ -15,7 +15,7 @@ class FilterCountText extends StatelessWidget {
   final Map<String, dynamic> filter;
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+      BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
         builder: (context, state) =>
             Text(filterToCount(filter, state).toString()),

@@ -24,7 +24,7 @@ class TodoCommentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<TodoComment>, ListState<TodoComment>>(
+      BlocBuilder<FastterBloc<TodoComment>, ListState<TodoComment>>(
         bloc: fastterTodoComments,
         builder: (context, state) => _TodoCommentsScreen(
               todo: todo,
@@ -151,7 +151,7 @@ class TodoCommentsAppBar extends StatelessWidget
 
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<TodoComment>, ListState<TodoComment>>(
+      BlocBuilder<FastterBloc<TodoComment>, ListState<TodoComment>>(
         bloc: fastterTodoComments,
         builder: (context, state) {
           final todoComments = state.items

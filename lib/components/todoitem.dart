@@ -267,7 +267,7 @@ class _TodoItem extends StatelessWidget {
             ),
           ],
         ),
-        child: BlocBuilder<SelectedTodoEvent, List<String>>(
+        child: BlocBuilder<SelectedTodosBloc, List<String>>(
           bloc: selectedTodosBloc,
           builder: (context, selectedTodos) => ListTile(
                 leading: TodoItemToggle(

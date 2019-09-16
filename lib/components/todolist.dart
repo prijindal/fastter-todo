@@ -32,10 +32,10 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+      BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
         builder: (context, todosState) =>
-            BlocBuilder<SelectedTodoEvent, List<String>>(
+            BlocBuilder<SelectedTodosBloc, List<String>>(
               bloc: selectedTodosBloc,
               builder: (context, selectedTodos) => _TodoList(
                     selectedTodos: selectedTodos,
@@ -91,7 +91,7 @@ class _TodoListState extends State<_TodoList> {
             bottom: 0,
             right: 2,
             left: 2,
-            child: BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+            child: BlocBuilder<FastterBloc<Project>, ListState<Project>>(
               bloc: fastterProjects,
               builder: (context, projects) => TodoInput(
                     project: (widget.filter.containsKey('project') &&

@@ -8,7 +8,7 @@ import 'package:fastter_dart/store/user.dart';
 
 class SignupScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, state) => _SignupScreen(
               signup: (email, password) =>

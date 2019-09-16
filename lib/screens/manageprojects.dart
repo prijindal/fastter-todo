@@ -17,7 +17,7 @@ import 'editproject.dart';
 class ManageProjectsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+      BlocBuilder<FastterBloc<Project>, ListState<Project>>(
         bloc: fastterProjects,
         builder: (context, state) => _ManageProjectsScreen(
               projects: state,

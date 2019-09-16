@@ -23,7 +23,7 @@ import '../helpers/theme.dart';
 
 class AppContainer extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, state) => _AppContainer(
               user: state,
@@ -70,9 +70,9 @@ class _AppContainerState extends State<_AppContainer> {
       _isTodosLoading = true;
       _isProjectsLoading = true;
     });
-    fastterUser.event.listen((event) {
+    fastterUser.state.listen((event) {
       if (event is InitStateUserEvent) {
-        Fastter.instance.bearer = event.initState.bearer;
+        Fastter.instance.bearer = event.bearer;
         Timer.run(() {
           setState(() {
             _isUserLoading = false;
@@ -81,7 +81,7 @@ class _AppContainerState extends State<_AppContainer> {
         });
       }
     });
-    fastterTodos.event.listen((event) {
+    fastterTodos.state.listen((event) {
       if (event is InitStateEvent<Todo>) {
         Timer.run(() {
           setState(() {
@@ -91,7 +91,7 @@ class _AppContainerState extends State<_AppContainer> {
         });
       }
     });
-    fastterProjects.event.listen((event) {
+    fastterProjects.state.listen((event) {
       if (event is InitStateEvent<Project>) {
         Timer.run(() {
           setState(() {

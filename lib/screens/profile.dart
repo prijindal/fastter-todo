@@ -9,7 +9,7 @@ import '../components/image_picker.dart';
 
 class ProfileScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, userState) => _ProfileScreen(
             user: userState,

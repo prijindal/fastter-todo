@@ -11,7 +11,7 @@ import 'notificationitem.dart';
 class NotificationsDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) => BlocBuilder<
-          FastterEvent<notification.Notification>,
+          FastterBloc<notification.Notification>,
           ListState<notification.Notification>>(
         bloc: fastterNotifications,
         builder: (context, state) => _NotificationsDrawer(

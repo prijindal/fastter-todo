@@ -82,7 +82,7 @@ class _SearchTodosResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+      BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
         builder: (context, state) => _SearchTodosResultsComponent(
               todos: state.copyWith(
@@ -121,7 +121,7 @@ class _SearchTodosResultsComponent extends StatelessWidget {
             bottom: 0,
             right: 2,
             left: 2,
-            child: BlocBuilder<SelectedTodoEvent, List<String>>(
+            child: BlocBuilder<SelectedTodosBloc, List<String>>(
               bloc: selectedTodosBloc,
               builder: (context, selectedTodos) => AnimatedSwitcher(
                     duration: const Duration(milliseconds: 350),
@@ -144,7 +144,7 @@ class _SearchProjectsResults extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+      BlocBuilder<FastterBloc<Project>, ListState<Project>>(
         bloc: prefix0.fastterProjects,
         builder: (context, state) => _SearchProjectsResultsComponent(
               projects: state.items,

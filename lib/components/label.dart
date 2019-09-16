@@ -42,7 +42,7 @@ class LabelItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+      BlocBuilder<FastterBloc<Label>, ListState<Label>>(
         bloc: fastterLabels,
         builder: (context, state) => _LabelItem(
               label: label,

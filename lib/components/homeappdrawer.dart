@@ -20,7 +20,7 @@ class HomeAppDrawer extends StatelessWidget {
   final bool disablePop;
 
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, userState) => _HomeAppDrawer(
               user: userState,

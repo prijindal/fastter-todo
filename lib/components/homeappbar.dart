@@ -40,19 +40,19 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, userState) =>
-            BlocBuilder<FastterEvent<Project>, ListState<Project>>(
+            BlocBuilder<FastterBloc<Project>, ListState<Project>>(
           bloc: fastterProjects,
           builder: (context, projectsState) =>
-              BlocBuilder<FastterEvent<Label>, ListState<Label>>(
+              BlocBuilder<FastterBloc<Label>, ListState<Label>>(
             bloc: fastterLabels,
             builder: (context, labelsState) =>
-                BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+                BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
               bloc: fastterTodos,
               builder: (context, todosState) =>
-                  BlocBuilder<SelectedTodoEvent, List<String>>(
+                  BlocBuilder<SelectedTodosBloc, List<String>>(
                 bloc: selectedTodosBloc,
                 builder: (context, selectedtodos) => _HomeAppBar(
                   filter: filter,
@@ -454,7 +454,7 @@ class _HomeAppBar extends StatelessWidget {
           automaticallyImplyLeading:
               getCurrentBreakpoint(context) == ResponsiveBreakpoints.potrait,
           leading: selectedtodos.isNotEmpty
-              ? BlocBuilder<SelectedTodoEvent, List<String>>(
+              ? BlocBuilder<SelectedTodosBloc, List<String>>(
                   bloc: selectedTodosBloc,
                   builder: (context, state) => IconButton(
                     icon: const Icon(Icons.arrow_back),
@@ -480,7 +480,7 @@ class _HomeAppBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildTitle(),
-              BlocBuilder<FastterConnectEvent, bool>(
+              BlocBuilder<Fastter, bool>(
                 bloc: Fastter.instance,
                 builder: (context, isConnected) => AnimatedCrossFade(
                   duration: kThemeAnimationDuration,

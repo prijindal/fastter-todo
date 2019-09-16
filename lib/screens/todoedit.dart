@@ -29,7 +29,7 @@ class TodoEditScreenFromId extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+      BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
         builder: (context, state) => TodoEditScreen(
               todo: state.items.singleWhere((todo) => todo.id == todoid),
@@ -230,7 +230,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                     ),
                   ),
                 ),
-                BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+                BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
                   bloc: fastterTodos,
                   builder: (context, todosState) {
                     final children = todosState.items.where((todo) =>
@@ -272,7 +272,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                       : Text(dueDateFormatter(_dueDate)),
                   onTap: _selectDate,
                 ),
-                BlocBuilder<FastterEvent<TodoComment>, ListState<TodoComment>>(
+                BlocBuilder<FastterBloc<TodoComment>, ListState<TodoComment>>(
                   bloc: fastterTodoComments,
                   builder: (context, commentsState) {
                     final todoComments = commentsState.items
@@ -290,7 +290,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                     );
                   },
                 ),
-                BlocBuilder<FastterEvent<TodoReminder>,
+                BlocBuilder<FastterBloc<TodoReminder>,
                     ListState<TodoReminder>>(
                   bloc: fastterTodoReminders,
                   builder: (context, remindersState) {

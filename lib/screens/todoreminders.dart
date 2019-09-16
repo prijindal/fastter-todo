@@ -21,7 +21,7 @@ class TodoRemindersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<FastterEvent<TodoReminder>, ListState<TodoReminder>>(
+      BlocBuilder<FastterBloc<TodoReminder>, ListState<TodoReminder>>(
         bloc: fastterTodoReminders,
         builder: (context, state) => _TodoRemindersScreen(
               todo: todo,

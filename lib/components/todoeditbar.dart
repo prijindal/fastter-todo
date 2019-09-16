@@ -22,10 +22,10 @@ import 'projectdropdown.dart';
 class TodoEditBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
-      BlocBuilder<SelectedTodoEvent, List<String>>(
+      BlocBuilder<SelectedTodosBloc, List<String>>(
         bloc: selectedTodosBloc,
         builder: (context, selectedTodos) =>
-            BlocBuilder<FastterEvent<Todo>, ListState<Todo>>(
+            BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
               bloc: fastterTodos,
               builder: (context, state) {
                 void _unSelectAllTodos() {

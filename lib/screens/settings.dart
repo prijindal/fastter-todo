@@ -8,7 +8,7 @@ import 'package:fastter_todo/screens/loading.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, state) => state != null && state.user != null
             ? _SettingsScreen(

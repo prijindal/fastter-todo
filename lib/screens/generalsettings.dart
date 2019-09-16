@@ -9,7 +9,7 @@ import 'package:fastter_dart/store/user.dart';
 class GeneralSettingsScreen extends StatelessWidget {
   @override
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, userState) => _GeneralSettingsScreen(
               settings: userState.user.settings ?? UserSettings(),

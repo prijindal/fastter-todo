@@ -8,7 +8,7 @@ import 'package:fastter_dart/store/user.dart';
 
 class LoginForm extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserEvent, UserState>(
+  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, userState) => _LoginForm(
               login: (email, password) =>
