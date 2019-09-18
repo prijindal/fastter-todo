@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import 'package:fastter_dart/models/base.model.dart';
 import 'package:fastter_dart/models/project.model.dart';
 import 'package:fastter_dart/models/todo.model.dart';
 import 'package:fastter_dart/store/projects.dart';
@@ -54,6 +55,9 @@ class _AppContainerState extends State<_AppContainer> {
   bool _isTodosLoading = true;
   bool _isProjectsLoading = true;
   bool _isWaiting = true;
+  StreamSubscription<UserState> userListener;
+  StreamSubscription<ListState<Todo>> todosListener;
+  StreamSubscription<ListState<Project>> projectsListener;
 
   @override
   void initState() {
@@ -70,34 +74,32 @@ class _AppContainerState extends State<_AppContainer> {
       _isTodosLoading = true;
       _isProjectsLoading = true;
     });
-    fastterUser.state.listen((event) {
-      if (event is InitStateUserEvent) {
+    _enableTryLoginTimer();
+    userListener = fastterUser.state.listen((event) {
+      if (event is UserState) {
         Fastter.instance.bearer = event.bearer;
         Timer.run(() {
           setState(() {
             _isUserLoading = false;
           });
-          _tryLogin();
         });
       }
     });
-    fastterTodos.state.listen((event) {
-      if (event is InitStateEvent<Todo>) {
+    todosListener = fastterTodos.state.listen((event) {
+      if (event is ListState<Todo>) {
         Timer.run(() {
           setState(() {
             _isTodosLoading = false;
           });
-          _tryLogin();
         });
       }
     });
-    fastterProjects.state.listen((event) {
-      if (event is InitStateEvent<Project>) {
+    projectsListener = fastterProjects.state.listen((event) {
+      if (event is ListState<Project>) {
         Timer.run(() {
           setState(() {
             _isProjectsLoading = false;
           });
-          _tryLogin();
         });
       }
     });
@@ -105,14 +107,24 @@ class _AppContainerState extends State<_AppContainer> {
     _flutterPersistor.initListeners();
   }
 
-  void _tryLogin() {
+  void _enableTryLoginTimer() {
     setState(() {
       _isWaiting = true;
     });
-    if (_isLoading) {
-      return;
-    }
-    Timer(Duration(milliseconds: 100), () {
+    Timer periodicTimer;
+    periodicTimer = Timer.periodic(const Duration(milliseconds: 100), (_timer) {
+      if(userListener != null) {
+        userListener.cancel();
+      }
+      if(todosListener != null) {
+        todosListener.cancel();
+      }
+      if(projectsListener != null) {
+        projectsListener.cancel();
+      }
+      if (_isLoading) {
+        return;
+      }
       setState(() {
         _isWaiting = false;
       });
@@ -121,6 +133,7 @@ class _AppContainerState extends State<_AppContainer> {
       } else {
         widget.confirmUser(widget.user.bearer);
       }
+      periodicTimer.cancel();
     });
   }
 
