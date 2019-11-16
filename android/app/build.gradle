@@ -81,7 +81,7 @@ android {
             for (String item : runTasks)
             if ( item.contains("assembleRelease") || item.contains("bundleRelease")) {
                 minifyEnabled true
-                useProguard true
+                shrinkResources true
 
                 proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro' 
             }
