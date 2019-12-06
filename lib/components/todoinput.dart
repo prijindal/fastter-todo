@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:fastter_dart/store/todos.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 import 'package:fastter_dart/fastter/fastter_bloc.dart';
 import 'package:fastter_dart/models/project.model.dart';
@@ -61,14 +62,14 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     }
     WidgetsBinding.instance.addObserver(this);
     if (Platform.isAndroid || Platform.isIOS) {
-      // subscribingId =
-      //     KeyboardVisibilityNotification().addNewListener(onChange: (visible) {
-      //   if (visible == false) {
-      //     _unFocusKeyboard();
-      //   } else {
-      //     _focusKeyboard();
-      //   }
-      // });
+      subscribingId =
+          KeyboardVisibilityNotification().addNewListener(onChange: (visible) {
+        if (visible == false) {
+          _unFocusKeyboard();
+        } else {
+          _focusKeyboard();
+        }
+      });
     }
   }
 
@@ -82,7 +83,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     if (subscribingId != null) {
-      // KeyboardVisibilityNotification().removeListener(subscribingId);
+      KeyboardVisibilityNotification().removeListener(subscribingId);
     }
     super.dispose();
   }

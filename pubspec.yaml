@@ -37,6 +37,7 @@ dependencies:
   image_picker: any
   intl: any
   json_annotation: any
+  flutter_keyboard_visibility: any
   package_info: any
   share: any
   shared_preferences: any
