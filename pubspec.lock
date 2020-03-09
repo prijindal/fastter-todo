@@ -88,7 +88,7 @@ packages:
   fastter_dart:
     dependency: "direct main"
     description:
-      path: "/home/prijindal/projects/fastter/dart"
+      path: "C:/Users/Priyanshu Jindal/projects/fastter/dart"
       relative: false
     source: path
     version: "0.0.0"
@@ -372,7 +372,7 @@ packages:
       name: test_api
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.11"
+    version: "0.2.14"
   tuple:
     dependency: "direct main"
     description:

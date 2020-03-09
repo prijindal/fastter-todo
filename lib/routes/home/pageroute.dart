@@ -14,7 +14,7 @@ class HomePageRoute<T> extends MaterialPageRoute<T> {
   @override
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
-    if (settings.isInitialRoute || !Fastter.instance.currentState) {
+    if (!Fastter.instance.currentState) {
       return child;
     }
     if (getCurrentBreakpoint(context) == ResponsiveBreakpoints.landscape) {

@@ -76,22 +76,22 @@ class _TodoItem extends StatelessWidget {
   Future<bool> _confirmDelete(BuildContext context) => showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-              title: const Text('Are You sure?'),
-              actions: <Widget>[
-                FlatButton(
-                  child: const Text('No'),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                ),
-                FlatButton(
-                  child: const Text('Yes'),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-              ],
+          title: const Text('Are You sure?'),
+          actions: <Widget>[
+            FlatButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
             ),
+            FlatButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        ),
       );
 
   void _toggleCompleted(bool newvalue) {
@@ -270,28 +270,28 @@ class _TodoItem extends StatelessWidget {
         child: BlocBuilder<SelectedTodosBloc, List<String>>(
           bloc: selectedTodosBloc,
           builder: (context, selectedTodos) => ListTile(
-                leading: TodoItemToggle(
-                  todo: todo,
-                  toggleCompleted: _toggleCompleted,
+            leading: TodoItemToggle(
+              todo: todo,
+              toggleCompleted: _toggleCompleted,
+            ),
+            selected: selectedTodos.contains(todo.id),
+            onTap: toggleSelected,
+            title: Flex(
+              direction: Axis.horizontal,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Flexible(
+                  child: _buildTitle(context),
                 ),
-                selected: selectedTodos.contains(todo.id),
-                onTap: toggleSelected,
-                title: Flex(
-                  direction: Axis.horizontal,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Flexible(
-                      child: _buildTitle(context),
-                    ),
-                    if (todo.dueDate == null &&
-                        todo.project != null &&
-                        reminders == 0 &&
-                        comments == 0)
-                      _buildProject(context, flex: 0),
-                  ],
-                ),
-                subtitle: _buildSubtitle(context),
-              ),
+                if (todo.dueDate == null &&
+                    todo.project != null &&
+                    reminders == 0 &&
+                    comments == 0)
+                  _buildProject(context, flex: 0),
+              ],
+            ),
+            subtitle: _buildSubtitle(context),
+          ),
         ),
       );
 

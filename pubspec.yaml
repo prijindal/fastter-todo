@@ -22,7 +22,7 @@ dependencies:
     sdk: flutter
   event_bus: any
   fastter_dart: 
-    path: /home/prijindal/projects/fastter/dart
+    path: C:/Users/Priyanshu Jindal/projects/fastter/dart
   firebase_core: any
   firebase_messaging: any
   firebase_storage: any

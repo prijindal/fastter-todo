@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:fastter_dart/store/todocomments.dart';
 import 'package:flutter/material.dart';
-import 'package:chewie/chewie.dart';
+// import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -64,22 +64,22 @@ class _TodoCommentItem extends StatelessWidget {
   Future<bool> _confirmDelete(BuildContext context) => showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-              title: const Text('Are You sure?'),
-              actions: <Widget>[
-                FlatButton(
-                  child: const Text('No'),
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                ),
-                FlatButton(
-                  child: const Text('Yes'),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-              ],
+          title: const Text('Are You sure?'),
+          actions: <Widget>[
+            FlatButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
             ),
+            FlatButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        ),
       );
 
   Widget _buildContent(BuildContext context) {
@@ -132,16 +132,17 @@ class _TodoCommentItem extends StatelessWidget {
           }
         }
       }
-      return Chewie(
-        controller: ChewieController(
-          videoPlayerController: VideoPlayerController.network(
-            todoComment.content,
-          ),
-          allowFullScreen: true,
-          autoInitialize: true,
-          looping: true,
-        ),
-      );
+      return VideoPlayer(VideoPlayerController.network(todoComment.content));
+      // return Chewie(
+      //   controller: ChewieController(
+      //     videoPlayerController: VideoPlayerController.network(
+      //       todoComment.content,
+      //     ),
+      //     allowFullScreen: true,
+      //     autoInitialize: true,
+      //     looping: true,
+      //   ),
+      // );
     }
     return Linkify(
       onOpen: (link) => launch(link.url),
