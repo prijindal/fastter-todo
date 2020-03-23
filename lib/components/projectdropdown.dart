@@ -25,12 +25,12 @@ class ProjectDropdown extends StatelessWidget {
       BlocBuilder<FastterBloc<Project>, ListState<Project>>(
         bloc: fastterProjects,
         builder: (context, state) => _ProjectDropdown(
-              projects: state,
-              onSelected: onSelected,
-              selectedProject: selectedProject,
-              onOpening: onOpening,
-              expanded: expanded,
-            ),
+          projects: state,
+          onSelected: onSelected,
+          selectedProject: selectedProject,
+          onOpening: onOpening,
+          expanded: expanded,
+        ),
       );
 }
 

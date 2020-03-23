@@ -27,11 +27,11 @@ class AppContainer extends StatelessWidget {
   Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, state) => _AppContainer(
-              user: state,
-              confirmUser: (bearer) =>
-                  fastterUser.dispatch(ConfirmUserEvent(bearer)),
-              clearAuth: () => fastterUser.dispatch(LogoutUserEvent()),
-            ),
+          user: state,
+          confirmUser: (bearer) =>
+              fastterUser.dispatch(ConfirmUserEvent(bearer)),
+          clearAuth: () => fastterUser.dispatch(LogoutUserEvent()),
+        ),
       );
 }
 
@@ -74,9 +74,11 @@ class _AppContainerState extends State<_AppContainer> {
       _isTodosLoading = true;
       _isProjectsLoading = true;
     });
+    await _flutterPersistor.load();
     _enableTryLoginTimer();
     userListener = fastterUser.state.listen((event) {
       if (event is UserState) {
+        print(event.bearer);
         Fastter.instance.bearer = event.bearer;
         Timer.run(() {
           setState(() {
@@ -103,7 +105,6 @@ class _AppContainerState extends State<_AppContainer> {
         });
       }
     });
-    await _flutterPersistor.load();
     _flutterPersistor.initListeners();
   }
 
@@ -113,13 +114,13 @@ class _AppContainerState extends State<_AppContainer> {
     });
     Timer periodicTimer;
     periodicTimer = Timer.periodic(const Duration(milliseconds: 100), (_timer) {
-      if(userListener != null) {
+      if (userListener != null) {
         userListener.cancel();
       }
-      if(todosListener != null) {
+      if (todosListener != null) {
         todosListener.cancel();
       }
-      if(projectsListener != null) {
+      if (projectsListener != null) {
         projectsListener.cancel();
       }
       if (_isLoading) {

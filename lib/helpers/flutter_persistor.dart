@@ -22,6 +22,15 @@ import 'package:fastter_dart/models/user.model.dart';
 class FlutterPersistor {
   SharedPreferences _sharedPreferences;
 
+  static FlutterPersistor _instance;
+
+  static FlutterPersistor getInstance() {
+    if (_instance == null) {
+      _instance = FlutterPersistor();
+    }
+    return _instance;
+  }
+
   Future<void> _initSharedPreferences() async {
     if (Platform.isAndroid || Platform.isIOS) {
       _sharedPreferences = await SharedPreferences.getInstance();
@@ -62,6 +71,56 @@ class FlutterPersistor {
       final file = File('$homeFolder/.config/fastter_todo/$key.json');
       file.createSync(recursive: true);
       await file.writeAsString(json.encode(value));
+    }
+  }
+
+  String loadString(String key) {
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
+        final string = _sharedPreferences.getString(key);
+        return string;
+      } else {
+        final homeFolder = Platform.environment['HOME'];
+        final file = File('$homeFolder/.config/fastter_todo/$key.txt');
+        if (file.existsSync()) {
+          return file.readAsStringSync();
+        } else {
+          return null;
+        }
+      }
+    } on Exception {
+      return null;
+    }
+  }
+
+  Future<void> setString(String key, String value) async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      try {
+        await _sharedPreferences.setString(key, value);
+      } on Exception catch (e) {
+        print(e);
+      }
+    } else {
+      final homeFolder = Platform.environment['HOME'];
+      final file = File('$homeFolder/.config/fastter_todo/$key.txt');
+      file.createSync(recursive: true);
+      await file.writeAsString(value);
+    }
+  }
+
+  Future<void> clearString(String key) async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      try {
+        await _sharedPreferences.remove(key);
+      } on Exception catch (e) {
+        print(e);
+      }
+    } else {
+      final homeFolder = Platform.environment['HOME'];
+      final file = File('$homeFolder/.config/fastter_todo/$key.txt');
+      if (file.existsSync()) {
+        file.deleteSync(recursive: true);
+      }
     }
   }
 

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:fastter_dart/models/todo.model.dart';
+import 'package:fastter_todo/helpers/encrypt.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_string_encryption/flutter_string_encryption.dart';
 
 class TodoItemTitle extends StatefulWidget {
   const TodoItemTitle({@required this.todo});
@@ -17,8 +17,9 @@ class _TodoItemTitleState extends State<TodoItemTitle> {
 
   Future<void> decrypt(String password) async {
     if (Platform.isAndroid || Platform.isIOS) {
-      final cryptor = PlatformStringCryptor();
-      final decrypt = await cryptor.decrypt(widget.todo.title, password);
+      final encryptionService = EncryptionService.getInstance();
+      encryptionService.setEncryptionKey(password, true);
+      final decrypt = encryptionService.decrypt(widget.todo.title);
       setState(() {
         decryptedText = decrypt;
         decrypted = true;
@@ -36,28 +37,28 @@ class _TodoItemTitleState extends State<TodoItemTitle> {
     final shouldDecrypt = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Type your Password'),
-            content: TextFormField(
-              controller: passwordController,
-              keyboardType: TextInputType.text,
-              obscureText: true,
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-              ),
-              FlatButton(
-                child: const Text('Decrypt'),
-                onPressed: () {
-                  // Save name
-                  Navigator.of(context).pop(true);
-                },
-              )
-            ],
+        title: const Text('Type your Password'),
+        content: TextFormField(
+          controller: passwordController,
+          keyboardType: TextInputType.text,
+          obscureText: true,
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
           ),
+          FlatButton(
+            child: const Text('Decrypt'),
+            onPressed: () {
+              // Save name
+              Navigator.of(context).pop(true);
+            },
+          )
+        ],
+      ),
     );
     if (shouldDecrypt) {
       await decrypt(passwordController.text);

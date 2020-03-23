@@ -21,6 +21,7 @@ dependencies:
   flutter:
     sdk: flutter
   event_bus: any
+  encrypt: any
   fastter_dart: 
     path: C:/Users/Priyanshu Jindal/projects/fastter/dart
   firebase_core: any
@@ -31,7 +32,6 @@ dependencies:
   flutter_colorpicker: any
   flutter_linkify: any
   flutter_signin_button: any
-  flutter_string_encryption: any
   google_sign_in: any
   http: any
   image_picker: any
