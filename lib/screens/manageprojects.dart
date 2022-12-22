@@ -1,13 +1,13 @@
-import 'package:fastter_dart/store/projects.dart';
-import 'package:fastter_dart/store/todos.dart';
+import '../store/projects.dart';
+import '../store/todos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_colorpicker/block_picker.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/base.model.dart';
+import '../models/project.model.dart';
+import '../models/todo.model.dart';
 
 import '../components/hexcolor.dart';
 import '../helpers/theme.dart';
@@ -20,36 +20,35 @@ class ManageProjectsScreen extends StatelessWidget {
       BlocBuilder<FastterBloc<Project>, ListState<Project>>(
         bloc: fastterProjects,
         builder: (context, state) => _ManageProjectsScreen(
-              projects: state,
-              deleteProject: (project) {
-                fastterProjects.dispatch(DeleteEvent<Project>(project.id));
-                fastterTodos.dispatch(SyncEvent<Todo>());
-              },
-              updateColor: (project, color) {
-                fastterProjects.dispatch(
-                  UpdateEvent<Project>(
-                    project.id,
-                    Project(
-                      id: project.id,
-                      title: project.title,
-                      color: color.value.toRadixString(16),
-                      createdAt: project.createdAt,
-                      updatedAt: project.updatedAt,
-                    ),
-                  ),
-                );
-              },
-            ),
+          projects: state,
+          deleteProject: (project) {
+            fastterProjects.add(DeleteEvent<Project>(project.id));
+            fastterTodos.add(SyncEvent<Todo>());
+          },
+          updateColor: (project, color) {
+            fastterProjects.add(
+              UpdateEvent<Project>(
+                project.id,
+                Project(
+                  id: project.id,
+                  title: project.title,
+                  color: color.value.toRadixString(16),
+                  createdAt: project.createdAt,
+                  updatedAt: project.updatedAt,
+                ),
+              ),
+            );
+          },
+        ),
       );
 }
 
 class _ManageProjectsScreen extends StatefulWidget {
   const _ManageProjectsScreen({
-    @required this.projects,
-    @required this.deleteProject,
-    @required this.updateColor,
-    Key key,
-  }) : super(key: key);
+    required this.projects,
+    required this.deleteProject,
+    required this.updateColor,
+  });
 
   final ListState<Project> projects;
   final void Function(Project) deleteProject;
@@ -62,22 +61,22 @@ class _ManageProjectsScreen extends StatefulWidget {
 class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
   List<String> selectedProjects = <String>[];
 
-  Future<bool> _deleteProject(String title) async => showDialog<bool>(
+  Future<bool?> _deleteProject(String title) async => showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text(title),
-              content: const Text('All tasks will move to inbox'),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () => Navigator.of(context).pop<bool>(false),
-                  child: const Text('No'),
-                ),
-                FlatButton(
-                  onPressed: () => Navigator.of(context).pop<bool>(true),
-                  child: const Text('Yes'),
-                )
-              ],
+          title: Text(title),
+          content: const Text('All tasks will move to inbox'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop<bool>(false),
+              child: const Text('No'),
             ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop<bool>(true),
+              child: const Text('Yes'),
+            )
+          ],
+        ),
       );
 
   void _unSelectAll() {
@@ -89,34 +88,34 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
   Widget _buildChangeColorButton() => IconButton(
         icon: const Icon(Icons.color_lens),
         onPressed: () async {
-          Color _pickerColor;
+          Color _pickerColor = Colors.black;
           final selectedColor = await showDialog<Color>(
             context: context,
             builder: (context) => AlertDialog(
-                  title: const Text('Pick a color'),
-                  content: SingleChildScrollView(
-                    child: BlockPicker(
-                      pickerColor: _pickerColor,
-                      onColorChanged: (color) {
-                        _pickerColor = color;
-                      },
-                    ),
-                  ),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: const Text('Cancel'),
-                      onPressed: () {
-                        Navigator.of(context).pop(null);
-                      },
-                    ),
-                    FlatButton(
-                      child: const Text('Got it'),
-                      onPressed: () {
-                        Navigator.of(context).pop(_pickerColor);
-                      },
-                    ),
-                  ],
+              title: const Text('Pick a color'),
+              content: SingleChildScrollView(
+                child: BlockPicker(
+                  pickerColor: _pickerColor,
+                  onColorChanged: (color) {
+                    _pickerColor = color;
+                  },
                 ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop(null);
+                  },
+                ),
+                TextButton(
+                  child: const Text('Got it'),
+                  onPressed: () {
+                    Navigator.of(context).pop(_pickerColor);
+                  },
+                ),
+              ],
+            ),
           );
           if (selectedColor != null) {
             final projects = widget.projects.items
@@ -132,7 +131,9 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
   Widget _buildDeleteButton() => IconButton(
         icon: const Icon(Icons.delete),
         onPressed: () async {
-          if (await _deleteProject('Delete ${_buildAppBarTitle()} ?')) {
+          final shouldDelete =
+              await _deleteProject('Delete ${_buildAppBarTitle()} ?');
+          if (shouldDelete != null && shouldDelete) {
             final projects = widget.projects.items
                 .where((project) => selectedProjects.contains(project.id))
                 .toList();
@@ -153,8 +154,8 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
             Navigator.of(context).push<void>(
               MaterialPageRoute<void>(
                 builder: (context) => EditProjectScreen(
-                      project: project,
-                    ),
+                  project: project,
+                ),
               ),
             );
           },
@@ -190,10 +191,10 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
           ? FloatingActionButton(
               child: const Icon(Icons.add),
               onPressed: () => Navigator.of(context).push<void>(
-                    MaterialPageRoute<void>(
-                      builder: (context) => const AddProjectScreen(),
-                    ),
-                  ),
+                MaterialPageRoute<void>(
+                  builder: (context) => const AddProjectScreen(),
+                ),
+              ),
             )
           : Material(
               elevation: 20,
@@ -263,7 +264,9 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () async {
-                      if (await _deleteProject('Delete ${project.title}?')) {
+                      final shouldDelete =
+                          await _deleteProject('Delete ${project.title}?');
+                      if (shouldDelete != null && shouldDelete) {
                         widget.deleteProject(project);
                       }
                     },

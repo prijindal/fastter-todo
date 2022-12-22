@@ -1,25 +1,26 @@
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/store/projects.dart';
+import '../fastter/fastter_bloc.dart';
+import '../store/projects.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/project.model.dart';
+import '../models/base.model.dart';
+import '../models/project.model.dart';
 
 import '../components/hexcolor.dart';
 
 class ProjectDropdown extends StatelessWidget {
   const ProjectDropdown({
-    @required this.onSelected,
+    super.key,
+    required this.onSelected,
     this.selectedProject,
     this.onOpening,
     this.expanded = false,
   });
 
   final bool expanded;
-  final void Function(Project) onSelected;
-  final Project selectedProject;
-  final void Function() onOpening;
+  final void Function(Project?) onSelected;
+  final Project? selectedProject;
+  final void Function()? onOpening;
   @override
   Widget build(BuildContext context) =>
       BlocBuilder<FastterBloc<Project>, ListState<Project>>(
@@ -36,35 +37,38 @@ class ProjectDropdown extends StatelessWidget {
 
 class _ProjectDropdown extends StatelessWidget {
   _ProjectDropdown({
-    @required this.projects,
-    @required this.onSelected,
+    required this.projects,
+    required this.onSelected,
     this.selectedProject,
     this.onOpening,
     this.expanded = false,
-    Key key,
-  }) : super(key: key);
+  });
 
   final GlobalKey _menuKey = GlobalKey();
   final bool expanded;
   final ListState<Project> projects;
-  final void Function(Project) onSelected;
-  final Project selectedProject;
-  final void Function() onOpening;
+  final void Function(Project?) onSelected;
+  final Project? selectedProject;
+  final void Function()? onOpening;
 
   RelativeRect _getPosition(BuildContext context) {
     if (onOpening != null) {
-      onOpening();
+      onOpening!();
     }
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
-    final RenderBox renderBox = _menuKey.currentContext.findRenderObject();
-    return RelativeRect.fromRect(
-      Rect.fromPoints(
-        renderBox.localToGlobal(Offset.zero, ancestor: overlay),
-        renderBox.localToGlobal(renderBox.size.bottomRight(Offset.zero),
-            ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
+    final RenderBox? overlay =
+        Overlay.of(context)?.context.findRenderObject() as RenderBox?;
+    final RenderBox? renderBox =
+        _menuKey.currentContext?.findRenderObject() as RenderBox?;
+    return renderBox != null && overlay != null
+        ? RelativeRect.fromRect(
+            Rect.fromPoints(
+              renderBox.localToGlobal(Offset.zero, ancestor: overlay),
+              renderBox.localToGlobal(renderBox.size.bottomRight(Offset.zero),
+                  ancestor: overlay),
+            ),
+            Offset.zero & overlay.size,
+          )
+        : const RelativeRect.fromLTRB(0, 0, 0, 0);
   }
 
   void _showMenu(BuildContext context) {
@@ -88,25 +92,26 @@ class _ProjectDropdown extends StatelessWidget {
                 ),
               ))
           .toList()
-            ..add(PopupMenuItem<Project>(
-              value: null,
-              child: ListTile(
-                onTap: () {
-                  Navigator.of(context).pop();
-                  onSelected(null);
-                },
-                leading: const Icon(
-                  Icons.group_work,
-                ),
-                title: const Text('Inbox'),
-              ),
-            )),
+        ..add(PopupMenuItem<Project>(
+          value: null,
+          child: ListTile(
+            onTap: () {
+              Navigator.of(context).pop();
+              onSelected(null);
+            },
+            leading: const Icon(
+              Icons.group_work,
+            ),
+            title: const Text('Inbox'),
+          ),
+        )),
     );
   }
 
   Icon _buildIcon() => Icon(
         Icons.group_work,
-        color: selectedProject == null ? null : HexColor(selectedProject.color),
+        color:
+            selectedProject == null ? null : HexColor(selectedProject!.color),
       );
 
   @override
@@ -117,7 +122,7 @@ class _ProjectDropdown extends StatelessWidget {
         leading: _buildIcon(),
         title: const Text('Project'),
         subtitle:
-            Text(selectedProject == null ? 'Inbox' : selectedProject.title),
+            Text(selectedProject == null ? 'Inbox' : selectedProject!.title),
         onTap: () => _showMenu(context),
       );
     }

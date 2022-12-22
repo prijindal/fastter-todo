@@ -1,15 +1,15 @@
-import 'package:fastter_dart/store/projects.dart';
+import '../store/projects.dart';
 import 'package:flutter/material.dart';
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import '../fastter/fastter_bloc.dart';
 
-import 'package:fastter_dart/models/project.model.dart';
+import '../models/project.model.dart';
 
 import '../components/colorpicker.dart';
 
 class AddProjectScreen extends StatefulWidget {
   const AddProjectScreen({
-    Key key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _AddProjectScreenState createState() => _AddProjectScreenState();
@@ -22,7 +22,7 @@ class _AddProjectScreenState extends State<AddProjectScreen> {
   Color _currentColor = const Color(0xff443a49);
 
   void _onSave() {
-    fastterProjects.dispatch(AddEvent<Project>(
+    fastterProjects.add(AddEvent<Project>(
       Project(
         title: titleController.text,
         color: _currentColor.value.toRadixString(16).substring(2),

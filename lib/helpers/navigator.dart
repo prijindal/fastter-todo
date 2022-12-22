@@ -6,7 +6,7 @@ class RouteInfo {
   RouteInfo(this.routeName, {this.arguments});
 
   String routeName;
-  Object arguments;
+  Map<String, dynamic>? arguments;
 }
 
 final List<RouteInfo> history = <RouteInfo>[];

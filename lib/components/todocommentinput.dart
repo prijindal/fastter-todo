@@ -1,20 +1,20 @@
 import 'dart:math';
-import 'package:fastter_dart/store/todocomments.dart';
+import '../store/todocomments.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/models/todocomment.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/todo.model.dart';
+import '../models/todocomment.model.dart';
 import 'image_picker.dart';
 import 'video_picker.dart';
 
 class TodoCommentInput extends StatelessWidget {
   const TodoCommentInput({
-    @required this.todo,
-    this.onAdded,
-    Key key,
-  }) : super(key: key);
+    required this.todo,
+    required this.onAdded,
+    super.key,
+  });
 
   final Todo todo;
   final VoidCallback onAdded;
@@ -23,7 +23,7 @@ class TodoCommentInput extends StatelessWidget {
   Widget build(BuildContext context) => _TodoCommentInput(
         todo: todo,
         addComment: (comment) {
-          fastterTodoComments.dispatch(AddEvent<TodoComment>(comment));
+          fastterTodoComments.add(AddEvent<TodoComment>(comment));
           if (onAdded != null) {
             onAdded();
           }
@@ -33,10 +33,9 @@ class TodoCommentInput extends StatelessWidget {
 
 class _TodoCommentInput extends StatefulWidget {
   const _TodoCommentInput({
-    @required this.todo,
-    @required this.addComment,
-    Key key,
-  }) : super(key: key);
+    required this.todo,
+    required this.addComment,
+  });
 
   final Todo todo;
   final void Function(TodoComment) addComment;
@@ -51,45 +50,45 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
   TextEditingController commentContentController = TextEditingController();
 
   void _addImageComment() {
-    ImagePickerUploader(
-      context: context,
-      text: 'Upload Image',
-      value: null,
-      storagePath: 'todocomments/${Uuid().v1()}.jpg',
-      onError: (dynamic error) {},
-      onChange: (value) {
-        if (value != null && value.isNotEmpty) {
-          widget.addComment(
-            TodoComment(
-              content: value,
-              type: TodoCommentType.image,
-              todo: widget.todo,
-              createdAt: DateTime.now(),
-            ),
-          );
-        }
-      },
-    ).editPicture();
+    // ImagePickerUploader(
+    //   context: context,
+    //   text: 'Upload Image',
+    //   value: null,
+    //   storagePath: 'todocomments/${Uuid().v1()}.jpg',
+    //   onError: (dynamic error) {},
+    //   onChange: (value) {
+    //     if (value != null && value.isNotEmpty) {
+    //       widget.addComment(
+    //         TodoComment(
+    //           content: value,
+    //           type: TodoCommentType.image,
+    //           todo: widget.todo,
+    //           createdAt: DateTime.now(),
+    //         ),
+    //       );
+    //     }
+    //   },
+    // ).editPicture();
   }
 
   void _addVideoComment() {
-    VideoPickerUploader(
-      context: context,
-      storagePath: 'todocomments/${Uuid().v1()}.mp4',
-      onError: (dynamic error) {},
-      onChange: (value) {
-        if (value != null && value.isNotEmpty) {
-          widget.addComment(
-            TodoComment(
-              content: value,
-              type: TodoCommentType.video,
-              todo: widget.todo,
-              createdAt: DateTime.now(),
-            ),
-          );
-        }
-      },
-    ).editVideo();
+    // VideoPickerUploader(
+    //   context: context,
+    //   storagePath: 'todocomments/${Uuid().v1()}.mp4',
+    //   onError: (dynamic error) {},
+    //   onChange: (value) {
+    //     if (value != null && value.isNotEmpty) {
+    //       widget.addComment(
+    //         TodoComment(
+    //           content: value,
+    //           type: TodoCommentType.video,
+    //           todo: widget.todo,
+    //           createdAt: DateTime.now(),
+    //         ),
+    //       );
+    //     }
+    //   },
+    // ).editVideo();
   }
 
   void _addComment() {
@@ -148,21 +147,21 @@ class _TodoCommentInputState extends State<_TodoCommentInput> {
                       },
                       child: const Icon(Icons.attach_file),
                       itemBuilder: (context) => [
-                            PopupMenuItem<TodoCommentInputAttachmentType>(
-                              value: TodoCommentInputAttachmentType.image,
-                              child: ListTile(
-                                leading: const Icon(Icons.image),
-                                title: const Text('Image'),
-                              ),
-                            ),
-                            PopupMenuItem<TodoCommentInputAttachmentType>(
-                              value: TodoCommentInputAttachmentType.video,
-                              child: ListTile(
-                                leading: const Icon(Icons.videocam),
-                                title: const Text('Video'),
-                              ),
-                            ),
-                          ],
+                        PopupMenuItem<TodoCommentInputAttachmentType>(
+                          value: TodoCommentInputAttachmentType.image,
+                          child: ListTile(
+                            leading: const Icon(Icons.image),
+                            title: const Text('Image'),
+                          ),
+                        ),
+                        PopupMenuItem<TodoCommentInputAttachmentType>(
+                          value: TodoCommentInputAttachmentType.video,
+                          child: ListTile(
+                            leading: const Icon(Icons.videocam),
+                            title: const Text('Video'),
+                          ),
+                        ),
+                      ],
                     ),
                     IconButton(
                       icon: const Icon(Icons.send),

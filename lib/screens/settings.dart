@@ -2,8 +2,8 @@ import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/store/user.dart';
+import '../models/user.model.dart';
+import '../store/user.dart';
 import 'package:fastter_todo/screens/loading.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -13,7 +13,7 @@ class SettingsScreen extends StatelessWidget {
         builder: (context, state) => state != null && state.user != null
             ? _SettingsScreen(
                 user: state,
-                onLogout: () => fastterUser.dispatch(LogoutUserEvent()),
+                onLogout: () => fastterUser.add(LogoutUserEvent()),
               )
             : LoadingScreen(),
       );
@@ -21,8 +21,8 @@ class SettingsScreen extends StatelessWidget {
 
 class _SettingsScreen extends StatelessWidget {
   const _SettingsScreen({
-    @required this.onLogout,
-    @required this.user,
+    required this.onLogout,
+    required this.user,
   });
 
   final void Function() onLogout;
@@ -34,17 +34,17 @@ class _SettingsScreen extends StatelessWidget {
         builder: (context) => AlertDialog(
               title: const Text('Logout?'),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   onPressed: () => Navigator.of(context).pop<bool>(false),
                   child: const Text('No'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () => Navigator.of(context).pop<bool>(true),
                   child: const Text('Yes'),
                 )
               ],
             ));
-    if (shouldDelete) {
+    if (shouldDelete != null && shouldDelete) {
       onLogout();
     }
   }
@@ -79,7 +79,7 @@ class _SettingsScreen extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.exit_to_app),
               title: const Text('Logout'),
-              subtitle: Text(user.user.email),
+              subtitle: Text(user.user?.email ?? ""),
               onTap: () => _onLogout(context),
             )
           ],

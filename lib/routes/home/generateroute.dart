@@ -2,9 +2,9 @@ import 'package:fastter_todo/screens/loading.dart';
 import 'package:fastter_todo/screens/loginsplash.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
+import '../../models/project.model.dart';
+import '../../models/label.model.dart';
+import '../../models/todo.model.dart';
 
 import '../../components/todolist.dart';
 import '../../screens/about.dart';
@@ -18,26 +18,29 @@ import '../../screens/todos.dart';
 import 'pageroute.dart';
 
 Route<dynamic> onGenerateRoute(RouteSettings settings) {
-  if (settings.name == '/') {
+  final name = settings.name;
+  print(name);
+  if (name == '/') {
     return HomePageRoute<void>(
       builder: (context) => InboxScreen(),
     );
-  } else if (settings.name == '/all') {
+  } else if (name == '/all') {
     return HomePageRoute<void>(
       builder: (context) => AllTodosScreen(),
     );
-  } else if (settings.name == '/today') {
+  } else if (name == '/today') {
     return HomePageRoute<void>(
       builder: (context) => TodayScreen(),
     );
-  } else if (settings.name == '/7days') {
+  } else if (name == '/7days') {
     return HomePageRoute<void>(
       builder: (context) => SevenDayScreen(),
     );
-  } else if (settings.name == '/todos') {
-    final Map<String, dynamic> arguments = settings.arguments;
+  } else if (name == '/todos') {
+    final Map<String, dynamic> arguments =
+        settings.arguments as Map<String, dynamic>;
     final filters = <String, dynamic>{};
-    String title;
+    String title = "Todos";
     if (arguments.containsKey('label')) {
       final Label label = arguments['label'];
       filters['label'] = label.id;
@@ -50,39 +53,40 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     }
     return HomePageRoute<void>(
       builder: (context) => TodoList(
-            filter: filters,
-            title: title,
-          ),
+        filter: filters,
+        title: title,
+      ),
     );
-  } else if (settings.name.startsWith('/todo/')) {
-    final todoid = settings.name.split('/todo/')[1];
+  } else if (name != null && name.startsWith('/todo/')) {
+    final todoid = name.split('/todo/')[1];
     return HomePageRoute<void>(
       builder: (context) => TodoEditScreenFromId(
-            todoid: todoid,
-          ),
+        todoid: todoid,
+      ),
     );
-  } else if (settings.name == '/todo') {
-    final Map<String, dynamic> arguments = settings.arguments;
+  } else if (name == '/todo') {
+    final Map<String, dynamic> arguments =
+        settings.arguments as Map<String, dynamic>;
     final Todo todo = arguments['todo'];
     return HomePageRoute<void>(
       builder: (context) => TodoEditScreen(
-            todo: todo,
-          ),
+        todo: todo,
+      ),
     );
-  } else if (settings.name == '/settings') {
+  } else if (name == '/settings') {
     return HomePageRoute<void>(builder: (context) => SettingsScreen());
-  } else if (settings.name == '/settings/account') {
+  } else if (name == '/settings/account') {
     return HomePageRoute<void>(builder: (context) => ProfileScreen());
-  } else if (settings.name == '/settings/general') {
+  } else if (name == '/settings/general') {
     return HomePageRoute<void>(builder: (context) => GeneralSettingsScreen());
-  } else if (settings.name == '/about') {
+  } else if (name == '/about') {
     return HomePageRoute<void>(builder: (context) => AboutScreen());
-  } else if (settings.name == '/privacypolicy') {
+  } else if (name == '/privacypolicy') {
     return HomePageRoute<void>(builder: (context) => PrivacyPolicyScreen());
   }
   return HomePageRoute<void>(
     builder: (context) => Scaffold(
-          body: const Text('404'),
-        ),
+      body: const Text('404'),
+    ),
   );
 }

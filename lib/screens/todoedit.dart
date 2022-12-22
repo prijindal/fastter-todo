@@ -1,17 +1,17 @@
-import 'package:fastter_dart/store/todocomments.dart';
-import 'package:fastter_dart/store/todoreminders.dart';
-import 'package:fastter_dart/store/todos.dart';
+import '../store/todocomments.dart';
+import '../store/todoreminders.dart';
+import '../store/todos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/models/todocomment.model.dart';
-import 'package:fastter_dart/models/todoreminder.model.dart';
-import 'package:fastter_dart/store/selectedtodos.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/base.model.dart';
+import '../models/label.model.dart';
+import '../models/project.model.dart';
+import '../models/todo.model.dart';
+import '../models/todocomment.model.dart';
+import '../models/todoreminder.model.dart';
+import '../store/selectedtodos.dart';
 
 import '../components/labelselector.dart';
 import '../components/prioritydialog.dart';
@@ -23,7 +23,7 @@ import 'todoreminders.dart';
 import 'todosubtasks.dart';
 
 class TodoEditScreenFromId extends StatelessWidget {
-  const TodoEditScreenFromId({@required this.todoid});
+  const TodoEditScreenFromId({required this.todoid});
 
   final String todoid;
 
@@ -32,16 +32,16 @@ class TodoEditScreenFromId extends StatelessWidget {
       BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
         builder: (context, state) => TodoEditScreen(
-              todo: state.items.singleWhere((todo) => todo.id == todoid),
-            ),
+          todo: state.items.singleWhere((todo) => todo.id == todoid),
+        ),
       );
 }
 
 class TodoEditScreen extends StatelessWidget {
   const TodoEditScreen({
-    @required this.todo,
-    Key key,
-  }) : super(key: key);
+    required this.todo,
+    super.key,
+  });
 
   final Todo todo;
 
@@ -49,21 +49,20 @@ class TodoEditScreen extends StatelessWidget {
   Widget build(BuildContext context) => _TodoEditScreen(
         todo: todo,
         updateTodo: (updated) =>
-            fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
+            fastterTodos.add(UpdateEvent<Todo>(todo.id, updated)),
         deleteTodo: () {
-          selectedTodosBloc.dispatch(UnSelectTodoEvent(todo.id));
-          fastterTodos.dispatch(DeleteEvent<Todo>(todo.id));
+          selectedTodosBloc.add(UnSelectTodoEvent(todo.id));
+          fastterTodos.add(DeleteEvent<Todo>(todo.id));
         },
       );
 }
 
 class _TodoEditScreen extends StatefulWidget {
   const _TodoEditScreen({
-    @required this.todo,
-    @required this.updateTodo,
-    @required this.deleteTodo,
-    Key key,
-  }) : super(key: key);
+    required this.todo,
+    required this.updateTodo,
+    required this.deleteTodo,
+  });
 
   final Todo todo;
   final void Function(Todo) updateTodo;
@@ -78,10 +77,10 @@ enum _PopupAction { delete }
 class __TodoEditScreenState extends State<_TodoEditScreen> {
   final double headerHeight = 120;
   final TextEditingController _titleInputController = TextEditingController();
-  Project _project;
-  List<Label> _labels;
-  DateTime _dueDate;
-  int _priority;
+  Project? _project;
+  List<Label> _labels = [];
+  DateTime? _dueDate;
+  int? _priority;
 
   @override
   void initState() {
@@ -93,7 +92,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
     _priority = widget.todo.priority;
   }
 
-  void _onSelectProject(Project selectedproject) {
+  void _onSelectProject(Project? selectedproject) {
     setState(() {
       _project = selectedproject;
     });
@@ -109,7 +108,8 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
 
   void _onSave() {
     if (_dueDate != null) {
-      _dueDate = DateTime(_dueDate.year, _dueDate.month, _dueDate.day, 0, 0, 0);
+      _dueDate =
+          DateTime(_dueDate!.year, _dueDate!.month, _dueDate!.day, 0, 0, 0);
     }
     final todo = Todo(
       id: widget.todo.id,
@@ -137,21 +137,21 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
   }
 
   void _selectDate() {
-    todoSelectDate(context, _dueDate).then((dueDate) {
-      setState(() {
-        if (dueDate != null) {
-          _dueDate = dueDate.dateTime;
-        }
-      });
-    });
+    // todoSelectDate(context, _dueDate).then((dueDate) {
+    //   setState(() {
+    //     if (dueDate != null) {
+    //       _dueDate = dueDate.dateTime;
+    //     }
+    //   });
+    // });
   }
 
   void _openComments() {
     Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => TodoCommentsScreen(
-              todo: widget.todo,
-            ),
+          todo: widget.todo,
+        ),
       ),
     );
   }
@@ -160,8 +160,8 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
     Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => TodoSubtasks(
-              todo: widget.todo,
-            ),
+          todo: widget.todo,
+        ),
       ),
     );
   }
@@ -170,8 +170,8 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
     Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (context) => TodoRemindersScreen(
-              todo: widget.todo,
-            ),
+          todo: widget.todo,
+        ),
       ),
     );
   }
@@ -194,11 +194,11 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
               },
               icon: const Icon(Icons.more_vert),
               itemBuilder: (context) => [
-                    const PopupMenuItem<_PopupAction>(
-                      child: Text('Delete'),
-                      value: _PopupAction.delete,
-                    )
-                  ],
+                const PopupMenuItem<_PopupAction>(
+                  child: Text('Delete'),
+                  value: _PopupAction.delete,
+                )
+              ],
             )
           ],
         ),
@@ -235,7 +235,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                   builder: (context, todosState) {
                     final children = todosState.items.where((todo) =>
                         todo.parent != null &&
-                        todo.parent.id == widget.todo.id);
+                        todo.parent?.id == widget.todo.id);
                     return ListTile(
                       leading: const Icon(Icons.format_strikethrough),
                       title: const Text('Subtasks'),
@@ -290,8 +290,7 @@ class __TodoEditScreenState extends State<_TodoEditScreen> {
                     );
                   },
                 ),
-                BlocBuilder<FastterBloc<TodoReminder>,
-                    ListState<TodoReminder>>(
+                BlocBuilder<FastterBloc<TodoReminder>, ListState<TodoReminder>>(
                   bloc: fastterTodoReminders,
                   builder: (context, remindersState) {
                     final todoReminders = remindersState.items

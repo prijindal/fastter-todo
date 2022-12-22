@@ -1,21 +1,20 @@
-import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/models/settings.model.dart';
-
 import '../helpers/navigator.dart';
+import '../models/label.model.dart';
+import '../models/project.model.dart';
+import '../models/settings.model.dart';
+import '../models/user.model.dart';
+import '../store/user.dart';
 
 import 'filtercountext.dart';
 import 'labelexpansiontile.dart';
 import 'projectexpansiontile.dart';
 
 class HomeAppDrawer extends StatelessWidget {
-  const HomeAppDrawer({Key key, this.disablePop = false}) : super(key: key);
+  const HomeAppDrawer({super.key, this.disablePop = false});
 
   final bool disablePop;
 
@@ -23,24 +22,23 @@ class HomeAppDrawer extends StatelessWidget {
   Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, userState) => _HomeAppDrawer(
-              user: userState,
-              disablePop: disablePop,
-              frontPage: userState.user?.settings?.frontPage ??
-                  FrontPage(
-                    route: '/',
-                    title: 'Inbox',
-                  ),
-            ),
+          user: userState,
+          disablePop: disablePop,
+          frontPage: userState.user?.settings?.frontPage ??
+              FrontPage(
+                route: '/',
+                title: 'Inbox',
+              ),
+        ),
       );
 }
 
 class _HomeAppDrawer extends StatelessWidget {
   const _HomeAppDrawer({
-    @required this.user,
-    @required this.frontPage,
+    required this.user,
+    required this.frontPage,
     this.disablePop = false,
-    Key key,
-  }) : super(key: key);
+  });
 
   final UserState user;
   final bool disablePop;
@@ -53,7 +51,7 @@ class _HomeAppDrawer extends StatelessWidget {
   void _pushRouteNamed(
     BuildContext context,
     String routeName, {
-    Object arguments,
+    Map<String, dynamic>? arguments,
   }) {
     if (!disablePop) {
       Navigator.pop(context);
@@ -65,20 +63,20 @@ class _HomeAppDrawer extends StatelessWidget {
   String get routeName =>
       history.isNotEmpty ? history.last.routeName : frontPage.route;
 
-  Project get _project {
+  Project? get _project {
     if (routeName == '/todos') {
-      final Map map = history.last.arguments;
-      final Project project = map['project'];
+      final Map<String, dynamic>? map = history.last.arguments;
+      final Project project = map?['project'];
       return project;
     } else {
       return null;
     }
   }
 
-  Label get _label {
+  Label? get _label {
     if (routeName == '/todos') {
-      final Map map = history.last.arguments;
-      final Label label = map['label'];
+      final Map<String, dynamic>? map = history.last.arguments;
+      final Label label = map?['label'];
       return label;
     } else {
       return null;
@@ -93,17 +91,18 @@ class _HomeAppDrawer extends StatelessWidget {
               ListTile(
                 onTap: () =>
                     Navigator.of(context).pushNamed('/settings/account'),
-                leading: user.user.picture == null || user.user.picture.isEmpty
-                    ? const Icon(
-                        Icons.person,
-                      )
-                    : CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          user.user.picture,
-                        ),
-                      ),
-                title: Text(user.user.name),
-                subtitle: Text(user.user.email),
+                leading:
+                    user.user?.picture == null || user.user!.picture!.isEmpty
+                        ? const Icon(
+                            Icons.person,
+                          )
+                        : CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              user.user!.picture!,
+                            ),
+                          ),
+                title: Text(user.user?.name ?? ""),
+                subtitle: Text(user.user?.email ?? ""),
               ),
             ListTile(
               dense: true,

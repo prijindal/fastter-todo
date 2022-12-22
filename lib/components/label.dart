@@ -1,14 +1,14 @@
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/store/labels.dart';
+import '../fastter/fastter_bloc.dart';
+import '../store/labels.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/label.model.dart';
+import '../models/base.model.dart';
+import '../models/label.model.dart';
 
 class LabelsList extends StatelessWidget {
   const LabelsList({
-    @required this.labels,
+    required this.labels,
   });
 
   final List<Label> labels;
@@ -35,7 +35,7 @@ class LabelsList extends StatelessWidget {
 
 class LabelItem extends StatelessWidget {
   const LabelItem({
-    @required this.label,
+    required this.label,
   });
 
   final Label label;
@@ -45,16 +45,16 @@ class LabelItem extends StatelessWidget {
       BlocBuilder<FastterBloc<Label>, ListState<Label>>(
         bloc: fastterLabels,
         builder: (context, state) => _LabelItem(
-              label: label,
-              labels: state.items,
-            ),
+          label: label,
+          labels: state.items,
+        ),
       );
 }
 
 class _LabelItem extends StatelessWidget {
   const _LabelItem({
-    @required this.labels,
-    @required this.label,
+    required this.labels,
+    required this.label,
   });
 
   final List<Label> labels;
@@ -70,7 +70,7 @@ class _LabelItem extends StatelessWidget {
       child: Text(
         filteredLabel.title,
         style: TextStyle(
-          fontSize: Theme.of(context).textTheme.body1.fontSize,
+          fontSize: Theme.of(context).textTheme.bodyText1?.fontSize,
           color: Colors.grey[200],
         ),
       ),

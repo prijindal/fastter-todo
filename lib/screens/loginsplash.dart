@@ -36,13 +36,13 @@ class _LoginSplashScreenState extends State<LoginSplashScreen> {
               ),
               Text(
                 'Welcome To Fastter',
-                style: _theme.textTheme.title.copyWith(
+                style: _theme.textTheme.titleLarge?.copyWith(
                   fontSize: 36,
                 ),
               ),
               Text(
                 'Todo App',
-                style: _theme.textTheme.title.copyWith(
+                style: _theme.textTheme.titleLarge?.copyWith(
                   fontSize: 36,
                 ),
               ),
@@ -63,25 +63,25 @@ class _LoginSplashScreenState extends State<LoginSplashScreen> {
             children: <Widget>[
               Text(
                 'You can create',
-                style: _theme.textTheme.title.copyWith(
+                style: _theme.textTheme.titleMedium?.copyWith(
                   fontSize: 24,
                 ),
               ),
               Text(
                 'Tasks, Projects',
-                style: _theme.textTheme.title.copyWith(
+                style: _theme.textTheme.titleMedium?.copyWith(
                   fontSize: 24,
                 ),
               ),
               Text(
                 'Labels, Comments',
-                style: _theme.textTheme.title.copyWith(
+                style: _theme.textTheme.titleMedium?.copyWith(
                   fontSize: 24,
                 ),
               ),
               Text(
                 'And much more',
-                style: _theme.textTheme.title.copyWith(
+                style: _theme.textTheme.titleMedium?.copyWith(
                   fontSize: 24,
                 ),
               ),

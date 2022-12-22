@@ -1,13 +1,13 @@
-import 'package:fastter_dart/store/todos.dart';
+import '../store/todos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/store/selectedtodos.dart';
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/base.model.dart';
+import '../models/label.model.dart';
+import '../store/selectedtodos.dart';
+import '../models/project.model.dart';
+import '../models/todo.model.dart';
 
 import '../components/prioritydialog.dart';
 import '../helpers/todouihelpers.dart';
@@ -26,135 +26,134 @@ class TodoEditBar extends StatelessWidget {
         bloc: selectedTodosBloc,
         builder: (context, selectedTodos) =>
             BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
-              bloc: fastterTodos,
-              builder: (context, state) {
-                void _unSelectAllTodos() {
-                  for (final todoid in selectedTodos) {
-                    selectedTodosBloc.dispatch(UnSelectTodoEvent(todoid));
+          bloc: fastterTodos,
+          builder: (context, state) {
+            void _unSelectAllTodos() {
+              for (final todoid in selectedTodos) {
+                selectedTodosBloc.add(UnSelectTodoEvent(todoid));
+              }
+            }
+
+            Future<void> _onMarkCompleted() async {
+              final body = <String, Todo>{};
+              for (final todoid in selectedTodos) {
+                if (state.items.isNotEmpty) {
+                  final todo =
+                      state.items.singleWhere((item) => item.id == todoid);
+                  if (todo != null) {
+                    todo.completed = true;
+                    body[todoid] = todo;
                   }
                 }
+              }
+              fastterTodos.add(UpdateManyEvent<Todo>(body));
+              _unSelectAllTodos();
+            }
 
-                Future<void> _onMarkCompleted() async {
-                  final body = <String, Todo>{};
-                  for (final todoid in selectedTodos) {
-                    if (state.items.isNotEmpty) {
-                      final todo =
-                          state.items.singleWhere((item) => item.id == todoid);
-                      if (todo != null) {
-                        todo.completed = true;
-                        body[todoid] = todo;
-                      }
-                    }
+            Future<void> _onChangeDate(DateTime date) async {
+              final body = <String, Todo>{};
+              for (final todoid in selectedTodos) {
+                if (state.items.isNotEmpty) {
+                  final todo =
+                      state.items.singleWhere((item) => item.id == todoid);
+                  if (todo != null) {
+                    todo.dueDate = date;
+                    body[todoid] = todo;
                   }
-                  fastterTodos.dispatch(UpdateManyEvent<Todo>(body));
-                  _unSelectAllTodos();
                 }
+              }
+              fastterTodos.add(UpdateManyEvent<Todo>(body));
+              _unSelectAllTodos();
+            }
 
-                Future<void> _onChangeDate(DateTime date) async {
-                  final body = <String, Todo>{};
-                  for (final todoid in selectedTodos) {
-                    if (state.items.isNotEmpty) {
-                      final todo =
-                          state.items.singleWhere((item) => item.id == todoid);
-                      if (todo != null) {
-                        todo.dueDate = date;
-                        body[todoid] = todo;
-                      }
-                    }
+            Future<void> _onChangeProject(Project? project) async {
+              final body = <String, Todo>{};
+              for (final todoid in selectedTodos) {
+                if (state.items.isNotEmpty) {
+                  final todo =
+                      state.items.singleWhere((item) => item.id == todoid);
+                  if (todo != null) {
+                    todo.project = project;
+                    body[todoid] = todo;
                   }
-                  fastterTodos.dispatch(UpdateManyEvent<Todo>(body));
-                  _unSelectAllTodos();
                 }
+              }
+              fastterTodos.add(UpdateManyEvent<Todo>(body));
+              _unSelectAllTodos();
+            }
 
-                Future<void> _onChangeProject(Project project) async {
-                  final body = <String, Todo>{};
-                  for (final todoid in selectedTodos) {
-                    if (state.items.isNotEmpty) {
-                      final todo =
-                          state.items.singleWhere((item) => item.id == todoid);
-                      if (todo != null) {
-                        todo.project = project;
-                        body[todoid] = todo;
-                      }
-                    }
+            Future<void> _onChangeLabels(List<Label> labels) async {
+              final body = <String, Todo>{};
+              for (final todoid in selectedTodos) {
+                if (state.items.isNotEmpty) {
+                  final todo =
+                      state.items.singleWhere((item) => item.id == todoid);
+                  if (todo != null) {
+                    todo.labels = labels;
+                    body[todoid] = todo;
                   }
-                  fastterTodos.dispatch(UpdateManyEvent<Todo>(body));
-                  _unSelectAllTodos();
                 }
+              }
+              fastterTodos.add(UpdateManyEvent<Todo>(body));
+              _unSelectAllTodos();
+            }
 
-                Future<void> _onChangeLabels(List<Label> labels) async {
-                  final body = <String, Todo>{};
-                  for (final todoid in selectedTodos) {
-                    if (state.items.isNotEmpty) {
-                      final todo =
-                          state.items.singleWhere((item) => item.id == todoid);
-                      if (todo != null) {
-                        todo.labels = labels;
-                        body[todoid] = todo;
-                      }
-                    }
+            Future<void> _onChangePriority(int priority) async {
+              final body = <String, Todo>{};
+              for (final todoid in selectedTodos) {
+                if (state.items.isNotEmpty) {
+                  final todo =
+                      state.items.singleWhere((item) => item.id == todoid);
+                  if (todo != null) {
+                    todo.priority = priority;
+                    body[todoid] = todo;
                   }
-                  fastterTodos.dispatch(UpdateManyEvent<Todo>(body));
-                  _unSelectAllTodos();
                 }
+              }
+              fastterTodos.add(UpdateManyEvent<Todo>(body));
+              _unSelectAllTodos();
+            }
 
-                Future<void> _onChangePriority(int priority) async {
-                  final body = <String, Todo>{};
-                  for (final todoid in selectedTodos) {
-                    if (state.items.isNotEmpty) {
-                      final todo =
-                          state.items.singleWhere((item) => item.id == todoid);
-                      if (todo != null) {
-                        todo.priority = priority;
-                        body[todoid] = todo;
-                      }
-                    }
-                  }
-                  fastterTodos.dispatch(UpdateManyEvent<Todo>(body));
-                  _unSelectAllTodos();
-                }
+            Future<void> _deleteSelected() async {
+              for (final todoid in selectedTodos) {
+                final action = DeleteEvent<Todo>(todoid);
+                fastterTodos.add(action);
+              }
+              _unSelectAllTodos();
+            }
 
-                Future<void> _deleteSelected() async {
-                  for (final todoid in selectedTodos) {
-                    final action = DeleteEvent<Todo>(todoid);
-                    fastterTodos.dispatch(action);
-                  }
-                  _unSelectAllTodos();
-                }
-
-                return _TodoEditBar(
-                  selectedTodos: selectedTodos,
-                  todos: state,
-                  onMarkCompleted: _onMarkCompleted,
-                  onChangeDate: _onChangeDate,
-                  onChangeProject: _onChangeProject,
-                  onChangeLabels: _onChangeLabels,
-                  onChangePriority: _onChangePriority,
-                  deleteSelected: _deleteSelected,
-                );
-              },
-            ),
+            return _TodoEditBar(
+              selectedTodos: selectedTodos,
+              todos: state,
+              onMarkCompleted: _onMarkCompleted,
+              onChangeDate: _onChangeDate,
+              onChangeProject: _onChangeProject,
+              onChangeLabels: _onChangeLabels,
+              onChangePriority: _onChangePriority,
+              deleteSelected: _deleteSelected,
+            );
+          },
+        ),
       );
 }
 
 class _TodoEditBar extends StatelessWidget {
   const _TodoEditBar({
-    @required this.todos,
-    @required this.selectedTodos,
-    @required this.onMarkCompleted,
-    @required this.onChangeDate,
-    @required this.onChangeProject,
-    @required this.onChangePriority,
-    @required this.onChangeLabels,
-    @required this.deleteSelected,
-    Key key,
-  }) : super(key: key);
+    required this.todos,
+    required this.selectedTodos,
+    required this.onMarkCompleted,
+    required this.onChangeDate,
+    required this.onChangeProject,
+    required this.onChangePriority,
+    required this.onChangeLabels,
+    required this.deleteSelected,
+  });
 
   final List<String> selectedTodos;
   final ListState<Todo> todos;
   final VoidCallback onMarkCompleted;
   final void Function(DateTime) onChangeDate;
-  final void Function(Project) onChangeProject;
+  final void Function(Project?) onChangeProject;
   final void Function(int) onChangePriority;
   final void Function(List<Label>) onChangeLabels;
   final VoidCallback deleteSelected;
@@ -162,10 +161,10 @@ class _TodoEditBar extends StatelessWidget {
   Future<void> _showDatePicker(BuildContext context) async {
     final todoid = selectedTodos[0];
     final todo = todos.items.singleWhere((item) => item.id == todoid);
-    final selectedDate = await todoSelectDate(context, todo.dueDate);
-    if (selectedDate != null) {
-      onChangeDate(selectedDate.dateTime);
-    }
+    // final selectedDate = await todoSelectDate(context, todo.dueDate);
+    // if (selectedDate != null) {
+    //   onChangeDate(selectedDate.dateTime);
+    // }
   }
 
   Widget _buildMarkCompletedButton() => Container(
@@ -284,23 +283,22 @@ class _TodoEditBar extends StatelessWidget {
             showDialog<void>(
               context: context,
               builder: (context) => AlertDialog(
-                    title: const Text('Are you sure'),
-                    content:
-                        Text('This will delete ${selectedTodos.length} tasks'),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: const Text('Cancel'),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                      FlatButton(
-                        child: const Text('Yes'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          deleteSelected();
-                        },
-                      ),
-                    ],
+                title: const Text('Are you sure'),
+                content: Text('This will delete ${selectedTodos.length} tasks'),
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('Cancel'),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
+                  TextButton(
+                    child: const Text('Yes'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      deleteSelected();
+                    },
+                  ),
+                ],
+              ),
             );
           },
           tooltip: 'Delete',
@@ -328,7 +326,7 @@ class _TodoEditBar extends StatelessWidget {
               ? todos.items
                   .singleWhere((item) => item.id == selectedTodos[0])
                   .labels
-              : null,
+              : [],
         ),
       );
 
@@ -382,7 +380,7 @@ class _TodoEditBar extends StatelessWidget {
       return true;
     }
     for (final id in selectedTodos) {
-      selectedTodosBloc.dispatch(UnSelectTodoEvent(id));
+      selectedTodosBloc.add(UnSelectTodoEvent(id));
     }
     return false;
   }

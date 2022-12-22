@@ -7,8 +7,10 @@ class PrivacyPolicyScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Privacy Policy'),
         ),
-        body: WebView(
-          initialUrl: 'https://fastter.easycode.club/privacy-policy.html',
+        body: WebViewWidget(
+          controller: WebViewController()
+            ..loadRequest(
+                Uri.parse('https://fastter.easycode.club/privacy-policy.html')),
         ),
       );
 }

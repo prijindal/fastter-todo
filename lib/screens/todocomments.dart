@@ -1,14 +1,14 @@
 import 'dart:io';
-import 'package:fastter_dart/store/todocomments.dart';
+import '../store/todocomments.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share/share.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/models/todocomment.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/base.model.dart';
+import '../models/todo.model.dart';
+import '../models/todocomment.model.dart';
 
 import '../components/todocommentinput.dart';
 import '../components/todocommentitem.dart';
@@ -16,9 +16,9 @@ import '../helpers/theme.dart';
 
 class TodoCommentsScreen extends StatelessWidget {
   const TodoCommentsScreen({
-    @required this.todo,
-    Key key,
-  }) : super(key: key);
+    required this.todo,
+    super.key,
+  });
 
   final Todo todo;
 
@@ -27,27 +27,24 @@ class TodoCommentsScreen extends StatelessWidget {
       BlocBuilder<FastterBloc<TodoComment>, ListState<TodoComment>>(
         bloc: fastterTodoComments,
         builder: (context, state) => _TodoCommentsScreen(
-              todo: todo,
-              todoComments: ListState<TodoComment>(
-                items: state.items
-                    .where((todocomment) =>
-                        todocomment.todo != null &&
-                        todocomment.todo.id == todo.id)
-                    .toList(),
-              ),
-              syncStart: () =>
-                  fastterTodoComments.dispatch(SyncEvent<TodoComment>()),
-            ),
+          todo: todo,
+          todoComments: ListState<TodoComment>(
+            items: state.items
+                .where((todocomment) =>
+                    todocomment.todo != null && todocomment.todo.id == todo.id)
+                .toList(),
+          ),
+          syncStart: () => fastterTodoComments.add(SyncEvent<TodoComment>()),
+        ),
       );
 }
 
 class _TodoCommentsScreen extends StatefulWidget {
   const _TodoCommentsScreen({
-    @required this.todo,
-    @required this.todoComments,
-    @required this.syncStart,
-    Key key,
-  }) : super(key: key);
+    required this.todo,
+    required this.todoComments,
+    required this.syncStart,
+  });
 
   final Todo todo;
   final ListState<TodoComment> todoComments;
@@ -106,15 +103,14 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
                       children: widget.todoComments.items.reversed
                           .map(
                             (todoComment) => TodoCommentItem(
-                                  todoComment: todoComment,
-                                  onLongPress: () =>
-                                      _toggleSelected(todoComment),
-                                  onTap: _selectedComments.isEmpty
-                                      ? null
-                                      : () => _toggleSelected(todoComment),
-                                  selected: _selectedComments
-                                      .contains(todoComment.id),
-                                ),
+                              todoComment: todoComment,
+                              onLongPress: () => _toggleSelected(todoComment),
+                              onTap: _selectedComments.isEmpty
+                                  ? () {}
+                                  : () => _toggleSelected(todoComment),
+                              selected:
+                                  _selectedComments.contains(todoComment.id),
+                            ),
                           )
                           .toList(),
                     ),
@@ -135,12 +131,12 @@ class _TodoCommentsScreenState extends State<_TodoCommentsScreen> {
 class TodoCommentsAppBar extends StatelessWidget
     implements PreferredSizeWidget {
   const TodoCommentsAppBar({
-    @required this.onClear,
-    @required this.todo,
+    required this.onClear,
+    required this.todo,
     this.selectedComments = const <String>[],
-    Key key,
+    super.key,
     this.preferredSize = const Size.fromHeight(kToolbarHeight),
-  }) : super(key: key);
+  });
 
   final List<String> selectedComments;
   final VoidCallback onClear;
@@ -170,7 +166,7 @@ class TodoCommentsAppBar extends StatelessWidget
               final futures = <Future<TodoComment>>[];
               for (final todoComment in todoComments) {
                 final action = DeleteEvent<TodoComment>(todoComment.id);
-                fastterTodoComments.dispatch(action);
+                fastterTodoComments.add(action);
                 futures.add(action.completer.future);
               }
               return Future.wait<TodoComment>(futures);
@@ -179,7 +175,7 @@ class TodoCommentsAppBar extends StatelessWidget
               final futures = <Future<TodoComment>>[];
               for (final todoComment in comments) {
                 final action = AddEvent<TodoComment>(todoComment);
-                fastterTodoComments.dispatch(action);
+                fastterTodoComments.add(action);
                 futures.add(action.completer.future);
               }
               return Future.wait<TodoComment>(futures);
@@ -191,13 +187,12 @@ class TodoCommentsAppBar extends StatelessWidget
 
 class _TodoCommentsAppBar extends StatelessWidget {
   const _TodoCommentsAppBar({
-    @required this.onClear,
-    @required this.todo,
-    @required this.todoComments,
-    @required this.deleteSelectedComment,
-    @required this.addComments,
-    Key key,
-  }) : super(key: key);
+    required this.onClear,
+    required this.todo,
+    required this.todoComments,
+    required this.deleteSelectedComment,
+    required this.addComments,
+  });
 
   final VoidCallback onClear;
   final Todo todo;
@@ -219,7 +214,7 @@ class _TodoCommentsAppBar extends StatelessWidget {
 
   Future<void> _copySelectedComment(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: _commentsToString()));
-    Scaffold.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Copied to clipboard'),
       ),
@@ -230,25 +225,24 @@ class _TodoCommentsAppBar extends StatelessWidget {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Are you sure'),
-            content:
-                Text('This will delete ${todoComments.items.length} comments'),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text('Cancel'),
-                onPressed: () => Navigator.of(context).pop(false),
-              ),
-              FlatButton(
-                child: const Text('Yes'),
-                onPressed: () => Navigator.of(context).pop(true),
-              ),
-            ],
+        title: const Text('Are you sure'),
+        content: Text('This will delete ${todoComments.items.length} comments'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(false),
           ),
+          TextButton(
+            child: const Text('Yes'),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
     );
     if (shouldDelete == true) {
       final deletedComments = await this.deleteSelectedComment();
       onClear();
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${deletedComments.length} Comments Deleted'),
           action: SnackBarAction(

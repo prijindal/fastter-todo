@@ -1,13 +1,13 @@
-import 'package:fastter_dart/store/todocomments.dart';
-import 'package:fastter_dart/store/todoreminders.dart';
-import 'package:fastter_dart/store/todos.dart';
+import '../store/todocomments.dart';
+import '../store/todoreminders.dart';
+import '../store/todos.dart';
 import 'package:fastter_todo/components/todoitemtitle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/selectedtodos.dart';
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
+import '../models/todo.model.dart';
+import '../store/selectedtodos.dart';
+import '../fastter/fastter_bloc.dart';
 
 import '../components/hexcolor.dart';
 import '../helpers/todouihelpers.dart';
@@ -16,27 +16,27 @@ import 'todoitemtoggle.dart';
 
 class TodoItem extends StatelessWidget {
   const TodoItem({
-    @required this.todo,
-    Key key,
-  }) : super(key: key);
+    required this.todo,
+    super.key,
+  });
 
   final Todo todo;
 
   @override
   Widget build(BuildContext context) => _TodoItem(
         todo: todo,
-        deleteTodo: () => fastterTodos.dispatch(DeleteEvent<Todo>(todo.id)),
+        deleteTodo: () => fastterTodos.add(DeleteEvent<Todo>(todo.id)),
         updateTodo: (updated) =>
-            fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
+            fastterTodos.add(UpdateEvent<Todo>(todo.id, updated)),
         toggleSelected: () =>
-            selectedTodosBloc.dispatch(ToggleSelectTodoEvent(todo.id)),
-        reminders: fastterTodoReminders.currentState.items
+            selectedTodosBloc.add(ToggleSelectTodoEvent(todo.id)),
+        reminders: fastterTodoReminders.state.items
             .where((reminder) =>
                 reminder.todo != null &&
                 reminder.completed == false &&
                 reminder.todo.id == todo.id)
             .length,
-        comments: fastterTodoComments.currentState.items
+        comments: fastterTodoComments.state.items
             .where(
                 (comment) => comment.todo != null && comment.todo.id == todo.id)
             .length,
@@ -45,14 +45,13 @@ class TodoItem extends StatelessWidget {
 
 class _TodoItem extends StatelessWidget {
   const _TodoItem({
-    @required this.todo,
-    @required this.deleteTodo,
-    @required this.updateTodo,
-    @required this.toggleSelected,
-    @required this.reminders,
-    @required this.comments,
-    Key key,
-  }) : super(key: key);
+    required this.todo,
+    required this.deleteTodo,
+    required this.updateTodo,
+    required this.toggleSelected,
+    required this.reminders,
+    required this.comments,
+  });
 
   final Todo todo;
   final VoidCallback deleteTodo;
@@ -63,28 +62,28 @@ class _TodoItem extends StatelessWidget {
   final int comments;
 
   void _selectDate(BuildContext context) {
-    todoSelectDate(context, todo.dueDate).then((dueDate) {
-      if (dueDate != null) {
-        todo.dueDate = dueDate.dateTime;
-      }
-      updateTodo(
-        todo,
-      );
-    });
+    // todoSelectDate(context, todo.dueDate).then((dueDate) {
+    //   if (dueDate != null) {
+    //     todo.dueDate = dueDate.dateTime;
+    //   }
+    //   updateTodo(
+    //     todo,
+    //   );
+    // });
   }
 
-  Future<bool> _confirmDelete(BuildContext context) => showDialog<bool>(
+  Future<bool?> _confirmDelete(BuildContext context) => showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Are You sure?'),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: const Text('No'),
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
             ),
-            FlatButton(
+            TextButton(
               child: const Text('Yes'),
               onPressed: () {
                 Navigator.of(context).pop(true);
@@ -100,7 +99,7 @@ class _TodoItem extends StatelessWidget {
   }
 
   TextStyle _subtitleTextStyle(ThemeData theme) {
-    final style = theme.textTheme.body1;
+    final style = theme.textTheme.bodyText1 ?? TextStyle();
     final color = theme.disabledColor;
     return style.copyWith(color: color);
   }
@@ -119,12 +118,12 @@ class _TodoItem extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 8),
                 constraints: const BoxConstraints(maxWidth: 200, maxHeight: 40),
                 child: Text(
-                  todo.project.title,
+                  todo.project?.title ?? "",
                 ),
               ),
               Icon(
                 Icons.group_work,
-                color: HexColor(todo.project.color),
+                color: HexColor(todo.project?.color ?? ""),
                 size: 16,
               ),
             ],
@@ -140,7 +139,7 @@ class _TodoItem extends StatelessWidget {
         ),
       );
 
-  Widget _buildSubtitleFirstRow(BuildContext context) {
+  Widget? _buildSubtitleFirstRow(BuildContext context) {
     final children = <Widget>[];
     if (todo.dueDate == null && reminders == 0 && comments == 0) {
       return null;
@@ -197,7 +196,7 @@ class _TodoItem extends StatelessWidget {
     );
   }
 
-  Widget _buildSubtitle(BuildContext context) {
+  Widget? _buildSubtitle(BuildContext context) {
     final firstRow = _buildSubtitleFirstRow(context);
     if (todo.labels.isEmpty) {
       return firstRow;
@@ -234,12 +233,13 @@ class _TodoItem extends StatelessWidget {
           } else if (direction == DismissDirection.endToStart) {
             return _confirmDelete(context);
           }
+          return false;
         },
         onDismissed: (direction) {
           if (direction == DismissDirection.endToStart) {
             deleteTodo();
-            Scaffold.of(context).removeCurrentSnackBar();
-            Scaffold.of(context)
+            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+            ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text('${todo.title} deleted')));
           }
         },

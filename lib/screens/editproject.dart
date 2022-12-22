@@ -1,18 +1,17 @@
-import 'package:fastter_dart/store/projects.dart';
 import 'package:flutter/material.dart';
-
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/project.model.dart';
 
 import '../components/colorpicker.dart';
 import '../components/hexcolor.dart';
+import '../fastter/fastter_bloc.dart';
 import '../helpers/navigator.dart';
+import '../models/project.model.dart';
+import '../store/projects.dart';
 
 class EditProjectScreen extends StatefulWidget {
   const EditProjectScreen({
-    @required this.project,
-    Key key,
-  }) : super(key: key);
+    required this.project,
+    super.key,
+  });
 
   final Project project;
 
@@ -21,10 +20,10 @@ class EditProjectScreen extends StatefulWidget {
 }
 
 class _EditProjectScreenState extends State<EditProjectScreen> {
-  TextEditingController titleController;
+  late final TextEditingController titleController;
   FocusNode titleFocusNode = FocusNode();
 
-  Color _currentColor;
+  late final Color _currentColor;
 
   @override
   void initState() {
@@ -34,7 +33,7 @@ class _EditProjectScreenState extends State<EditProjectScreen> {
   }
 
   void _onSave() {
-    fastterProjects.dispatch(UpdateEvent<Project>(
+    fastterProjects.add(UpdateEvent<Project>(
       widget.project.id,
       Project(
         id: widget.project.id,
@@ -58,18 +57,18 @@ class _EditProjectScreenState extends State<EditProjectScreen> {
               title: Text('Delete ${widget.project.title}?'),
               content: const Text('All tasks will move to inbox'),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   onPressed: () => Navigator.of(context).pop<bool>(false),
                   child: const Text('No'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () => Navigator.of(context).pop<bool>(true),
                   child: const Text('Yes'),
                 )
               ],
             ));
-    if (shouldDelete) {
-      fastterProjects.dispatch(DeleteEvent<Project>(
+    if (shouldDelete != null && shouldDelete) {
+      fastterProjects.add(DeleteEvent<Project>(
         widget.project.id,
       ));
       history.add(RouteInfo('/'));
@@ -105,7 +104,7 @@ class _EditProjectScreenState extends State<EditProjectScreen> {
               currentValue: _currentColor,
               onChange: _pickColor,
             ),
-            FlatButton(
+            TextButton(
               child: const Text('Delete Project'),
               onPressed: _deleteProject,
             )

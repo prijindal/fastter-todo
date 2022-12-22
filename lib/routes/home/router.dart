@@ -1,21 +1,21 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/store/user.dart';
-import 'package:fastter_dart/store/labels.dart';
-import 'package:fastter_dart/store/notifications.dart';
-import 'package:fastter_dart/store/projects.dart';
-import 'package:fastter_dart/store/todocomments.dart';
-import 'package:fastter_dart/store/todoreminders.dart';
-import 'package:fastter_dart/store/todos.dart';
 import 'package:fastter_todo/bloc.dart';
 import 'package:fastter_todo/helpers/fastter_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:fastter_dart/fastter/fastter.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/models/settings.model.dart';
+import '../../fastter/fastter.dart';
+import '../../models/todo.model.dart';
+import '../../models/settings.model.dart';
+import '../../fastter/fastter_bloc.dart';
+import '../../store/user.dart';
+import '../../store/labels.dart';
+import '../../store/notifications.dart';
+import '../../store/projects.dart';
+import '../../store/todocomments.dart';
+import '../../store/todoreminders.dart';
+import '../../store/todos.dart';
 
 import '../../helpers/firebase.dart';
 import '../../helpers/navigator.dart';
@@ -26,7 +26,7 @@ import 'generateroute.dart' show onGenerateRoute;
 
 class HomePage extends StatefulWidget {
   const HomePage({
-    @required this.frontPage,
+    required this.frontPage,
   });
 
   final FrontPage frontPage;
@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
       print(sharedData);
       if (sharedData != null && sharedData.isNotEmpty) {
         final event = AddEvent<Todo>(Todo(title: sharedData));
-        fastterTodos.dispatch(event);
+        fastterTodos.add(event);
         final todo = await event.completer.future;
         if (navigatorKey.currentState != null) {
           _openNewTodo(todo);
@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _openNewTodo(Todo todo) {
-    navigatorKey.currentState.push<void>(MaterialPageRoute<void>(
+    navigatorKey.currentState?.push<void>(MaterialPageRoute<void>(
       builder: (context) => TodoEditScreen(
         todo: todo,
       ),
@@ -73,16 +73,14 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _initRequests() async {
     startSyncAll();
-    fastterLabels.queries.initSubscriptions(fastterLabels.dispatch);
-    fastterProjects.queries.initSubscriptions(fastterProjects.dispatch);
-    fastterTodos.queries.initSubscriptions(fastterTodos.dispatch);
-    fastterTodoComments.queries.initSubscriptions(fastterTodoComments.dispatch);
-    fastterTodoReminders.queries
-        .initSubscriptions(fastterTodoReminders.dispatch);
-    fastterNotifications.queries
-        .initSubscriptions(fastterNotifications.dispatch);
+    fastterLabels.queries.initSubscriptions(fastterLabels.add);
+    fastterProjects.queries.initSubscriptions(fastterProjects.add);
+    fastterTodos.queries.initSubscriptions(fastterTodos.add);
+    fastterTodoComments.queries.initSubscriptions(fastterTodoComments.add);
+    fastterTodoReminders.queries.initSubscriptions(fastterTodoReminders.add);
+    fastterNotifications.queries.initSubscriptions(fastterNotifications.add);
     Fastter.instance.onConnect = () {
-      fastterUser.dispatch(ConfirmUserEvent(Fastter.instance.bearer));
+      fastterUser.add(ConfirmUserEvent(Fastter.instance.bearer));
     };
   }
 

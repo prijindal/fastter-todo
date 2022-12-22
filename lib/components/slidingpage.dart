@@ -5,8 +5,8 @@ import '../helpers/theme.dart';
 
 class SlidingPageScreen extends StatefulWidget {
   const SlidingPageScreen({
-    @required this.children,
-    this.onPageChanged,
+    required this.children,
+    required this.onPageChanged,
   });
   final List<Widget> children;
   final ValueChanged<int> onPageChanged;
@@ -50,11 +50,11 @@ class _SlidingPageScreenState extends State<SlidingPageScreen> {
       );
 
   Widget _buildSlidingIcon({
-    @required Icon icon,
-    @required int nextPage,
-    bool disabled,
-    double left,
-    double right,
+    required Icon icon,
+    required int nextPage,
+    required bool disabled,
+    double? left,
+    double? right,
   }) =>
       Positioned(
         left: left,
@@ -127,7 +127,7 @@ class _SlidingPageScreenState extends State<SlidingPageScreen> {
               right: 20,
               child: AnimatedTheme(
                 data: _theme,
-                child: FlatButton(
+                child: TextButton(
                   child: const Text('Skip'),
                   onPressed: () {
                     _pageController.animateToPage(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:fastter_dart/models/todo.model.dart';
+import '../models/todo.model.dart';
 import 'prioritydialog.dart';
 
 class TodoItemToggle extends StatelessWidget {
   const TodoItemToggle({
-    @required this.todo,
-    @required this.toggleCompleted,
+    required this.todo,
+    required this.toggleCompleted,
   });
   final Todo todo;
   final ValueChanged<bool> toggleCompleted;

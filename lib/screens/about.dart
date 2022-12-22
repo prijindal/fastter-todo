@@ -54,11 +54,11 @@ class _AboutScreen extends State<AboutScreen> {
                       children: <Widget>[
                         Text(
                           _applicationName,
-                          style: Theme.of(context).textTheme.headline,
+                          style: Theme.of(context).textTheme.headline1,
                         ),
                         Text(
                           _applicationVersion,
-                          style: Theme.of(context).textTheme.body1,
+                          style: Theme.of(context).textTheme.bodyText1,
                         ),
                         Container(height: 18),
                       ],
@@ -92,7 +92,7 @@ class _AboutScreen extends State<AboutScreen> {
                 ),
               ],
             ),
-            FlatButton(
+            TextButton(
               child: Text(
                 MaterialLocalizations.of(context).viewLicensesButtonLabel,
               ),

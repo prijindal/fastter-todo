@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/block_picker.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ColorPicker extends StatelessWidget {
   const ColorPicker({
-    @required this.currentValue,
-    @required this.onChange,
+    required this.currentValue,
+    required this.onChange,
   });
 
   final Color currentValue;
@@ -15,25 +15,25 @@ class ColorPicker extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Pick a color'),
-            content: SingleChildScrollView(
-              child: BlockPicker(
-                pickerColor: _pickerColor,
-                onColorChanged: (color) {
-                  _pickerColor = color;
-                },
-              ),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text('Got it'),
-                onPressed: () {
-                  onChange(_pickerColor);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+        title: const Text('Pick a color'),
+        content: SingleChildScrollView(
+          child: BlockPicker(
+            pickerColor: _pickerColor,
+            onColorChanged: (color) {
+              _pickerColor = color;
+            },
           ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Got it'),
+            onPressed: () {
+              onChange(_pickerColor);
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
     );
   }
 

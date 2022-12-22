@@ -1,16 +1,15 @@
-import 'package:fastter_dart/store/labels.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/label.model.dart';
-
+import '../fastter/fastter_bloc.dart';
 import '../helpers/navigator.dart';
+import '../models/label.model.dart';
+import '../store/labels.dart';
 
 class EditLabelScreen extends StatefulWidget {
   const EditLabelScreen({
-    @required this.label,
-    Key key,
-  }) : super(key: key);
+    super.key,
+    required this.label,
+  });
 
   final Label label;
 
@@ -19,7 +18,7 @@ class EditLabelScreen extends StatefulWidget {
 }
 
 class _EditLabelScreenState extends State<EditLabelScreen> {
-  TextEditingController titleController;
+  late final TextEditingController titleController;
   FocusNode titleFocusNode = FocusNode();
 
   @override
@@ -29,7 +28,7 @@ class _EditLabelScreenState extends State<EditLabelScreen> {
   }
 
   void _onSave() {
-    fastterLabels.dispatch(UpdateEvent<Label>(
+    fastterLabels.add(UpdateEvent<Label>(
       widget.label.id,
       Label(
         id: widget.label.id,
@@ -45,18 +44,18 @@ class _EditLabelScreenState extends State<EditLabelScreen> {
         builder: (context) => AlertDialog(
               title: Text('Delete ${widget.label.title}?'),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   onPressed: () => Navigator.of(context).pop<bool>(false),
                   child: const Text('No'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () => Navigator.of(context).pop<bool>(true),
                   child: const Text('Yes'),
                 )
               ],
             ));
-    if (shouldDelete) {
-      fastterLabels.dispatch(DeleteEvent<Label>(
+    if (shouldDelete != null && shouldDelete) {
+      fastterLabels.add(DeleteEvent<Label>(
         widget.label.id,
       ));
       history.add(RouteInfo('/'));
@@ -85,7 +84,7 @@ class _EditLabelScreenState extends State<EditLabelScreen> {
                 labelText: 'Title',
               ),
             ),
-            FlatButton(
+            TextButton(
               child: const Text('Delete Label'),
               onPressed: _deleteLabel,
             )

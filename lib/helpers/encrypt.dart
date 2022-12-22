@@ -6,25 +6,25 @@ import 'flutter_persistor.dart';
 const String ENCRYPTION_KEY = "ENCRYPTION_KEY";
 
 class EncryptionService {
-  String _encryptionKey;
+  String? _encryptionKey;
   Map<String, String> _cacheEncrypted = {};
   Map<String, String> _cacheDecrypted = {};
 
-  static EncryptionService _instance;
+  static EncryptionService? _instance;
 
   static EncryptionService getInstance() {
     if (_instance == null) {
       _instance = EncryptionService();
     }
-    return _instance;
+    return _instance!;
   }
 
-  String get encryptionKey {
+  String? get encryptionKey {
     if (_encryptionKey == null) {
       this._encryptionKey =
           FlutterPersistor.getInstance().loadString(ENCRYPTION_KEY);
     }
-    if (this._encryptionKey == null || this._encryptionKey.isEmpty) {
+    if (this._encryptionKey == null || this._encryptionKey!.isEmpty) {
       return null;
     }
     return this._encryptionKey;
@@ -36,7 +36,7 @@ class EncryptionService {
     _cacheEncrypted = {};
     if (shouldSave) {
       FlutterPersistor.getInstance()
-          .setString(ENCRYPTION_KEY, this._encryptionKey);
+          .setString(ENCRYPTION_KEY, this._encryptionKey!);
     }
   }
 
@@ -45,21 +45,24 @@ class EncryptionService {
     FlutterPersistor.getInstance().clearString(ENCRYPTION_KEY);
   }
 
-  Encrypter getEncryptor() {
+  Encrypter? getEncryptor() {
     if (encryptionKey == null) {
       return null;
     }
-    final key = Key.fromUtf8(encryptionKey);
+    final key = Key.fromUtf8(encryptionKey!);
     final encrypter = Encrypter(AES(key, mode: AESMode.cbc));
     return encrypter;
   }
 
   String encrypt(String decryptedText) {
     if (_cacheEncrypted.containsKey(decryptedText)) {
-      return _cacheDecrypted[decryptedText];
+      return _cacheDecrypted[decryptedText]!;
     }
     final iv = IV.fromLength(16);
-    final encryptedText = getEncryptor().encrypt(decryptedText, iv: iv).base64;
+    final encryptedText = getEncryptor()?.encrypt(decryptedText, iv: iv).base64;
+    if (encryptedText == null) {
+      throw NullThrownError();
+    }
     final transitmessage = iv.base64 + encryptedText;
     _cacheDecrypted[decryptedText] = transitmessage;
     return transitmessage;
@@ -67,7 +70,7 @@ class EncryptionService {
 
   String decrypt(String transitmessage) {
     if (_cacheDecrypted.containsKey(transitmessage)) {
-      return _cacheDecrypted[transitmessage];
+      return _cacheDecrypted[transitmessage]!;
     }
     final iv = IV.fromBase64(transitmessage.substring(0, 24));
     final encryptedText = transitmessage.substring(24);

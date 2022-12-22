@@ -1,5 +1,7 @@
 import 'dart:io';
-import 'package:fastter_dart/store/todocomments.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
+import '../store/todocomments.dart';
 import 'package:flutter/material.dart';
 // import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
@@ -7,20 +9,20 @@ import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/todocomment.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/todocomment.model.dart';
 
 import '../helpers/todouihelpers.dart';
 import 'imageviewer.dart';
 
 class TodoCommentItem extends StatelessWidget {
   const TodoCommentItem({
-    Key key,
-    this.todoComment,
-    this.onLongPress,
-    this.onTap,
-    this.selected,
-  }) : super(key: key);
+    super.key,
+    required this.todoComment,
+    required this.onLongPress,
+    required this.onTap,
+    required this.selected,
+  });
 
   final TodoComment todoComment;
   final VoidCallback onLongPress;
@@ -32,11 +34,11 @@ class TodoCommentItem extends StatelessWidget {
         todoComment: todoComment,
         deleteComment: () {
           final action = DeleteEvent<TodoComment>(todoComment.id);
-          fastterTodoComments.dispatch(action);
+          fastterTodoComments.add(action);
           return action.completer.future;
         },
         addComment: (comment) =>
-            fastterTodoComments.dispatch(AddEvent<TodoComment>(comment)),
+            fastterTodoComments.add(AddEvent<TodoComment>(comment)),
         onLongPress: onLongPress,
         onTap: onTap,
         selected: selected,
@@ -45,14 +47,13 @@ class TodoCommentItem extends StatelessWidget {
 
 class _TodoCommentItem extends StatelessWidget {
   const _TodoCommentItem({
-    @required this.todoComment,
-    @required this.deleteComment,
-    @required this.addComment,
-    this.onLongPress,
-    this.onTap,
-    this.selected,
-    Key key,
-  }) : super(key: key);
+    required this.todoComment,
+    required this.deleteComment,
+    required this.addComment,
+    required this.onLongPress,
+    required this.onTap,
+    required this.selected,
+  });
 
   final TodoComment todoComment;
   final Future<TodoComment> Function() deleteComment;
@@ -61,18 +62,18 @@ class _TodoCommentItem extends StatelessWidget {
   final VoidCallback onTap;
   final bool selected;
 
-  Future<bool> _confirmDelete(BuildContext context) => showDialog<bool>(
+  Future<bool?> _confirmDelete(BuildContext context) => showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Are You sure?'),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: const Text('No'),
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
             ),
-            FlatButton(
+            TextButton(
               child: const Text('Yes'),
               onPressed: () {
                 Navigator.of(context).pop(true);
@@ -110,18 +111,20 @@ class _TodoCommentItem extends StatelessWidget {
             return Container(
               width: width,
               height: height,
-              child: WebView(
-                navigationDelegate: (navigationRequest) {
-                  if (navigationRequest.url.startsWith(
-                      videoEmbedder['link'].replaceAll('{{id}}', ''))) {
-                    return NavigationDecision.navigate;
-                  } else {
-                    launch(navigationRequest.url);
-                    return NavigationDecision.prevent;
-                  }
-                },
-                javascriptMode: JavascriptMode.unrestricted,
-                initialUrl: initialUrl,
+              child: WebViewWidget(
+                controller: WebViewController()
+                  ..setNavigationDelegate(NavigationDelegate(
+                      onNavigationRequest: (navigationRequest) {
+                    if (navigationRequest.url.startsWith(
+                        videoEmbedder['link'].replaceAll('{{id}}', ''))) {
+                      return NavigationDecision.navigate;
+                    } else {
+                      launchUrlString(navigationRequest.url);
+                      return NavigationDecision.prevent;
+                    }
+                  }))
+                  ..setJavaScriptMode(JavaScriptMode.unrestricted)
+                  ..loadRequest(Uri.parse(initialUrl)),
               ),
             );
           } else {
@@ -154,8 +157,8 @@ class _TodoCommentItem extends StatelessWidget {
       BuildContext context, DismissDirection direction) async {
     final deletedComment = await deleteComment();
     try {
-      Scaffold.of(context).removeCurrentSnackBar();
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${todoComment.content} deleted'),
           action: SnackBarAction(

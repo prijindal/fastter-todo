@@ -1,14 +1,14 @@
 import 'dart:async';
-import 'package:fastter_dart/store/projects.dart' show fastterProjects;
-import 'package:fastter_dart/store/selectedtodos.dart';
+import '../store/projects.dart' show fastterProjects;
+import '../store/selectedtodos.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/todos.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/base.model.dart';
+import '../models/project.model.dart';
+import '../models/todo.model.dart';
+import '../store/todos.dart';
 
 import '../components/homeappbar.dart';
 import '../components/homeappdrawer.dart';
@@ -20,11 +20,11 @@ import 'todoeditbar.dart';
 
 class TodoList extends StatelessWidget {
   const TodoList({
+    super.key,
     this.filter = const <String, dynamic>{},
     this.categoryView = false,
     this.title = 'Todos',
-    Key key,
-  }) : super(key: key);
+  });
 
   final Map<String, dynamic> filter;
   final bool categoryView;
@@ -36,40 +36,39 @@ class TodoList extends StatelessWidget {
         bloc: fastterTodos,
         builder: (context, todosState) =>
             BlocBuilder<SelectedTodosBloc, List<String>>(
-              bloc: selectedTodosBloc,
-              builder: (context, selectedTodos) => _TodoList(
-                    selectedTodos: selectedTodos,
-                    categoryView: categoryView,
-                    todos: todosState.copyWith(
-                      items: todosState.items
-                          .where((todo) =>
-                              todo.parent == null &&
-                              fastterTodos.filterObject(todo, filter))
-                          .toList()
-                            ..sort(getCompareFunction(todosState.sortBy)),
-                    ),
-                    filter: filter,
-                    title: title,
-                    syncStart: () {
-                      final action = SyncEvent<Todo>();
-                      fastterTodos.dispatch(action);
-                      return action.completer;
-                    },
-                  ),
+          bloc: selectedTodosBloc,
+          builder: (context, selectedTodos) => _TodoList(
+            selectedTodos: selectedTodos,
+            categoryView: categoryView,
+            todos: todosState.copyWith(
+              items: todosState.items
+                  .where((todo) =>
+                      todo.parent == null &&
+                      fastterTodos.filterObject(todo, filter))
+                  .toList()
+                ..sort(getCompareFunction(todosState.sortBy)),
             ),
+            filter: filter,
+            title: title,
+            syncStart: () {
+              final action = SyncEvent<Todo>();
+              fastterTodos.add(action);
+              return action.completer;
+            },
+          ),
+        ),
       );
 }
 
 class _TodoList extends StatefulWidget {
   const _TodoList({
-    @required this.todos,
-    @required this.syncStart,
-    @required this.selectedTodos,
+    required this.todos,
+    required this.syncStart,
+    required this.selectedTodos,
     this.categoryView = false,
     this.filter = const <String, dynamic>{},
     this.title = 'Todos',
-    Key key,
-  }) : super(key: key);
+  });
 
   final ListState<Todo> todos;
   final Completer Function() syncStart;
@@ -94,18 +93,18 @@ class _TodoListState extends State<_TodoList> {
             child: BlocBuilder<FastterBloc<Project>, ListState<Project>>(
               bloc: fastterProjects,
               builder: (context, projects) => TodoInput(
-                    project: (widget.filter.containsKey('project') &&
-                            projects.items.isNotEmpty)
-                        ? projects.items.singleWhere(
-                            (project) => project.id == widget.filter['project'],
-                            orElse: () => null)
-                        : null,
-                    onBackButton: () {
-                      setState(() {
-                        _showInput = false;
-                      });
-                    },
-                  ),
+                project: (widget.filter.containsKey('project') &&
+                        projects.items.isNotEmpty)
+                    ? projects.items.singleWhere(
+                        (project) => project.id == widget.filter['project'],
+                      )
+                    : null,
+                onBackButton: () {
+                  setState(() {
+                    _showInput = false;
+                  });
+                },
+              ),
             ),
           ),
         if (widget.selectedTodos.isNotEmpty)
@@ -151,26 +150,26 @@ class _TodoListState extends State<_TodoList> {
         if (!mapCategoryToList.containsKey(priorityString)) {
           mapCategoryToList[priorityString] = [];
         }
-        mapCategoryToList[priorityString].add(todo);
+        mapCategoryToList[priorityString]?.add(todo);
       } else if (sortBy == 'title') {
         final titleString = '${todo.title[0].toUpperCase().toString()}';
         if (!mapCategoryToList.containsKey(titleString)) {
           mapCategoryToList[titleString] = [];
         }
-        mapCategoryToList[titleString].add(todo);
+        mapCategoryToList[titleString]?.add(todo);
       } else if (sortBy == 'project') {
         final projectString =
-            todo.project == null ? 'Inbox' : '${todo.project.title}';
+            todo.project == null ? 'Inbox' : '${todo.project?.title}';
         if (!mapCategoryToList.containsKey(projectString)) {
           mapCategoryToList[projectString] = [];
         }
-        mapCategoryToList[projectString].add(todo);
+        mapCategoryToList[projectString]?.add(todo);
       } else {
         final dueDateString = _dueDateCategorize(todo.dueDate);
         if (!mapCategoryToList.containsKey(dueDateString)) {
           mapCategoryToList[dueDateString] = [];
         }
-        mapCategoryToList[dueDateString].add(todo);
+        mapCategoryToList[dueDateString]?.add(todo);
       }
     }
     final completedItems =
@@ -196,29 +195,31 @@ class _TodoListState extends State<_TodoList> {
       );
     }
     final categoryString = _mapCategoryToList.keys.elementAt(index);
+    final initiallyExpanded = _mapCategoryToList[categoryString]
+        ?.where((todo) => todo.completed != true)
+        .isNotEmpty;
+    final children = _mapCategoryToList[categoryString]
+        ?.map(
+          (todo) => ListTileTheme.merge(
+              key: Key('${todo.id}_listitletheme'),
+              dense: false,
+              child: TodoItem(
+                todo: todo,
+                key: Key(todo.id),
+              )),
+        )
+        .toList();
     return ListTileTheme.merge(
       key: Key('${categoryString}_listitletheme'),
       dense: true,
       child: ExpansionTile(
         key: Key(categoryString),
-        initiallyExpanded: _mapCategoryToList[categoryString]
-            .where((todo) => todo.completed != true)
-            .isNotEmpty,
+        initiallyExpanded: initiallyExpanded ?? false,
         title: Text(
           categoryString,
-          style: Theme.of(context).textTheme.body1,
+          style: Theme.of(context).textTheme.bodyText1,
         ),
-        children: _mapCategoryToList[categoryString]
-            .map(
-              (todo) => ListTileTheme.merge(
-                  key: Key('${todo.id}_listitletheme'),
-                  dense: false,
-                  child: TodoItem(
-                    todo: todo,
-                    key: Key(todo.id),
-                  )),
-            )
-            .toList(),
+        children: children ?? [],
       ),
     );
   }
@@ -254,7 +255,7 @@ class _TodoListState extends State<_TodoList> {
                   margin: const EdgeInsets.symmetric(vertical: 20),
                 ),
                 const Text('No Tasks yet'),
-                RaisedButton(
+                ElevatedButton(
                   child: const Text('Add a todo'),
                   onPressed: () {
                     setState(() {

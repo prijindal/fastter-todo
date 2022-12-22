@@ -5,9 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 
-import 'package:fastter_dart/fastter/fastter.dart';
-import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/store/user.dart';
+import '../fastter/fastter.dart';
+import '../models/user.model.dart';
+import '../store/user.dart';
 
 class GoogleSignInForm extends StatelessWidget {
   @protected
@@ -15,17 +15,17 @@ class GoogleSignInForm extends StatelessWidget {
   Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, state) => _GoogleSignInForm(
-              user: state,
-              loginWithGoogle: (idToken) =>
-                  fastterUser.dispatch(GoogleLoginUserEvent(idToken)),
-            ),
+          user: state,
+          loginWithGoogle: (idToken) =>
+              fastterUser.add(GoogleLoginUserEvent(idToken)),
+        ),
       );
 }
 
 class _GoogleSignInForm extends StatelessWidget {
   const _GoogleSignInForm({
-    @required this.loginWithGoogle,
-    @required this.user,
+    required this.loginWithGoogle,
+    required this.user,
   });
 
   final UserState user;
@@ -35,26 +35,26 @@ class _GoogleSignInForm extends StatelessWidget {
     if (Platform.isAndroid || Platform.isIOS) {
       final _googleSignIn = GoogleSignIn(scopes: ['profile', 'email']);
       _googleSignIn.signIn().then((account) {
-        account.authentication.then((auth) {
-          loginWithGoogle(auth.idToken);
+        account?.authentication.then((auth) {
+          loginWithGoogle(auth.idToken!);
         });
       });
       Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
           builder: (context) => Scaffold(
-                body: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
+            body: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
         ),
       );
     } else {
       Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
           builder: (context) => _GoogleSignInScreen(
-                loginWithGoogle: loginWithGoogle,
-                user: user,
-              ),
+            loginWithGoogle: loginWithGoogle,
+            user: user,
+          ),
         ),
       );
     }
@@ -71,8 +71,8 @@ class _GoogleSignInForm extends StatelessWidget {
 
 class _GoogleSignInScreen extends StatefulWidget {
   const _GoogleSignInScreen({
-    @required this.loginWithGoogle,
-    @required this.user,
+    required this.loginWithGoogle,
+    required this.user,
   });
 
   final UserState user;
@@ -108,7 +108,7 @@ class _GoogleSignInScreenState extends State<_GoogleSignInScreen> {
                     TextField(
                       controller: _idTokenController,
                     ),
-                    RaisedButton(
+                    ElevatedButton(
                       child: const Text('Login'),
                       onPressed: _onLogin,
                     )

@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'package:fastter_dart/models/todo.model.dart';
+import '../models/todo.model.dart';
 import 'package:fastter_todo/helpers/encrypt.dart';
 import 'package:flutter/material.dart';
 
 class TodoItemTitle extends StatefulWidget {
-  const TodoItemTitle({@required this.todo});
+  const TodoItemTitle({required this.todo});
 
   final Todo todo;
   @override
@@ -44,13 +44,13 @@ class _TodoItemTitleState extends State<TodoItemTitle> {
           obscureText: true,
         ),
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: const Text('Cancel'),
             onPressed: () {
               Navigator.of(context).pop(false);
             },
           ),
-          FlatButton(
+          TextButton(
             child: const Text('Decrypt'),
             onPressed: () {
               // Save name
@@ -60,7 +60,7 @@ class _TodoItemTitleState extends State<TodoItemTitle> {
         ],
       ),
     );
-    if (shouldDecrypt) {
+    if (shouldDecrypt != null && shouldDecrypt) {
       await decrypt(passwordController.text);
     }
   }

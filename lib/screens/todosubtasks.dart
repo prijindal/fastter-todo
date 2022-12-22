@@ -1,17 +1,17 @@
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/store/todos.dart';
+import '../models/base.model.dart';
+import '../store/todos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/todo.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/todo.model.dart';
 
 import '../components/todoitemtoggle.dart';
 import 'todoedit.dart';
 
 class TodoSubtasks extends StatelessWidget {
   const TodoSubtasks({
-    @required this.todo,
+    required this.todo,
   });
   final Todo todo;
 
@@ -28,7 +28,7 @@ class TodoSubtasks extends StatelessWidget {
 
 class _TodoSubTaskList extends StatelessWidget {
   const _TodoSubTaskList({
-    @required this.todo,
+    required this.todo,
   });
   final Todo todo;
 
@@ -37,23 +37,23 @@ class _TodoSubTaskList extends StatelessWidget {
       BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
         builder: (context, state) => _TodoSubTaskListComponent(
-              todo: todo,
-              children: state.items
-                  .where((todo) =>
-                      todo.parent != null && todo.parent.id == this.todo.id)
-                  .toList()
-                    ..sort((a, b) => a.createdAt.compareTo(b.createdAt)),
-              updateTodo: (id, updated) =>
-                  fastterTodos.dispatch(UpdateEvent<Todo>(id, updated)),
-            ),
+          todo: todo,
+          children: state.items
+              .where((todo) =>
+                  todo.parent != null && todo.parent?.id == this.todo.id)
+              .toList()
+            ..sort((a, b) => a.createdAt.compareTo(b.createdAt)),
+          updateTodo: (id, updated) =>
+              fastterTodos.add(UpdateEvent<Todo>(id, updated)),
+        ),
       );
 }
 
 class _TodoSubTaskListComponent extends StatelessWidget {
   const _TodoSubTaskListComponent({
-    @required this.todo,
-    @required this.children,
-    @required this.updateTodo,
+    required this.todo,
+    required this.children,
+    required this.updateTodo,
   });
   final Todo todo;
   final List<Todo> children;
@@ -64,8 +64,8 @@ class _TodoSubTaskListComponent extends StatelessWidget {
         children: children
             .map(
               (child) => _TodoSubTaskItem(
-                    todo: child,
-                  ),
+                todo: child,
+              ),
             )
             .toList(),
       );
@@ -73,7 +73,7 @@ class _TodoSubTaskListComponent extends StatelessWidget {
 
 class _TodoSubTaskItem extends StatelessWidget {
   const _TodoSubTaskItem({
-    @required this.todo,
+    required this.todo,
   });
 
   final Todo todo;
@@ -81,18 +81,18 @@ class _TodoSubTaskItem extends StatelessWidget {
   Widget build(BuildContext context) => _TodoSubTaskItemComponent(
         todo: todo,
         updateTodo: (updated) =>
-            fastterTodos.dispatch(UpdateEvent<Todo>(todo.id, updated)),
-        addTodo: (newtodo) => fastterTodos.dispatch(AddEvent<Todo>(newtodo)),
-        deleteTodo: () => fastterTodos.dispatch(DeleteEvent<Todo>(todo.id)),
+            fastterTodos.add(UpdateEvent<Todo>(todo.id, updated)),
+        addTodo: (newtodo) => fastterTodos.add(AddEvent<Todo>(newtodo)),
+        deleteTodo: () => fastterTodos.add(DeleteEvent<Todo>(todo.id)),
       );
 }
 
 class _TodoSubTaskItemComponent extends StatefulWidget {
   const _TodoSubTaskItemComponent({
-    @required this.todo,
-    @required this.updateTodo,
-    @required this.addTodo,
-    @required this.deleteTodo,
+    required this.todo,
+    required this.updateTodo,
+    required this.addTodo,
+    required this.deleteTodo,
   });
 
   final Todo todo;
@@ -128,8 +128,8 @@ class _TodoSubTaskItemState extends State<_TodoSubTaskItemComponent> {
     Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (context) => TodoEditScreen(
-              todo: widget.todo,
-            ),
+          todo: widget.todo,
+        ),
       ),
     );
   }
@@ -138,22 +138,22 @@ class _TodoSubTaskItemState extends State<_TodoSubTaskItemComponent> {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-            title: const Text('Are You sure?'),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text('No'),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-              ),
-              FlatButton(
-                child: const Text('Yes'),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-              ),
-            ],
+        title: const Text('Are You sure?'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('No'),
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
           ),
+          TextButton(
+            child: const Text('Yes'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+        ],
+      ),
     );
     if (shouldDelete == true) {
       widget.deleteTodo();
@@ -202,8 +202,8 @@ class _TodoSubTaskItemState extends State<_TodoSubTaskItemComponent> {
                   IconButton(
                     icon: const Icon(Icons.add),
                     onPressed: () => setState(() {
-                          adding = true;
-                        }),
+                      adding = true;
+                    }),
                   )
               ],
             ),
@@ -215,16 +215,16 @@ class _TodoSubTaskItemState extends State<_TodoSubTaskItemComponent> {
                   prefix: IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => setState(() {
-                          adding = false;
-                        }),
+                      adding = false;
+                    }),
                   ),
                   suffix: IconButton(
                     icon: const Icon(Icons.send),
                     onPressed: _addSubtask,
                   )),
               onChanged: (title) => setState(() {
-                    this.title = title;
-                  }),
+                this.title = title;
+              }),
               onSubmitted: (_) => _addSubtask(),
             ),
           Container(

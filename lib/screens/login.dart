@@ -18,9 +18,9 @@ class LoginScreen extends StatelessWidget {
             const Text('Or'),
             LoginForm(),
             const Text('Or'),
-            RaisedButton(
+            ElevatedButton(
               child: const Text('Signup'),
-              color: Colors.grey[300],
+              // color: Colors.grey[300],
               onPressed: () {
                 Navigator.of(context).push<void>(
                   MaterialPageRoute<void>(
@@ -29,9 +29,9 @@ class LoginScreen extends StatelessWidget {
                 );
               },
             ),
-            RaisedButton(
+            ElevatedButton(
               child: const Text('Read About Us'),
-              color: Colors.grey[300],
+              // color: Colors.grey[300],
               onPressed: () {
                 Navigator.of(context).push<void>(
                   MaterialPageRoute<void>(
@@ -40,9 +40,9 @@ class LoginScreen extends StatelessWidget {
                 );
               },
             ),
-            RaisedButton(
+            ElevatedButton(
               child: const Text('Read Our Privacy Policy'),
-              color: Colors.grey[300],
+              // color: Colors.grey[300],
               onPressed: () {
                 Navigator.of(context).push<void>(
                   MaterialPageRoute<void>(

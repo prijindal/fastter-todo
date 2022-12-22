@@ -1,13 +1,13 @@
-import 'package:fastter_dart/store/labels.dart';
+import '../store/labels.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/label.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/label.model.dart';
 
 class AddLabelScreen extends StatefulWidget {
   const AddLabelScreen({
-    Key key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _AddLabelScreenState createState() => _AddLabelScreenState();
@@ -18,7 +18,7 @@ class _AddLabelScreenState extends State<AddLabelScreen> {
   FocusNode titleFocusNode = FocusNode();
 
   void _onSave() {
-    fastterLabels.dispatch(AddEvent<Label>(
+    fastterLabels.add(AddEvent<Label>(
       Label(
         title: titleController.text,
       ),

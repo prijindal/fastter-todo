@@ -1,4 +1,4 @@
-import 'package:fastter_dart/store/notifications.dart';
+import '../store/notifications.dart';
 import 'package:flutter/material.dart'
     show
         Key,
@@ -10,12 +10,11 @@ import 'package:flutter/material.dart'
         Text,
         Navigator;
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/notification.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/notification.model.dart';
 
 class NotificationItem extends StatelessWidget {
-  const NotificationItem({@required this.notification, Key key})
-      : super(key: key);
+  const NotificationItem({required this.notification, super.key});
 
   final Notification notification;
 
@@ -23,8 +22,8 @@ class NotificationItem extends StatelessWidget {
   Widget build(BuildContext context) => _NotificationItem(
         markRead: () {
           notification.read = true;
-          fastterNotifications.dispatch(
-              UpdateEvent<Notification>(notification.id, notification));
+          fastterNotifications
+              .add(UpdateEvent<Notification>(notification.id, notification));
         },
         notification: notification,
       );
@@ -32,8 +31,8 @@ class NotificationItem extends StatelessWidget {
 
 class _NotificationItem extends StatelessWidget {
   const _NotificationItem({
-    @required this.notification,
-    @required this.markRead,
+    required this.notification,
+    required this.markRead,
   });
 
   final Notification notification;

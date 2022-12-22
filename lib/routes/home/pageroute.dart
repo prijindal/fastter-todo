@@ -1,10 +1,10 @@
-import 'package:fastter_dart/fastter/fastter.dart';
 import 'package:flutter/material.dart';
+import '../../fastter/fastter.dart';
 import '../../helpers/responsive.dart';
 
 class HomePageRoute<T> extends MaterialPageRoute<T> {
   HomePageRoute({
-    WidgetBuilder builder,
+    required WidgetBuilder builder,
     bool fullscreenDialog = true,
   }) : super(
           builder: builder,
@@ -14,7 +14,7 @@ class HomePageRoute<T> extends MaterialPageRoute<T> {
   @override
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
-    if (!Fastter.instance.currentState) {
+    if (!Fastter.instance.state) {
       return child;
     }
     if (getCurrentBreakpoint(context) == ResponsiveBreakpoints.landscape) {

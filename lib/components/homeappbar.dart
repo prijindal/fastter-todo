@@ -1,36 +1,35 @@
 import 'dart:io';
-import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/store/labels.dart';
-import 'package:fastter_dart/store/projects.dart';
-import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share/share.dart';
 
-import 'package:fastter_dart/fastter/fastter.dart';
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/label.model.dart';
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/settings.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/selectedtodos.dart';
-import 'package:fastter_dart/store/todos.dart';
-
+import '../fastter/fastter.dart';
+import '../fastter/fastter_bloc.dart';
 import '../helpers/fastter_helper.dart';
 import '../helpers/navigator.dart';
 import '../helpers/responsive.dart';
 import '../helpers/theme.dart';
+import '../models/base.model.dart';
+import '../models/label.model.dart';
+import '../models/project.model.dart';
+import '../models/settings.model.dart';
+import '../models/todo.model.dart';
+import '../models/user.model.dart';
 import '../screens/editlabel.dart';
 import '../screens/editproject.dart';
 import '../screens/search.dart';
+import '../store/labels.dart';
+import '../store/projects.dart';
+import '../store/selectedtodos.dart';
+import '../store/todos.dart';
+import '../store/user.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({
-    @required this.filter,
-    @required this.title,
+    required this.filter,
+    required this.title,
     this.preferredSize = const Size.fromHeight(kToolbarHeight),
   });
 
@@ -61,17 +60,17 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   labels: labelsState,
                   todos: todosState,
                   updateTodo: (id, updated) =>
-                      fastterTodos.dispatch(UpdateEvent<Todo>(id, updated)),
+                      fastterTodos.add(UpdateEvent<Todo>(id, updated)),
                   deleteSelected: () {
                     for (final todoid in selectedtodos) {
-                      fastterTodos.dispatch(DeleteEvent<Todo>(todoid));
-                      selectedTodosBloc.dispatch(UnSelectTodoEvent(todoid));
+                      fastterTodos.add(DeleteEvent<Todo>(todoid));
+                      selectedTodosBloc.add(UnSelectTodoEvent(todoid));
                     }
                   },
                   deleteAll: () {
                     for (final todo in todosState.items.where(
                         (todo) => fastterTodos.filterObject(todo, filter))) {
-                      fastterTodos.dispatch(DeleteEvent<Todo>(todo.id));
+                      fastterTodos.add(DeleteEvent<Todo>(todo.id));
                     }
                   },
                   selectedtodos: selectedtodos,
@@ -81,7 +80,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                         title: 'Inbox',
                       ),
                   updateSortBy: (sortBy) =>
-                      fastterTodos.dispatch(SetSortByEvent<Todo>(sortBy)),
+                      fastterTodos.add(SetSortByEvent<Todo>(sortBy)),
                 ),
               ),
             ),
@@ -105,19 +104,18 @@ enum _SortAction { duedate, title, priority, project }
 
 class _HomeAppBar extends StatelessWidget {
   const _HomeAppBar({
-    @required this.selectedtodos,
-    @required this.deleteSelected,
-    @required this.deleteAll,
-    @required this.projects,
-    @required this.labels,
-    @required this.todos,
-    @required this.filter,
-    @required this.title,
-    @required this.updateTodo,
-    @required this.updateSortBy,
-    @required this.frontPage,
-    Key key,
-  }) : super(key: key);
+    required this.selectedtodos,
+    required this.deleteSelected,
+    required this.deleteAll,
+    required this.projects,
+    required this.labels,
+    required this.todos,
+    required this.filter,
+    required this.title,
+    required this.updateTodo,
+    required this.updateSortBy,
+    required this.frontPage,
+  });
 
   final Map<String, dynamic> filter;
   final List<String> selectedtodos;
@@ -131,11 +129,19 @@ class _HomeAppBar extends StatelessWidget {
   final void Function(String) updateSortBy;
   final FrontPage frontPage;
 
-  Project get _project => projects.items
-      .singleWhere((item) => item.id == filter['project'], orElse: () => null);
+  Project? get _project {
+    final filteredProjects = projects.items.where(
+      (item) => item.id == filter['project'],
+    );
+    return filteredProjects.isEmpty ? null : filteredProjects.first;
+  }
 
-  Label get _label => labels.items
-      .singleWhere((item) => item.id == filter['label'], orElse: () => null);
+  Label? get _label {
+    final filteredLabels = labels.items.where(
+      (item) => item.id == filter['label'],
+    );
+    return filteredLabels.isEmpty ? null : filteredLabels.first;
+  }
 
   Widget _buildTitle() {
     if (selectedtodos.isNotEmpty) {
@@ -151,7 +157,7 @@ class _HomeAppBar extends StatelessWidget {
     } else {
       routeName = frontPage.route;
     }
-    String title;
+    String title = "Todos";
     switch (routeName) {
       case '/':
         title = 'Inbox';
@@ -167,10 +173,10 @@ class _HomeAppBar extends StatelessWidget {
         break;
       case '/todos':
         if (_project != null) {
-          title = _project.title;
+          title = _project!.title;
         } else {
-          final Map map = history.last.arguments;
-          if (map.containsKey('project')) {
+          final map = history.last.arguments;
+          if (map != null && map.containsKey('project')) {
             final Project project = map['project'];
             title = project.title;
           }
@@ -189,11 +195,11 @@ class _HomeAppBar extends StatelessWidget {
         title: const Text('Are you sure'),
         content: Text('This will delete ${selectedtodos.length} tasks'),
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: const Text('Cancel'),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          FlatButton(
+          TextButton(
             child: const Text('Yes'),
             onPressed: () {
               Navigator.of(context).pop();
@@ -216,7 +222,7 @@ class _HomeAppBar extends StatelessWidget {
 
   Future<void> _copySelected(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: _tasksToString()));
-    Scaffold.of(context).showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Copied to clipboard'),
       ),
@@ -272,11 +278,11 @@ class _HomeAppBar extends StatelessWidget {
         title: const Text('Are you sure'),
         content: const Text('This will delete all tasks'),
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             child: const Text('Cancel'),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          FlatButton(
+          TextButton(
             child: const Text('Yes'),
             onPressed: () {
               Navigator.of(context).pop();
@@ -292,7 +298,7 @@ class _HomeAppBar extends StatelessWidget {
     Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (context) => EditLabelScreen(
-          label: _label,
+          label: _label!,
         ),
       ),
     );
@@ -302,7 +308,7 @@ class _HomeAppBar extends StatelessWidget {
     Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (context) => EditProjectScreen(
-          project: _project,
+          project: _project!,
         ),
       ),
     );
@@ -448,7 +454,7 @@ class _HomeAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedTheme(
-        isMaterialAppTheme: true,
+        // isMaterialAppTheme: true,
         data: selectedtodos.isNotEmpty ? whiteTheme : primaryTheme,
         child: AppBar(
           automaticallyImplyLeading:
@@ -460,7 +466,7 @@ class _HomeAppBar extends StatelessWidget {
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
                       for (final id in state) {
-                        selectedTodosBloc.dispatch(UnSelectTodoEvent(id));
+                        selectedTodosBloc.add(UnSelectTodoEvent(id));
                       }
                     },
                     tooltip: 'Unselect',
@@ -488,8 +494,8 @@ class _HomeAppBar extends StatelessWidget {
                     'Connecting...',
                     style: Theme.of(context)
                         .textTheme
-                        .body1
-                        .apply(color: Colors.white),
+                        .bodyText1
+                        ?.apply(color: Colors.white),
                   ),
                   secondChild: Container(),
                   crossFadeState: isConnected

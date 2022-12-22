@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'package:fastter_dart/store/user.dart';
 import 'package:fastter_todo/helpers/firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../store/user.dart';
 
 Future<void> _clearPersisted() async {
   if (Platform.isAndroid || Platform.isIOS) {

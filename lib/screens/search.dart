@@ -1,12 +1,12 @@
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/store/projects.dart' as prefix0;
-import 'package:fastter_dart/store/selectedtodos.dart';
+import '../fastter/fastter_bloc.dart';
+import '../store/projects.dart' as prefix0;
+import '../store/selectedtodos.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
-import 'package:fastter_dart/store/todos.dart';
+import '../models/base.model.dart';
+import '../models/project.model.dart';
+import '../models/todo.model.dart';
+import '../store/todos.dart';
 
 import '../components/hexcolor.dart';
 import '../components/todoeditbar.dart';
@@ -16,8 +16,8 @@ import '../helpers/navigator.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({
-    Key key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   SearchScreenState createState() => SearchScreenState();
@@ -26,7 +26,7 @@ class SearchScreen extends StatefulWidget {
 class SearchScreenState extends State<SearchScreen>
     with SingleTickerProviderStateMixin {
   String _searchText = '';
-  TabController _tabController;
+  late final TabController _tabController;
 
   @override
   void initState() {
@@ -76,7 +76,7 @@ class SearchScreenState extends State<SearchScreen>
 
 class _SearchTodosResults extends StatelessWidget {
   const _SearchTodosResults({
-    @required this.query,
+    required this.query,
   });
   final String query;
 
@@ -85,22 +85,22 @@ class _SearchTodosResults extends StatelessWidget {
       BlocBuilder<FastterBloc<Todo>, ListState<Todo>>(
         bloc: fastterTodos,
         builder: (context, state) => _SearchTodosResultsComponent(
-              todos: state.copyWith(
-                items: state.items
-                    .where((todo) =>
-                        fastterTodos.filterObject(todo, <String, dynamic>{
+          todos: state.copyWith(
+            items: state.items
+                .where(
+                    (todo) => fastterTodos.filterObject(todo, <String, dynamic>{
                           'query': query,
                         }))
-                    .toList()
-                      ..sort(getCompareFunction(state.sortBy)),
-              ),
-            ),
+                .toList()
+              ..sort(getCompareFunction(state.sortBy)),
+          ),
+        ),
       );
 }
 
 class _SearchTodosResultsComponent extends StatelessWidget {
   const _SearchTodosResultsComponent({
-    @required this.todos,
+    required this.todos,
   });
 
   final ListState<Todo> todos;
@@ -114,8 +114,8 @@ class _SearchTodosResultsComponent extends StatelessWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: todos.items.length,
             itemBuilder: (context, index) => TodoItem(
-                  todo: todos.items[index],
-                ),
+              todo: todos.items[index],
+            ),
           ),
           Positioned(
             bottom: 0,
@@ -124,12 +124,11 @@ class _SearchTodosResultsComponent extends StatelessWidget {
             child: BlocBuilder<SelectedTodosBloc, List<String>>(
               bloc: selectedTodosBloc,
               builder: (context, selectedTodos) => AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 350),
-                    transitionBuilder: (child, animation) =>
-                        SizeTransition(child: child, sizeFactor: animation),
-                    child:
-                        selectedTodos.isNotEmpty ? TodoEditBar() : Container(),
-                  ),
+                duration: const Duration(milliseconds: 350),
+                transitionBuilder: (child, animation) =>
+                    SizeTransition(child: child, sizeFactor: animation),
+                child: selectedTodos.isNotEmpty ? TodoEditBar() : Container(),
+              ),
             ),
           ),
         ],
@@ -138,7 +137,7 @@ class _SearchTodosResultsComponent extends StatelessWidget {
 
 class _SearchProjectsResults extends StatelessWidget {
   const _SearchProjectsResults({
-    @required this.query,
+    required this.query,
   });
   final String query;
 
@@ -147,14 +146,14 @@ class _SearchProjectsResults extends StatelessWidget {
       BlocBuilder<FastterBloc<Project>, ListState<Project>>(
         bloc: prefix0.fastterProjects,
         builder: (context, state) => _SearchProjectsResultsComponent(
-              projects: state.items,
-            ),
+          projects: state.items,
+        ),
       );
 }
 
 class _SearchProjectsResultsComponent extends StatelessWidget {
   const _SearchProjectsResultsComponent({
-    @required this.projects,
+    required this.projects,
   });
 
   final List<Project> projects;
@@ -163,19 +162,19 @@ class _SearchProjectsResultsComponent extends StatelessWidget {
   Widget build(BuildContext context) => ListView.builder(
         itemCount: projects.length,
         itemBuilder: (context, index) => ListTile(
-              onTap: () {
-                Navigator.of(context).pushNamed('/todos',
-                    arguments: {'project': projects[index]});
-                history.add(RouteInfo('/todos',
-                    arguments: {'project': projects[index]}));
-              },
-              leading: Icon(
-                Icons.group_work,
-                color: projects[index].color == null
-                    ? null
-                    : HexColor(projects[index].color),
-              ),
-              title: Text(projects[index].title),
-            ),
+          onTap: () {
+            Navigator.of(context)
+                .pushNamed('/todos', arguments: {'project': projects[index]});
+            history.add(
+                RouteInfo('/todos', arguments: {'project': projects[index]}));
+          },
+          leading: Icon(
+            Icons.group_work,
+            color: projects[index].color == null
+                ? null
+                : HexColor(projects[index].color),
+          ),
+          title: Text(projects[index].title),
+        ),
       );
 }

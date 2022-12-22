@@ -1,29 +1,30 @@
 import 'dart:io';
 import 'dart:math';
-import 'package:fastter_dart/store/todos.dart';
+import 'dart:async';
+import '../store/todos.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/project.model.dart';
-import 'package:fastter_dart/models/todo.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/project.model.dart';
+import '../models/todo.model.dart';
 
 import '../helpers/todouihelpers.dart';
 import 'projectdropdown.dart';
 
 class TodoInput extends StatelessWidget {
   const TodoInput({
-    Key key,
-    this.onBackButton,
+    super.key,
+    required this.onBackButton,
     this.project,
-  }) : super(key: key);
+  });
 
   final void Function() onBackButton;
-  final Project project;
+  final Project? project;
 
   @override
   Widget build(BuildContext context) => _TodoInput(
-        addTodo: (todo) => fastterTodos.dispatch(AddEvent<Todo>(todo)),
+        addTodo: (todo) => fastterTodos.add(AddEvent<Todo>(todo)),
         onBackButton: onBackButton,
         project: project,
       );
@@ -31,15 +32,14 @@ class TodoInput extends StatelessWidget {
 
 class _TodoInput extends StatefulWidget {
   const _TodoInput({
-    @required this.addTodo,
-    this.onBackButton,
+    required this.addTodo,
+    required this.onBackButton,
     this.project,
-    Key key,
-  }) : super(key: key);
+  });
 
   final void Function() onBackButton;
   final void Function(Todo todo) addTodo;
-  final Project project;
+  final Project? project;
 
   @override
   _TodoInputState createState() => _TodoInputState();
@@ -51,8 +51,8 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   final FocusNode _titleFocusNode = FocusNode();
   bool _isPreventClose = false;
   DateTime dueDate = DateTime.now();
-  Project project;
-  int subscribingId;
+  Project? project;
+  StreamSubscription<bool>? subscribingId;
 
   @override
   void initState() {
@@ -62,8 +62,8 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     }
     WidgetsBinding.instance.addObserver(this);
     if (Platform.isAndroid || Platform.isIOS) {
-      subscribingId =
-          KeyboardVisibilityNotification().addNewListener(onChange: (visible) {
+      var keyboardVisibilityController = KeyboardVisibilityController();
+      subscribingId = keyboardVisibilityController.onChange.listen((visible) {
         if (visible == false) {
           _unFocusKeyboard();
         } else {
@@ -82,9 +82,7 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    if (subscribingId != null) {
-      KeyboardVisibilityNotification().removeListener(subscribingId);
-    }
+    subscribingId?.cancel();
     super.dispose();
   }
 
@@ -104,31 +102,31 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
       showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-              title: const Text('Do you want to save before cancelling?'),
-              actions: <Widget>[
-                FlatButton(
-                  child: const Text('No'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      _isPreventClose = false;
-                    });
-                    widget.onBackButton();
-                  },
-                ),
-                FlatButton(
-                  child: const Text('Yes'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _onSave();
-                    setState(() {
-                      _isPreventClose = false;
-                    });
-                    widget.onBackButton();
-                  },
-                ),
-              ],
+          title: const Text('Do you want to save before cancelling?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  _isPreventClose = false;
+                });
+                widget.onBackButton();
+              },
             ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _onSave();
+                setState(() {
+                  _isPreventClose = false;
+                });
+                widget.onBackButton();
+              },
+            ),
+          ],
+        ),
       );
     } else if (widget.onBackButton != null) {
       widget.onBackButton();
@@ -155,18 +153,18 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     setState(() {
       _isPreventClose = true;
     });
-    todoSelectDate(context).then((date) {
-      setState(() {
-        if (date != null) {
-          dueDate = date.dateTime;
-        }
-        _isPreventClose = false;
-        _focusKeyboard();
-      });
-    });
+    // todoSelectDate(context).then((date) {
+    //   setState(() {
+    //     if (date != null) {
+    //       dueDate = date.dateTime;
+    //     }
+    //     _isPreventClose = false;
+    //     _focusKeyboard();
+    //   });
+    // });
   }
 
-  void _onSelectProject(Project selectedproject) {
+  void _onSelectProject(Project? selectedproject) {
     setState(() {
       project = selectedproject;
       _isPreventClose = false;

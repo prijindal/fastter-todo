@@ -1,10 +1,10 @@
-import 'package:fastter_dart/store/labels.dart';
+import '../store/labels.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/label.model.dart';
+import '../fastter/fastter_bloc.dart';
+import '../models/base.model.dart';
+import '../models/label.model.dart';
 
 import '../helpers/theme.dart';
 import 'addlabel.dart';
@@ -16,20 +16,20 @@ class ManageLabelsScreen extends StatelessWidget {
       BlocBuilder<FastterBloc<Label>, ListState<Label>>(
         bloc: fastterLabels,
         builder: (context, state) => _ManageLabelsScreen(
-              labels: state,
-              deleteLabel: (label) {
-                fastterLabels.dispatch(DeleteEvent<Label>(label.id));
-              },
-            ),
+          labels: state,
+          deleteLabel: (label) {
+            fastterLabels.add(DeleteEvent<Label>(label.id));
+          },
+        ),
       );
 }
 
 class _ManageLabelsScreen extends StatefulWidget {
   const _ManageLabelsScreen({
-    @required this.labels,
-    @required this.deleteLabel,
-    Key key,
-  }) : super(key: key);
+    required this.labels,
+    required this.deleteLabel,
+    super.key,
+  });
 
   final ListState<Label> labels;
   final void Function(Label) deleteLabel;
@@ -41,22 +41,22 @@ class _ManageLabelsScreen extends StatefulWidget {
 class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
   List<String> selectedLabels = <String>[];
 
-  Future<bool> _deleteLabel(String title) => showDialog<bool>(
+  Future<bool?> _deleteLabel(String title) => showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text(title),
-              content: const Text('All tasks will move to inbox'),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () => Navigator.of(context).pop<bool>(false),
-                  child: const Text('No'),
-                ),
-                FlatButton(
-                  onPressed: () => Navigator.of(context).pop<bool>(true),
-                  child: const Text('Yes'),
-                )
-              ],
+          title: Text(title),
+          content: const Text('All tasks will move to inbox'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop<bool>(false),
+              child: const Text('No'),
             ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop<bool>(true),
+              child: const Text('Yes'),
+            )
+          ],
+        ),
       );
 
   void _unSelectAll() {
@@ -68,7 +68,9 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
   Widget _buildDeleteButton() => IconButton(
         icon: const Icon(Icons.delete),
         onPressed: () async {
-          if (await _deleteLabel('Delete${_buildAppBarTitle()}?')) {
+          final shouldDelete =
+              await _deleteLabel('Delete${_buildAppBarTitle()}?');
+          if (shouldDelete != null && shouldDelete) {
             final labels = widget.labels.items
                 .where((label) => selectedLabels.contains(label.id))
                 .toList();
@@ -89,8 +91,8 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
             Navigator.of(context).push<void>(
               MaterialPageRoute<void>(
                 builder: (context) => EditLabelScreen(
-                      label: label,
-                    ),
+                  label: label,
+                ),
               ),
             );
           },
@@ -124,10 +126,10 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
           ? FloatingActionButton(
               child: const Icon(Icons.add),
               onPressed: () => Navigator.of(context).push<void>(
-                    MaterialPageRoute<void>(
-                      builder: (context) => const AddLabelScreen(),
-                    ),
-                  ),
+                MaterialPageRoute<void>(
+                  builder: (context) => const AddLabelScreen(),
+                ),
+              ),
             )
           : Material(
               elevation: 20,
@@ -192,7 +194,9 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete),
                     onPressed: () async {
-                      if (await _deleteLabel('Delete ${label.title}?')) {
+                      final shouldDelete =
+                          await _deleteLabel('Delete ${label.title}?');
+                      if (shouldDelete != null && shouldDelete) {
                         widget.deleteLabel(label);
                       }
                     },

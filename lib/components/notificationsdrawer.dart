@@ -1,10 +1,10 @@
-import 'package:fastter_dart/fastter/fastter_bloc.dart';
-import 'package:fastter_dart/store/notifications.dart';
+import '../fastter/fastter_bloc.dart';
+import '../store/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/models/base.model.dart';
-import 'package:fastter_dart/models/notification.model.dart' as notification;
+import '../models/base.model.dart';
+import '../models/notification.model.dart' as notification;
 
 import 'notificationitem.dart';
 
@@ -15,16 +15,15 @@ class NotificationsDrawer extends StatelessWidget {
           ListState<notification.Notification>>(
         bloc: fastterNotifications,
         builder: (context, state) => _NotificationsDrawer(
-              notifications: state,
-            ),
+          notifications: state,
+        ),
       );
 }
 
 class _NotificationsDrawer extends StatelessWidget {
   const _NotificationsDrawer({
-    @required this.notifications,
-    Key key,
-  }) : super(key: key);
+    required this.notifications,
+  });
 
   final ListState<notification.Notification> notifications;
 
@@ -37,9 +36,9 @@ class _NotificationsDrawer extends StatelessWidget {
             : ListView.builder(
                 itemCount: notifications.items.length,
                 itemBuilder: (context, index) => NotificationItem(
-                      key: Key(notifications.items[index].id),
-                      notification: notifications.items[index],
-                    ),
+                  key: Key(notifications.items[index].id),
+                  notification: notifications.items[index],
+                ),
               ),
       );
 }

@@ -3,25 +3,25 @@ import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:fastter_dart/models/user.model.dart';
-import 'package:fastter_dart/store/user.dart';
+import '../models/user.model.dart';
+import '../store/user.dart';
 
 class LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
         builder: (context, userState) => _LoginForm(
-              login: (email, password) =>
-                  fastterUser.dispatch(LoginUserEvent(email, password)),
-              user: userState,
-            ),
+          login: (email, password) =>
+              fastterUser.add(LoginUserEvent(email, password)),
+          user: userState,
+        ),
       );
 }
 
 class _LoginForm extends StatefulWidget {
   const _LoginForm({
-    @required this.login,
-    @required this.user,
+    required this.login,
+    required this.user,
   });
 
   final UserState user;
@@ -49,7 +49,7 @@ class _LoginFormState extends State<_LoginForm> {
           alignment: Alignment.center,
           width: min(400, MediaQuery.of(context).size.width - 20.0),
           child: Form(
-            autovalidate: true,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Center(
               child: Column(
                 children: <Widget>[
@@ -72,13 +72,11 @@ class _LoginFormState extends State<_LoginForm> {
                       labelText: 'Password',
                     ),
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     child: const Text('Login'),
                     onPressed: _login,
                   ),
-                  Text(widget.user.errorMessage == null
-                      ? ''
-                      : widget.user.errorMessage),
+                  Text(widget.user.errorMessage ?? ''),
                 ],
               ),
             ),
