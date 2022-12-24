@@ -66,21 +66,23 @@ class _HomeAppDrawer extends StatelessWidget {
   Project? get _project {
     if (routeName == '/todos') {
       final Map<String, dynamic>? map = history.last.arguments;
-      final Project project = map?['project'];
-      return project;
-    } else {
-      return null;
+      final project = map?['project'];
+      if (project is Project) {
+        return project;
+      }
     }
+    return null;
   }
 
   Label? get _label {
     if (routeName == '/todos') {
       final Map<String, dynamic>? map = history.last.arguments;
-      final Label label = map?['label'];
-      return label;
-    } else {
-      return null;
+      final label = map?['label'];
+      if (label is Label) {
+        return label;
+      }
     }
+    return null;
   }
 
   @override

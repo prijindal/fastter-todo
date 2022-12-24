@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:fastter_todo/helpers/firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/firebase.dart';
 import '../store/user.dart';
 
 Future<void> _clearPersisted() async {

@@ -1,13 +1,12 @@
 import 'dart:io';
-import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:share/share.dart';
 
-import '../fastter/fastter.dart';
+import '../bloc.dart';
+import '../helpers/flutter_persistor.dart';
 import '../fastter/fastter_bloc.dart';
-import '../helpers/fastter_helper.dart';
 import '../helpers/navigator.dart';
 import '../helpers/responsive.dart';
 import '../helpers/theme.dart';
@@ -268,7 +267,7 @@ class _HomeAppBar extends StatelessWidget {
   }
 
   Future<void> _refresh() async {
-    startSyncAll();
+    FlutterPersistor.getInstance().load();
   }
 
   void _deleteAll(BuildContext context) {
@@ -484,26 +483,7 @@ class _HomeAppBar extends StatelessWidget {
           title: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTitle(),
-              BlocBuilder<Fastter, bool>(
-                bloc: Fastter.instance,
-                builder: (context, isConnected) => AnimatedCrossFade(
-                  duration: kThemeAnimationDuration,
-                  firstChild: Text(
-                    'Connecting...',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1
-                        ?.apply(color: Colors.white),
-                  ),
-                  secondChild: Container(),
-                  crossFadeState: isConnected
-                      ? CrossFadeState.showSecond
-                      : CrossFadeState.showFirst,
-                ),
-              ),
-            ],
+            children: [_buildTitle()],
           ),
           actions: [
             if (selectedtodos.isEmpty)

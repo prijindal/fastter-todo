@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:uuid/uuid.dart';
 
 part 'base.model.g.dart';
 
@@ -8,7 +9,7 @@ class BaseModel extends Object {
     String? id,
     DateTime? createdAt,
     DateTime? updatedAt,
-  })  : id = id ?? "",
+  })  : id = id ?? const Uuid().v4(),
         createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 

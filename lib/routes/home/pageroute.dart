@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../fastter/fastter.dart';
 import '../../helpers/responsive.dart';
 
 class HomePageRoute<T> extends MaterialPageRoute<T> {
@@ -14,9 +13,6 @@ class HomePageRoute<T> extends MaterialPageRoute<T> {
   @override
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
-    if (!Fastter.instance.state) {
-      return child;
-    }
     if (getCurrentBreakpoint(context) == ResponsiveBreakpoints.landscape) {
       return FadeTransition(
         opacity: animation,

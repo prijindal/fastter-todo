@@ -1,23 +1,13 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:fastter_todo/bloc.dart';
-import 'package:fastter_todo/helpers/fastter_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../fastter/fastter.dart';
 import '../../models/todo.model.dart';
 import '../../models/settings.model.dart';
 import '../../fastter/fastter_bloc.dart';
-import '../../store/user.dart';
-import '../../store/labels.dart';
-import '../../store/notifications.dart';
-import '../../store/projects.dart';
-import '../../store/todocomments.dart';
-import '../../store/todoreminders.dart';
 import '../../store/todos.dart';
 
-import '../../helpers/firebase.dart';
 import '../../helpers/navigator.dart';
 import '../../helpers/theme.dart';
 import '../../screens/todoedit.dart';
@@ -42,7 +32,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _initRequests();
     _getSharedText();
   }
 
@@ -69,19 +58,6 @@ class _HomePageState extends State<HomePage> {
         todo: todo,
       ),
     ));
-  }
-
-  Future<void> _initRequests() async {
-    startSyncAll();
-    fastterLabels.queries.initSubscriptions(fastterLabels.add);
-    fastterProjects.queries.initSubscriptions(fastterProjects.add);
-    fastterTodos.queries.initSubscriptions(fastterTodos.add);
-    fastterTodoComments.queries.initSubscriptions(fastterTodoComments.add);
-    fastterTodoReminders.queries.initSubscriptions(fastterTodoReminders.add);
-    fastterNotifications.queries.initSubscriptions(fastterNotifications.add);
-    Fastter.instance.onConnect = () {
-      fastterUser.add(ConfirmUserEvent(Fastter.instance.bearer));
-    };
   }
 
   @override

@@ -14,8 +14,8 @@ class LoginScreen extends StatelessWidget {
         ),
         body: Column(
           children: [
-            GoogleSignInForm(),
-            const Text('Or'),
+            // GoogleSignInForm(),
+            // const Text('Or'),
             LoginForm(),
             const Text('Or'),
             ElevatedButton(

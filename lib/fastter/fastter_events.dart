@@ -9,21 +9,21 @@ class InitStateEvent<T extends BaseModel> extends FastterEvent<T> {
   final ListState<T> initState;
 }
 
-class SetFetching<T extends BaseModel> extends FastterEvent<T> {}
+// class SetFetching<T extends BaseModel> extends FastterEvent<T> {}
 
-class SyncEvent<T extends BaseModel> extends FastterEvent<T> {
-  SyncEvent([this.filter = const <String, dynamic>{}])
-      : completer = Completer<List<T>>();
-  final Completer<List<T>> completer;
+// class SyncEvent<T extends BaseModel> extends FastterEvent<T> {
+//   SyncEvent([this.filter = const <String, dynamic>{}])
+//       : completer = Completer<List<T>>();
+//   final Completer<List<T>> completer;
 
-  Map<String, dynamic> filter;
-}
+//   Map<String, dynamic> filter;
+// }
 
-class SyncEventCompleted<T extends BaseModel> extends FastterEvent<T> {
-  SyncEventCompleted(this.items);
+// class SyncEventCompleted<T extends BaseModel> extends FastterEvent<T> {
+//   SyncEventCompleted(this.items);
 
-  final List<T> items;
-}
+//   final List<T> items;
+// }
 
 class AddEvent<T extends BaseModel> extends FastterEvent<T> {
   AddEvent(this.item) : completer = Completer<T>();
@@ -31,10 +31,10 @@ class AddEvent<T extends BaseModel> extends FastterEvent<T> {
   final Completer<T> completer;
 }
 
-class AddEventLocal<T extends BaseModel> extends FastterEvent<T> {
-  AddEventLocal(this.item);
-  final T item;
-}
+// class AddEventLocal<T extends BaseModel> extends FastterEvent<T> {
+//   AddEventLocal(this.item);
+//   final T item;
+// }
 
 class DeleteEvent<T extends BaseModel> extends FastterEvent<T> {
   DeleteEvent(this.itemid) : completer = Completer<T>();
@@ -42,10 +42,10 @@ class DeleteEvent<T extends BaseModel> extends FastterEvent<T> {
   final Completer<T> completer;
 }
 
-class DeleteEventLocal<T extends BaseModel> extends FastterEvent<T> {
-  DeleteEventLocal(this.itemid);
-  final String itemid;
-}
+// class DeleteEventLocal<T extends BaseModel> extends FastterEvent<T> {
+//   DeleteEventLocal(this.itemid);
+//   final String itemid;
+// }
 
 class UpdateEvent<T extends BaseModel> extends FastterEvent<T> {
   UpdateEvent(this.itemid, this.item) : completer = Completer<T>();
@@ -54,11 +54,11 @@ class UpdateEvent<T extends BaseModel> extends FastterEvent<T> {
   final Completer<T> completer;
 }
 
-class UpdateEventLocal<T extends BaseModel> extends FastterEvent<T> {
-  UpdateEventLocal(this.itemid, this.item);
-  final String itemid;
-  final T item;
-}
+// class UpdateEventLocal<T extends BaseModel> extends FastterEvent<T> {
+//   UpdateEventLocal(this.itemid, this.item);
+//   final String itemid;
+//   final T item;
+// }
 
 class UpdateManyEvent<T extends BaseModel> extends FastterEvent<T> {
   UpdateManyEvent(this.body);

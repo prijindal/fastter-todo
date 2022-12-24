@@ -29,16 +29,14 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  bloc: any
   chewie: any
   flutter:
     sdk: flutter
-  drift: ^2.3.0
   event_bus: any
   encrypt: any
-  # fastter_dart: 
-  #   path: /home/prijindal/projects/fastter-dart-example
   firebase_core: any
-  firebase_messaging: any
+  # firebase_messaging: any
   firebase_storage: any
   font_awesome_flutter: any
   flutter_bloc: any
@@ -52,9 +50,6 @@ dependencies:
   json_annotation: any
   flutter_keyboard_visibility: any
   package_info: any
-  path_provider: ^2.0.0
-  path: any
-  sqlite3_flutter_libs: ^0.5.0
   share: any
   shared_preferences: any
   tuple: any
@@ -66,7 +61,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: any
-  drift_dev: any
   json_serializable: any
 
   # The "flutter_lints" package below contains a set of recommended lints to

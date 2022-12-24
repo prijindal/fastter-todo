@@ -8,25 +8,17 @@ import 'package:fastter_todo/screens/loading.dart';
 
 class SettingsScreen extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
-        bloc: fastterUser,
-        builder: (context, state) => state != null && state.user != null
-            ? _SettingsScreen(
-                user: state,
-                onLogout: () => fastterUser.add(LogoutUserEvent()),
-              )
-            : LoadingScreen(),
+  Widget build(BuildContext context) => _SettingsScreen(
+        onLogout: () => fastterUser.add(LogoutUserEvent()),
       );
 }
 
 class _SettingsScreen extends StatelessWidget {
   const _SettingsScreen({
     required this.onLogout,
-    required this.user,
   });
 
   final void Function() onLogout;
-  final UserState user;
 
   Future<void> _onLogout(BuildContext context) async {
     final shouldDelete = await showDialog<bool>(
@@ -76,11 +68,15 @@ class _SettingsScreen extends StatelessWidget {
               title: const Text('Privacy Policy'),
               onTap: () => Navigator.of(context).pushNamed('/privacypolicy'),
             ),
-            ListTile(
-              leading: const Icon(Icons.exit_to_app),
-              title: const Text('Logout'),
-              subtitle: Text(user.user?.email ?? ""),
-              onTap: () => _onLogout(context),
+            BlocBuilder<UserBloc, UserState>(
+              bloc: fastterUser,
+              builder: (context, state) => state != null && state.user != null
+                  ? ListTile(
+                      leading: const Icon(Icons.exit_to_app),
+                      title: const Text('Logout'),
+                      onTap: () => _onLogout(context),
+                    )
+                  : Container(),
             )
           ],
         ),

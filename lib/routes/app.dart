@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import '../fastter/fastter.dart';
 import '../fastter/fastter_bloc.dart';
 import '../models/base.model.dart';
 import '../models/project.model.dart';
@@ -26,35 +25,22 @@ class AppContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) => BlocBuilder<UserBloc, UserState>(
         bloc: fastterUser,
-        builder: (context, state) => _AppContainer(
-          user: state,
-          confirmUser: (bearer) => fastterUser.add(ConfirmUserEvent(bearer)),
-          clearAuth: () => fastterUser.add(LogoutUserEvent()),
-        ),
+        builder: (context, state) => const _AppContainer(),
       );
 }
 
 class _AppContainer extends StatefulWidget {
-  const _AppContainer({
-    required this.user,
-    required this.confirmUser,
-    required this.clearAuth,
-  });
+  const _AppContainer();
 
-  final UserState user;
-  final void Function(String) confirmUser;
-  final void Function() clearAuth;
   @override
   _AppContainerState createState() => _AppContainerState();
 }
 
 class _AppContainerState extends State<_AppContainer> {
   final FlutterPersistor _flutterPersistor = FlutterPersistor();
-  bool _isUserLoading = true;
   bool _isTodosLoading = true;
   bool _isProjectsLoading = true;
   bool _isWaiting = true;
-  StreamSubscription<UserState>? userListener;
   StreamSubscription<ListState<Todo>>? todosListener;
   StreamSubscription<ListState<Project>>? projectsListener;
 
@@ -64,28 +50,15 @@ class _AppContainerState extends State<_AppContainer> {
     _init();
   }
 
-  bool get _isLoading =>
-      _isUserLoading || _isTodosLoading || _isProjectsLoading;
+  bool get _isLoading => _isTodosLoading || _isProjectsLoading;
 
   Future<void> _init() async {
     setState(() {
-      _isUserLoading = true;
       _isTodosLoading = true;
       _isProjectsLoading = true;
     });
     await _flutterPersistor.load();
     _enableTryLoginTimer();
-    userListener = fastterUser.stream.listen((event) {
-      if (event is UserState) {
-        print(event.bearer);
-        Fastter.instance.bearer = event.bearer;
-        Timer.run(() {
-          setState(() {
-            _isUserLoading = false;
-          });
-        });
-      }
-    });
     todosListener = fastterTodos.stream.listen((event) {
       if (event is ListState<Todo>) {
         Timer.run(() {
@@ -113,9 +86,6 @@ class _AppContainerState extends State<_AppContainer> {
     });
     Timer? periodicTimer;
     periodicTimer = Timer.periodic(const Duration(milliseconds: 100), (_timer) {
-      if (userListener != null) {
-        userListener?.cancel();
-      }
       if (todosListener != null) {
         todosListener?.cancel();
       }
@@ -128,11 +98,6 @@ class _AppContainerState extends State<_AppContainer> {
       setState(() {
         _isWaiting = false;
       });
-      if (widget.user == null || widget.user.bearer == null) {
-        widget.clearAuth();
-      } else {
-        widget.confirmUser(widget.user.bearer!);
-      }
       periodicTimer?.cancel();
     });
   }
@@ -143,12 +108,6 @@ class _AppContainerState extends State<_AppContainer> {
       return MaterialApp(
         theme: primaryTheme,
         home: LoadingScreen(),
-      );
-    }
-    if (widget.user == null || widget.user.bearer == null) {
-      return MaterialApp(
-        theme: primaryTheme,
-        home: LoginSplashScreen(),
       );
     }
     return HomeContainer();

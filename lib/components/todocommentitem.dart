@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../store/todocomments.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +119,7 @@ class _TodoCommentItem extends StatelessWidget {
                         videoEmbedder['link'].replaceAll('{{id}}', ''))) {
                       return NavigationDecision.navigate;
                     } else {
-                      launchUrlString(navigationRequest.url);
+                      launch(navigationRequest.url);
                       return NavigationDecision.prevent;
                     }
                   }))

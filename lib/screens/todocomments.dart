@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import '../store/todocomments.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ import '../models/todocomment.model.dart';
 import '../components/todocommentinput.dart';
 import '../components/todocommentitem.dart';
 import '../helpers/theme.dart';
+import '../helpers/flutter_persistor.dart';
 
 class TodoCommentsScreen extends StatelessWidget {
   const TodoCommentsScreen({
@@ -34,7 +36,7 @@ class TodoCommentsScreen extends StatelessWidget {
                     todocomment.todo != null && todocomment.todo.id == todo.id)
                 .toList(),
           ),
-          syncStart: () => fastterTodoComments.add(SyncEvent<TodoComment>()),
+          syncStart: () => FlutterPersistor.getInstance().load(),
         ),
       );
 }

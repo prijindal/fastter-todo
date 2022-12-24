@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import '../store/projects.dart' show fastterProjects;
 import '../store/selectedtodos.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +16,7 @@ import '../components/homeappdrawer.dart';
 import '../components/notificationsdrawer.dart';
 import '../components/todoinput.dart';
 import '../components/todoitem.dart';
+import '../helpers/flutter_persistor.dart';
 import '../helpers/responsive.dart';
 import 'todoeditbar.dart';
 
@@ -51,9 +53,7 @@ class TodoList extends StatelessWidget {
             filter: filter,
             title: title,
             syncStart: () {
-              final action = SyncEvent<Todo>();
-              fastterTodos.add(action);
-              return action.completer;
+              FlutterPersistor.getInstance().load();
             },
           ),
         ),
@@ -71,7 +71,7 @@ class _TodoList extends StatefulWidget {
   });
 
   final ListState<Todo> todos;
-  final Completer Function() syncStart;
+  final VoidCallback syncStart;
   final bool categoryView;
   final String title;
   final List<String> selectedTodos;
@@ -275,9 +275,8 @@ class _TodoListState extends State<_TodoList> {
           );
   }
 
-  Future<void> _onRefresh() {
-    final completer = widget.syncStart();
-    return completer.future;
+  Future<void> _onRefresh() async {
+    widget.syncStart();
   }
 
   Widget _build() => RefreshIndicator(

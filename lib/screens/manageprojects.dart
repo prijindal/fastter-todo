@@ -23,7 +23,7 @@ class ManageProjectsScreen extends StatelessWidget {
           projects: state,
           deleteProject: (project) {
             fastterProjects.add(DeleteEvent<Project>(project.id));
-            fastterTodos.add(SyncEvent<Todo>());
+            // fastterTodos.add(SyncEvent<Todo>());
           },
           updateColor: (project, color) {
             fastterProjects.add(

@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:bloc/bloc.dart';
 
-import '../fastter/fastter.dart';
 import '../models/settings.model.dart';
 import '../models/user.model.dart';
 
@@ -95,7 +93,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           isLoading: true,
           errorMessage: null,
         ));
-        await _confirmUser(event);
+        // await _confirmUser(event);
       } else if (event is GoogleLoginUserEvent) {
         emit(UserState(
           bearer: null,
@@ -104,7 +102,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           isLoading: true,
           errorMessage: null,
         ));
-        await _googleLogin(event);
+        // await _googleLogin(event);
       } else if (event is LoginUserEvent) {
         emit(UserState(
           user: null,
@@ -113,7 +111,15 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           errorMessage: null,
           initLoaded: true,
         ));
-        await _loginUser(event);
+        add(
+          LoginUserSuccessfull(
+            User(
+                name: "Priyanshu Jindal",
+                email: "priyanshujindal1995@gmail.com"),
+            '',
+          ),
+        );
+        // await _loginUser(event);
       } else if (event is SignupUserEvent) {
         emit(UserState(
           user: null,
@@ -122,7 +128,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           errorMessage: null,
           initLoaded: true,
         ));
-        await _signupUser(event);
+        // await _signupUser(event);
       } else if (event is UpdateUserEvent) {
         emit(UserState(
           user: User(
@@ -139,9 +145,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           isLoading: false,
           errorMessage: null,
         ));
-        await _updateUser(event);
+        // await _updateUser(event);
       } else if (event is UpdateUserPasswordEvent) {
-        await _updatePassword(event);
+        // await _updatePassword(event);
       } else if (event is LogoutUserEvent) {
         emit(UserState(
           user: null,
@@ -151,7 +157,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           errorMessage: null,
         ));
         add(ClearAll());
-        Fastter.instance.logout();
+        // Fastter.instance.logout();
         if (onLogout != null) {
           onLogout!();
         }
@@ -163,7 +169,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           isLoading: false,
           errorMessage: null,
         ));
-        await _deleteUser(event);
+        // await _deleteUser(event);
       } else if (event is LoginUserSuccessfull) {
         emit(UserState(
           user: event.user,
@@ -172,12 +178,10 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           isLoading: false,
           errorMessage: null,
         ));
-        Fastter.instance.bearer = event.bearer;
-        Fastter.instance.user = event.user;
-        _initMessaging();
+        // _initMessaging();
       } else if (event is LoginUserError) {
         add(ClearAll());
-        Fastter.instance.logout();
+        // Fastter.instance.logout();
         if (onLogout != null) {
           onLogout!();
         }
@@ -192,180 +196,4 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   final Future<String> Function()? initMessaging;
   final void Function()? onLogout;
-
-  Future<void> _loginUser(LoginUserEvent event) async {
-    add(
-      LoginUserSuccessfull(
-        User(name: "Priyanshu Jindal", email: "priyanshujindal1995@gmail.com"),
-        '',
-      ),
-    );
-    return;
-    try {
-      final response =
-          await Fastter.instance.login(event.email, event.password);
-      if (response.login.user != null) {
-        add(
-          LoginUserSuccessfull(response.login.user, response.login.bearer),
-        );
-      } else {
-        throw Exception('Wrong username password');
-      }
-    } on Exception catch (error) {
-      add(LoginUserError(error.toString()));
-    }
-  }
-
-  Future<void> _googleLogin(GoogleLoginUserEvent event) async {
-    try {
-      final resp = await Fastter.instance.request(
-        SingleRequest(
-          query: '''
-            mutation(\$idToken: String!) {
-              login:loginWithGoogle(input:{idToken:\$idToken}) {bearer, user {...user}}
-            }
-            $userFragment
-            ''',
-          variables: <String, dynamic>{
-            'idToken': event.idToken,
-          },
-        ),
-      );
-
-      final response = LoginData.fromJson(resp);
-      if (response.login.user != null) {
-        Fastter.instance.bearer = response.login.bearer;
-        Fastter.instance.auth();
-        add(LoginUserSuccessfull(
-          response.login.user,
-          response.login.bearer,
-        ));
-      } else {
-        throw Exception('Wrong username password');
-      }
-    } on Exception catch (error) {
-      add(LoginUserError(error.toString()));
-    }
-  }
-
-  Future<void> _confirmUser(ConfirmUserEvent event) async {
-    Fastter.instance.bearer = event.bearer;
-    try {
-      final response = await Fastter.instance.checkCurrent();
-      Fastter.instance.auth();
-      if (response != null && response.current != null) {
-        add(LoginUserSuccessfull(response.current!, event.bearer!));
-      } else {
-        throw Exception('Invalid User');
-      }
-    } on Exception catch (error) {
-      add(LoginUserError(error.toString()));
-    }
-    event.completer.complete();
-  }
-
-  Future<void> _signupUser(SignupUserEvent event) async {
-    try {
-      final response =
-          await Fastter.instance.signup(event.email, event.password);
-      if (response.signup.user != null) {
-        add(
-          LoginUserSuccessfull(response.signup.user, response.signup.bearer),
-        );
-      } else {
-        throw Exception('Wrong username password');
-      }
-    } on Exception catch (error) {
-      add(LoginUserError(error.toString()));
-    }
-  }
-
-  Future<void> _updateUser(UpdateUserEvent event) async {
-    try {
-      await Fastter.instance.request(
-        SingleRequest(
-          query: '''
-              mutation(\$email:String, \$name:String, \$picture: String, \$settings: UserSettingsInput) {
-                updateUser(input:{email:\$email,name:\$name, picture: \$picture, settings: \$settings}) {
-                  ...user
-                }
-              }
-              $userFragment
-            ''',
-          variables: <String, dynamic>{
-            'name': event.name,
-            'email': event.email,
-            'picture': event.picture,
-            'settings': event.settings,
-          },
-        ),
-      );
-      event.completer.complete();
-    } on Exception catch (error) {
-      add(LoginUserError(error.toString()));
-    }
-  }
-
-  Future<void> _updatePassword(UpdateUserPasswordEvent event) async {
-    try {
-      await Fastter.instance.request(
-        SingleRequest(
-          query: '''
-              mutation(\$password:String) {
-                updatePassword(input:{password:\$password}) {
-                  ...user
-                }
-              }
-              $userFragment
-            ''',
-          variables: <String, dynamic>{
-            'password': event.password,
-          },
-        ),
-      );
-      event.completer.complete();
-    } on Exception catch (error) {
-      add(LoginUserError(error.toString()));
-    }
-  }
-
-  Future<void> _deleteUser(DeleteUserEvent event) async {
-    await Fastter.instance.request(
-      SingleRequest(
-        query: '''
-          mutation {
-            deleteUser {
-              status
-            }
-          }
-        ''',
-        variables: <String, dynamic>{},
-      ),
-    );
-    add(LogoutUserEvent());
-  }
-
-  Future<void> _initMessaging() async {
-    if (initMessaging != null) {
-      final fcmToken = await initMessaging!();
-      if (fcmToken != null) {
-        await Fastter.instance.request(
-          SingleRequest(
-            query: '''
-                mutation(\$fcmToken: String!, \$platform:String!) {
-                  registerFcmCurrentUser(fcmToken: \$fcmToken, platform:\$platform) {
-                    registered
-                  }
-                }
-              ''',
-            variables: <String, dynamic>{
-              'fcmToken': fcmToken,
-              'platform': Platform.isAndroid ? 'android' : 'ios',
-            },
-            skipResponse: true,
-          ),
-        );
-      }
-    }
-  }
 }
