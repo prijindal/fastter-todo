@@ -107,7 +107,7 @@ class _BaseExpansionTileState<T extends BaseModel>
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -119,9 +119,9 @@ class _BaseExpansionTileState<T extends BaseModel>
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
-        _controller?.forward();
+        _controller.forward();
       } else {
-        _controller?.reverse().then<void>((value) {
+        _controller.reverse().then<void>((value) {
           if (!mounted) {
             return;
           }
@@ -200,7 +200,7 @@ class _BaseExpansionTileState<T extends BaseModel>
   @override
   Widget build(BuildContext context) {
     final closed =
-        !_isExpanded && _controller != null && _controller!.isDismissed;
+        !_isExpanded && _controller != null && _controller.isDismissed;
     return AnimatedBuilder(
       animation: _controller,
       builder: _buildChildren,
