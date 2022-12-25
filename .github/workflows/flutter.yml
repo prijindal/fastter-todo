@@ -24,15 +24,16 @@ jobs:
       - run: flutter --version
       - run: flutter pub get
       # - run: flutter test
-      - name: generate debug key
+      - name: save release key
         run: |
-          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug"
-          echo "storeFile=$(pwd)/debug.keystore" >> android/key.properties
-          echo "keyAlias=androiddebugkey" >> android/key.properties
-          echo "keyPassword=android" >> android/key.properties
-          echo "storePassword=android" >> android/key.properties
+          echo "$KEY_FILE_BASE64" | base64 -d > "$(pwd)/release.keystore"
+          echo "storeFile=$(pwd)/release.keystore" >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+          echo "storePassword=$KEY_PASSWORD" >> android/key.properties
 
       - run: flutter build apk --release
+      - run: flutter build appbundle --release
       - uses: actions/upload-artifact@v3
         with:
           name: android
