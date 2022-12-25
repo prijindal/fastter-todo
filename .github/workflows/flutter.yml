@@ -32,6 +32,7 @@ jobs:
           echo "keyAlias=$KEY_ALIAS" >> android/key.properties
           echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
           echo "storePassword=$KEY_PASSWORD" >> android/key.properties
+          echo "VERSION_CODE=`expr 185 + $GITHUB_RUN_NUMBER`" > android/version.properties
 
       # - run: flutter build apk --release
       - run: flutter build appbundle --release
