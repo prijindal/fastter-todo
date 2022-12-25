@@ -43,7 +43,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.prijindal.fastter_todo
-          track: INTERNAL
+          track: internal
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
           mappingFile: build/app/outputs/mapping/release/mapping.txt
           debugSymbols: build/app/intermediates/merged_native_libs/release/out/lib
