@@ -1,8 +1,7 @@
 on:
   push:
     branches:
-      - '*'
-
+      - "*"
 
 name: Flutter
 
@@ -13,10 +12,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable' # or: 'beta', 'dev' or 'master'
-     - run: |
-        sudo apt-get update -y
-        sudo apt-get install -y ninja-build libgtk-3-dev
+          channel: "stable" # or: 'beta', 'dev' or 'master'
+      # - run: |
+      #   sudo apt-get update -y
+      #   sudo apt-get install -y ninja-build libgtk-3-dev
       - run: flutter --version
       - run: flutter pub get
       # - run: flutter test
@@ -29,7 +28,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable' # or: 'beta', 'dev' or 'master'
+          channel: "stable" # or: 'beta', 'dev' or 'master'
       - run: flutter --version
       - run: flutter pub get
       # - run: flutter test
@@ -42,7 +41,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable' # or: 'beta', 'dev' or 'master'
+          channel: "stable" # or: 'beta', 'dev' or 'master'
       - run: flutter --version
       - run: flutter pub get
       # - run: flutter test
