@@ -25,6 +25,10 @@ jobs:
       - run: flutter pub get
       # - run: flutter test
       - name: save release key
+        env:
+          KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           echo "$KEY_FILE_BASE64" | base64 -d > "$(pwd)/release.keystore"
           echo "storeFile=$(pwd)/release.keystore" >> android/key.properties
@@ -61,11 +65,11 @@ jobs:
       - run: flutter --version
       - run: flutter pub get
       # - run: flutter test
-      - run: flutter build ios --release --no-codesign
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ios
-          path: build/ios
+      # - run: flutter build ios --release --no-codesign
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ios
+      #     path: build/ios
       # - run: flutter build macos --release
       # - uses: actions/upload-artifact@v3
       #   with:
