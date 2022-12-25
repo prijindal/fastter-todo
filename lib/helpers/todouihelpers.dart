@@ -1,19 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
 import '../components/date_picker.dart';
 
-// Future<DatePickerResponse> todoSelectDate(BuildContext context,
-//     [DateTime? initialDate, bool? allowNull]) {
-//   final now = DateTime.now();
-//   final selectedDate = showDatePicker(
-//     context: context,
-//     initialDate: initialDate == null ? now : initialDate,
-//     firstDate: now.subtract(const Duration(days: 365)),
-//     lastDate: now.add(const Duration(days: 365)),
-//     allowNull: allowNull,
-//   );
-//   return selectedDate;
-// }
+Future<DateTime?> todoSelectDate(BuildContext context,
+    [DateTime? initialDate, bool? allowNull]) {
+  final now = DateTime.now();
+  final selectedDate = showDatePicker(
+    context: context,
+    initialDate: initialDate ?? now,
+    firstDate: now.subtract(const Duration(days: 365)),
+    lastDate: now.add(const Duration(days: 365)),
+  );
+  return selectedDate;
+}
 
 String dueDateFormatter(DateTime? dateUtc) {
   if (dateUtc == null) {

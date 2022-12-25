@@ -84,37 +84,46 @@ class _TodoList extends StatefulWidget {
 class _TodoListState extends State<_TodoList> {
   bool _showInput = false;
 
-  List<Widget> _buildBottom() => [
-        if (widget.selectedTodos.isEmpty && _showInput)
-          Positioned(
-            bottom: 0,
-            right: 2,
-            left: 2,
-            child: BlocBuilder<FastterBloc<Project>, ListState<Project>>(
-              bloc: fastterProjects,
-              builder: (context, projects) => TodoInput(
-                project: (widget.filter.containsKey('project') &&
-                        projects.items.isNotEmpty)
-                    ? projects.items.singleWhere(
-                        (project) => project.id == widget.filter['project'],
-                      )
-                    : null,
-                onBackButton: () {
-                  setState(() {
-                    _showInput = false;
-                  });
-                },
-              ),
+  Project? _filterProject(ListState<Project> projects) {
+    if (widget.filter.containsKey('project') && projects.items.isNotEmpty) {
+      final filteredProjects = projects.items.where(
+        (project) => project.id == widget.filter['project'],
+      );
+      if (filteredProjects.isNotEmpty) {
+        return filteredProjects.first;
+      }
+    }
+    return null;
+  }
+
+  List<Widget> _buildBottom() {
+    return [
+      if (widget.selectedTodos.isEmpty && _showInput)
+        Positioned(
+          bottom: 0,
+          right: 2,
+          left: 2,
+          child: BlocBuilder<FastterBloc<Project>, ListState<Project>>(
+            bloc: fastterProjects,
+            builder: (context, projects) => TodoInput(
+              project: _filterProject(projects),
+              onBackButton: () {
+                setState(() {
+                  _showInput = false;
+                });
+              },
             ),
           ),
-        if (widget.selectedTodos.isNotEmpty)
-          Positioned(
-            bottom: 0,
-            right: 2,
-            left: 2,
-            child: TodoEditBar(),
-          ),
-      ];
+        ),
+      if (widget.selectedTodos.isNotEmpty)
+        Positioned(
+          bottom: 0,
+          right: 2,
+          left: 2,
+          child: TodoEditBar(),
+        ),
+    ];
+  }
 
   String _dueDateCategorize(DateTime dueDate) {
     if (dueDate == null) {

@@ -160,11 +160,14 @@ class _TodoEditBar extends StatelessWidget {
 
   Future<void> _showDatePicker(BuildContext context) async {
     final todoid = selectedTodos[0];
-    final todo = todos.items.singleWhere((item) => item.id == todoid);
-    // final selectedDate = await todoSelectDate(context, todo.dueDate);
-    // if (selectedDate != null) {
-    //   onChangeDate(selectedDate.dateTime);
-    // }
+    final filteredTodos = todos.items.where((item) => item.id == todoid);
+    if (filteredTodos.isNotEmpty) {
+      final selectedDate =
+          await todoSelectDate(context, filteredTodos.first.dueDate);
+      if (selectedDate != null) {
+        onChangeDate(selectedDate);
+      }
+    }
   }
 
   Widget _buildMarkCompletedButton() => Container(

@@ -153,15 +153,15 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
     setState(() {
       _isPreventClose = true;
     });
-    // todoSelectDate(context).then((date) {
-    //   setState(() {
-    //     if (date != null) {
-    //       dueDate = date.dateTime;
-    //     }
-    //     _isPreventClose = false;
-    //     _focusKeyboard();
-    //   });
-    // });
+    todoSelectDate(context).then((date) {
+      setState(() {
+        if (date != null) {
+          dueDate = date;
+        }
+        _isPreventClose = false;
+        _focusKeyboard();
+      });
+    });
   }
 
   void _onSelectProject(Project? selectedproject) {

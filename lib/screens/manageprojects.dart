@@ -145,16 +145,15 @@ class _ManageProjectsScreenState extends State<_ManageProjectsScreen> {
   Widget _buildEditButton() {
     if (selectedProjects.isNotEmpty && widget.projects.items.isNotEmpty) {
       final todoid = selectedProjects[0];
-      final project =
-          widget.projects.items.singleWhere((item) => item.id == todoid);
-      if (project != null) {
+      final projects = widget.projects.items.where((item) => item.id == todoid);
+      if (projects.isNotEmpty) {
         return IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
             Navigator.of(context).push<void>(
               MaterialPageRoute<void>(
                 builder: (context) => EditProjectScreen(
-                  project: project,
+                  project: projects.first,
                 ),
               ),
             );

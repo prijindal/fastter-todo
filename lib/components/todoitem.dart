@@ -62,14 +62,14 @@ class _TodoItem extends StatelessWidget {
   final int comments;
 
   void _selectDate(BuildContext context) {
-    // todoSelectDate(context, todo.dueDate).then((dueDate) {
-    //   if (dueDate != null) {
-    //     todo.dueDate = dueDate.dateTime;
-    //   }
-    //   updateTodo(
-    //     todo,
-    //   );
-    // });
+    todoSelectDate(context, todo.dueDate).then((dueDate) {
+      if (dueDate != null) {
+        todo.dueDate = dueDate;
+      }
+      updateTodo(
+        todo,
+      );
+    });
   }
 
   Future<bool?> _confirmDelete(BuildContext context) => showDialog<bool>(

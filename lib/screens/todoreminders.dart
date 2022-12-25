@@ -66,37 +66,37 @@ class _TodoRemindersScreen extends StatelessWidget {
 
   Future<void> _newReminder(BuildContext context) async {
     final now = DateTime.now();
-    // final dateResponse = await todoSelectDate(context, now, false);
-    // if (dateResponse != null) {
-    //   final date = dateResponse.dateTime;
-    //   final time = await showTimePicker(
-    //     context: context,
-    //     initialTime: TimeOfDay(minute: date.minute, hour: date.hour),
-    //   );
-    //   if (time != null) {
-    //     final newTime =
-    //         DateTime(date.year, date.month, date.day, time.hour, time.minute);
-    //     final newReminder = await addReminder(
-    //       TodoReminder(
-    //         time: newTime.toUtc(),
-    //         title: 'New Reminder',
-    //         todo: todo,
-    //         completed: false,
-    //       ),
-    //     );
-    //     if (newReminder != null) {
-    //       _scaffoldKey.currentState.showSnackBar(
-    //         SnackBar(
-    //           content: const Text('New Reminder Created'),
-    //           action: SnackBarAction(
-    //             label: 'Undo',
-    //             onPressed: () => deleteReminder(newReminder.id),
-    //           ),
-    //         ),
-    //       );
-    //     }
-    //   }
-    // }
+    final dateResponse = await todoSelectDate(context, now, false);
+    if (dateResponse != null) {
+      final date = dateResponse;
+      final time = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay(minute: date.minute, hour: date.hour),
+      );
+      if (time != null) {
+        final newTime =
+            DateTime(date.year, date.month, date.day, time.hour, time.minute);
+        final newReminder = await addReminder(
+          TodoReminder(
+            time: newTime.toUtc(),
+            title: 'New Reminder',
+            todo: todo,
+            completed: false,
+          ),
+        );
+        if (newReminder != null) {
+          _scaffoldKey.currentState?.showSnackBar(
+            SnackBar(
+              content: const Text('New Reminder Created'),
+              action: SnackBarAction(
+                label: 'Undo',
+                onPressed: () => deleteReminder(newReminder.id),
+              ),
+            ),
+          );
+        }
+      }
+    }
   }
 
   String _formattedTime(TodoReminder todoReminder) =>

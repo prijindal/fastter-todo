@@ -82,16 +82,15 @@ class _ManageLabelsScreenState extends State<_ManageLabelsScreen> {
   Widget _buildEditButton() {
     if (selectedLabels.isNotEmpty && widget.labels.items.isNotEmpty) {
       final todoid = selectedLabels[0];
-      final label =
-          widget.labels.items.singleWhere((item) => item.id == todoid);
-      if (label != null) {
+      final labels = widget.labels.items.where((item) => item.id == todoid);
+      if (labels.isNotEmpty) {
         return IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
             Navigator.of(context).push<void>(
               MaterialPageRoute<void>(
                 builder: (context) => EditLabelScreen(
-                  label: label,
+                  label: labels.first,
                 ),
               ),
             );
