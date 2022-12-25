@@ -7,7 +7,7 @@ on:
 name: Flutter
 
 jobs:
-  build_linux:
+  linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,7 +23,7 @@ jobs:
       - run: flutter build web --release
       - run: flutter build linux --release
 
-  build_macos:
+  macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -36,7 +36,7 @@ jobs:
       - run: flutter build ios --release --no-codesign
       - run: flutter build macos --release
 
-  build_windows:
+  windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
