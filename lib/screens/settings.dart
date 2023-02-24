@@ -1,6 +1,7 @@
 import 'package:fastter_todo/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../models/user.model.dart';
 import '../store/user.dart';
@@ -66,7 +67,8 @@ class _SettingsScreen extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('Privacy Policy'),
-              onTap: () => Navigator.of(context).pushNamed('/privacypolicy'),
+              onTap: () => launchUrlString(
+                  'https://fastter-todo.web.app/privacy-policy.html'),
             ),
             BlocBuilder<UserBloc, UserState>(
               bloc: fastterUser,

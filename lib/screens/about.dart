@@ -54,11 +54,11 @@ class _AboutScreen extends State<AboutScreen> {
                       children: <Widget>[
                         Text(
                           _applicationName,
-                          style: Theme.of(context).textTheme.headline1,
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                         Text(
                           _applicationVersion,
-                          style: Theme.of(context).textTheme.bodyText1,
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         Container(height: 18),
                       ],
@@ -69,7 +69,7 @@ class _AboutScreen extends State<AboutScreen> {
             ),
             Container(
               margin: const EdgeInsets.only(bottom: 6),
-              child: Text('Made by'),
+              child: const Text('Made by'),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -78,7 +78,7 @@ class _AboutScreen extends State<AboutScreen> {
                 Container(
                   height: 50,
                   margin: const EdgeInsets.only(right: 6),
-                  child: ImageViewer(
+                  child: const ImageViewer(
                     NetworkImage(
                       'https://avatars2.githubusercontent.com/u/10034872?s=50&v=4',
                     ),
@@ -87,9 +87,7 @@ class _AboutScreen extends State<AboutScreen> {
                     ),
                   ),
                 ),
-                Container(
-                  child: Text('Priyanshu Jindal'),
-                ),
+                const Text('Priyanshu Jindal'),
               ],
             ),
             TextButton(

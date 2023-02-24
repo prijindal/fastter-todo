@@ -9,7 +9,6 @@ import '../../models/todo.model.dart';
 import '../../components/todolist.dart';
 import '../../screens/about.dart';
 import '../../screens/generalsettings.dart';
-import '../../screens/privacypolicy.dart';
 import '../../screens/profile.dart';
 import '../../screens/settings.dart';
 import '../../screens/todoedit.dart';
@@ -81,8 +80,6 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     return HomePageRoute<void>(builder: (context) => GeneralSettingsScreen());
   } else if (name == '/about') {
     return HomePageRoute<void>(builder: (context) => AboutScreen());
-  } else if (name == '/privacypolicy') {
-    return HomePageRoute<void>(builder: (context) => PrivacyPolicyScreen());
   }
   return HomePageRoute<void>(
     builder: (context) => Scaffold(

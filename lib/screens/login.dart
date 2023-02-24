@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../components/googlesigninform.dart';
 import '../components/loginform.dart';
 import 'about.dart';
-import 'privacypolicy.dart';
 import 'signup.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -44,11 +44,8 @@ class LoginScreen extends StatelessWidget {
               child: const Text('Read Our Privacy Policy'),
               // color: Colors.grey[300],
               onPressed: () {
-                Navigator.of(context).push<void>(
-                  MaterialPageRoute<void>(
-                    builder: (context) => PrivacyPolicyScreen(),
-                  ),
-                );
+                launchUrlString(
+                    'https://fastter-todo.web.app/privacy-policy.html');
               },
             ),
           ],
