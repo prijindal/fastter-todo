@@ -61,16 +61,14 @@ class _TodoInputState extends State<_TodoInput> with WidgetsBindingObserver {
       project = widget.project;
     }
     WidgetsBinding.instance.addObserver(this);
-    if (Platform.isAndroid || Platform.isIOS) {
-      var keyboardVisibilityController = KeyboardVisibilityController();
-      subscribingId = keyboardVisibilityController.onChange.listen((visible) {
-        if (visible == false) {
-          _unFocusKeyboard();
-        } else {
-          _focusKeyboard();
-        }
-      });
-    }
+    var keyboardVisibilityController = KeyboardVisibilityController();
+    subscribingId = keyboardVisibilityController.onChange.listen((visible) {
+      if (visible == false) {
+        _unFocusKeyboard();
+      } else {
+        _focusKeyboard();
+      }
+    });
   }
 
   @override

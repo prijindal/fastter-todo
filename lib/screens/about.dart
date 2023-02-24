@@ -19,14 +19,12 @@ class _AboutScreen extends State<AboutScreen> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid || Platform.isIOS) {
-      PackageInfo.fromPlatform().then((packageInfo) {
-        setState(() {
-          _applicationName = packageInfo.appName;
-          _applicationVersion = packageInfo.version;
-        });
+    PackageInfo.fromPlatform().then((packageInfo) {
+      setState(() {
+        _applicationName = packageInfo.appName;
+        _applicationVersion = packageInfo.version;
       });
-    }
+    });
   }
 
   @override

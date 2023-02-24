@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../bloc.dart';
 import '../helpers/flutter_persistor.dart';
@@ -388,23 +388,21 @@ class _HomeAppBar extends StatelessWidget {
         itemBuilder: (context) {
           if (selectedtodos.isNotEmpty) {
             return [
-              if (Platform.isAndroid || Platform.isIOS)
-                const PopupMenuItem<_PopupAction>(
-                  child: Text('Copy'),
-                  value: _PopupAction.copy,
-                ),
-              if (Platform.isAndroid || Platform.isIOS)
-                const PopupMenuItem<_PopupAction>(
-                  child: Text('Share'),
-                  value: _PopupAction.share,
-                ),
               const PopupMenuItem<_PopupAction>(
-                child: Text('Attach To'),
-                value: _PopupAction.attach,
+                value: _PopupAction.copy,
+                child: Text('Copy'),
               ),
               const PopupMenuItem<_PopupAction>(
-                child: Text('Delete'),
+                value: _PopupAction.share,
+                child: Text('Share'),
+              ),
+              const PopupMenuItem<_PopupAction>(
+                value: _PopupAction.attach,
+                child: Text('Attach To'),
+              ),
+              const PopupMenuItem<_PopupAction>(
                 value: _PopupAction.delete,
+                child: Text('Delete'),
               )
             ];
           } else {

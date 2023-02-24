@@ -50,7 +50,7 @@ dependencies:
   json_annotation: any
   flutter_keyboard_visibility: any
   package_info: any
-  share: any
+  share_plus: any
   shared_preferences: any
   tuple: any
   url_launcher: any

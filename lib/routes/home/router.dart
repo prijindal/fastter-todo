@@ -36,18 +36,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _getSharedText() async {
-    if (Platform.isAndroid || Platform.isIOS) {
-      final sharedData = await platform.invokeMethod<String>('getSharedText');
-      print(sharedData);
-      if (sharedData != null && sharedData.isNotEmpty) {
-        final event = AddEvent<Todo>(Todo(title: sharedData));
-        fastterTodos.add(event);
-        final todo = await event.completer.future;
-        if (navigatorKey.currentState != null) {
-          _openNewTodo(todo);
-        } else {
-          Timer(const Duration(milliseconds: 500), () => _openNewTodo(todo));
-        }
+    final sharedData = await platform.invokeMethod<String>('getSharedText');
+    print(sharedData);
+    if (sharedData != null && sharedData.isNotEmpty) {
+      final event = AddEvent<Todo>(Todo(title: sharedData));
+      fastterTodos.add(event);
+      final todo = await event.completer.future;
+      if (navigatorKey.currentState != null) {
+        _openNewTodo(todo);
+      } else {
+        Timer(const Duration(milliseconds: 500), () => _openNewTodo(todo));
       }
     }
   }

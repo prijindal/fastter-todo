@@ -16,20 +16,13 @@ class _TodoItemTitleState extends State<TodoItemTitle> {
   String decryptedText = '';
 
   Future<void> decrypt(String password) async {
-    if (Platform.isAndroid || Platform.isIOS) {
-      final encryptionService = EncryptionService.getInstance();
-      encryptionService.setEncryptionKey(password, true);
-      final decrypt = encryptionService.decrypt(widget.todo.title);
-      setState(() {
-        decryptedText = decrypt;
-        decrypted = true;
-      });
-    } else {
-      setState(() {
-        decryptedText = 'Not yet implemented';
-        decrypted = true;
-      });
-    }
+    final encryptionService = EncryptionService.getInstance();
+    encryptionService.setEncryptionKey(password, true);
+    final decrypt = encryptionService.decrypt(widget.todo.title);
+    setState(() {
+      decryptedText = decrypt;
+      decrypted = true;
+    });
   }
 
   Future<void> _inputPassword() async {
