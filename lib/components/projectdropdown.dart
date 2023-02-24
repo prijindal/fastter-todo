@@ -56,7 +56,7 @@ class _ProjectDropdown extends StatelessWidget {
       onOpening!();
     }
     final RenderBox? overlay =
-        Overlay.of(context)?.context.findRenderObject() as RenderBox?;
+        Overlay.of(context).context.findRenderObject() as RenderBox?;
     final RenderBox? renderBox =
         _menuKey.currentContext?.findRenderObject() as RenderBox?;
     return renderBox != null && overlay != null

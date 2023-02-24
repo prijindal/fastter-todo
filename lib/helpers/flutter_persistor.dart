@@ -126,34 +126,22 @@ class FlutterPersistor {
 
   void initListeners() {
     fastterUser.stream.listen((data) {
-      if (data != null && data.bearer != null) {
-        _saveKey('user', data.toJson());
-      }
+      _saveKey('user', data.toJson());
     });
     fastterTodos.stream.listen((data) {
-      if (data != null && data.items != null && data.items.isNotEmpty) {
-        _saveKey('todos', data.toJson());
-      }
+      _saveKey('todos', data.toJson());
     });
     fastterProjects.stream.listen((data) {
-      if (data != null && data.items != null && data.items.isNotEmpty) {
-        _saveKey('projects', data.toJson());
-      }
+      _saveKey('projects', data.toJson());
     });
     fastterLabels.stream.listen((data) {
-      if (data != null && data.items != null && data.items.isNotEmpty) {
-        _saveKey('labels', data.toJson());
-      }
+      _saveKey('labels', data.toJson());
     });
     fastterTodoComments.stream.listen((data) {
-      if (data != null && data.items != null && data.items.isNotEmpty) {
-        _saveKey('todoComments', data.toJson());
-      }
+      _saveKey('todoComments', data.toJson());
     });
     fastterTodoReminders.stream.listen((data) {
-      if (data != null && data.items != null && data.items.isNotEmpty) {
-        _saveKey('todoReminders', data.toJson());
-      }
+      _saveKey('todoReminders', data.toJson());
     });
   }
 

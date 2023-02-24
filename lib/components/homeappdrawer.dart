@@ -56,7 +56,7 @@ class _HomeAppDrawer extends StatelessWidget {
     if (!disablePop) {
       Navigator.pop(context);
     }
-    Navigator.of(context).pushReplacementNamed(routeName, arguments: arguments);
+    Navigator.of(context).pushNamed(routeName, arguments: arguments);
     history.add(RouteInfo(routeName, arguments: arguments));
   }
 

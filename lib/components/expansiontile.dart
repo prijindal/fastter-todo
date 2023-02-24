@@ -99,7 +99,7 @@ class _BaseExpansionTileState<T extends BaseModel>
     _backgroundColor =
         _controller.drive(_backgroundColorTween.chain(_easeOutTween));
 
-    _isExpanded = PageStorage.of(context)?.readState(context) != null;
+    _isExpanded = PageStorage.of(context).readState(context) != null;
     if (_isExpanded) {
       _controller.value = 1.0;
     }
@@ -130,7 +130,7 @@ class _BaseExpansionTileState<T extends BaseModel>
           });
         });
       }
-      PageStorage.of(context)?.writeState(context, _isExpanded);
+      PageStorage.of(context).writeState(context, _isExpanded);
     });
   }
 
