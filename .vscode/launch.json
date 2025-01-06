@@ -5,18 +5,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "fastter-todo",
+      "name": "fastter_todo",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "fastter-todo (profile mode)",
+      "name": "fastter_todo (profile mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile"
     },
     {
-      "name": "fastter-todo (release mode)",
+      "name": "fastter_todo (release mode)",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release"

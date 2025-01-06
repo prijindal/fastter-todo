@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "fastter_todo" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "fastter_todo" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022 com.prijindal. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.prijindal. All rights reserved." "\0"
             VALUE "OriginalFilename", "fastter_todo.exe" "\0"
             VALUE "ProductName", "fastter_todo" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

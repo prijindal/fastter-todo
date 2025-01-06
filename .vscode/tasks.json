@@ -1,0 +1,18 @@
+{
+    "tasks": [
+        {
+            "type": "dart",
+            "command": "dart",
+            "args": [
+                "run",
+                "build_runner",
+                "build",
+                "--delete-conflicting-outputs"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "label": "dart: dart run build_runner build --delete-conflicting-outputs",
+            "detail": ""
+        }
+    ]
+}
