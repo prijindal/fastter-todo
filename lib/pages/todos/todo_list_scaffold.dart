@@ -12,9 +12,13 @@ class TodoListScaffold extends StatefulWidget {
     super.key,
     this.appBar,
     this.projectFilter,
+    this.tagFilter,
+    this.daysAhead,
   });
 
   final String? projectFilter;
+  final String? tagFilter;
+  final int? daysAhead;
 
   /// An app bar to display at the top of the scaffold.
   final PreferredSizeWidget? appBar;
@@ -42,6 +46,8 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
   Widget _buildList() {
     return TodoList(
       projectFilter: widget.projectFilter,
+      tagFilter: widget.tagFilter,
+      daysAhead: widget.daysAhead,
     );
   }
 

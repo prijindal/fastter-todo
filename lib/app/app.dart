@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,16 +32,50 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyMaterialApp extends StatelessWidget {
-  MyMaterialApp({super.key});
+class MyMaterialApp extends StatefulWidget {
+  const MyMaterialApp({super.key});
+
+  @override
+  State<MyMaterialApp> createState() => _MyMaterialAppState();
+}
+
+class _MyMaterialAppState extends State<MyMaterialApp> {
   // This widget is the root of your application.
   final appRouter = AppRouter();
+  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
+  @override
+  void initState() {
+    Timer(
+      const Duration(seconds: 1),
+      () => _initSync(),
+    );
+    Timer(
+      const Duration(seconds: 3),
+      () => _sync(),
+    );
+    super.initState();
+  }
+
+  Future<void> _initSync() async {
+    // This is just to initialize firebase and gdrive sync after firebase init is called
+    Provider.of<FirebaseSync>(context, listen: false);
+  }
+
+  Future<void> _sync() async {
+    await Future.wait([
+      Provider.of<FirebaseSync>(context, listen: false)
+          .sync(scaffoldMessengerKey.currentState, suppressErrors: false),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
     AppLogger.instance.d("Building MyApp");
     return Consumer<SettingsStorageNotifier>(
       builder: (context, settingsStorage, _) => MaterialApp.router(
+        scaffoldMessengerKey: scaffoldMessengerKey,
         routerConfig: appRouter.config(),
         theme: lightTheme(settingsStorage.getBaseColor().color),
         darkTheme: darkTheme(settingsStorage.getBaseColor().color),
