@@ -132,6 +132,7 @@ class _BackupEncryptionTileState extends State<BackupEncryptionTile> {
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
+      tristate: true,
       enabled: _encryptionStatus != null,
       value: _encryptionStatus,
       title: Text(_buildTitle()),

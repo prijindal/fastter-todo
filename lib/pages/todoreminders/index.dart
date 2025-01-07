@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../models/core.dart';
 import '../../models/drift.dart';
-import '../home/todo_select_date.dart';
+import '../todos/todo_select_date.dart';
 
 @RoutePage()
 class TodoRemindersScreen extends StatelessWidget {

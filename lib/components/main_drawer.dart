@@ -22,12 +22,12 @@ class NavigationListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final autoRouter = AutoRouter.of(context);
-    final selected = autoRouter.currentPath == route;
+    final selected = autoRouter.currentUrl == route;
     return ListTile(
       title: Text(label),
       selected: selected,
       leading: selected ? selectedIcon : icon,
-      onTap: route == null ? null : () => autoRouter.replaceNamed(route!),
+      onTap: route == null ? null : () => autoRouter.navigateNamed(route!),
     );
   }
 }
@@ -44,7 +44,7 @@ class MainDrawer extends StatelessWidget {
       children.addAll(projects
           .map(
             (project) => NavigationListTile(
-              route: "/project/${project.id}",
+              route: "/todos?projectFilter=${project.id}",
               icon: Icon(
                 Icons.group_work_outlined,
                 color: HexColor(project.color),
@@ -84,13 +84,41 @@ class MainDrawer extends StatelessWidget {
     );
   }
 
+  Widget _buildTagsDestination(BuildContext context, List<String>? tags) {
+    final children = <Widget>[];
+    if (tags != null) {
+      children.addAll(tags
+          .map(
+            (tag) => NavigationListTile(
+              route: "/todos?tagFilter=$tag",
+              icon: Icon(
+                Icons.tag_outlined,
+              ),
+              selectedIcon: Icon(
+                Icons.tag,
+              ),
+              label: tag,
+            ),
+          )
+          .toList());
+    }
+    // TODO: Make this better
+    // trailing icons should show both down arrow and add
+    return ExpansionTile(
+      initiallyExpanded: true,
+      leading: Icon(Icons.tag),
+      title: Text("Tags"),
+      children: children,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
         children: [
           NavigationListTile(
-            route: "/project/inbox",
+            route: "/todos?projectFilter=inbox",
             icon: Icon(Icons.inbox_outlined),
             selectedIcon: Icon(Icons.inbox),
             label: "Inbox",
@@ -102,11 +130,13 @@ class MainDrawer extends StatelessWidget {
             label: "All tasks",
           ),
           NavigationListTile(
+            route: "/todos?daysAhead=1",
             icon: Icon(Icons.calendar_today_outlined),
             selectedIcon: Icon(Icons.calendar_today),
             label: "Today",
           ),
           NavigationListTile(
+            route: "/todos?daysAhead=7",
             icon: Icon(Icons.calendar_view_day_outlined),
             selectedIcon: Icon(Icons.calendar_view_day),
             label: "7 Days",
@@ -115,6 +145,16 @@ class MainDrawer extends StatelessWidget {
             stream: MyDatabase.instance.managers.project.watch(),
             builder: (context, projectsSnapshot) {
               return _buildProjectsDestination(context, projectsSnapshot.data);
+            },
+          ),
+          StreamBuilder<List<String>>(
+            stream: MyDatabase.instance.managers.todo.watch().map<List<String>>(
+                (a) => a
+                    .map((b) => b.tags)
+                    .toList()
+                    .reduce((prev, current) => prev..addAll(current))),
+            builder: (context, tagsSnapshot) {
+              return _buildTagsDestination(context, tagsSnapshot.data);
             },
           ),
         ],

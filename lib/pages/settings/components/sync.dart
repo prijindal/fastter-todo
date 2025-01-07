@@ -218,16 +218,17 @@ abstract class SyncBase<U> with ChangeNotifier {
     }
   }
 
-  Future<bool> sync(BuildContext context, {bool suppressErrors = false}) async {
+  Future<bool> sync(ScaffoldMessengerState? scaffoldMessengerState,
+      {bool suppressErrors = false}) async {
     try {
       final syncReason = await _sync();
-      if (context.mounted) {
+      if (scaffoldMessengerState != null) {
         AppLogger.instance.i(syncReason.title);
         if (syncReason.status == false && suppressErrors == true) {
           return false;
         }
         // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessengerState.showSnackBar(
           SnackBar(
             content: Text(syncReason.title),
           ),
@@ -236,9 +237,9 @@ abstract class SyncBase<U> with ChangeNotifier {
       return syncReason.status;
     } catch (e, stackTrace) {
       AppLogger.instance.e(e, error: e, stackTrace: stackTrace);
-      if (context.mounted) {
+      if (scaffoldMessengerState != null) {
         // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
+        scaffoldMessengerState.showSnackBar(
           SnackBar(
             content: Text(SyncReason.unknown.title),
           ),

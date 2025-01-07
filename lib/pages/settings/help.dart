@@ -69,9 +69,9 @@ class _HelpSettingsScreenState extends State<HelpSettingsScreen> {
         ),
         ListTile(
             title: const Text('Source Code'),
-            subtitle: const Text('https://github.com/prijindal/fastter_todo'),
+            subtitle: const Text('https://github.com/prijindal/fastter-todo'),
             onTap: () => launchUrlString(
-                  'https://github.com/prijindal/fastter_todo',
+                  'https://github.com/prijindal/fastter-todo',
                 )),
         const ListTile(
           title: Text("Developer Info"),

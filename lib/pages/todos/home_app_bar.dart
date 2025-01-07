@@ -6,7 +6,12 @@ import '../../models/local_state.dart';
 import 'todoeditbar/delete_selected_todos_button.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const HomeAppBar({super.key});
+  const HomeAppBar({
+    super.key,
+    required this.title,
+  });
+
+  final String title;
 
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
@@ -15,7 +20,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Selector<LocalStateNotifier, bool>(
       builder: (context, selectedEntriesEmpty, _) => selectedEntriesEmpty
-          ? const MainAppBar()
+          ? MainAppBar(
+              title: title,
+            )
           : const SelectedEntriesAppBar(),
       selector: (_, localState) => localState.selectedTodoIds.isEmpty,
     );
@@ -23,12 +30,14 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class MainAppBar extends StatelessWidget {
-  const MainAppBar({super.key});
+  const MainAppBar({super.key, required this.title});
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text("App Bar"),
+      title: Text(title),
       actions: [
         IconButton(
           onPressed: () {

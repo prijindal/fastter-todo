@@ -13,15 +13,11 @@ class AppRouter extends RootStackRouter {
         AutoRoute(
           initial: true,
           path: "/todos",
-          page: HomeRoute.page,
+          page: TodosRoute.page,
         ),
         AutoRoute(
           path: "/projects",
           page: ProjectsRoute.page,
-        ),
-        AutoRoute(
-          path: "/project/:projectFilter",
-          page: ProjectRoute.page,
         ),
         AutoRoute(
           path: "/newproject",

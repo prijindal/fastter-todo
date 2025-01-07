@@ -59,7 +59,7 @@ class _FirebaseBackupScreenState extends State<FirebaseBackupScreen> {
           ),
           ListTile(
             title: const Text("Sync"),
-            onTap: () => firebaseSync.sync(context),
+            onTap: () => firebaseSync.sync(ScaffoldMessenger.of(context)),
           ),
           ListTile(
             title: const Text("Logout"),
