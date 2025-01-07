@@ -6,7 +6,7 @@ class TagSelectorDialog extends StatefulWidget {
   const TagSelectorDialog({
     super.key,
     List<String>? selectedTags = const <String>[],
-  }) : this.selectedTags = selectedTags ?? const <String>[];
+  }) : selectedTags = selectedTags ?? const <String>[];
 
   final List<String> selectedTags;
 

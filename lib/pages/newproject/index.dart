@@ -25,6 +25,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
         title: titleController.text,
       ),
     );
+    // ignore: use_build_context_synchronously
     Navigator.of(context).pop();
   }
 

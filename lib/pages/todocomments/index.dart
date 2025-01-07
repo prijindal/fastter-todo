@@ -151,6 +151,7 @@ class TodoCommentsAppBar extends StatelessWidget
 
   Future<void> _copySelectedComment(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: _commentsToString()));
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Copied to clipboard'),

@@ -22,14 +22,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeViewState extends State<HomeScreen> {
   @override
   void initState() {
-    // Timer(
-    //   const Duration(seconds: 1),
-    //   () => _initSync(),
-    // );
-    // Timer(
-    //   const Duration(seconds: 3),
-    //   () => _sync(),
-    // );
+    Timer(
+      const Duration(seconds: 1),
+      () => _initSync(),
+    );
+    Timer(
+      const Duration(seconds: 3),
+      () => _sync(),
+    );
     super.initState();
   }
 
