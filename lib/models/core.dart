@@ -15,6 +15,9 @@ class Project extends Table {
   late final id = text().clientDefault(() => _uuid.v4())();
   late final title = text()();
   late final color = text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
 class Todo extends Table {
@@ -51,6 +54,9 @@ class Comment extends Table {
     onDelete: KeyAction.cascade,
   )();
   late final creationTime = dateTime().clientDefault(() => DateTime.now())();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
 class Reminder extends Table {
@@ -64,6 +70,9 @@ class Reminder extends Table {
     onUpdate: KeyAction.cascade,
     onDelete: KeyAction.cascade,
   )();
+
+  @override
+  Set<Column> get primaryKey => {id};
 }
 
 // this annotation tells drift to prepare a database class that uses both of the
