@@ -16,7 +16,7 @@ SharedDatabase constructDb() {
     final path = p.join(dbFolder.path, dbFileName);
     AppLogger.instance.d("Db Path: $path");
     final file = File(path);
-    return NativeDatabase(file);
+    return NativeDatabase.createInBackground(file);
   });
   return SharedDatabase(db);
 }

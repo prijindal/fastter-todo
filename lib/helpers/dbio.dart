@@ -19,37 +19,65 @@ class DatabaseIO {
   }
 
   Future<String> extractDbJson() async {
-    final entries = await MyDatabase.instance.managers.todo.get();
+    final db = await Future.wait([
+      MyDatabase.instance.managers.todo.get(),
+      MyDatabase.instance.managers.project.get(),
+      MyDatabase.instance.managers.comment.get(),
+      MyDatabase.instance.managers.reminder.get(),
+    ]);
     String encoded = jsonEncode(
       {
-        "entries": entries,
+        "todo": db[0],
+        "project": db[1],
+        "comment": db[2],
+        "reminder": db[3],
       },
     );
     AppLogger.instance.i("Extracted data from database");
     return encoded;
   }
 
-  Future<void> jsonToDb(String jsonEncoded) async {
-    final decoded = jsonDecode(jsonEncoded);
-    List<dynamic> entries = decoded["entries"] as List<dynamic>;
+  Future<void> _jsonToDbTable(
+      List<dynamic> entries,
+      TableInfo<Table, dynamic> manager,
+      Insertable Function(Map<String, dynamic>) toElement) async {
     await MyDatabase.instance.batch((batch) {
       batch.insertAll(
-        MyDatabase.instance.todo,
+        manager,
         entries.map(
-          (a) {
-            // Workaround to make it so that the document in json is properly inserted back to db
-            a["tags"] = (a["tags"] as List<dynamic>)
-                .map<String>((a) => a as String)
-                .toList();
-            a["updationTime"] = (a["updationTime"] ?? DateTime.now());
-            a["creationTime"] = (a["creationTime"] ?? DateTime.now());
-            a["hidden"] = (a["hidden"] ?? false);
-            return TodoData.fromJson(a as Map<String, dynamic>);
-          },
+          (a) => toElement(a as Map<String, dynamic>),
         ),
         mode: InsertMode.insertOrIgnore,
       );
     });
+  }
+
+  Future<void> jsonToDb(String jsonEncoded) async {
+    final decoded = jsonDecode(jsonEncoded);
+    await Future.wait(
+      [
+        _jsonToDbTable(
+          decoded["todo"] as List<dynamic>,
+          MyDatabase.instance.todo,
+          TodoData.fromJson,
+        ),
+        _jsonToDbTable(
+          decoded["project"] as List<dynamic>,
+          MyDatabase.instance.project,
+          ProjectData.fromJson,
+        ),
+        _jsonToDbTable(
+          decoded["comment"] as List<dynamic>,
+          MyDatabase.instance.comment,
+          CommentData.fromJson,
+        ),
+        _jsonToDbTable(
+          decoded["reminder"] as List<dynamic>,
+          MyDatabase.instance.reminder,
+          ReminderData.fromJson,
+        )
+      ],
+    );
     AppLogger.instance.d("Loaded data into database");
   }
 
@@ -67,7 +95,7 @@ class DatabaseIO {
     } else {
       // else, encryption is enabled, and password must be used
       // TODO: This is a placeholder, sercure storage will be used, and there will be a way to save this in UI
-      return SharedPreferencesAsync().getString(backupEncryptionKey);
+      return SharedPreferencesAsync().getString(lastUpdateTimeKey);
     }
   }
 
@@ -86,11 +114,11 @@ class DatabaseIO {
     if (key == null) {
       // If key is null, set backup encryption status as false and remove key
       await SharedPreferencesAsync().setBool(backupEncryptionStatus, false);
-      await SharedPreferencesAsync().remove(backupEncryptionKey);
+      await SharedPreferencesAsync().remove(lastUpdateTimeKey);
     } else {
       // set status as true and encryption key
       await SharedPreferencesAsync().setBool(backupEncryptionStatus, true);
-      await SharedPreferencesAsync().setString(backupEncryptionKey, key);
+      await SharedPreferencesAsync().setString(lastUpdateTimeKey, key);
     }
   }
 
@@ -126,20 +154,16 @@ class DatabaseIO {
     await jsonToDb(content);
   }
 
+  Future<void> updateLastUpdatedTime() async {
+    await SharedPreferencesAsync()
+        .setInt(lastUpdateTimeKey, DateTime.now().millisecondsSinceEpoch);
+  }
+
   Future<DateTime> getLastUpdatedTime() async {
-    final lastUpdatedRows = await (MyDatabase.instance.todo.select()
-          ..limit(1)
-          ..orderBy([
-            (t) => OrderingTerm(
-                  expression: t.creationTime,
-                  mode: OrderingMode.desc,
-                ),
-          ]))
-        .get();
-    if (lastUpdatedRows.isEmpty) {
+    final lastTime = await SharedPreferencesAsync().getInt(lastUpdateTimeKey);
+    if (lastTime == null) {
       return DateTime.now();
     }
-    final lastUpdatedTime = lastUpdatedRows.first.creationTime;
-    return lastUpdatedTime;
+    return DateTime.fromMillisecondsSinceEpoch(lastTime);
   }
 }

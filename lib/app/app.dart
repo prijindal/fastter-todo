@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../helpers/dbio.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
+import '../models/drift.dart';
 import '../models/local_state.dart';
 import '../models/settings.dart';
 import '../pages/settings/backup/firebase/firebase_sync.dart';
@@ -55,6 +57,7 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
       const Duration(seconds: 3),
       () => _sync(),
     );
+    _addWatcher();
     super.initState();
   }
 
@@ -68,6 +71,14 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
       Provider.of<FirebaseSync>(context, listen: false)
           .sync(scaffoldMessengerKey.currentState, suppressErrors: false),
     ]);
+  }
+
+  Future<void> _addWatcher() async {
+    final stream = MyDatabase.instance.tableUpdates();
+    await for (final event in stream) {
+      AppLogger.instance.d(event);
+      await DatabaseIO.instance.updateLastUpdatedTime();
+    }
   }
 
   @override

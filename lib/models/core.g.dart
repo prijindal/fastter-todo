@@ -164,7 +164,7 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
     return $TodoTable(attachedDatabase, alias);
   }
 
-  static TypeConverter<List<String>, String> $convertertags =
+  static JsonTypeConverter2<List<String>, String, String> $convertertags =
       const StringListConverter();
 }
 
@@ -242,7 +242,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       creationTime: serializer.fromJson<DateTime>(json['creationTime']),
       project: serializer.fromJson<String?>(json['project']),
       parent: serializer.fromJson<String?>(json['parent']),
-      tags: serializer.fromJson<List<String>>(json['tags']),
+      tags: $TodoTable.$convertertags
+          .fromJson(serializer.fromJson<String>(json['tags'])),
     );
   }
   @override
@@ -257,7 +258,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       'creationTime': serializer.toJson<DateTime>(creationTime),
       'project': serializer.toJson<String?>(project),
       'parent': serializer.toJson<String?>(parent),
-      'tags': serializer.toJson<List<String>>(tags),
+      'tags': serializer.toJson<String>($TodoTable.$convertertags.toJson(tags)),
     };
   }
 
@@ -526,7 +527,7 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   ProjectData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -776,7 +777,7 @@ class $CommentTable extends Comment with TableInfo<$CommentTable, CommentData> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   CommentData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -1095,7 +1096,7 @@ class $ReminderTable extends Reminder
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   ReminderData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';

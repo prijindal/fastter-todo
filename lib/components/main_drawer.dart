@@ -157,6 +157,12 @@ class MainDrawer extends StatelessWidget {
               return _buildTagsDestination(context, tagsSnapshot.data);
             },
           ),
+          NavigationListTile(
+            route: "/settings",
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: "Settings",
+          ),
         ],
       ),
     );
