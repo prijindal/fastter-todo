@@ -80,7 +80,7 @@ jobs:
           echo "keyAlias=$KEY_ALIAS" >> android/key.properties
           echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
           echo "storePassword=$KEY_PASSWORD" >> android/key.properties
-          echo "VERSION_CODE=$GITHUB_RUN_NUMBER" > android/version.properties
+          echo "VERSION_CODE=`expr 185 + $GITHUB_RUN_NUMBER`" > android/version.properties
 
       - run: curl -sL https://firebase.tools | bash
       - run: echo "$FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL" > google-application-credentials.json
@@ -98,7 +98,7 @@ jobs:
             build/app/outputs/bundle/release/
             build/app/outputs/mapping/release/
             build/app/intermediates/merged_native_libs/release/out/lib/
-      - run: echo "VERSION_CODE=$GITHUB_RUN_NUMBER" > android/version.properties
+      - run: echo "VERSION_CODE=`expr 185 + $GITHUB_RUN_NUMBER`" > android/version.properties
       - run: flutter build apk --release --split-per-abi
       - uses: actions/upload-artifact@v4
         with:
@@ -116,7 +116,6 @@ jobs:
   android-publish:
     needs: [test, android]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: Download appbundle from android build
         uses: actions/download-artifact@v4
@@ -170,7 +169,6 @@ jobs:
 
   web-publish:
     needs: [test, web]
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
