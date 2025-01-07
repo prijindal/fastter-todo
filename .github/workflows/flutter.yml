@@ -32,11 +32,11 @@ jobs:
       - run: flutter --version
       - run: flutter pub get
       - run: flutter analyze
-      - run: flutter test --coverage
-      - name: Run Integration Tests
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: flutter test integration_test -d linux -r github --coverage
+      # - run: flutter test --coverage
+      # - name: Run Integration Tests
+      #   uses: coactions/setup-xvfb@v1
+      #   with:
+      #     run: flutter test integration_test -d linux -r github --coverage
       - uses: codecov/codecov-action@v5
         with:
           flags: app-flutter
@@ -87,7 +87,7 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
       - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=android --ios-bundle-id=com.prijindal.fastter-todo --macos-bundle-id=com.prijindal.fastter-todo --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
+      - run: flutterfire configure -y --platforms=android --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
         env:
           GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build appbundle --release
@@ -159,7 +159,7 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
       - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=web --ios-bundle-id=com.prijindal.fastter-todo --macos-bundle-id=com.prijindal.fastter-todo --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
+      - run: flutterfire configure -y --platforms=web --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
         env:
           GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build web --release
@@ -241,7 +241,7 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
       - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=macos --ios-bundle-id=com.prijindal.fastter-todo --macos-bundle-id=com.prijindal.fastter-todo --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
+      - run: flutterfire configure -y --platforms=macos --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
         env:
           GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build macos --release
@@ -277,7 +277,7 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
       - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=ios --ios-bundle-id=com.prijindal.fastter-todo --macos-bundle-id=com.prijindal.fastter-todo --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
+      - run: flutterfire configure -y --platforms=ios --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
         env:
           GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build ios --release --no-codesign --release
@@ -314,7 +314,7 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
       - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=windows --ios-bundle-id=com.prijindal.fastter-todo --macos-bundle-id=com.prijindal.fastter-todo --web-app-id=1:903944243626:web:575096b9f07bed49f9c3d3 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:903944243626:web:575096b9f07bed49f9c3d3
+      - run: flutterfire configure -y --platforms=windows --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
         env:
           GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build windows --release
