@@ -1,0 +1,11 @@
+web/drift_worker.dart.js linguist-vendored
+web/sqlite3.wasm linguist-vendored
+
+*.cc linguist-generated
+*.h linguist-generated
+*.cpp linguist-generated
+*.cmake linguist-generated
+**/CMakeLists.txt linguist-generated
+
+*.swift linguist-generated
+**/Podfile linguist-generated
