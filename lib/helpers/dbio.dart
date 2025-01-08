@@ -155,15 +155,16 @@ class DatabaseIO {
   }
 
   Future<void> updateLastUpdatedTime() async {
-    await SharedPreferencesAsync()
-        .setInt(lastUpdateTimeKey, DateTime.now().millisecondsSinceEpoch);
+    await SharedPreferencesAsync().setString(
+        lastUpdateTimeKey, DateTime.now().millisecondsSinceEpoch.toString());
   }
 
   Future<DateTime> getLastUpdatedTime() async {
-    final lastTime = await SharedPreferencesAsync().getInt(lastUpdateTimeKey);
+    final lastTime =
+        await SharedPreferencesAsync().getString(lastUpdateTimeKey);
     if (lastTime == null) {
       return DateTime.now();
     }
-    return DateTime.fromMillisecondsSinceEpoch(lastTime);
+    return DateTime.fromMillisecondsSinceEpoch(int.parse(lastTime));
   }
 }
