@@ -241,7 +241,6 @@ class SubtitleProject extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 8),
           constraints: const BoxConstraints(maxWidth: 200, maxHeight: 40),
           child: Text(
-            // TODO: Replace with actual title of project
             project?.title ?? "Inbox",
           ),
         ),
