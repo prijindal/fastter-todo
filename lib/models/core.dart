@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 import 'package:uuid/uuid.dart';
 
+import '../helpers/constants.dart';
 import 'string_list.dart';
 
 // assuming that your file is called filename.dart. This will give an error at
@@ -79,7 +81,11 @@ class Reminder extends Table {
 // tables we just defined. We'll see how to use that database class in a moment.
 @DriftDatabase(tables: [Todo, Project, Comment, Reminder])
 class SharedDatabase extends _$SharedDatabase {
+  // Keeping a custom constructor is useful for unit tests which may want to
+  // open an in-memory database only.
   SharedDatabase(super.e);
+
+  SharedDatabase.defaults() : super(driftDatabase(name: dbFileName));
 
   @override
   int get schemaVersion => 1;
