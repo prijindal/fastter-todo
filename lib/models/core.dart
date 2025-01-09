@@ -85,7 +85,14 @@ class SharedDatabase extends _$SharedDatabase {
   // open an in-memory database only.
   SharedDatabase(super.e);
 
-  SharedDatabase.defaults() : super(driftDatabase(name: dbFileName));
+  SharedDatabase.defaults()
+      : super(driftDatabase(
+          name: dbName,
+          web: DriftWebOptions(
+            sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+            driftWorker: Uri.parse('drift_worker.dart.js'),
+          ),
+        ));
 
   @override
   int get schemaVersion => 1;
