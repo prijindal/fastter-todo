@@ -75,8 +75,8 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
 
   Future<void> _addWatcher() async {
     final stream = MyDatabase.instance.tableUpdates();
-    await for (final event in stream) {
-      AppLogger.instance.d(event);
+    await for (final events in stream) {
+      AppLogger.instance.d(events);
       await DatabaseIO.instance.updateLastUpdatedTime();
     }
   }
