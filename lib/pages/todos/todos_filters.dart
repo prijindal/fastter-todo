@@ -1,12 +1,9 @@
-import 'dart:async';
-
 import 'package:auto_route/auto_route.dart';
-import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 
 class AppBarActions {
   final void Function(BuildContext context) onPressed;
@@ -31,6 +28,14 @@ class AppBarActions {
           AutoRouter.of(context).pushNamed("/project/$projectId"),
     );
   }
+
+  factory AppBarActions.forceRefresh() {
+    return AppBarActions(
+      icon: Icon(Icons.refresh),
+      onPressed: (context) =>
+          Provider.of<LocalDbState>(context, listen: false).initSubscriptions(),
+    );
+  }
 }
 
 class TodosFilters {
@@ -44,32 +49,34 @@ class TodosFilters {
     this.daysAhead,
   });
 
-  Stream<List<TodoData>> createStream(BuildContext context) {
-    var manager = Provider.of<DbSelector>(context, listen: false)
-        .database
-        .managers
-        .todo
-        .filter((f) => f.id.not.isNull());
-    manager = manager.orderBy(
-        (o) => o.priority.desc() & o.completed.asc() & o.dueDate.asc());
+  List<TodoData> filtered(List<TodoData> todos) {
+    // TODO: Compare, sorting order: priority, completed, dueDate
     if (projectFilter != null) {
       if (projectFilter == "inbox") {
-        manager = manager.filter((f) => f.project.isNull());
+        todos = todos.where((t) => t.project == null).toList();
       } else {
-        manager = manager.filter((f) => f.project.equals(projectFilter));
+        todos = todos.where((t) => t.project == projectFilter).toList();
       }
     }
     if (tagFilter != null) {
-      manager = manager.filter((f) => f.tags.column.contains(tagFilter!));
+      todos = todos.where((t) => t.tags.contains(tagFilter)).toList();
     }
     if (daysAhead != null) {
-      manager = manager.filter((f) =>
-          f.dueDate.isBefore(DateTime.now().add(Duration(days: daysAhead!))));
+      todos = todos
+          .where(
+            (t) =>
+                t.dueDate != null &&
+                t.dueDate!.compareTo(
+                      DateTime.now().add(Duration(days: daysAhead!)),
+                    ) <=
+                    0,
+          )
+          .toList();
     }
-    return manager.watch();
+    return todos;
   }
 
-  FutureOr<String> createTitle(BuildContext context) {
+  String createTitle(BuildContext context) {
     if (projectFilter == null && tagFilter == null && daysAhead == null) {
       return "All Todos";
     }
@@ -86,16 +93,14 @@ class TodosFilters {
       if (projectFilter == "inbox") {
         return "Inbox";
       } else {
-        return Future(() async {
-          // ignore: use_build_context_synchronously
-          final project = await Provider.of<DbSelector>(context, listen: false)
-              .database
-              .managers
-              .project
-              .filter((f) => f.id.equals(projectFilter))
-              .getSingle();
+        // ignore: use_build_context_synchronously
+        final project = Provider.of<LocalDbState>(context, listen: false)
+            .projects
+            .where((f) => f.id == projectFilter)
+            .firstOrNull;
+        if (project != null) {
           return project.title;
-        });
+        }
       }
     }
     return "Todos";
@@ -120,6 +125,7 @@ class TodosFilters {
     if (projectFilter != null && projectFilter != "inbox") {
       actions.add(AppBarActions.editProject(projectFilter!));
     }
+    actions.add(AppBarActions.forceRefresh());
     actions.add(AppBarActions.settings());
     return actions;
   }

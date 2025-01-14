@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../components/main_drawer.dart';
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 
 @RoutePage()
 class ProjectsScreen extends StatelessWidget {
@@ -44,14 +44,10 @@ class ProjectsScreen extends StatelessWidget {
         title: Text("Projects"),
       ),
       drawer: MainDrawer(),
-      body: StreamBuilder<List<ProjectData>>(
-        stream: Provider.of<DbSelector>(context, listen: false)
-            .database
-            .managers
-            .project
-            .watch(),
-        builder: (context, projectsSnapshot) {
-          return _buildBody(context, projectsSnapshot.data);
+      body: Selector<LocalDbState, List<ProjectData>>(
+        selector: (_, state) => state.projects,
+        builder: (context, projects, _) {
+          return _buildBody(context, projects);
         },
       ),
       floatingActionButton: FloatingActionButton(

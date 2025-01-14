@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
 import '../../../models/db_selector.dart';
+import '../../../models/local_db_state.dart';
 import '../projectdropdown.dart';
 
 class ChangeProjectButton extends StatelessWidget {
@@ -32,16 +33,13 @@ class ChangeProjectButton extends StatelessWidget {
         selectedProject: null,
       );
     }
-    return StreamBuilder<ProjectData>(
-      stream: Provider.of<DbSelector>(context, listen: false)
-          .database
-          .managers
-          .project
-          .filter((f) => f.id.equals(selectedTodos.first.project))
-          .watchSingle(),
-      builder: (context, project) => ProjectDropdown(
+    return Selector<LocalDbState, ProjectData?>(
+      selector: (_, state) => state.projects
+          .where((p) => p.id == selectedTodos.first.project)
+          .firstOrNull,
+      builder: (context, project, _) => ProjectDropdown(
         onSelected: (p) => _onChangeProject(p, context),
-        selectedProject: project.data,
+        selectedProject: project,
       ),
     );
   }

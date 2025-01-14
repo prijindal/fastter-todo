@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 
 class TagSelectorDialog extends StatefulWidget {
   const TagSelectorDialog({
@@ -26,12 +26,8 @@ class _TagSelectionState extends State<TagSelectorDialog> {
     super.initState();
   }
 
-  void _fetchTags() async {
-    final todos = await Provider.of<DbSelector>(context, listen: false)
-        .database
-        .managers
-        .todo
-        .get();
+  void _fetchTags() {
+    final todos = Provider.of<LocalDbState>(context, listen: false).todos;
     final allTags = <String>[];
     for (var todo in todos) {
       final tags = todo.tags;

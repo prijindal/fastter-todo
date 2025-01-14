@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
 import '../../../models/db_selector.dart';
+import '../../../models/local_db_state.dart';
 import '../../../models/local_state.dart';
 import '../tagselector.dart';
 import 'change_date_button.dart';
@@ -22,28 +23,12 @@ class TodoEditBar extends StatelessWidget {
   Widget build(BuildContext context) =>
       Selector<LocalStateNotifier, List<String>>(
         selector: (context, localState) => localState.selectedTodoIds,
-        builder: (context, selectedTodoIds, _) => StreamBuilder<List<TodoData>>(
-          initialData: selectedTodoIds
-              .map(
-                // Mocked data for init screen
-                (a) => TodoData(
-                  id: a,
-                  title: a,
-                  priority: 1,
-                  completed: false,
-                  creationTime: DateTime.now(),
-                  tags: [],
-                ),
-              )
-              .toList(),
-          stream: Provider.of<DbSelector>(context, listen: false)
-              .database
-              .managers
-              .todo
-              .filter((f) => f.id.isIn(selectedTodoIds))
-              .watch(),
-          builder: (context, selectedTodos) => _TodoEditBar(
-            selectedTodos: selectedTodos.requireData,
+        builder: (context, selectedTodoIds, _) =>
+            Selector<LocalDbState, List<TodoData>>(
+          selector: (_, state) =>
+              state.todos.where((a) => selectedTodoIds.contains(a.id)).toList(),
+          builder: (context, selectedTodos, _) => _TodoEditBar(
+            selectedTodos: selectedTodos,
           ),
         ),
       );

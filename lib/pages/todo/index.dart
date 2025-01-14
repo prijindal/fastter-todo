@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 
 @RoutePage()
 class TodoScreen extends StatelessWidget {
@@ -15,24 +15,10 @@ class TodoScreen extends StatelessWidget {
   final String todoId;
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<TodoData>(
-        // Mocked data for init screen
-        initialData: TodoData(
-          id: todoId,
-          title: todoId,
-          priority: 1,
-          completed: false,
-          creationTime: DateTime.now(),
-          tags: [],
-        ),
-        stream: Provider.of<DbSelector>(context, listen: false)
-            .database
-            .managers
-            .todo
-            .filter((f) => f.id.equals(todoId))
-            .watchSingle(),
-        builder: (context, todoSnapshot) => _TodoScreen(
-          todo: todoSnapshot.requireData,
+  Widget build(BuildContext context) => Selector<LocalDbState, TodoData>(
+        selector: (_, state) => state.todos.where((a) => a.id == todoId).first,
+        builder: (context, todo, _) => _TodoScreen(
+          todo: todo,
         ),
       );
 }

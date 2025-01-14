@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
 import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 import '../todos/todo_select_date.dart';
 
 @RoutePage()
@@ -18,27 +19,11 @@ class TodoRemindersScreen extends StatelessWidget {
   final String todoId;
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<TodoData>(
-        stream: Provider.of<DbSelector>(context, listen: false)
-            .database
-            .managers
-            .todo
-            .filter((f) => f.id.equals(todoId))
-            .watchSingle(),
-        builder: (context, todoSnapshot) => StreamBuilder<List<ReminderData>>(
-          stream: Provider.of<DbSelector>(context, listen: false)
-              .database
-              .managers
-              .reminder
-              .filter((f) => f.todo.id.equals(todoId))
-              .watch(),
-          builder: (context, remindersSnapshot) =>
-              (!remindersSnapshot.hasData || !todoSnapshot.hasData)
-                  ? Scaffold(body: Center(child: Text("Loading...")))
-                  : _TodoRemindersScreen(
-                      todo: todoSnapshot.requireData,
-                      reminders: remindersSnapshot.requireData,
-                    ),
+  Widget build(BuildContext context) => Consumer<LocalDbState>(
+        builder: (context, localDbState, _) => _TodoRemindersScreen(
+          todo: localDbState.todos.firstWhere((f) => f.id == todoId),
+          reminders:
+              localDbState.reminders.where((a) => a.todo == todoId).toList(),
         ),
       );
 }

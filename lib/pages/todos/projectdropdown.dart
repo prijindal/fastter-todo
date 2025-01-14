@@ -3,9 +3,9 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 
-class ProjectDropdown extends StatefulWidget {
+class ProjectDropdown extends StatelessWidget {
   const ProjectDropdown({
     super.key,
     required this.onSelected,
@@ -20,45 +20,18 @@ class ProjectDropdown extends StatefulWidget {
   final void Function()? onOpening;
 
   @override
-  State<ProjectDropdown> createState() => _ProjectDropdownState();
-}
-
-class _ProjectDropdownState extends State<ProjectDropdown> {
-  List<ProjectData>? projects;
-
-  @override
-  void initState() {
-    _fetchProjects();
-    super.initState();
+  Widget build(BuildContext context) {
+    return Selector<LocalDbState, List<ProjectData>>(
+      selector: (_, state) => state.projects,
+      builder: (context, projects, _) => _ProjectDropdown(
+        projects: projects,
+        onSelected: onSelected,
+        selectedProject: selectedProject,
+        onOpening: onOpening,
+        expanded: expanded,
+      ),
+    );
   }
-
-  void _fetchProjects() async {
-    final projects = await Provider.of<DbSelector>(context, listen: false)
-        .database
-        .managers
-        .project
-        .get();
-    if (context.mounted) {
-      setState(() {
-        this.projects = projects;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => projects == null
-      ? IconButton(
-          icon: Icon(Icons.group_work),
-          onPressed: null,
-          tooltip: 'Project',
-        )
-      : _ProjectDropdown(
-          projects: projects!,
-          onSelected: widget.onSelected,
-          selectedProject: widget.selectedProject,
-          onOpening: widget.onOpening,
-          expanded: widget.expanded,
-        );
 }
 
 class _ProjectDropdown extends StatelessWidget {
