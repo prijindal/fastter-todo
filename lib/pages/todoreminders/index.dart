@@ -34,7 +34,7 @@ class TodoRemindersScreen extends StatelessWidget {
               .watch(),
           builder: (context, remindersSnapshot) =>
               (!remindersSnapshot.hasData || !todoSnapshot.hasData)
-                  ? Center(child: Text("Loading..."))
+                  ? Scaffold(body: Center(child: Text("Loading...")))
                   : _TodoRemindersScreen(
                       todo: todoSnapshot.requireData,
                       reminders: remindersSnapshot.requireData,

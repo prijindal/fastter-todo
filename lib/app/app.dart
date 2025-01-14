@@ -38,37 +38,47 @@ class MyMaterialAppWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DbSelector>(
-      builder: (context, dbSelector, _) {
-        if (!dbSelector.isInitialized) {
-          return MaterialApp(
-            home: Scaffold(
-              appBar: AppBar(
-                title: Text("Fastter Todo"),
-                actions: [
-                  IconButton(
-                      onPressed: () async {
-                        await dbSelector.setLocal();
-                        await dbSelector.initDb();
-                      },
-                      icon: Icon(Icons.restore)),
-                ],
+    return Consumer<SettingsStorageNotifier>(
+      builder: (context, settingsStorage, _) {
+        return Consumer<DbSelector>(
+          builder: (context, dbSelector, _) {
+            if (!dbSelector.isInitialized) {
+              return MaterialApp(
+                theme: lightTheme(settingsStorage.getBaseColor().color),
+                darkTheme: darkTheme(settingsStorage.getBaseColor().color),
+                themeMode: settingsStorage.getTheme(),
+                home: Scaffold(
+                  appBar: AppBar(
+                    title: Text("Todos"),
+                    actions: [
+                      IconButton(
+                          onPressed: () async {
+                            await dbSelector.setLocal();
+                            await dbSelector.initDb();
+                          },
+                          icon: Icon(Icons.restore)),
+                    ],
+                  ),
+                  body: Center(
+                    child: Text("Loading"),
+                  ),
+                ),
+              );
+            }
+            return MultiProvider(
+              providers: [
+                ChangeNotifierProvider<FirebaseSync>(
+                  create: (context) => FirebaseSync(
+                    () => Provider.of<DbSelector>(context, listen: false).io,
+                  ),
+                ),
+              ],
+              child: MyMaterialApp(
+                key: Key(dbSelector.database.hashCode.toString()),
+                settingsStorage: settingsStorage,
               ),
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          );
-        }
-        return MultiProvider(
-          providers: [
-            ChangeNotifierProvider<FirebaseSync>(
-              create: (context) => FirebaseSync(
-                () => Provider.of<DbSelector>(context, listen: false).io,
-              ),
-            ),
-          ],
-          child: MyMaterialApp(),
+            );
+          },
         );
       },
     );
@@ -76,7 +86,12 @@ class MyMaterialAppWrapper extends StatelessWidget {
 }
 
 class MyMaterialApp extends StatefulWidget {
-  const MyMaterialApp({super.key});
+  const MyMaterialApp({
+    super.key,
+    required this.settingsStorage,
+  });
+
+  final SettingsStorageNotifier settingsStorage;
 
   @override
   State<MyMaterialApp> createState() => _MyMaterialAppState();
@@ -116,14 +131,12 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
   @override
   Widget build(BuildContext context) {
     AppLogger.instance.d("Building MyApp");
-    return Consumer<SettingsStorageNotifier>(
-      builder: (context, settingsStorage, _) => MaterialApp.router(
-        scaffoldMessengerKey: scaffoldMessengerKey,
-        routerConfig: appRouter.config(),
-        theme: lightTheme(settingsStorage.getBaseColor().color),
-        darkTheme: darkTheme(settingsStorage.getBaseColor().color),
-        themeMode: settingsStorage.getTheme(),
-      ),
+    return MaterialApp.router(
+      scaffoldMessengerKey: scaffoldMessengerKey,
+      routerConfig: appRouter.config(),
+      theme: lightTheme(widget.settingsStorage.getBaseColor().color),
+      darkTheme: darkTheme(widget.settingsStorage.getBaseColor().color),
+      themeMode: widget.settingsStorage.getTheme(),
     );
   }
 }
