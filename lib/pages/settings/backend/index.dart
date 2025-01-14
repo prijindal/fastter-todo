@@ -78,7 +78,7 @@ class BackendImplementationTile extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context) {
-    final dbSelector = Provider.of<DbSelector>(context);
+    final dbSelector = Provider.of<DbSelector>(context, listen: false);
     final dbType = dbSelector.dbType;
     return DropdownButton<DbSelectorType>(
       value: dbType,
