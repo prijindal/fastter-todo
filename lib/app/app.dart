@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../helpers/dbio.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
-import '../models/drift.dart';
+import '../models/db_selector.dart';
 import '../models/local_state.dart';
 import '../models/settings.dart';
 import '../pages/settings/backup/firebase/firebase_sync.dart';
@@ -19,17 +18,59 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<DbSelector>(
+          create: (context) => DbSelector(),
+        ),
         ChangeNotifierProvider<SettingsStorageNotifier>(
           create: (context) => SettingsStorageNotifier(),
-        ),
-        ChangeNotifierProvider<FirebaseSync>(
-          create: (_) => FirebaseSync(),
         ),
         ChangeNotifierProvider<LocalStateNotifier>(
           create: (_) => LocalStateNotifier(),
         ),
       ],
-      child: MyMaterialApp(),
+      child: MyMaterialAppWrapper(),
+    );
+  }
+}
+
+class MyMaterialAppWrapper extends StatelessWidget {
+  const MyMaterialAppWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<DbSelector>(
+      builder: (context, dbSelector, _) {
+        if (!dbSelector.isInitialized) {
+          return MaterialApp(
+            home: Scaffold(
+              appBar: AppBar(
+                title: Text("Fastter Todo"),
+                actions: [
+                  IconButton(
+                      onPressed: () async {
+                        await dbSelector.setLocal();
+                        await dbSelector.initDb();
+                      },
+                      icon: Icon(Icons.restore)),
+                ],
+              ),
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        }
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider<FirebaseSync>(
+              create: (context) => FirebaseSync(
+                () => Provider.of<DbSelector>(context).io,
+              ),
+            ),
+          ],
+          child: MyMaterialApp(),
+        );
+      },
     );
   }
 }
@@ -57,7 +98,6 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
       const Duration(seconds: 3),
       () => _sync(),
     );
-    _addWatcher();
     super.initState();
   }
 
@@ -71,14 +111,6 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
       Provider.of<FirebaseSync>(context, listen: false)
           .sync(scaffoldMessengerKey.currentState, suppressErrors: false),
     ]);
-  }
-
-  Future<void> _addWatcher() async {
-    final stream = MyDatabase.instance.tableUpdates();
-    await for (final events in stream) {
-      AppLogger.instance.d(events);
-      await DatabaseIO.instance.updateLastUpdatedTime();
-    }
   }
 
   @override

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../helpers/date_fomatters.dart';
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 
 class TodoCommentItem extends StatelessWidget {
   const TodoCommentItem({
@@ -22,7 +23,10 @@ class TodoCommentItem extends StatelessWidget {
   Widget build(BuildContext context) => _TodoCommentItem(
         todoComment: todoComment,
         deleteComment: () async {
-          await MyDatabase.instance.managers.comment
+          await Provider.of<DbSelector>(context, listen: false)
+              .database
+              .managers
+              .comment
               .filter((f) => f.id.equals(todoComment.id))
               .delete();
         },

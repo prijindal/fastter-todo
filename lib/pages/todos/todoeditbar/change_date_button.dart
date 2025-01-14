@@ -1,8 +1,9 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
-import '../../../models/drift.dart';
+import '../../../models/db_selector.dart';
 import '../todo_select_date.dart';
 
 class ChangeDateButton extends StatelessWidget {
@@ -17,8 +18,11 @@ class ChangeDateButton extends StatelessWidget {
     if (selectedTodos.isNotEmpty && context.mounted) {
       final selectedDate =
           await todoSelectDate(context, selectedTodos.first.dueDate);
-      if (selectedDate != null) {
-        await (MyDatabase.instance.todo.update()
+      if (selectedDate != null && context.mounted) {
+        await (Provider.of<DbSelector>(context, listen: false)
+                .database
+                .todo
+                .update()
               ..where((tbl) => tbl.id.isIn(selectedTodos.map((a) => a.id))))
             .write(
           TodoCompanion(

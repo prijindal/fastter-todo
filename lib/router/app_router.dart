@@ -46,6 +46,11 @@ class AppRouter extends RootStackRouter {
           transitionsBuilder: TransitionsBuilders.slideLeft,
         ),
         CustomRoute<void>(
+          path: "/settings/backend",
+          page: BackendSettingsRoute.page,
+          transitionsBuilder: TransitionsBuilders.slideLeft,
+        ),
+        CustomRoute<void>(
           path: "/settings/help",
           page: HelpSettingsRoute.page,
           transitionsBuilder: TransitionsBuilders.slideLeft,

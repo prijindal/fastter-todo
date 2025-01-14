@@ -6,24 +6,21 @@ import 'package:drift/drift.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/core.dart';
-import '../models/drift.dart';
 import 'constants.dart';
 import 'logger.dart';
 
 class DatabaseIO {
-  static DatabaseIO? _instance;
+  final SharedDatabase _database;
+  DatabaseIO(this._database);
 
-  static DatabaseIO get instance {
-    _instance ??= DatabaseIO();
-    return _instance as DatabaseIO;
-  }
+  SharedDatabase get database => _database;
 
   Future<String> extractDbJson() async {
     final db = await Future.wait([
-      MyDatabase.instance.managers.todo.get(),
-      MyDatabase.instance.managers.project.get(),
-      MyDatabase.instance.managers.comment.get(),
-      MyDatabase.instance.managers.reminder.get(),
+      database.managers.todo.get(),
+      database.managers.project.get(),
+      database.managers.comment.get(),
+      database.managers.reminder.get(),
     ]);
     String encoded = jsonEncode(
       {
@@ -41,7 +38,7 @@ class DatabaseIO {
       List<dynamic> entries,
       TableInfo<Table, dynamic> manager,
       Insertable Function(Map<String, dynamic>) toElement) async {
-    await MyDatabase.instance.batch((batch) {
+    database.batch((batch) {
       batch.insertAll(
         manager,
         entries.map(
@@ -58,22 +55,22 @@ class DatabaseIO {
       [
         _jsonToDbTable(
           decoded["todo"] as List<dynamic>,
-          MyDatabase.instance.todo,
+          database.todo,
           TodoData.fromJson,
         ),
         _jsonToDbTable(
           decoded["project"] as List<dynamic>,
-          MyDatabase.instance.project,
+          database.project,
           ProjectData.fromJson,
         ),
         _jsonToDbTable(
           decoded["comment"] as List<dynamic>,
-          MyDatabase.instance.comment,
+          database.comment,
           CommentData.fromJson,
         ),
         _jsonToDbTable(
           decoded["reminder"] as List<dynamic>,
-          MyDatabase.instance.reminder,
+          database.reminder,
           ReminderData.fromJson,
         )
       ],

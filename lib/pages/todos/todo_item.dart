@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../helpers/date_fomatters.dart';
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 import '../../models/local_state.dart';
 import 'confirmation_dialog.dart';
 import 'tagslist.dart';
@@ -22,8 +22,11 @@ class TodoItem extends StatelessWidget {
 
   void _selectDate(BuildContext context) {
     todoSelectDate(context, todo.dueDate).then((dueDate) async {
-      if (dueDate != null) {
-        await MyDatabase.instance.managers.todo
+      if (dueDate != null && context.mounted) {
+        await Provider.of<DbSelector>(context, listen: false)
+            .database
+            .managers
+            .todo
             .filter((tbl) => tbl.id.equals(todo.id))
             .update((o) => o(dueDate: drift.Value(dueDate)));
       }
@@ -35,8 +38,11 @@ class TodoItem extends StatelessWidget {
         builder: (context) => ConfirmationDialog(),
       );
 
-  void _deleteTodo() async {
-    await MyDatabase.instance.managers.todo
+  void _deleteTodo(BuildContext context) async {
+    await Provider.of<DbSelector>(context, listen: false)
+        .database
+        .managers
+        .todo
         .filter((tbl) => tbl.id.equals(todo.id))
         .delete();
   }
@@ -56,7 +62,7 @@ class TodoItem extends StatelessWidget {
       },
       onDismissed: (direction) {
         if (direction == DismissDirection.endToStart) {
-          _deleteTodo();
+          _deleteTodo(context);
           ScaffoldMessenger.of(context).removeCurrentSnackBar();
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text('${todo.title} deleted')));
@@ -107,7 +113,10 @@ class TodoItem extends StatelessWidget {
           leading: TodoItemToggle(
             todo: todo,
             toggleCompleted: (bool newValue) async {
-              await MyDatabase.instance.managers.todo
+              await Provider.of<DbSelector>(context, listen: false)
+                  .database
+                  .managers
+                  .todo
                   .filter((tbl) => tbl.id.equals(todo.id))
                   .update((o) => o(completed: drift.Value(newValue)));
             },
@@ -262,7 +271,10 @@ class SubtitleProject extends StatelessWidget {
         child: todo.project == null
             ? _buildContainer(null)
             : StreamBuilder<ProjectData>(
-                stream: MyDatabase.instance.managers.project
+                stream: Provider.of<DbSelector>(context, listen: false)
+                    .database
+                    .managers
+                    .project
                     .filter((f) => f.id.equals(todo.project))
                     .watchSingle(),
                 builder: (context, projectSnapshot) {

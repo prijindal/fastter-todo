@@ -2,9 +2,10 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 
 class TodoCommentInput extends StatefulWidget {
   const TodoCommentInput({
@@ -24,13 +25,18 @@ class _TodoCommentInputState extends State<TodoCommentInput> {
   TextEditingController commentContentController = TextEditingController();
 
   void _addComment() async {
-    await MyDatabase.instance.managers.comment.create(
-      (f) => f(
-        type: TodoCommentType.text,
-        content: Uint8List.fromList(commentContentController.text.codeUnits),
-        todo: widget.todo.id,
-      ),
-    );
+    await Provider.of<DbSelector>(context, listen: false)
+        .database
+        .managers
+        .comment
+        .create(
+          (f) => f(
+            type: TodoCommentType.text,
+            content:
+                Uint8List.fromList(commentContentController.text.codeUnits),
+            todo: widget.todo.id,
+          ),
+        );
   }
 
   @override

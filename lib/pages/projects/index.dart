@@ -1,10 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
 
 import '../../components/main_drawer.dart';
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 
 @RoutePage()
 class ProjectsScreen extends StatelessWidget {
@@ -44,7 +45,11 @@ class ProjectsScreen extends StatelessWidget {
       ),
       drawer: MainDrawer(),
       body: StreamBuilder<List<ProjectData>>(
-        stream: MyDatabase.instance.managers.project.watch(),
+        stream: Provider.of<DbSelector>(context, listen: false)
+            .database
+            .managers
+            .project
+            .watch(),
         builder: (context, projectsSnapshot) {
           return _buildBody(context, projectsSnapshot.data);
         },
