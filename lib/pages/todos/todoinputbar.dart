@@ -4,9 +4,10 @@ import 'dart:math';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 import 'projectdropdown.dart';
 import 'todo_select_date.dart';
 
@@ -59,13 +60,17 @@ class _TodoInputBarState extends State<TodoInputBar>
     if (dueDate != null) {
       dueDate = DateTime(dueDate!.year, dueDate!.month, dueDate!.day, 0, 0, 0);
     }
-    await MyDatabase.instance.managers.todo.create(
-      (o) => o(
-        title: titleInputController.text,
-        dueDate: drift.Value(dueDate),
-        project: drift.Value(project?.id),
-      ),
-    );
+    await Provider.of<DbSelector>(context, listen: false)
+        .database
+        .managers
+        .todo
+        .create(
+          (o) => o(
+            title: titleInputController.text,
+            dueDate: drift.Value(dueDate),
+            project: drift.Value(project?.id),
+          ),
+        );
     if (mounted) {
       titleInputController.clear();
       await _unFocusKeyboard();

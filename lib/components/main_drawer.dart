@@ -1,9 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
 
 import '../models/core.dart';
-import '../models/drift.dart';
+import '../models/db_selector.dart';
 
 class NavigationListTile extends StatelessWidget {
   const NavigationListTile({
@@ -142,14 +143,22 @@ class MainDrawer extends StatelessWidget {
             label: "7 Days",
           ),
           StreamBuilder<List<ProjectData>>(
-            stream: MyDatabase.instance.managers.project.watch(),
+            stream: Provider.of<DbSelector>(context, listen: false)
+                .database
+                .managers
+                .project
+                .watch(),
             builder: (context, projectsSnapshot) {
               return _buildProjectsDestination(context, projectsSnapshot.data);
             },
           ),
           StreamBuilder<List<String>>(
-            stream: MyDatabase.instance.managers.todo.watch().map<List<String>>(
-                (a) => a
+            stream: Provider.of<DbSelector>(context, listen: false)
+                .database
+                .managers
+                .todo
+                .watch()
+                .map<List<String>>((a) => a
                     .map((b) => b.tags)
                     .toList()
                     .reduce((prev, current) => prev..addAll(current))),

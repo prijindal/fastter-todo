@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:provider/provider.dart';
 
-import '../../../helpers/dbio.dart';
+import '../../../models/db_selector.dart';
 
 class BackupEncryptionTile extends StatefulWidget {
   const BackupEncryptionTile({super.key});
@@ -20,7 +21,10 @@ class _BackupEncryptionTileState extends State<BackupEncryptionTile> {
   }
 
   void _loadEncryptionStatus() {
-    DatabaseIO.instance.readEncrptionStatus().then((status) {
+    Provider.of<DbSelector>(context, listen: false)
+        .io
+        .readEncrptionStatus()
+        .then((status) {
       setState(() {
         _encryptionStatus = status;
       });
@@ -97,16 +101,25 @@ class _BackupEncryptionTileState extends State<BackupEncryptionTile> {
           content: Text("Backup encryption is now enabled"),
         ),
       );
-      await DatabaseIO.instance.writeEncryptionKey(newPassword);
-      setState(() {
-        _encryptionStatus = true;
-      });
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        await Provider.of<DbSelector>(context, listen: false)
+            .io
+            .writeEncryptionKey(newPassword);
+        setState(() {
+          _encryptionStatus = true;
+        });
+      }
     }
   }
 
   Future<void> _disableEncryption() async {
     final inputedPassword = await _showPasswordDialog();
-    final existingPassword = await DatabaseIO.instance.readEncryptionKey();
+    final existingPassword =
+        // ignore: use_build_context_synchronously
+        await Provider.of<DbSelector>(context, listen: false)
+            .io
+            .readEncryptionKey();
     if (inputedPassword != existingPassword) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
@@ -122,7 +135,10 @@ class _BackupEncryptionTileState extends State<BackupEncryptionTile> {
           content: Text("Removed backup encryption"),
         ),
       );
-      await DatabaseIO.instance.writeEncryptionKey(null);
+      // ignore: use_build_context_synchronously
+      await Provider.of<DbSelector>(context, listen: false)
+          .io
+          .writeEncryptionKey(null);
       setState(() {
         _encryptionStatus = false;
       });

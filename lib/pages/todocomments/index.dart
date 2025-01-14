@@ -1,10 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 import 'todo_comment_input.dart';
 import 'todo_comment_item.dart';
 
@@ -19,11 +20,17 @@ class TodoCommentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<TodoData>(
-        stream: MyDatabase.instance.managers.todo
+        stream: Provider.of<DbSelector>(context, listen: false)
+            .database
+            .managers
+            .todo
             .filter((f) => f.id.equals(todoId))
             .watchSingle(),
         builder: (context, todoSnapshot) => StreamBuilder<List<CommentData>>(
-          stream: MyDatabase.instance.managers.comment
+          stream: Provider.of<DbSelector>(context, listen: false)
+              .database
+              .managers
+              .comment
               .filter((f) => f.todo.id.equals(todoId))
               .watch(),
           builder: (context, commentsSnapshot) =>
@@ -177,8 +184,11 @@ class TodoCommentsAppBar extends StatelessWidget
         ],
       ),
     );
-    if (shouldDelete == true) {
-      await MyDatabase.instance.managers.comment
+    if (shouldDelete == true && context.mounted) {
+      await Provider.of<DbSelector>(context, listen: false)
+          .database
+          .managers
+          .comment
           .filter((f) => f.id.isIn(selectedComments))
           .delete();
     }

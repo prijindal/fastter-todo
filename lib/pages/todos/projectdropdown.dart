@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 
 class ProjectDropdown extends StatefulWidget {
   const ProjectDropdown({
@@ -32,10 +33,16 @@ class _ProjectDropdownState extends State<ProjectDropdown> {
   }
 
   void _fetchProjects() async {
-    final projects = await MyDatabase.instance.managers.project.get();
-    setState(() {
-      this.projects = projects;
-    });
+    final projects = await Provider.of<DbSelector>(context, listen: false)
+        .database
+        .managers
+        .project
+        .get();
+    if (context.mounted) {
+      setState(() {
+        this.projects = projects;
+      });
+    }
   }
 
   @override

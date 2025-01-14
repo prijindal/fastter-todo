@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 
 @RoutePage()
 class TodoScreen extends StatelessWidget {
@@ -24,7 +25,10 @@ class TodoScreen extends StatelessWidget {
           creationTime: DateTime.now(),
           tags: [],
         ),
-        stream: MyDatabase.instance.managers.todo
+        stream: Provider.of<DbSelector>(context, listen: false)
+            .database
+            .managers
+            .todo
             .filter((f) => f.id.equals(todoId))
             .watchSingle(),
         builder: (context, todoSnapshot) => _TodoScreen(
@@ -48,7 +52,7 @@ class _TodoScreen extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             onPressed: () async {
-              // await MyDatabase.instance.managers.todo
+              // await Provider.of<DbSelector>(context, listen: false).database.managers.todo
               //     .filter((a) => a.id.equals(todo.id))
               //     .delete();
               // await AutoRouter.of(context).maybePop();

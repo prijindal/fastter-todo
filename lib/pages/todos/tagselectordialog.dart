@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 
 class TagSelectorDialog extends StatefulWidget {
   const TagSelectorDialog({
@@ -26,7 +27,11 @@ class _TagSelectionState extends State<TagSelectorDialog> {
   }
 
   void _fetchTags() async {
-    final todos = await MyDatabase.instance.managers.todo.get();
+    final todos = await Provider.of<DbSelector>(context, listen: false)
+        .database
+        .managers
+        .todo
+        .get();
     final allTags = <String>[];
     for (var todo in todos) {
       final tags = todo.tags;

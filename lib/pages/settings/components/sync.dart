@@ -63,6 +63,11 @@ enum SyncReason {
 abstract class SyncBase<U> with ChangeNotifier {
   SyncStatus _syncStatus = SyncStatus.waiting;
   SyncMetadata? _syncMetadata;
+  final DatabaseIO Function() _ioGetter;
+
+  SyncBase(DatabaseIO Function() ioGetter) : _ioGetter = ioGetter;
+
+  DatabaseIO get io => _ioGetter();
 
   U? get currentUser;
   bool get isSupported => throw UnimplementedError();
@@ -87,10 +92,9 @@ abstract class SyncBase<U> with ChangeNotifier {
   }
 
   Future<void> _upload() async {
-    await uploadFile(
-        dbExportArchiveName, await DatabaseIO.instance.extractDbArchive());
-    final lastUpdatedTime = await DatabaseIO.instance.getLastUpdatedTime();
-    final encryptionKeyHash = await DatabaseIO.instance.readEncryptionKeyHash();
+    await uploadFile(dbExportArchiveName, await io.extractDbArchive());
+    final lastUpdatedTime = await io.getLastUpdatedTime();
+    final encryptionKeyHash = await io.readEncryptionKeyHash();
     final metadata = SyncMetadata(
       lastUpdatedAt: lastUpdatedTime,
       encryptedKeyHash: encryptionKeyHash,
@@ -112,12 +116,11 @@ abstract class SyncBase<U> with ChangeNotifier {
     if (fileContent == null) {
       return SyncReason.notFound;
     }
-    final currentEncryptionHash =
-        await DatabaseIO.instance.readEncryptionKeyHash();
+    final currentEncryptionHash = await io.readEncryptionKeyHash();
     if (_syncMetadata!.encryptedKeyHash != currentEncryptionHash) {
       return SyncReason.encryptionKeyMismatch;
     }
-    await DatabaseIO.instance.archiveToDb(fileContent);
+    await io.archiveToDb(fileContent);
     return SyncReason.downloaded;
   }
 
@@ -142,8 +145,7 @@ abstract class SyncBase<U> with ChangeNotifier {
       notifyListeners();
       return SyncReason.uploaded;
     } else {
-      final lastUpdatedTimeLocal =
-          await DatabaseIO.instance.getLastUpdatedTime();
+      final lastUpdatedTimeLocal = await io.getLastUpdatedTime();
       SyncReason reason = SyncReason.unknown;
       if (lastUpdatedTimeLocal.compareTo(_syncMetadata!.lastUpdatedAt) == 0) {
         reason = SyncReason.alreadySynced;
@@ -152,8 +154,7 @@ abstract class SyncBase<U> with ChangeNotifier {
         _upload();
         reason = SyncReason.uploaded;
       } else {
-        final currentEncryptionHash =
-            await DatabaseIO.instance.readEncryptionKeyHash();
+        final currentEncryptionHash = await io.readEncryptionKeyHash();
         if (_syncMetadata!.encryptedKeyHash != currentEncryptionHash) {
           return SyncReason.encryptionKeyMismatch;
         }

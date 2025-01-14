@@ -18,6 +18,11 @@ class SettingsScreen extends StatelessWidget {
           onTap: () => AutoRouter.of(context).pushNamed("/settings/styling"),
         ),
         ListTile(
+          leading: const Icon(Icons.code),
+          title: const Text("Backend"),
+          onTap: () => AutoRouter.of(context).pushNamed("/settings/backend"),
+        ),
+        ListTile(
           leading: const Icon(Icons.backup),
           title: const Text("Backup"),
           onTap: () => AutoRouter.of(context).pushNamed("/settings/backup"),

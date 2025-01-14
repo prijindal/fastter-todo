@@ -12,7 +12,7 @@ class FirebaseSync extends SyncBase<auth.User> {
   auth.User? _user;
   StreamSubscription<auth.User?>? _subscription;
 
-  FirebaseSync() {
+  FirebaseSync(super.ioGetter) {
     AppLogger.instance.d("Registering subscription");
     if (isSupported) {
       _subscription =

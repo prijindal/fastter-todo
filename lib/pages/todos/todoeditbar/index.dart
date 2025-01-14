@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
-import '../../../models/drift.dart';
+import '../../../models/db_selector.dart';
 import '../../../models/local_state.dart';
 import '../tagselector.dart';
 import 'change_date_button.dart';
@@ -36,7 +36,10 @@ class TodoEditBar extends StatelessWidget {
                 ),
               )
               .toList(),
-          stream: MyDatabase.instance.managers.todo
+          stream: Provider.of<DbSelector>(context, listen: false)
+              .database
+              .managers
+              .todo
               .filter((f) => f.id.isIn(selectedTodoIds))
               .watch(),
           builder: (context, selectedTodos) => _TodoEditBar(
@@ -70,14 +73,17 @@ class _TodoEditBar extends StatelessWidget {
         TagSelector(
           expanded: false,
           selectedTags: selectedTodos.first.tags,
-          onSelected: (selectedTags) async => await MyDatabase
-              .instance.managers.todo
-              .filter((f) => f.id.equals(selectedTodos.first.id))
-              .update(
-                (o) => o(
-                  tags: drift.Value(selectedTags),
-                ),
-              ),
+          onSelected: (selectedTags) async =>
+              await Provider.of<DbSelector>(context)
+                  .database
+                  .managers
+                  .todo
+                  .filter((f) => f.id.equals(selectedTodos.first.id))
+                  .update(
+                    (o) => o(
+                      tags: drift.Value(selectedTags),
+                    ),
+                  ),
         ),
         ChangePriorityButton(
           selectedTodos: selectedTodos,
@@ -103,14 +109,17 @@ class _TodoEditBar extends StatelessWidget {
         selectedTags: selectedTodos.map((a) => a.tags).reduce(
               (value, element) => value..addAll(element),
             ),
-        onSelected: (selectedTags) async => await MyDatabase
-            .instance.managers.todo
-            .filter((f) => f.id.isIn(selectedTodos.map((a) => a.id)))
-            .update(
-              (o) => o(
-                tags: drift.Value(selectedTags),
-              ),
-            ),
+        onSelected: (selectedTags) async =>
+            await Provider.of<DbSelector>(context)
+                .database
+                .managers
+                .todo
+                .filter((f) => f.id.isIn(selectedTodos.map((a) => a.id)))
+                .update(
+                  (o) => o(
+                    tags: drift.Value(selectedTags),
+                  ),
+                ),
       ),
       ChangePriorityButton(
         selectedTodos: selectedTodos,

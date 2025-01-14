@@ -2,7 +2,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/drift.dart';
+import '../../../models/db_selector.dart';
 import '../../../models/local_state.dart';
 
 class MarkCompletedButton extends StatelessWidget {
@@ -11,7 +11,10 @@ class MarkCompletedButton extends StatelessWidget {
   void _onMarkCompleted(BuildContext context) async {
     final localStateNotifier =
         Provider.of<LocalStateNotifier>(context, listen: false);
-    await MyDatabase.instance.managers.todo
+    await Provider.of<DbSelector>(context, listen: false)
+        .database
+        .managers
+        .todo
         .filter((f) => f.id.isIn(localStateNotifier.selectedTodoIds))
         .update((o) => o(completed: drift.Value(true)));
   }

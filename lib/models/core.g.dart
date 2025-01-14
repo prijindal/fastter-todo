@@ -1911,7 +1911,7 @@ final class $$CommentTableReferences
 
   $$TodoTableProcessedTableManager get todo {
     final manager = $$TodoTableTableManager($_db, $_db.todo)
-        .filter((f) => f.id($_item.todo!));
+        .filter((f) => f.id($_item.todo));
     final item = $_typedResult.readTableOrNull(_todoTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
@@ -2181,7 +2181,7 @@ final class $$ReminderTableReferences
 
   $$TodoTableProcessedTableManager get todo {
     final manager = $$TodoTableTableManager($_db, $_db.todo)
-        .filter((f) => f.id($_item.todo!));
+        .filter((f) => f.id($_item.todo));
     final item = $_typedResult.readTableOrNull(_todoTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(

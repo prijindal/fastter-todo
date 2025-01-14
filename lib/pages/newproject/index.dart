@@ -2,8 +2,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
 
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 
 @RoutePage()
 class NewProjectScreen extends StatefulWidget {
@@ -19,12 +20,16 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   HexColor _currentColor = HexColor("#FFFFFF");
 
   void _onSave() async {
-    await MyDatabase.instance.managers.project.create(
-      (o) => o(
-        color: _currentColor.hex,
-        title: titleController.text,
-      ),
-    );
+    await Provider.of<DbSelector>(context, listen: false)
+        .database
+        .managers
+        .project
+        .create(
+          (o) => o(
+            color: _currentColor.hex,
+            title: titleController.text,
+          ),
+        );
     // ignore: use_build_context_synchronously
     Navigator.of(context).pop();
   }

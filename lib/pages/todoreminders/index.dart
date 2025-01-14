@@ -2,9 +2,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 import '../todos/todo_select_date.dart';
 
 @RoutePage()
@@ -18,11 +19,17 @@ class TodoRemindersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StreamBuilder<TodoData>(
-        stream: MyDatabase.instance.managers.todo
+        stream: Provider.of<DbSelector>(context, listen: false)
+            .database
+            .managers
+            .todo
             .filter((f) => f.id.equals(todoId))
             .watchSingle(),
         builder: (context, todoSnapshot) => StreamBuilder<List<ReminderData>>(
-          stream: MyDatabase.instance.managers.reminder
+          stream: Provider.of<DbSelector>(context, listen: false)
+              .database
+              .managers
+              .reminder
               .filter((f) => f.todo.id.equals(todoId))
               .watch(),
           builder: (context, remindersSnapshot) =>
@@ -54,12 +61,17 @@ class _TodoRemindersScreen extends StatelessWidget {
       if (time != null) {
         final newTime =
             DateTime(date.year, date.month, date.day, time.hour, time.minute);
-        await MyDatabase.instance.managers.reminder.create((o) => o(
-              time: newTime.toUtc(),
-              title: "New Reminder",
-              todo: todo.id,
-              completed: drift.Value(false),
-            ));
+        // ignore: use_build_context_synchronously
+        await Provider.of<DbSelector>(context, listen: false)
+            .database
+            .managers
+            .reminder
+            .create((o) => o(
+                  time: newTime.toUtc(),
+                  title: "New Reminder",
+                  todo: todo.id,
+                  completed: drift.Value(false),
+                ));
       }
     }
   }

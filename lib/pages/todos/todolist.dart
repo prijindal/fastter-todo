@@ -1,8 +1,9 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/drift.dart';
+import '../../models/db_selector.dart';
 import 'todo_item.dart';
 
 class TodoList extends StatelessWidget {
@@ -35,9 +36,12 @@ class TodoList extends StatelessWidget {
     );
   }
 
-  Stream<List<TodoData>> get _stream {
-    var manager =
-        MyDatabase.instance.managers.todo.filter((f) => f.id.not.isNull());
+  Stream<List<TodoData>> _stream(BuildContext context) {
+    var manager = Provider.of<DbSelector>(context, listen: false)
+        .database
+        .managers
+        .todo
+        .filter((f) => f.id.not.isNull());
     manager = manager.orderBy(
         (o) => o.priority.desc() & o.completed.asc() & o.dueDate.asc());
     if (projectFilter != null) {
@@ -60,7 +64,7 @@ class TodoList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<TodoData>>(
-      stream: _stream,
+      stream: _stream(context),
       builder: (context, entries) => _buildList(context, entries.data),
     );
   }

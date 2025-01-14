@@ -1,8 +1,9 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
-import '../../../models/drift.dart';
+import '../../../models/db_selector.dart';
 import '../projectdropdown.dart';
 
 class ChangeProjectButton extends StatelessWidget {
@@ -15,7 +16,10 @@ class ChangeProjectButton extends StatelessWidget {
 
   Future<void> _onChangeProject(
       ProjectData? project, BuildContext context) async {
-    await MyDatabase.instance.managers.todo
+    await Provider.of<DbSelector>(context, listen: false)
+        .database
+        .managers
+        .todo
         .filter((f) => f.id.isIn(selectedTodos.map((a) => a.id)))
         .update((o) => o(project: drift.Value(project?.id)));
   }
@@ -29,7 +33,10 @@ class ChangeProjectButton extends StatelessWidget {
       );
     }
     return StreamBuilder<ProjectData>(
-      stream: MyDatabase.instance.managers.project
+      stream: Provider.of<DbSelector>(context, listen: false)
+          .database
+          .managers
+          .project
           .filter((f) => f.id.equals(selectedTodos.first.project))
           .watchSingle(),
       builder: (context, project) => ProjectDropdown(
