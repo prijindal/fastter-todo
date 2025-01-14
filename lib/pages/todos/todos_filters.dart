@@ -8,19 +8,7 @@ import 'package:provider/provider.dart';
 import '../../models/core.dart';
 import '../../models/db_selector.dart';
 
-void openSettings(BuildContext context) {
-  AutoRouter.of(context).pushNamed("/settings");
-}
-
-enum AppBarActions {
-  settings(
-    onPressed: openSettings,
-    icon: Icon(
-      Icons.settings,
-      size: 26.0,
-    ),
-  );
-
+class AppBarActions {
   final void Function(BuildContext context) onPressed;
   final Icon icon;
 
@@ -28,6 +16,21 @@ enum AppBarActions {
     required this.icon,
     required this.onPressed,
   });
+
+  factory AppBarActions.settings() {
+    return AppBarActions(
+      icon: Icon(Icons.settings),
+      onPressed: (context) => AutoRouter.of(context).pushNamed("/settings"),
+    );
+  }
+
+  factory AppBarActions.editProject(String projectId) {
+    return AppBarActions(
+      icon: Icon(Icons.edit),
+      onPressed: (context) =>
+          AutoRouter.of(context).pushNamed("/project/$projectId"),
+    );
+  }
 }
 
 class TodosFilters {
@@ -113,7 +116,12 @@ class TodosFilters {
   }
 
   List<AppBarActions> get actions {
-    return [AppBarActions.settings];
+    final actions = <AppBarActions>[];
+    if (projectFilter != null && projectFilter != "inbox") {
+      actions.add(AppBarActions.editProject(projectFilter!));
+    }
+    actions.add(AppBarActions.settings());
+    return actions;
   }
 
   @override
