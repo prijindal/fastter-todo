@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
 import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 import 'projectdropdown.dart';
 import 'todo_select_date.dart';
 
@@ -58,12 +59,10 @@ class _TodoInputBarState extends State<TodoInputBar>
 
   Future<void> _initialValues() async {
     if (widget.initialProject != null && widget.initialProject != "inbox") {
-      final project = await Provider.of<DbSelector>(context, listen: false)
-          .database
-          .managers
-          .project
-          .filter((f) => f.id.equals(widget.initialProject))
-          .getSingle();
+      final project = Provider.of<LocalDbState>(context, listen: false)
+          .projects
+          .where((f) => f.id == widget.initialProject)
+          .firstOrNull;
       setState(() {
         this.project = project;
       });

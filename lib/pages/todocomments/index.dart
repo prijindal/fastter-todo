@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../models/core.dart';
 import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 import 'todo_comment_input.dart';
 import 'todo_comment_item.dart';
 
@@ -19,27 +20,11 @@ class TodoCommentsScreen extends StatelessWidget {
   final String todoId;
 
   @override
-  Widget build(BuildContext context) => StreamBuilder<TodoData>(
-        stream: Provider.of<DbSelector>(context, listen: false)
-            .database
-            .managers
-            .todo
-            .filter((f) => f.id.equals(todoId))
-            .watchSingle(),
-        builder: (context, todoSnapshot) => StreamBuilder<List<CommentData>>(
-          stream: Provider.of<DbSelector>(context, listen: false)
-              .database
-              .managers
-              .comment
-              .filter((f) => f.todo.id.equals(todoId))
-              .watch(),
-          builder: (context, commentsSnapshot) =>
-              (!commentsSnapshot.hasData || !todoSnapshot.hasData)
-                  ? Scaffold(body: Center(child: Text("Loading...")))
-                  : _TodoCommentsScreen(
-                      todo: todoSnapshot.requireData,
-                      todoComments: commentsSnapshot.requireData,
-                    ),
+  Widget build(BuildContext context) => Consumer<LocalDbState>(
+        builder: (context, localDbState, _) => _TodoCommentsScreen(
+          todo: localDbState.todos.firstWhere((f) => f.id == todoId),
+          todoComments:
+              localDbState.comments.where((a) => a.todo == todoId).toList(),
         ),
       );
 }

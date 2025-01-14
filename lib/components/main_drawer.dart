@@ -4,7 +4,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
 import '../models/core.dart';
-import '../models/db_selector.dart';
+import '../models/local_db_state.dart';
 import '../pages/todos/todos_filters.dart';
 
 class NavigationListTile extends StatelessWidget {
@@ -14,12 +14,14 @@ class NavigationListTile extends StatelessWidget {
     required this.icon,
     required this.selectedIcon,
     this.route,
+    this.trailing,
   });
 
   final String label;
   final Icon icon;
   final Icon selectedIcon;
   final String? route;
+  final String? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +31,7 @@ class NavigationListTile extends StatelessWidget {
       title: Text(label),
       selected: selected,
       leading: selected ? selectedIcon : icon,
+      trailing: trailing == null ? null : Text(trailing!),
       onTap: route == null
           ? null
           : () async {
@@ -54,22 +57,17 @@ class TodosNavigationListTile extends StatelessWidget {
   final Icon icon;
   final Icon selectedIcon;
 
-  String _buildLabel(BuildContext context) {
-    final future = filters.createTitle(context);
-    if (future is String) {
-      return future;
-    } else {
-      return "Todos";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return NavigationListTile(
-      icon: icon,
-      selectedIcon: selectedIcon,
-      route: "/todos?${filters.queryString}",
-      label: _buildLabel(context),
+    return Selector<LocalDbState, int>(
+      selector: (_, state) => filters.filtered(state.todos).length,
+      builder: (context, count, _) => NavigationListTile(
+        icon: icon,
+        selectedIcon: selectedIcon,
+        route: "/todos?${filters.queryString}",
+        label: filters.createTitle(context),
+        trailing: count.toString(),
+      ),
     );
   }
 }
@@ -81,12 +79,12 @@ class MainDrawer extends StatelessWidget {
 
   Widget _buildProjectsDestination(
       BuildContext context, List<ProjectData>? projects) {
-    final children = <NavigationListTile>[];
+    final children = <Widget>[];
     if (projects != null) {
       children.addAll(projects
           .map(
-            (project) => NavigationListTile(
-              route: "/todos?projectFilter=${project.id}",
+            (project) => TodosNavigationListTile(
+              filters: TodosFilters(projectFilter: project.id),
               icon: Icon(
                 Icons.group_work_outlined,
                 color: HexColor(project.color),
@@ -95,7 +93,6 @@ class MainDrawer extends StatelessWidget {
                 Icons.group_work,
                 color: HexColor(project.color),
               ),
-              label: project.title,
             ),
           )
           .toList());
@@ -178,28 +175,18 @@ class MainDrawer extends StatelessWidget {
             icon: Icon(Icons.calendar_view_day_outlined),
             selectedIcon: Icon(Icons.calendar_view_day),
           ),
-          StreamBuilder<List<ProjectData>>(
-            stream: Provider.of<DbSelector>(context, listen: false)
-                .database
-                .managers
-                .project
-                .watch(),
-            builder: (context, projectsSnapshot) {
-              return _buildProjectsDestination(context, projectsSnapshot.data);
+          Selector<LocalDbState, List<ProjectData>>(
+            selector: (_, state) => state.projects,
+            builder: (context, projects, _) {
+              return _buildProjectsDestination(context, projects);
             },
           ),
-          StreamBuilder<List<String>>(
-            stream: Provider.of<DbSelector>(context, listen: false)
-                .database
-                .managers
-                .todo
-                .watch()
-                .map<List<String>>((a) => a
-                    .map((b) => b.tags)
-                    .toList()
-                    .reduce((prev, current) => prev..addAll(current))),
-            builder: (context, tagsSnapshot) {
-              return _buildTagsDestination(context, tagsSnapshot.data);
+          Selector<LocalDbState, List<String>>(
+            selector: (_, state) => state.todos
+                .map<List<String>>((a) => a.tags.toList())
+                .fold([], (prev, current) => prev..addAll(current)),
+            builder: (context, tags, _) {
+              return _buildTagsDestination(context, tags);
             },
           ),
           NavigationListTile(

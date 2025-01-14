@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
 import '../models/db_selector.dart';
+import '../models/local_db_state.dart';
 import '../models/local_state.dart';
 import '../models/settings.dart';
 import '../pages/settings/backup/firebase/firebase_sync.dart';
@@ -16,10 +17,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dbSelector = DbSelector();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<DbSelector>(
-          create: (context) => DbSelector(),
+          create: (context) => dbSelector,
         ),
         ChangeNotifierProvider<SettingsStorageNotifier>(
           create: (context) => SettingsStorageNotifier(),
@@ -69,7 +71,12 @@ class MyMaterialAppWrapper extends StatelessWidget {
               providers: [
                 ChangeNotifierProvider<FirebaseSync>(
                   create: (context) => FirebaseSync(
-                    () => Provider.of<DbSelector>(context, listen: false).io,
+                    () => dbSelector.io,
+                  ),
+                ),
+                ChangeNotifierProvider<LocalDbState>(
+                  create: (context) => LocalDbState(
+                    dbSelector.database,
                   ),
                 ),
               ],

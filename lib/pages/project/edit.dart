@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
 import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 import 'form.dart';
 
 @RoutePage()
@@ -19,17 +20,13 @@ class EditProjectScreen extends StatelessWidget {
   final String projectId;
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<ProjectData>(
-      future: Provider.of<DbSelector>(context, listen: false)
-          .database
-          .managers
-          .project
-          .filter((f) => f.id.equals(projectId))
-          .getSingle(),
-      builder: (_, snapshot) => (!snapshot.hasData)
+    return Selector<LocalDbState, ProjectData?>(
+      selector: (_, state) =>
+          state.projects.where((a) => a.id == projectId).firstOrNull,
+      builder: (_, project, __) => project == null
           ? Scaffold(body: Center(child: Text("Loading...")))
           : _EditProjectScreen(
-              project: snapshot.requireData,
+              project: project,
             ),
     );
   }

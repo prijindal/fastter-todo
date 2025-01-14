@@ -84,7 +84,7 @@ class DbSelector extends ChangeNotifier {
       }
       final remoteSettings = RemoteDbSettings.fromJson(remoteSettingsString);
       AppLogger.instance.d(
-          "Initiating remote database with implementation type ${remoteSettings.implementationType}");
+          "Initiating remote database with implementation type ${remoteSettings.implementationType} with ${remoteSettings.url}");
       if (remoteSettings.implementationType ==
           RemoteDbImplementationType.hrana) {
         _database = SharedDatabase.hrana(

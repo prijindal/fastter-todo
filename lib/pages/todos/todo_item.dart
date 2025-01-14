@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../helpers/date_fomatters.dart';
 import '../../models/core.dart';
 import '../../models/db_selector.dart';
+import '../../models/local_db_state.dart';
 import '../../models/local_state.dart';
 import 'confirmation_dialog.dart';
 import 'tagslist.dart';
@@ -270,18 +271,12 @@ class SubtitleProject extends StatelessWidget {
         flex: 1,
         child: todo.project == null
             ? _buildContainer(null)
-            : StreamBuilder<ProjectData>(
-                stream: Provider.of<DbSelector>(context, listen: false)
-                    .database
-                    .managers
-                    .project
-                    .filter((f) => f.id.equals(todo.project))
-                    .watchSingle(),
-                builder: (context, projectSnapshot) {
-                  if (!projectSnapshot.hasData) {
-                    return Container();
-                  }
-                  return _buildContainer(projectSnapshot.data);
+            : Selector<LocalDbState, ProjectData?>(
+                selector: (_, state) => state.projects
+                    .where((f) => f.id == todo.project)
+                    .firstOrNull,
+                builder: (context, project, _) {
+                  return _buildContainer(project);
                 },
               ),
       ),

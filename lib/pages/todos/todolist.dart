@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
+import '../../models/local_db_state.dart';
 import 'todo_item.dart';
 import 'todos_filters.dart';
 
@@ -32,10 +34,10 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<TodoData>>(
-      key: Key(filters.hashCode.toString()),
-      stream: filters.createStream(context),
-      builder: (context, entries) => _buildList(context, entries.data),
+    return Consumer<LocalDbState>(
+      builder: (context, state, _) => !state.isInitialized
+          ? Center(child: Text("Loading"))
+          : _buildList(context, filters.filtered(state.todos)),
     );
   }
 }

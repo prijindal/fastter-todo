@@ -35,22 +35,7 @@ class MainAppBar extends StatelessWidget {
   final TodosFilters filters;
 
   Widget _buildTitle(BuildContext context) {
-    final futureOrString = filters.createTitle(context);
-    if (futureOrString is String) {
-      return Text(
-        futureOrString,
-      );
-    } else {
-      return FutureBuilder<String>(
-        future: futureOrString,
-        initialData: "Todos",
-        builder: (context, snapshot) {
-          return Text(
-            snapshot.requireData,
-          );
-        },
-      );
-    }
+    return Text(filters.createTitle(context));
   }
 
   @override
