@@ -74,7 +74,7 @@ class _TodoEditBar extends StatelessWidget {
           expanded: false,
           selectedTags: selectedTodos.first.tags,
           onSelected: (selectedTags) async =>
-              await Provider.of<DbSelector>(context)
+              await Provider.of<DbSelector>(context, listen: false)
                   .database
                   .managers
                   .todo
@@ -110,7 +110,7 @@ class _TodoEditBar extends StatelessWidget {
               (value, element) => value..addAll(element),
             ),
         onSelected: (selectedTags) async =>
-            await Provider.of<DbSelector>(context)
+            await Provider.of<DbSelector>(context, listen: false)
                 .database
                 .managers
                 .todo

@@ -64,7 +64,7 @@ class MyMaterialAppWrapper extends StatelessWidget {
           providers: [
             ChangeNotifierProvider<FirebaseSync>(
               create: (context) => FirebaseSync(
-                () => Provider.of<DbSelector>(context).io,
+                () => Provider.of<DbSelector>(context, listen: false).io,
               ),
             ),
           ],
