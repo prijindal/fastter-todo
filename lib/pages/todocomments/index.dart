@@ -35,7 +35,7 @@ class TodoCommentsScreen extends StatelessWidget {
               .watch(),
           builder: (context, commentsSnapshot) =>
               (!commentsSnapshot.hasData || !todoSnapshot.hasData)
-                  ? Center(child: Text("Loading..."))
+                  ? Scaffold(body: Center(child: Text("Loading...")))
                   : _TodoCommentsScreen(
                       todo: todoSnapshot.requireData,
                       todoComments: commentsSnapshot.requireData,
