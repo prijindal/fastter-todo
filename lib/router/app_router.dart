@@ -24,6 +24,10 @@ class AppRouter extends RootStackRouter {
           page: NewProjectRoute.page,
         ),
         AutoRoute(
+          path: "/project/:projectId",
+          page: EditProjectRoute.page,
+        ),
+        AutoRoute(
           path: "/todo/:todoId",
           page: TodoRoute.page,
         ),
