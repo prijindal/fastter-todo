@@ -1,22 +1,16 @@
-import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
 import 'todo_item.dart';
+import 'todos_filters.dart';
 
 class TodoList extends StatelessWidget {
   const TodoList({
     super.key,
-    this.projectFilter,
-    this.tagFilter,
-    this.daysAhead,
+    required this.filters,
   });
 
-  final String? projectFilter;
-  final String? tagFilter;
-  final int? daysAhead;
+  final TodosFilters filters;
 
   Widget _buildList(BuildContext context, List<TodoData>? entries) {
     if (entries == null) {
@@ -36,35 +30,11 @@ class TodoList extends StatelessWidget {
     );
   }
 
-  Stream<List<TodoData>> _stream(BuildContext context) {
-    var manager = Provider.of<DbSelector>(context, listen: false)
-        .database
-        .managers
-        .todo
-        .filter((f) => f.id.not.isNull());
-    manager = manager.orderBy(
-        (o) => o.priority.desc() & o.completed.asc() & o.dueDate.asc());
-    if (projectFilter != null) {
-      if (projectFilter == "inbox") {
-        manager = manager.filter((f) => f.project.isNull());
-      } else {
-        manager = manager.filter((f) => f.project.equals(projectFilter));
-      }
-    }
-    if (tagFilter != null) {
-      manager = manager.filter((f) => f.tags.column.contains(tagFilter!));
-    }
-    if (daysAhead != null) {
-      manager = manager.filter((f) =>
-          f.dueDate.isBefore(DateTime.now().add(Duration(days: daysAhead!))));
-    }
-    return manager.watch();
-  }
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<TodoData>>(
-      stream: _stream(context),
+      key: Key(filters.hashCode.toString()),
+      stream: filters.createStream(context),
       builder: (context, entries) => _buildList(context, entries.data),
     );
   }

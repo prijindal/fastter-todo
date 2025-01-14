@@ -1,17 +1,17 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/local_state.dart';
 import 'todoeditbar/delete_selected_todos_button.dart';
+import 'todos_filters.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({
     super.key,
-    required this.title,
+    required this.filters,
   });
 
-  final String title;
+  final TodosFilters filters;
 
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
@@ -21,7 +21,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Selector<LocalStateNotifier, bool>(
       builder: (context, selectedEntriesEmpty, _) => selectedEntriesEmpty
           ? MainAppBar(
-              title: title,
+              filters: filters,
             )
           : const SelectedEntriesAppBar(),
       selector: (_, localState) => localState.selectedTodoIds.isEmpty,
@@ -30,25 +30,41 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class MainAppBar extends StatelessWidget {
-  const MainAppBar({super.key, required this.title});
+  const MainAppBar({super.key, required this.filters});
 
-  final String title;
+  final TodosFilters filters;
+
+  Widget _buildTitle(BuildContext context) {
+    final futureOrString = filters.createTitle(context);
+    if (futureOrString is String) {
+      return Text(
+        futureOrString,
+      );
+    } else {
+      return FutureBuilder<String>(
+        future: futureOrString,
+        initialData: "Todos",
+        builder: (context, snapshot) {
+          return Text(
+            snapshot.requireData,
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(title),
-      actions: [
-        IconButton(
-          onPressed: () {
-            AutoRouter.of(context).pushNamed("/settings");
-          },
-          icon: const Icon(
-            Icons.settings,
-            size: 26.0,
-          ),
-        ),
-      ],
+      title: _buildTitle(context),
+      actions: filters.actions
+          .map(
+            (action) => IconButton(
+              onPressed: () => action.onPressed(context),
+              icon: action.icon,
+            ),
+          )
+          .toList(),
     );
   }
 }

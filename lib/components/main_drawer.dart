@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../models/core.dart';
 import '../models/db_selector.dart';
+import '../pages/todos/todos_filters.dart';
 
 class NavigationListTile extends StatelessWidget {
   const NavigationListTile({
@@ -28,7 +29,47 @@ class NavigationListTile extends StatelessWidget {
       title: Text(label),
       selected: selected,
       leading: selected ? selectedIcon : icon,
-      onTap: route == null ? null : () => autoRouter.navigateNamed(route!),
+      onTap: route == null
+          ? null
+          : () async {
+              await autoRouter.navigateNamed(route!);
+              if (context.mounted && Scaffold.of(context).isDrawerOpen) {
+                Scaffold.of(context).closeDrawer();
+              }
+            },
+    );
+  }
+}
+
+// List tile to specifically navigate to todos page
+class TodosNavigationListTile extends StatelessWidget {
+  const TodosNavigationListTile({
+    super.key,
+    required this.filters,
+    required this.icon,
+    required this.selectedIcon,
+  });
+
+  final TodosFilters filters;
+  final Icon icon;
+  final Icon selectedIcon;
+
+  String _buildLabel(BuildContext context) {
+    final future = filters.createTitle(context);
+    if (future is String) {
+      return future;
+    } else {
+      return "Todos";
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NavigationListTile(
+      icon: icon,
+      selectedIcon: selectedIcon,
+      route: "/todos?${filters.queryString}",
+      label: _buildLabel(context),
     );
   }
 }
@@ -90,15 +131,14 @@ class MainDrawer extends StatelessWidget {
     if (tags != null) {
       children.addAll(tags
           .map(
-            (tag) => NavigationListTile(
-              route: "/todos?tagFilter=$tag",
+            (tag) => TodosNavigationListTile(
+              filters: TodosFilters(tagFilter: tag),
               icon: Icon(
                 Icons.tag_outlined,
               ),
               selectedIcon: Icon(
                 Icons.tag,
               ),
-              label: tag,
             ),
           )
           .toList());
@@ -118,29 +158,25 @@ class MainDrawer extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
-          NavigationListTile(
-            route: "/todos?projectFilter=inbox",
+          TodosNavigationListTile(
+            filters: TodosFilters(projectFilter: "inbox"),
             icon: Icon(Icons.inbox_outlined),
             selectedIcon: Icon(Icons.inbox),
-            label: "Inbox",
           ),
-          NavigationListTile(
-            route: "/todos",
+          TodosNavigationListTile(
+            filters: TodosFilters(),
             icon: Icon(Icons.select_all_outlined),
             selectedIcon: Icon(Icons.select_all),
-            label: "All tasks",
           ),
-          NavigationListTile(
-            route: "/todos?daysAhead=1",
+          TodosNavigationListTile(
+            filters: TodosFilters(daysAhead: 1),
             icon: Icon(Icons.calendar_today_outlined),
             selectedIcon: Icon(Icons.calendar_today),
-            label: "Today",
           ),
-          NavigationListTile(
-            route: "/todos?daysAhead=7",
+          TodosNavigationListTile(
+            filters: TodosFilters(daysAhead: 7),
             icon: Icon(Icons.calendar_view_day_outlined),
             selectedIcon: Icon(Icons.calendar_view_day),
-            label: "7 Days",
           ),
           StreamBuilder<List<ProjectData>>(
             stream: Provider.of<DbSelector>(context, listen: false)

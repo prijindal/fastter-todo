@@ -15,9 +15,11 @@ class TodoInputBar extends StatefulWidget {
   const TodoInputBar({
     super.key,
     required this.onBackButton,
+    this.initialProject,
   });
 
   final void Function() onBackButton;
+  final String? initialProject; // this will be a project id
   @override
   State<TodoInputBar> createState() => _TodoInputBarState();
 }
@@ -35,9 +37,7 @@ class _TodoInputBarState extends State<TodoInputBar>
   @override
   void initState() {
     super.initState();
-    // if (widget.project != null) {
-    //   project = widget.project;
-    // }
+    _initialValues();
     WidgetsBinding.instance.addObserver(this);
     var keyboardVisibilityController = KeyboardVisibilityController();
     subscribingId = keyboardVisibilityController.onChange.listen((visible) {
@@ -54,6 +54,20 @@ class _TodoInputBarState extends State<TodoInputBar>
     WidgetsBinding.instance.removeObserver(this);
     subscribingId?.cancel();
     super.dispose();
+  }
+
+  Future<void> _initialValues() async {
+    if (widget.initialProject != null && widget.initialProject != "inbox") {
+      final project = await Provider.of<DbSelector>(context, listen: false)
+          .database
+          .managers
+          .project
+          .filter((f) => f.id.equals(widget.initialProject))
+          .getSingle();
+      setState(() {
+        this.project = project;
+      });
+    }
   }
 
   void _onSave() async {

@@ -6,19 +6,16 @@ import '../../models/local_state.dart';
 import 'todoeditbar/index.dart';
 import 'todoinputbar.dart';
 import 'todolist.dart';
+import 'todos_filters.dart';
 
 class TodoListScaffold extends StatefulWidget {
   const TodoListScaffold({
     super.key,
     this.appBar,
-    this.projectFilter,
-    this.tagFilter,
-    this.daysAhead,
+    required this.filters,
   });
 
-  final String? projectFilter;
-  final String? tagFilter;
-  final int? daysAhead;
+  final TodosFilters filters;
 
   /// An app bar to display at the top of the scaffold.
   final PreferredSizeWidget? appBar;
@@ -45,9 +42,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
 
   Widget _buildList() {
     return TodoList(
-      projectFilter: widget.projectFilter,
-      tagFilter: widget.tagFilter,
-      daysAhead: widget.daysAhead,
+      filters: widget.filters,
     );
   }
 
@@ -59,6 +54,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
           right: 2,
           left: 2,
           child: TodoInputBar(
+            initialProject: widget.filters.projectFilter,
             onBackButton: () {
               setState(() {
                 _showInput = false;
