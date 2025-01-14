@@ -340,7 +340,6 @@ class TodosRoute extends _i16.PageRouteInfo<TodosRouteArgs> {
     String? projectFilter,
     String? tagFilter,
     int? daysAhead,
-    String title = "Todos",
     List<_i16.PageRouteInfo>? children,
   }) : super(
          TodosRoute.name,
@@ -349,13 +348,11 @@ class TodosRoute extends _i16.PageRouteInfo<TodosRouteArgs> {
            projectFilter: projectFilter,
            tagFilter: tagFilter,
            daysAhead: daysAhead,
-           title: title,
          ),
          rawQueryParams: {
            'projectFilter': projectFilter,
            'tagFilter': tagFilter,
            'daysAhead': daysAhead,
-           'title': title,
          },
          initialChildren: children,
        );
@@ -372,7 +369,6 @@ class TodosRoute extends _i16.PageRouteInfo<TodosRouteArgs> {
               projectFilter: queryParams.optString('projectFilter'),
               tagFilter: queryParams.optString('tagFilter'),
               daysAhead: queryParams.optInt('daysAhead'),
-              title: queryParams.getString('title', "Todos"),
             ),
       );
       return _i15.TodosScreen(
@@ -380,7 +376,6 @@ class TodosRoute extends _i16.PageRouteInfo<TodosRouteArgs> {
         projectFilter: args.projectFilter,
         tagFilter: args.tagFilter,
         daysAhead: args.daysAhead,
-        title: args.title,
       );
     },
   );
@@ -392,7 +387,6 @@ class TodosRouteArgs {
     this.projectFilter,
     this.tagFilter,
     this.daysAhead,
-    this.title = "Todos",
   });
 
   final _i17.Key? key;
@@ -403,10 +397,8 @@ class TodosRouteArgs {
 
   final int? daysAhead;
 
-  final String title;
-
   @override
   String toString() {
-    return 'TodosRouteArgs{key: $key, projectFilter: $projectFilter, tagFilter: $tagFilter, daysAhead: $daysAhead, title: $title}';
+    return 'TodosRouteArgs{key: $key, projectFilter: $projectFilter, tagFilter: $tagFilter, daysAhead: $daysAhead}';
   }
 }

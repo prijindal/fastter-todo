@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'home_app_bar.dart';
 import 'todo_list_scaffold.dart';
+import 'todos_filters.dart';
 
 const mediaBreakpoint = 700;
 
@@ -13,23 +14,25 @@ class TodosScreen extends StatelessWidget {
     @queryParam this.projectFilter,
     @queryParam this.tagFilter,
     @queryParam this.daysAhead,
-    @queryParam this.title = "Todos",
   });
 
   final String? projectFilter;
   final String? tagFilter;
   final int? daysAhead; // Due Date less than or equal to
-  final String title;
+
+  TodosFilters get filters => TodosFilters(
+        projectFilter: projectFilter,
+        tagFilter: tagFilter,
+        daysAhead: daysAhead,
+      );
 
   @override
   Widget build(BuildContext context) {
     return TodoListScaffold(
       appBar: HomeAppBar(
-        title: title,
+        filters: filters,
       ),
-      projectFilter: projectFilter,
-      tagFilter: tagFilter,
-      daysAhead: daysAhead,
+      filters: filters,
     );
   }
 }
