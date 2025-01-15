@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/isolate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/core.dart';
@@ -16,18 +17,24 @@ class DatabaseIO {
   SharedDatabase get database => _database;
 
   Future<String> extractDbJson() async {
-    final db = await Future.wait([
-      database.managers.todo.get(),
-      database.managers.project.get(),
-      database.managers.comment.get(),
-      database.managers.reminder.get(),
-    ]);
+    final entries = await database.computeWithDatabase<List<List<DataClass>>>(
+      computation: (database) async {
+        final [todo, project, comment, reminder] = await Future.wait([
+          database.managers.todo.get(),
+          database.managers.project.get(),
+          database.managers.comment.get(),
+          database.managers.reminder.get(),
+        ]);
+        return [todo, project, comment, reminder];
+      },
+      connect: (connection) => SharedDatabase(connection),
+    );
     String encoded = jsonEncode(
       {
-        "todo": db[0],
-        "project": db[1],
-        "comment": db[2],
-        "reminder": db[3],
+        "todo": entries[0],
+        "project": entries[1],
+        "comment": entries[2],
+        "reminder": entries[3],
       },
     );
     AppLogger.instance.i("Extracted data from database");
