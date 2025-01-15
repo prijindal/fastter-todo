@@ -43,12 +43,12 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
 
   Future<void> _newReminder(BuildContext context) async {
     final now = DateTime.now();
-    final dateResponse = await todoSelectDate(context, now, false);
+    final dateResponse = await todoSelectDate(context, now, false, now);
     if (dateResponse != null && context.mounted) {
       final date = dateResponse;
       final time = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay(minute: date.minute, hour: date.hour),
+        initialTime: TimeOfDay(minute: now.minute, hour: now.hour),
       );
       if (time != null) {
         final newTime =

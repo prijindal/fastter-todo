@@ -39,9 +39,9 @@ class LocalNotificationsManager {
       macOS: initializationSettingsDarwin,
       linux: initializationSettingsLinux,
     );
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-    );
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onDidReceiveNotificationResponse: (details) =>
+            {AppLogger.instance.d("Received notification: ${details.id}")});
   }
 
   Future<bool> requestPermissions() async {
