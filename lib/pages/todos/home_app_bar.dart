@@ -60,17 +60,27 @@ class SelectedEntriesAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localStateNotifier = Provider.of<LocalStateNotifier>(context);
-    return AppBar(
-      leading: IconButton(
-        onPressed: () {
+    return PopScope(
+      canPop: localStateNotifier.selectedTodoIds.isEmpty,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) {
+          // If route did not pop, then it means that the selectedTodoIds is not empty,
+          // We need to clear it
           localStateNotifier.setSelectedTodoIds([]);
-        },
-        icon: Icon(Icons.arrow_back),
+        }
+      },
+      child: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            localStateNotifier.setSelectedTodoIds([]);
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
+        title: Text("${localStateNotifier.selectedTodoIds.length} Selected"),
+        actions: [
+          DeleteSelectedTodosButton(),
+        ],
       ),
-      title: Text("${localStateNotifier.selectedTodoIds.length} Selected"),
-      actions: [
-        DeleteSelectedTodosButton(),
-      ],
     );
   }
 }

@@ -204,17 +204,25 @@ class TodoCommentsAppBar extends StatelessWidget
   }
 
   @override
-  Widget build(BuildContext context) => AppBar(
-        title: Text(selectedComments.isEmpty
-            ? todo.title
-            : '${selectedComments.length} Comments selected'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: selectedComments.isEmpty
-              ? () => {AutoRouter.of(context).maybePop()}
-              : onClear,
-          tooltip: 'Back',
+  Widget build(BuildContext context) => PopScope(
+        canPop: selectedComments.isEmpty,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) {
+            onClear();
+          }
+        },
+        child: AppBar(
+          title: Text(selectedComments.isEmpty
+              ? todo.title
+              : '${selectedComments.length} Comments selected'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: selectedComments.isEmpty
+                ? () => {AutoRouter.of(context).maybePop()}
+                : onClear,
+            tooltip: 'Back',
+          ),
+          actions: _buildActions(context),
         ),
-        actions: _buildActions(context),
       );
 }

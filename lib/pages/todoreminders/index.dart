@@ -39,7 +39,7 @@ class _TodoRemindersScreen extends StatefulWidget {
 }
 
 class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
-  final List<String> _selectedReminders = [];
+  List<String> _selectedReminders = [];
 
   Future<void> _newReminder(BuildContext context) async {
     final now = DateTime.now();
@@ -128,52 +128,76 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
   String _formattedTime(ReminderData todoReminder) =>
       DateFormat('EEE dd MMM y, hh:mm a').format(todoReminder.time.toLocal());
 
+  void _onClear() {
+    setState(() {
+      _selectedReminders = [];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_selectedReminders.isEmpty
-            ? widget.todo.title
-            : "${_selectedReminders.length} Reminders selected"),
-        actions: _buildActions(context),
+    return PopScope(
+      canPop: _selectedReminders.isEmpty,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) {
+          _onClear();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_selectedReminders.isEmpty
+              ? widget.todo.title
+              : "${_selectedReminders.length} Reminders selected"),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _selectedReminders.isEmpty
+                ? () => {AutoRouter.of(context).maybePop()}
+                : _onClear,
+            tooltip: 'Back',
+          ),
+          actions: _buildActions(context),
+        ),
+        body: _buildBody(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => _newReminder(context),
+          child: const Icon(Icons.add),
+        ),
       ),
-      body: Flex(
-        direction: Axis.vertical,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          if (widget.reminders.isEmpty)
-            const Flexible(
-              child: Center(
-                child: Text('No Reminders'),
-              ),
-            )
-          else
-            Flexible(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: widget.reminders.reversed
-                      .map(
-                        (todoReminder) => ListTile(
-                          title: Text(todoReminder.title),
-                          subtitle: Text(_formattedTime(todoReminder)),
-                          onLongPress: () => _toggleSelected(todoReminder),
-                          onTap: _selectedReminders.isEmpty
-                              ? () {}
-                              : () => _toggleSelected(todoReminder),
-                          selected:
-                              _selectedReminders.contains(todoReminder.id),
-                        ),
-                      )
-                      .toList(),
-                ),
+    );
+  }
+
+  Flex _buildBody() {
+    return Flex(
+      direction: Axis.vertical,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        if (widget.reminders.isEmpty)
+          const Flexible(
+            child: Center(
+              child: Text('No Reminders'),
+            ),
+          )
+        else
+          Flexible(
+            child: SingleChildScrollView(
+              child: Column(
+                children: widget.reminders.reversed
+                    .map(
+                      (todoReminder) => ListTile(
+                        title: Text(todoReminder.title),
+                        subtitle: Text(_formattedTime(todoReminder)),
+                        onLongPress: () => _toggleSelected(todoReminder),
+                        onTap: _selectedReminders.isEmpty
+                            ? () {}
+                            : () => _toggleSelected(todoReminder),
+                        selected: _selectedReminders.contains(todoReminder.id),
+                      ),
+                    )
+                    .toList(),
               ),
             ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _newReminder(context),
-        child: const Icon(Icons.add),
-      ),
+          ),
+      ],
     );
   }
 }
