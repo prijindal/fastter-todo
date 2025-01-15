@@ -7,7 +7,7 @@ import '../../models/local_db_state.dart';
 
 class AppBarActions {
   final void Function(BuildContext context) onPressed;
-  final Icon icon;
+  final Widget icon;
 
   const AppBarActions({
     required this.icon,
@@ -31,9 +31,13 @@ class AppBarActions {
 
   factory AppBarActions.forceRefresh() {
     return AppBarActions(
-      icon: Icon(Icons.refresh),
+      icon: Selector<LocalDbState, bool>(
+        selector: (_, state) => state.isRefreshing || !state.isInitialized,
+        builder: (context, isRefreshing, _) =>
+            isRefreshing ? Icon(Icons.sync) : Icon(Icons.refresh),
+      ),
       onPressed: (context) =>
-          Provider.of<LocalDbState>(context, listen: false).initSubscriptions(),
+          Provider.of<LocalDbState>(context, listen: false).refresh(),
     );
   }
 }

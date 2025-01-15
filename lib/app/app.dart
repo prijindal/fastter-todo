@@ -131,7 +131,7 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
   Future<void> _sync() async {
     await Future.wait([
       Provider.of<FirebaseSync>(context, listen: false)
-          .sync(scaffoldMessengerKey.currentState, suppressErrors: false),
+          .sync(scaffoldMessengerKey.currentState, suppressErrors: true),
     ]);
   }
 
