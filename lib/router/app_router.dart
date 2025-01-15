@@ -4,6 +4,8 @@ import 'app_router.gr.dart';
 
 @AutoRouterConfig(replaceInRouteName: 'Screen,Route')
 class AppRouter extends RootStackRouter {
+  static AppRouter instance = AppRouter();
+
   @override
   RouteType get defaultRouteType =>
       RouteType.adaptive(); //.cupertino, .adaptive ..etc

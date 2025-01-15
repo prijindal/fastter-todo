@@ -106,7 +106,6 @@ class MyMaterialApp extends StatefulWidget {
 
 class _MyMaterialAppState extends State<MyMaterialApp> {
   // This widget is the root of your application.
-  final appRouter = AppRouter();
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
 
@@ -140,7 +139,7 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
     AppLogger.instance.d("Building MyApp");
     return MaterialApp.router(
       scaffoldMessengerKey: scaffoldMessengerKey,
-      routerConfig: appRouter.config(),
+      routerConfig: AppRouter.instance.config(),
       theme: lightTheme(widget.settingsStorage.getBaseColor().color),
       darkTheme: darkTheme(widget.settingsStorage.getBaseColor().color),
       themeMode: widget.settingsStorage.getTheme(),

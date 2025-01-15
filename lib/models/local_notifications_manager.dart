@@ -6,6 +6,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../helpers/logger.dart';
+import '../router/app_router.dart';
 import 'core.dart';
 
 class LocalNotificationsManager {
@@ -40,8 +41,13 @@ class LocalNotificationsManager {
       linux: initializationSettingsLinux,
     );
     await flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onDidReceiveNotificationResponse: (details) =>
-            {AppLogger.instance.d("Received notification: ${details.id}")});
+        onDidReceiveNotificationResponse: (details) {
+      AppLogger.instance.d(
+          "Received notification: ${details.id}, payload: ${details.payload}");
+      if (details.payload != null) {
+        AppRouter.instance.navigateNamed(details.payload!);
+      }
+    });
   }
 
   Future<bool> requestPermissions() async {
@@ -115,6 +121,7 @@ class LocalNotificationsManager {
             channelDescription: "To show reminders of a todo",
           ),
         ),
+        payload: "/todo/${reminder.todo}",
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
