@@ -81,6 +81,7 @@ dev_dependencies:
   drift_dev: ^2.23.0
   auto_route_generator: ^9.0.0
   build_runner: ^2.4.14
+  msix: ^3.16.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -126,3 +127,17 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+msix_config:
+  display_name: Fastter Todo
+  publisher_display_name: Priyanshu Jindal
+  identity_name: com.prijindal.FastterTodo
+  logo_path: assets/icon/ic_launcher.png
+  msix_version: 1.0.0.0
+  store: false
+  install_certificate: false
+  debug: false
+  toast_activator:
+    clsid: "d49b0314-ee7a-4626-bf79-97cdb8a991bb"
+    arguments: "msix-args"
+    display_name: "Flutter Local Notifications"
