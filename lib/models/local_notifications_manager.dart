@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_local_notifications_windows/flutter_local_notifications_windows.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -12,51 +11,41 @@ import 'core.dart';
 class LocalNotificationsManager {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  FlutterLocalNotificationsWindows flutterLocalNotificationsWindows =
-      FlutterLocalNotificationsWindows();
   bool initialized = false;
 
   LocalNotificationsManager() {
     tz.initializeTimeZones();
   }
 
+  bool get isSupported => !kIsWeb && !Platform.isWindows;
+
   Future<void> init() async {
+    if (!isSupported) return;
     AppLogger.instance.d("Initializing notifications");
-    if (Platform.isWindows) {
-      final WindowsInitializationSettings initializationSettingsWindows =
-          WindowsInitializationSettings(
-        appName: "Fastter Todo",
-        appUserModelId: "com.prijindal.FastterTodo",
-        guid: "d49b0314-ee7a-4626-bf79-97cdb8a991bb",
-      );
-      flutterLocalNotificationsWindows
-          .initialize(initializationSettingsWindows);
-    } else {
-      const AndroidInitializationSettings initializationSettingsAndroid =
-          AndroidInitializationSettings('app_icon');
-      final DarwinInitializationSettings initializationSettingsDarwin =
-          DarwinInitializationSettings(
-        requestSoundPermission: false,
-        requestBadgePermission: false,
-        requestAlertPermission: false,
-      );
-      final LinuxInitializationSettings initializationSettingsLinux =
-          LinuxInitializationSettings(defaultActionName: 'Open notification');
-      final InitializationSettings initializationSettings =
-          InitializationSettings(
-        android: initializationSettingsAndroid,
-        iOS: initializationSettingsDarwin,
-        macOS: initializationSettingsDarwin,
-        linux: initializationSettingsLinux,
-      );
-      await flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
-      );
-    }
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
+    final DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+    );
+    final LinuxInitializationSettings initializationSettingsLinux =
+        LinuxInitializationSettings(defaultActionName: 'Open notification');
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+      macOS: initializationSettingsDarwin,
+      linux: initializationSettingsLinux,
+    );
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
   }
 
   Future<bool> requestPermissions() async {
-    if (kIsWasm) return false;
+    if (!isSupported) return false;
     AppLogger.instance.d("Requesting permissions for notifications");
     if (Platform.isAndroid) {
       final platformSpecificImplementation =
@@ -95,7 +84,7 @@ class LocalNotificationsManager {
   }
 
   Future<bool> register() async {
-    if (kIsWeb) return false;
+    if (!isSupported) return false;
     if (!initialized) {
       await init();
       final status = await requestPermissions();
@@ -108,35 +97,25 @@ class LocalNotificationsManager {
   }
 
   Future<List<PendingNotificationRequest>> _pendingNotificationRequests() =>
-      Platform.isWindows
-          ? flutterLocalNotificationsWindows.pendingNotificationRequests()
-          : flutterLocalNotificationsPlugin.pendingNotificationRequests();
+      flutterLocalNotificationsPlugin.pendingNotificationRequests();
 
-  Future<void> _cancelNotification(int id) => Platform.isWindows
-      ? flutterLocalNotificationsWindows.cancel(id)
-      : flutterLocalNotificationsPlugin.cancel(id);
+  Future<void> _cancelNotification(int id) =>
+      flutterLocalNotificationsPlugin.cancel(id);
 
-  Future<void> _zonedSchedule(ReminderData reminder) => Platform.isWindows
-      ? flutterLocalNotificationsWindows.zonedSchedule(
-          reminder.id.hashCode,
-          reminder.title,
-          reminder.title,
-          tz.TZDateTime.from(reminder.time, tz.local),
-          WindowsNotificationDetails(),
-        )
-      : flutterLocalNotificationsPlugin.zonedSchedule(
-          reminder.id.hashCode,
-          reminder.title,
-          reminder.title,
-          tz.TZDateTime.from(reminder.time, tz.local),
-          NotificationDetails(),
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        );
+  Future<void> _zonedSchedule(ReminderData reminder) =>
+      flutterLocalNotificationsPlugin.zonedSchedule(
+        reminder.id.hashCode,
+        reminder.title,
+        reminder.title,
+        tz.TZDateTime.from(reminder.time, tz.local),
+        NotificationDetails(),
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
 
   Future<void> syncReminders(List<ReminderData> reminders) async {
-    if (kIsWeb) return;
+    if (!isSupported) return;
     if (!initialized) return;
     final pendingNotifications = await _pendingNotificationRequests();
     for (var pendingNotification in pendingNotifications) {
