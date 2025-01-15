@@ -16,18 +16,6 @@ class LocalNotificationsManager {
 
   LocalNotificationsManager() {
     tz.initializeTimeZones();
-    flutterLocalNotificationsPlugin
-        .getNotificationAppLaunchDetails()
-        .then((notification) {
-      if (notification != null &&
-          notification.didNotificationLaunchApp &&
-          notification.notificationResponse != null &&
-          notification.notificationResponse!.payload != null) {
-        AppRouter.instance.navigateNamed(
-          notification.notificationResponse!.payload!,
-        );
-      }
-    });
   }
 
   bool get isSupported => !kIsWeb && !Platform.isWindows;
@@ -58,6 +46,18 @@ class LocalNotificationsManager {
           "Received notification: ${details.id}, payload: ${details.payload}");
       if (details.payload != null) {
         AppRouter.instance.navigateNamed(details.payload!);
+      }
+    });
+    flutterLocalNotificationsPlugin
+        .getNotificationAppLaunchDetails()
+        .then((notification) {
+      if (notification != null &&
+          notification.didNotificationLaunchApp &&
+          notification.notificationResponse != null &&
+          notification.notificationResponse!.payload != null) {
+        AppRouter.instance.navigateNamed(
+          notification.notificationResponse!.payload!,
+        );
       }
     });
   }

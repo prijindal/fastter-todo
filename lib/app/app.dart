@@ -17,11 +17,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dbSelector = DbSelector();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<DbSelector>(
-          create: (context) => dbSelector,
+          create: (context) => DbSelector(),
         ),
         ChangeNotifierProvider<SettingsStorageNotifier>(
           create: (context) => SettingsStorageNotifier(),

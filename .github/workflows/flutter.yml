@@ -33,10 +33,10 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       # - run: flutter test --coverage
-      # - name: Run Integration Tests
-      #   uses: coactions/setup-xvfb@v1
-      #   with:
-      #     run: flutter test integration_test -d linux -r github --coverage
+      - name: Run Integration Tests
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: flutter test integration_test -d linux -r github --coverage
       - uses: codecov/codecov-action@v5
         with:
           flags: app-flutter

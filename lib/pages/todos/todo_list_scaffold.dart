@@ -34,8 +34,8 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
           _showInput = true;
         });
       },
-      tooltip: 'New Journal',
-      key: Key("New Journal"),
+      tooltip: 'New Todo',
+      key: Key("New Todo"),
       child: const Icon(Icons.add),
     );
   }
