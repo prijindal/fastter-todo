@@ -16,6 +16,18 @@ class LocalNotificationsManager {
 
   LocalNotificationsManager() {
     tz.initializeTimeZones();
+    flutterLocalNotificationsPlugin
+        .getNotificationAppLaunchDetails()
+        .then((notification) {
+      if (notification != null &&
+          notification.didNotificationLaunchApp &&
+          notification.notificationResponse != null &&
+          notification.notificationResponse!.payload != null) {
+        AppRouter.instance.navigateNamed(
+          notification.notificationResponse!.payload!,
+        );
+      }
+    });
   }
 
   bool get isSupported => !kIsWeb && !Platform.isWindows;
@@ -119,6 +131,7 @@ class LocalNotificationsManager {
             "remnders",
             "Reminders",
             channelDescription: "To show reminders of a todo",
+            category: AndroidNotificationCategory.reminder,
           ),
         ),
         payload: "/todo/${reminder.todo}",
