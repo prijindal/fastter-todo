@@ -1,13 +1,14 @@
 import 'dart:async';
 
-import 'package:drift/drift.dart';
-import 'package:drift/isolate.dart';
 import 'package:flutter/widgets.dart';
 
 import 'core.dart';
+import 'local_notifications_manager.dart';
 
 class LocalDbState extends ChangeNotifier {
   final SharedDatabase db;
+  final LocalNotificationsManager _localNotificationsManager =
+      LocalNotificationsManager();
 
   StreamSubscription<List<TodoData>>? _todosSubscription;
   StreamSubscription<List<ProjectData>>? _projectsSubscription;
@@ -50,22 +51,21 @@ class LocalDbState extends ChangeNotifier {
   }
 
   Future<void> _refreshData() async {
-    final entries = await db.computeWithDatabase<List<List<DataClass>>>(
-      computation: (database) async {
-        final [todo, project, comment, reminder] = await Future.wait([
-          database.managers.todo.get(),
-          database.managers.project.get(),
-          database.managers.comment.get(),
-          database.managers.reminder.get(),
-        ]);
-        return [todo, project, comment, reminder];
-      },
-      connect: (connection) => SharedDatabase(connection),
-    );
-    todos = entries[0] as List<TodoData>;
-    projects = entries[1] as List<ProjectData>;
-    comments = entries[2] as List<CommentData>;
-    reminders = entries[3] as List<ReminderData>;
+    await Future.wait([
+      db.managers.todo.get().then((values) => todos = values),
+      db.managers.project.get().then((values) => projects = values),
+      db.managers.comment.get().then((values) => comments = values),
+      db.managers.reminder.get().then((values) => reminders = values),
+    ]);
+  }
+
+  Future<void> syncReminders() async {
+    if (reminders.isNotEmpty) {
+      final status = await _localNotificationsManager.register();
+      if (status) {
+        await _localNotificationsManager.syncReminders(reminders);
+      }
+    }
   }
 
   Future<void> refresh() async {
@@ -85,6 +85,7 @@ class LocalDbState extends ChangeNotifier {
         counts[3] != reminders.length) {
       await _refreshData();
     }
+    await syncReminders();
     _isRefreshing = false;
     notifyListeners();
   }

@@ -57,6 +57,8 @@ class _TodoRemindersScreen extends StatelessWidget {
                   todo: todo.id,
                   completed: drift.Value(false),
                 ));
+        // ignore: use_build_context_synchronously
+        await Provider.of<LocalDbState>(context, listen: false).refresh();
       }
     }
   }
