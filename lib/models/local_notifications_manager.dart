@@ -132,6 +132,8 @@ class LocalNotificationsManager {
             "Reminders",
             channelDescription: "To show reminders of a todo",
             category: AndroidNotificationCategory.reminder,
+            importance: Importance.high,
+            priority: Priority.high,
           ),
         ),
         payload: "/todo/${reminder.todo}",
