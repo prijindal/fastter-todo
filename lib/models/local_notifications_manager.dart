@@ -23,7 +23,7 @@ class LocalNotificationsManager {
     if (!isSupported) return;
     AppLogger.instance.d("Initializing notifications");
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('app_icon');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     final DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
       requestSoundPermission: false,
@@ -108,7 +108,13 @@ class LocalNotificationsManager {
         reminder.title,
         reminder.title,
         tz.TZDateTime.from(reminder.time, tz.local),
-        NotificationDetails(),
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            "remnders",
+            "Reminders",
+            channelDescription: "To show reminders of a todo",
+          ),
+        ),
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

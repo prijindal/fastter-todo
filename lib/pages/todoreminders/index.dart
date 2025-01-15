@@ -28,11 +28,18 @@ class TodoRemindersScreen extends StatelessWidget {
       );
 }
 
-class _TodoRemindersScreen extends StatelessWidget {
+class _TodoRemindersScreen extends StatefulWidget {
   const _TodoRemindersScreen({required this.todo, required this.reminders});
 
   final TodoData todo;
   final List<ReminderData> reminders;
+
+  @override
+  State<_TodoRemindersScreen> createState() => _TodoRemindersScreenState();
+}
+
+class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
+  final List<String> _selectedReminders = [];
 
   Future<void> _newReminder(BuildContext context) async {
     final now = DateTime.now();
@@ -54,12 +61,67 @@ class _TodoRemindersScreen extends StatelessWidget {
             .create((o) => o(
                   time: newTime.toUtc(),
                   title: "New Reminder",
-                  todo: todo.id,
+                  todo: widget.todo.id,
                   completed: drift.Value(false),
                 ));
         // ignore: use_build_context_synchronously
         await Provider.of<LocalDbState>(context, listen: false).refresh();
       }
+    }
+  }
+
+  void _toggleSelected(ReminderData todoReminder) {
+    setState(() {
+      if (_selectedReminders.contains(todoReminder.id)) {
+        _selectedReminders.remove(todoReminder.id);
+      } else {
+        _selectedReminders.add(todoReminder.id);
+      }
+    });
+  }
+
+  Future<void> _deleteSelectedReminders(BuildContext context) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Are you sure'),
+        content:
+            Text('This will delete ${_selectedReminders.length} reminders'),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          TextButton(
+            child: const Text('Yes'),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+    if (shouldDelete == true && context.mounted) {
+      await Provider.of<DbSelector>(context, listen: false)
+          .database
+          .managers
+          .reminder
+          .filter((f) => f.id.isIn(_selectedReminders))
+          .delete();
+      // ignore: use_build_context_synchronously
+      await Provider.of<LocalDbState>(context, listen: false).refresh();
+    }
+  }
+
+  List<Widget> _buildActions(BuildContext context) {
+    if (_selectedReminders.isEmpty) {
+      return [];
+    } else {
+      return [
+        IconButton(
+          icon: const Icon(Icons.delete),
+          onPressed: () => _deleteSelectedReminders(context),
+          tooltip: 'Delete',
+        )
+      ];
     }
   }
 
@@ -70,13 +132,16 @@ class _TodoRemindersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(todo.title),
+        title: Text(_selectedReminders.isEmpty
+            ? widget.todo.title
+            : "${_selectedReminders.length} Reminders selected"),
+        actions: _buildActions(context),
       ),
       body: Flex(
         direction: Axis.vertical,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          if (reminders.isEmpty)
+          if (widget.reminders.isEmpty)
             const Flexible(
               child: Center(
                 child: Text('No Reminders'),
@@ -86,11 +151,17 @@ class _TodoRemindersScreen extends StatelessWidget {
             Flexible(
               child: SingleChildScrollView(
                 child: Column(
-                  children: reminders.reversed
+                  children: widget.reminders.reversed
                       .map(
                         (todoReminder) => ListTile(
                           title: Text(todoReminder.title),
                           subtitle: Text(_formattedTime(todoReminder)),
+                          onLongPress: () => _toggleSelected(todoReminder),
+                          onTap: _selectedReminders.isEmpty
+                              ? () {}
+                              : () => _toggleSelected(todoReminder),
+                          selected:
+                              _selectedReminders.contains(todoReminder.id),
                         ),
                       )
                       .toList(),
