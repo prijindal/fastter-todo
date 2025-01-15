@@ -38,7 +38,7 @@ class LocalDbState extends ChangeNotifier {
 
   LocalDbState(this.db) {
     initSubscriptions();
-    const duration = Duration(seconds: 10);
+    const duration = Duration(seconds: 2);
     timer = Timer.periodic(duration, (_) => refresh());
   }
 
@@ -49,10 +49,7 @@ class LocalDbState extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> refresh() async {
-    if (_isRefreshing) return;
-    _isRefreshing = true;
-    notifyListeners();
+  Future<void> _refreshData() async {
     final entries = await db.computeWithDatabase<List<List<DataClass>>>(
       computation: (database) async {
         final [todo, project, comment, reminder] = await Future.wait([
@@ -69,6 +66,25 @@ class LocalDbState extends ChangeNotifier {
     projects = entries[1] as List<ProjectData>;
     comments = entries[2] as List<CommentData>;
     reminders = entries[3] as List<ReminderData>;
+  }
+
+  Future<void> refresh() async {
+    if (_isRefreshing) return;
+    _isRefreshing = true;
+    notifyListeners();
+    final counts = await Future.wait([
+      db.managers.todo.count(),
+      db.managers.project.count(),
+      db.managers.comment.count(),
+      db.managers.reminder.count(),
+    ]);
+    // Only refresh if counts are mismatched
+    if (counts[0] != todos.length ||
+        counts[1] != projects.length ||
+        counts[2] != comments.length ||
+        counts[3] != reminders.length) {
+      await _refreshData();
+    }
     _isRefreshing = false;
     notifyListeners();
   }

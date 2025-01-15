@@ -150,10 +150,9 @@ class TodoItemSubtitle extends StatelessWidget {
           child: Text(dueDateFormatter(todo.dueDate)),
         ),
       );
-  Widget _buildSubtitleFirstRow(BuildContext context) {
+  Widget _buildSubtitleFirstRow(
+      BuildContext context, int comments, int reminders) {
     final children = <Widget>[];
-    final reminders = 0; // TODO
-    final comments = 0; // TODO
     if (todo.dueDate != null) {
       children.add(_buildDueDate(context));
     }
@@ -208,7 +207,14 @@ class TodoItemSubtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firstRow = _buildSubtitleFirstRow(context);
+    final firstRow = Selector<LocalDbState, List<int>>(
+      selector: (_, state) => [
+        state.comments.where((f) => f.todo == todo.id).length,
+        state.reminders.where((f) => f.todo == todo.id).length,
+      ],
+      builder: (context, counts, _) =>
+          _buildSubtitleFirstRow(context, counts[0], counts[1]),
+    );
     if (todo.tags.isEmpty) {
       return firstRow;
     } else {
