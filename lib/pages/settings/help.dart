@@ -85,6 +85,15 @@ class _HelpSettingsScreenState extends State<HelpSettingsScreen> {
           title: Text("Priyanshu Jindal"),
           onTap: () => launchUrlString("https://github.com/prijindal"),
         ),
+        ListTile(
+          title: Text("Build number"),
+          subtitle: Text(_packageInfo.buildNumber),
+        ),
+        if (_packageInfo.installerStore != null)
+          ListTile(
+            title: Text("Installed from"),
+            subtitle: Text(_packageInfo.installerStore!),
+          ),
       ]),
     );
   }

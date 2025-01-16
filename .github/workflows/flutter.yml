@@ -103,6 +103,10 @@ jobs:
         with:
           name: android-x86_64
           path: build/app/outputs/apk/release/app-x86_64-release.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-output-metadata
+          path: build/app/outputs/apk/release/output-metadata.json
       - run: echo "VERSION_CODE=`expr 185 + $GITHUB_RUN_NUMBER`" > android/version.properties
       - run: flutter build appbundle --release
       - uses: actions/upload-artifact@v4
