@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../components/main_drawer.dart';
+import '../../helpers/todos_filters.dart';
 import '../../models/local_state.dart';
 import 'todoeditbar/index.dart';
 import 'todoinputbar.dart';
 import 'todolist.dart';
-import 'todos_filters.dart';
 
 class TodoListScaffold extends StatefulWidget {
   const TodoListScaffold({
@@ -46,43 +46,27 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
     );
   }
 
-  List<Widget> _buildBottom() {
+  Widget? _buildBottom() {
     if (_showInput) {
-      return [
-        Positioned(
-          bottom: 0,
-          right: 2,
-          left: 2,
-          child: TodoInputBar(
-            initialProject: widget.filters.projectFilter,
-            onBackButton: () {
-              setState(() {
-                _showInput = false;
-              });
-            },
-          ),
-        ),
-      ];
+      return TodoInputBar(
+        initialProject: widget.filters.projectFilter,
+        onBackButton: () {
+          setState(() {
+            _showInput = false;
+          });
+        },
+      );
     }
     final selectedEntriesEmpty =
         Provider.of<LocalStateNotifier>(context).selectedTodoIds.isEmpty;
     if (selectedEntriesEmpty) {
-      return [];
+      return null;
     }
-    return [
-      Positioned(
-        bottom: 0,
-        right: 2,
-        left: 2,
-        child: TodoEditBar(),
-      ),
-    ];
+    return TodoEditBar();
   }
 
   Widget _buildBody() {
-    return Stack(
-      children: [_buildList(), ..._buildBottom()],
-    );
+    return _buildList();
   }
 
   @override
@@ -92,6 +76,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
       drawer: MainDrawer(),
       body: _buildBody(),
       floatingActionButton: _showInput == true ? null : _buildFab(),
+      bottomSheet: _buildBottom(),
     );
   }
 }

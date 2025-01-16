@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/todos_filters.dart';
 import '../../models/local_state.dart';
 import 'todoeditbar/delete_selected_todos_button.dart';
-import 'todos_filters.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({

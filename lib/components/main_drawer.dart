@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
+import '../helpers/todos_filters.dart';
 import '../models/core.dart';
 import '../models/local_db_state.dart';
-import '../pages/todos/todos_filters.dart';
 
 class NavigationListTile extends StatelessWidget {
   const NavigationListTile({

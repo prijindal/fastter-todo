@@ -2,8 +2,8 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/core.dart';
-import '../../models/local_db_state.dart';
+import '../models/core.dart';
+import '../models/local_db_state.dart';
 
 class AppBarActions {
   final void Function(BuildContext context) onPressed;

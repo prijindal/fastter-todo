@@ -216,23 +216,17 @@ class _TodoInputBarState extends State<TodoInputBar>
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 8,
+      elevation: 20,
       child: Container(
-        padding: EdgeInsets.only(
-          top: 10.0,
-        ),
-        child: Center(
-          child: Container(
-            width: min(480, MediaQuery.of(context).size.width - 20.0),
-            padding: const EdgeInsets.all(4),
-            child: Form(
-              child: Column(
-                children: [
-                  _buildInput(),
-                  _buildButtons(),
-                ],
-              ),
-            ),
+        width: min(480, MediaQuery.of(context).size.width - 20.0),
+        height: 120,
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+        child: Form(
+          child: Column(
+            children: [
+              _buildInput(),
+              _buildButtons(),
+            ],
           ),
         ),
       ),

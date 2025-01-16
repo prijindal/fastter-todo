@@ -1,16 +1,11 @@
-# fastter_todo
+# Fastter Todo
 
-A new Flutter project.
+[![Flutter](https://github.com/prijindal/fastter-todo/actions/workflows/flutter.yml/badge.svg)](https://github.com/prijindal/fastter-todo/actions/workflows/flutter.yml)
+[![codecov](https://codecov.io/gh/prijindal/fastter-todo/branch/main/graph/badge.svg?token=75K4JMDVSJ)](https://codecov.io/gh/prijindal/fastter-todo)
 
-## Getting Started
+## How to get Fastter Todo...
 
-This project is a starting point for a Flutter application.
+[![Google Play Store badge](https://play.google.com/intl/en_us/badges/images/badge_new.png)](https://play.google.com/store/apps/details?id=com.prijindal.fastter_todo) &nbsp;&nbsp;
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [Web Version](https://fastter-todo-prijindal.web.app/)
+- [Download Builds](https://nightly.link/prijindal/fastter-todo/workflows/flutter/main)

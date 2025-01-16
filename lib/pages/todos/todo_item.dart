@@ -122,7 +122,14 @@ class TodoItem extends StatelessWidget {
                   .update((o) => o(completed: drift.Value(newValue)));
             },
           ),
-          title: Text(todo.title),
+          title: Text(
+            todo.title,
+            style: todo.completed
+                ? DefaultTextStyle.of(context).style.copyWith(
+                      decoration: TextDecoration.lineThrough,
+                    )
+                : null,
+          ),
           subtitle: TodoItemSubtitle(
             todo: todo,
           ),

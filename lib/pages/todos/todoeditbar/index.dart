@@ -117,13 +117,9 @@ class _TodoEditBar extends StatelessWidget {
   Widget build(BuildContext context) => Card(
         elevation: 20,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          height: 60,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            shrinkWrap: true,
-            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-            // crossAxisAlignment: CrossAxisAlignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8.0),
+          child: Wrap(
+            spacing: 8.0,
             children: _buildButtons(context),
           ),
         ),
