@@ -173,6 +173,7 @@ class LocalDbState extends ChangeNotifier {
       _readFromLocalDb<CommentData>("comments", CommentData.fromJson),
       _readFromLocalDb<ReminderData>("reminders", ReminderData.fromJson),
     ]);
+    await syncReminders();
   }
 
   Future<void> setLocalTempDb(String table, List<drift.DataClass> items) async {
