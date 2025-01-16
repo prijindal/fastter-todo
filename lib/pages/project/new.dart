@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/db_selector.dart';
+import '../../models/db_manager.dart';
 import 'form.dart';
 
 @RoutePage()
@@ -15,7 +15,7 @@ class NewProjectScreen extends StatelessWidget {
     if (title == null || color == null) {
       return;
     }
-    await Provider.of<DbSelector>(context, listen: false)
+    await Provider.of<DbManager>(context, listen: false)
         .database
         .managers
         .project

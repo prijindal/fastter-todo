@@ -10,13 +10,13 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../models/db_selector.dart';
+import '../models/db_manager.dart';
 import 'constants.dart';
 import 'logger.dart';
 
 void downloadContent(BuildContext context) async {
   final encoded =
-      await Provider.of<DbSelector>(context, listen: false).io.extractDbJson();
+      await Provider.of<DbManager>(context, listen: false).io.extractDbJson();
   if (Platform.isAndroid || Platform.isIOS) {
     final params = SaveFileDialogParams(
       data: Uint8List.fromList(encoded.codeUnits),
@@ -63,7 +63,7 @@ void uploadContent(BuildContext context) async {
     }
     if (jsonEncoded != null && context.mounted) {
       try {
-        await Provider.of<DbSelector>(context, listen: false)
+        await Provider.of<DbManager>(context, listen: false)
             .io
             .jsonToDb(jsonEncoded);
         if (context.mounted) {

@@ -182,9 +182,7 @@ class MainDrawer extends StatelessWidget {
             },
           ),
           Selector<LocalDbState, List<String>>(
-            selector: (_, state) => state.todos
-                .map<List<String>>((a) => a.tags.toList())
-                .fold([], (prev, current) => prev..addAll(current)),
+            selector: (_, state) => state.allTags,
             builder: (context, tags, _) {
               return _buildTagsDestination(context, tags);
             },

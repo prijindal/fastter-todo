@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
-import '../models/db_selector.dart';
+import '../models/db_manager.dart';
 import '../models/local_db_state.dart';
 import '../models/local_state.dart';
 import '../models/settings.dart';
@@ -19,8 +19,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<DbSelector>(
-          create: (context) => DbSelector(),
+        ChangeNotifierProvider<DbManager>(
+          create: (context) => DbManager(),
         ),
         ChangeNotifierProvider<SettingsStorageNotifier>(
           create: (context) => SettingsStorageNotifier(),
@@ -41,7 +41,7 @@ class MyMaterialAppWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingsStorageNotifier>(
       builder: (context, settingsStorage, _) {
-        return Consumer<DbSelector>(
+        return Consumer<DbManager>(
           builder: (context, dbSelector, _) {
             if (!dbSelector.isInitialized) {
               return MaterialApp(

@@ -7,7 +7,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import 'projectdropdown.dart';
 import 'todo_select_date.dart';
@@ -73,7 +73,7 @@ class _TodoInputBarState extends State<TodoInputBar>
     if (dueDate != null) {
       dueDate = DateTime(dueDate!.year, dueDate!.month, dueDate!.day, 0, 0, 0);
     }
-    await Provider.of<DbSelector>(context, listen: false)
+    await Provider.of<DbManager>(context, listen: false)
         .database
         .managers
         .todo

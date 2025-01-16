@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import '../todos/todo_select_date.dart';
 
@@ -54,7 +54,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
         final newTime =
             DateTime(date.year, date.month, date.day, time.hour, time.minute);
         // ignore: use_build_context_synchronously
-        await Provider.of<DbSelector>(context, listen: false)
+        await Provider.of<DbManager>(context, listen: false)
             .database
             .managers
             .reminder
@@ -100,7 +100,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
       ),
     );
     if (shouldDelete == true && context.mounted) {
-      await Provider.of<DbSelector>(context, listen: false)
+      await Provider.of<DbManager>(context, listen: false)
           .database
           .managers
           .reminder

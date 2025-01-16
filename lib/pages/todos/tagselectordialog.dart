@@ -27,18 +27,9 @@ class _TagSelectionState extends State<TagSelectorDialog> {
   }
 
   void _fetchTags() {
-    final todos = Provider.of<LocalDbState>(context, listen: false).todos;
-    final allTags = <String>[];
-    for (var todo in todos) {
-      final tags = todo.tags;
-      for (var tag in tags) {
-        if (!allTags.contains(tag)) {
-          allTags.add(tag);
-        }
-      }
-    }
+    final tags = Provider.of<LocalDbState>(context, listen: false).allTags;
     setState(() {
-      _allTags = allTags;
+      _allTags = tags;
     });
   }
 

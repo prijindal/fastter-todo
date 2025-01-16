@@ -6,7 +6,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import 'form.dart';
 
@@ -40,7 +40,7 @@ class _EditProjectScreen extends StatelessWidget {
   final ProjectData project;
 
   void _onSave(BuildContext context, {String? title, HexColor? color}) async {
-    await Provider.of<DbSelector>(context, listen: false)
+    await Provider.of<DbManager>(context, listen: false)
         .database
         .managers
         .project

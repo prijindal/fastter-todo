@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/db_selector.dart';
+import '../../../models/db_manager.dart';
 import '../../../models/local_state.dart';
 import '../confirmation_dialog.dart';
 
@@ -16,7 +16,7 @@ class DeleteSelectedTodosButton extends StatelessWidget {
       builder: (context) => ConfirmationDialog(),
     );
     if (shouldDelete != null && shouldDelete && context.mounted) {
-      await Provider.of<DbSelector>(context, listen: false)
+      await Provider.of<DbManager>(context, listen: false)
           .database
           .managers
           .todo

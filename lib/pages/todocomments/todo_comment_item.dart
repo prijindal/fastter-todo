@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../helpers/date_fomatters.dart';
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/db_manager.dart';
 
 class TodoCommentItem extends StatelessWidget {
   const TodoCommentItem({
@@ -23,7 +23,7 @@ class TodoCommentItem extends StatelessWidget {
   Widget build(BuildContext context) => _TodoCommentItem(
         todoComment: todoComment,
         deleteComment: () async {
-          await Provider.of<DbSelector>(context, listen: false)
+          await Provider.of<DbManager>(context, listen: false)
               .database
               .managers
               .comment

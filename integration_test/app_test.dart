@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fastter_todo/models/core.dart';
-import 'package:fastter_todo/models/db_selector.dart';
+import 'package:fastter_todo/models/db_manager.dart';
 import 'package:fastter_todo/models/local_db_state.dart';
 import 'package:fastter_todo/models/local_state.dart';
 import 'package:fastter_todo/models/settings.dart';
@@ -32,8 +32,8 @@ void main() {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
-            ChangeNotifierProvider<DbSelector>(
-              create: (context) => DbSelector(),
+            ChangeNotifierProvider<DbManager>(
+              create: (context) => DbManager(),
             ),
             ChangeNotifierProvider<SettingsStorageNotifier>(
               create: (context) => SettingsStorageNotifier(),

@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core.dart';
 import 'local_notifications_manager.dart';
@@ -17,10 +20,25 @@ class LocalDbState extends ChangeNotifier {
 
   Timer? timer;
 
-  List<TodoData> todos = [];
-  List<ProjectData> projects = [];
-  List<CommentData> comments = [];
-  List<ReminderData> reminders = [];
+  List<TodoData> _todos = [];
+  List<ProjectData> _projects = [];
+  List<CommentData> _comments = [];
+  List<ReminderData> _reminders = [];
+
+  final Map<String, List<drift.DataClass>> _localState = {};
+
+  List<TodoData> get todos => _isTodosInitialized
+      ? _todos
+      : (_localState["todos"] as List<TodoData>?) ?? [];
+  List<ProjectData> get projects => _isProjectsInitialized
+      ? _projects
+      : (_localState["projects"] as List<ProjectData>?) ?? [];
+  List<CommentData> get comments => _isCommentsInitialized
+      ? _comments
+      : (_localState["comments"] as List<CommentData>?) ?? [];
+  List<ReminderData> get reminders => _isRemindersInitialized
+      ? _reminders
+      : (_localState["reminders"] as List<ReminderData>?) ?? [];
 
   bool _isTodosInitialized = false;
   bool _isProjectsInitialized = false;
@@ -31,13 +49,19 @@ class LocalDbState extends ChangeNotifier {
 
   bool get isRefreshing => _isRefreshing;
 
+  bool get isTodosInitialized =>
+      _localState["todos"] != null || _isTodosInitialized;
+
   bool get isInitialized =>
-      _isTodosInitialized &&
-      _isProjectsInitialized &&
-      _isCommentsInitialized &&
-      _isRemindersInitialized;
+      (_localState["todos"] != null || _isTodosInitialized) &&
+      (_localState["projects"] != null || _isProjectsInitialized) &&
+      (_localState["comments"] != null || _isCommentsInitialized) &&
+      (_localState["reminders"] != null || _isRemindersInitialized);
 
   LocalDbState(this.db) {
+    // Local state is first initialized with local storage, this makes sure that when we first do init, we have some data on ui
+    // This is only really useful when our sqlite db is a remote one
+    initFromLocalTempDb();
     initSubscriptions();
     const duration = Duration(seconds: 2);
     timer = Timer.periodic(duration, (_) => refresh());
@@ -52,10 +76,10 @@ class LocalDbState extends ChangeNotifier {
 
   Future<void> _refreshData() async {
     await Future.wait([
-      db.managers.todo.get().then((values) => todos = values),
-      db.managers.project.get().then((values) => projects = values),
-      db.managers.comment.get().then((values) => comments = values),
-      db.managers.reminder.get().then((values) => reminders = values),
+      db.managers.todo.get().then((values) => _todos = values),
+      db.managers.project.get().then((values) => _projects = values),
+      db.managers.comment.get().then((values) => _comments = values),
+      db.managers.reminder.get().then((values) => _reminders = values),
     ]);
   }
 
@@ -93,24 +117,28 @@ class LocalDbState extends ChangeNotifier {
   void initSubscriptions() {
     cancelSubscriptions();
     _todosSubscription = db.managers.todo.watch().listen((event) {
-      todos = event;
+      _todos = event;
       _isTodosInitialized = true;
       notifyListeners();
+      setLocalTempDb("todos", event);
     });
     _projectsSubscription = db.managers.project.watch().listen((event) {
-      projects = event;
+      _projects = event;
       _isProjectsInitialized = true;
       notifyListeners();
+      setLocalTempDb("projects", event);
     });
     _commentsSubscription = db.managers.comment.watch().listen((event) {
-      comments = event;
+      _comments = event;
       _isCommentsInitialized = true;
       notifyListeners();
+      setLocalTempDb("comments", event);
     });
     _remindersSubscription = db.managers.reminder.watch().listen((event) {
-      reminders = event;
+      _reminders = event;
       _isRemindersInitialized = true;
       notifyListeners();
+      setLocalTempDb("reminders", event);
     });
   }
 
@@ -119,5 +147,48 @@ class LocalDbState extends ChangeNotifier {
     _projectsSubscription?.cancel();
     _commentsSubscription?.cancel();
     _remindersSubscription?.cancel();
+  }
+
+  List<String> get allTags {
+    final List<String> tags = [];
+    for (var todo in todos) {
+      for (var tag in todo.tags) {
+        if (!tags.contains(tag)) {
+          tags.add(tag);
+        }
+      }
+    }
+    return tags;
+  }
+
+  Future<void> _readFromLocalDb<T extends drift.DataClass>(
+      String table, T Function(Map<String, dynamic>) fromJson) async {
+    final entriesStr =
+        await SharedPreferencesAsync().getString("LocalTempDb$table");
+    if (entriesStr != null) {
+      final entries = (jsonDecode(entriesStr) as List<dynamic>)
+          .map<T>((a) => fromJson(a as Map<String, dynamic>))
+          .toList();
+      if (_localState[table] == null) {
+        _localState[table] = entries;
+        print("$table:");
+        print(entries);
+        notifyListeners();
+      }
+    }
+  }
+
+  void initFromLocalTempDb() async {
+    await Future.wait([
+      _readFromLocalDb<TodoData>("todos", TodoData.fromJson),
+      _readFromLocalDb<ProjectData>("projects", ProjectData.fromJson),
+      _readFromLocalDb<CommentData>("comments", CommentData.fromJson),
+      _readFromLocalDb<ReminderData>("reminders", ReminderData.fromJson),
+    ]);
+  }
+
+  Future<void> setLocalTempDb(String table, List<drift.DataClass> items) async {
+    await SharedPreferencesAsync().setString(
+        "LocalTempDb$table", jsonEncode(items.map((a) => a.toJson()).toList()));
   }
 }

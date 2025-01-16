@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/db_selector.dart';
+import '../../../models/db_manager.dart';
 
 class BackupEncryptionTile extends StatefulWidget {
   const BackupEncryptionTile({super.key});
@@ -21,7 +21,7 @@ class _BackupEncryptionTileState extends State<BackupEncryptionTile> {
   }
 
   void _loadEncryptionStatus() {
-    Provider.of<DbSelector>(context, listen: false)
+    Provider.of<DbManager>(context, listen: false)
         .io
         .readEncrptionStatus()
         .then((status) {
@@ -103,7 +103,7 @@ class _BackupEncryptionTileState extends State<BackupEncryptionTile> {
       );
       if (context.mounted) {
         // ignore: use_build_context_synchronously
-        await Provider.of<DbSelector>(context, listen: false)
+        await Provider.of<DbManager>(context, listen: false)
             .io
             .writeEncryptionKey(newPassword);
         setState(() {
@@ -117,7 +117,7 @@ class _BackupEncryptionTileState extends State<BackupEncryptionTile> {
     final inputedPassword = await _showPasswordDialog();
     final existingPassword =
         // ignore: use_build_context_synchronously
-        await Provider.of<DbSelector>(context, listen: false)
+        await Provider.of<DbManager>(context, listen: false)
             .io
             .readEncryptionKey();
     if (inputedPassword != existingPassword) {
@@ -136,7 +136,7 @@ class _BackupEncryptionTileState extends State<BackupEncryptionTile> {
         ),
       );
       // ignore: use_build_context_synchronously
-      await Provider.of<DbSelector>(context, listen: false)
+      await Provider.of<DbManager>(context, listen: false)
           .io
           .writeEncryptionKey(null);
       setState(() {

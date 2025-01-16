@@ -44,7 +44,7 @@ class RemoteDbSettings {
 
 enum DbSelectorType { local, remote }
 
-class DbSelector extends ChangeNotifier {
+class DbManager extends ChangeNotifier {
   SharedDatabase? _database;
   DbSelectorType? _dbType;
 
@@ -60,7 +60,7 @@ class DbSelector extends ChangeNotifier {
 
   bool get isInitialized => _database != null;
 
-  DbSelector() {
+  DbManager() {
     initDb();
   }
 
@@ -102,7 +102,6 @@ class DbSelector extends ChangeNotifier {
         // );
       }
     }
-    await database.customStatement("SELECT current_timestamp;");
     notifyListeners();
     _addWatcher();
   }

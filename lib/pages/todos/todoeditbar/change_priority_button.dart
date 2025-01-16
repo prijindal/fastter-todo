@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
-import '../../../models/db_selector.dart';
+import '../../../models/db_manager.dart';
 import '../priority_dialog.dart';
 
 class ChangePriorityButton extends StatelessWidget {
@@ -33,7 +33,7 @@ class ChangePriorityButton extends StatelessWidget {
   void _selectPriority(BuildContext context) async {
     final priority = await showPriorityDialog(context);
     if (priority != null && context.mounted) {
-      await Provider.of<DbSelector>(context, listen: false)
+      await Provider.of<DbManager>(context, listen: false)
           .database
           .managers
           .todo

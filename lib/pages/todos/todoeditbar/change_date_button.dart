@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
-import '../../../models/db_selector.dart';
+import '../../../models/db_manager.dart';
 import '../todo_select_date.dart';
 
 class ChangeDateButton extends StatelessWidget {
@@ -19,7 +19,7 @@ class ChangeDateButton extends StatelessWidget {
       final selectedDate =
           await todoSelectDate(context, selectedTodos.first.dueDate);
       if (selectedDate != null && context.mounted) {
-        await (Provider.of<DbSelector>(context, listen: false)
+        await (Provider.of<DbManager>(context, listen: false)
                 .database
                 .todo
                 .update()

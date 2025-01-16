@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/db_manager.dart';
 
 class TodoCommentInput extends StatefulWidget {
   const TodoCommentInput({
@@ -25,7 +25,7 @@ class _TodoCommentInputState extends State<TodoCommentInput> {
   TextEditingController commentContentController = TextEditingController();
 
   void _addComment() async {
-    await Provider.of<DbSelector>(context, listen: false)
+    await Provider.of<DbManager>(context, listen: false)
         .database
         .managers
         .comment

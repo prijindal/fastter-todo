@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import 'todo_comment_input.dart';
 import 'todo_comment_item.dart';
@@ -170,7 +170,7 @@ class TodoCommentsAppBar extends StatelessWidget
       ),
     );
     if (shouldDelete == true && context.mounted) {
-      await Provider.of<DbSelector>(context, listen: false)
+      await Provider.of<DbManager>(context, listen: false)
           .database
           .managers
           .comment

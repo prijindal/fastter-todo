@@ -6,7 +6,7 @@ permissions:
   contents: write
 
 jobs:
-  test:
+  test-linux:
     runs-on: ubuntu-22.04 # libwebkit2gtk-4.1 is not compatible with flutter
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
           run: flutter test integration_test -d linux -r github --coverage
       - uses: codecov/codecov-action@v5
         with:
-          flags: app-flutter
+          flags: linux
         env: 
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -114,7 +114,7 @@ jobs:
             build/app/intermediates/merged_native_libs/release/out/lib/
 
   android-publish:
-    needs: [test, android]
+    needs: [test-linux, android]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
@@ -169,7 +169,7 @@ jobs:
           path: build/web
 
   web-publish:
-    needs: [test, web]
+    needs: [test-linux, web]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
-import '../../../models/db_selector.dart';
+import '../../../models/db_manager.dart';
 import '../../../models/local_db_state.dart';
 import '../projectdropdown.dart';
 
@@ -17,7 +17,7 @@ class ChangeProjectButton extends StatelessWidget {
 
   Future<void> _onChangeProject(
       ProjectData? project, BuildContext context) async {
-    await Provider.of<DbSelector>(context, listen: false)
+    await Provider.of<DbManager>(context, listen: false)
         .database
         .managers
         .todo

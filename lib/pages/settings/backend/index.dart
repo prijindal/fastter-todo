@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 
-import '../../../models/db_selector.dart';
+import '../../../models/db_manager.dart';
 
 @RoutePage()
 class BackendSettingsScreen extends StatelessWidget {
@@ -78,7 +78,7 @@ class BackendImplementationTile extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context) {
-    final dbSelector = Provider.of<DbSelector>(context, listen: false);
+    final dbSelector = Provider.of<DbManager>(context, listen: false);
     final dbType = dbSelector.dbType;
     return DropdownButton<DbSelectorType>(
       value: dbType,

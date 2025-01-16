@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../helpers/date_fomatters.dart';
 import '../../models/core.dart';
-import '../../models/db_selector.dart';
+import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import '../../models/local_state.dart';
 import 'confirmation_dialog.dart';
@@ -24,7 +24,7 @@ class TodoItem extends StatelessWidget {
   void _selectDate(BuildContext context) {
     todoSelectDate(context, todo.dueDate).then((dueDate) async {
       if (dueDate != null && context.mounted) {
-        await Provider.of<DbSelector>(context, listen: false)
+        await Provider.of<DbManager>(context, listen: false)
             .database
             .managers
             .todo
@@ -40,7 +40,7 @@ class TodoItem extends StatelessWidget {
       );
 
   void _deleteTodo(BuildContext context) async {
-    await Provider.of<DbSelector>(context, listen: false)
+    await Provider.of<DbManager>(context, listen: false)
         .database
         .managers
         .todo
@@ -114,7 +114,7 @@ class TodoItem extends StatelessWidget {
           leading: TodoItemToggle(
             todo: todo,
             toggleCompleted: (bool newValue) async {
-              await Provider.of<DbSelector>(context, listen: false)
+              await Provider.of<DbManager>(context, listen: false)
                   .database
                   .managers
                   .todo
@@ -215,7 +215,8 @@ class TodoItemSubtitle extends StatelessWidget {
       builder: (context, counts, _) =>
           _buildSubtitleFirstRow(context, counts[0], counts[1]),
     );
-    if (todo.tags.isEmpty) {
+    final tags = todo.tags.toSet().toList();
+    if (tags.isEmpty) {
       return firstRow;
     } else {
       return Column(
@@ -230,7 +231,7 @@ class TodoItemSubtitle extends StatelessWidget {
               maxWidth: MediaQuery.of(context).size.width - 100,
             ),
             child: TagsList(
-              tags: todo.tags,
+              tags: tags,
             ),
           )
         ],

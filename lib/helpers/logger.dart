@@ -10,8 +10,8 @@ class CrashlyticsLogPrinter extends PrettyPrinter {
   @override
   List<String> log(LogEvent event) {
     /// This sends logs of warning level and above to Crashlytics
-    if (event.level.index >= Level.warning.index) {
-      if (isFirebaseInitialized()) {
+    if (isFirebaseInitialized()) {
+      if (event.level.index >= Level.warning.index) {
         FirebaseCrashlytics.instance.recordError(
           event.message,
           event.stackTrace,
@@ -19,6 +19,8 @@ class CrashlyticsLogPrinter extends PrettyPrinter {
           information: [event.level],
           printDetails: false,
         );
+      } else {
+        FirebaseCrashlytics.instance.log(event.message.toString());
       }
     }
     return super.log(event);

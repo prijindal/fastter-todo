@@ -35,7 +35,7 @@ class TodoList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<LocalDbState>(
-      builder: (context, state, _) => !state.isInitialized
+      builder: (context, state, _) => !state.isTodosInitialized
           ? Center(child: Text("Loading"))
           : _buildList(context, filters.filtered(state.todos)),
     );
