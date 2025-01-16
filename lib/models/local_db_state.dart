@@ -5,6 +5,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helpers/logger.dart';
 import 'core.dart';
 import 'local_notifications_manager.dart';
 
@@ -171,8 +172,7 @@ class LocalDbState extends ChangeNotifier {
           .toList();
       if (_localState[table] == null) {
         _localState[table] = entries;
-        print("$table:");
-        print(entries);
+        AppLogger.instance.d("Found local shared preferences for $table:");
         notifyListeners();
       }
     }
