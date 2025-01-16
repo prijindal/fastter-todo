@@ -219,10 +219,10 @@ class _TodoInputBarState extends State<TodoInputBar>
       elevation: 20,
       child: Container(
         width: min(480, MediaQuery.of(context).size.width - 20.0),
-        height: 120,
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
         child: Form(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               _buildInput(),
               _buildButtons(),

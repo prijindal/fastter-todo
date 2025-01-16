@@ -56,13 +56,17 @@ class TodosSortingAlgorithm {
       );
 
   factory TodosSortingAlgorithm.base() {
+    final completionSorting = TodosSortingAlgorithm.completion();
     final prioritySorting = TodosSortingAlgorithm.priority();
     final dueDateSorting = TodosSortingAlgorithm.dueDate();
-    final completionSorting = TodosSortingAlgorithm.completion();
     final creationTimeSorting = TodosSortingAlgorithm.creationTime();
     return TodosSortingAlgorithm(
       title: "Default",
       compare: (a, b) {
+        final completionSort = completionSorting.compare(a, b);
+        if (completionSort != 0) {
+          return completionSort;
+        }
         final prioritySort = prioritySorting.compare(a, b);
         if (prioritySort != 0) {
           return prioritySort;
@@ -70,10 +74,6 @@ class TodosSortingAlgorithm {
         final dueDateSort = dueDateSorting.compare(a, b);
         if (dueDateSort != 0) {
           return dueDateSort;
-        }
-        final completionSort = completionSorting.compare(a, b);
-        if (completionSort != 0) {
-          return completionSort;
         }
         return creationTimeSorting.compare(a, b);
       },

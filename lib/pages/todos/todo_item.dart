@@ -160,6 +160,7 @@ class TodoItemSubtitle extends StatelessWidget {
   Widget _buildSubtitleFirstRow(
       BuildContext context, int comments, int reminders) {
     final children = <Widget>[];
+    var mainAxisAlignment = MainAxisAlignment.spaceBetween;
     if (todo.dueDate != null) {
       children.add(_buildDueDate(context));
     }
@@ -195,18 +196,19 @@ class TodoItemSubtitle extends StatelessWidget {
         ),
       );
     }
-    children.add(Flexible(
-      child: Container(),
-    ));
+    if (children.isEmpty) {
+      // If children are empty, since there is only one element, which is going to be project, we display it at end
+      mainAxisAlignment = MainAxisAlignment.end;
+    }
     children.add(SubtitleProject(
       todo: todo,
     ));
     if (children.isEmpty) {
       return Container();
     }
-    return Flex(
-      direction: Axis.horizontal,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Row(
+      // direction: Axis.horizontal,
+      mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: children,
     );
@@ -257,6 +259,7 @@ class SubtitleProject extends StatelessWidget {
 
   Flex _buildContainer(ProjectData? project) {
     return Flex(
+      mainAxisSize: MainAxisSize.min,
       direction: Axis.horizontal,
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,

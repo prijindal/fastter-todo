@@ -118,8 +118,11 @@ class _TodoEditBar extends StatelessWidget {
         elevation: 20,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8.0),
-          child: Wrap(
-            spacing: 8.0,
+          height: 50,
+          child: ListView(
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            // spacing: 8.0,
             children: _buildButtons(context),
           ),
         ),
