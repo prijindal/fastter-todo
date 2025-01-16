@@ -727,10 +727,7 @@ class $CommentTable extends Comment with TableInfo<$CommentTable, CommentData> {
   @override
   late final GeneratedColumn<String> todo = GeneratedColumn<String>(
       'todo', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: true,
-      defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'REFERENCES todo (id) ON UPDATE CASCADE ON DELETE CASCADE'));
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _creationTimeMeta =
       const VerificationMeta('creationTime');
   @override
@@ -1051,10 +1048,7 @@ class $ReminderTable extends Reminder
   @override
   late final GeneratedColumn<String> todo = GeneratedColumn<String>(
       'todo', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: true,
-      defaultConstraints: GeneratedColumn.constraintIsAlways(
-          'REFERENCES todo (id) ON UPDATE CASCADE ON DELETE CASCADE'));
+      type: DriftSqlType.string, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [id, title, time, completed, todo];
   @override
@@ -1335,39 +1329,6 @@ abstract class _$SharedDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
       [todo, project, comment, reminder];
-  @override
-  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
-        [
-          WritePropagation(
-            on: TableUpdateQuery.onTableName('todo',
-                limitUpdateKind: UpdateKind.delete),
-            result: [
-              TableUpdate('comment', kind: UpdateKind.delete),
-            ],
-          ),
-          WritePropagation(
-            on: TableUpdateQuery.onTableName('todo',
-                limitUpdateKind: UpdateKind.update),
-            result: [
-              TableUpdate('comment', kind: UpdateKind.update),
-            ],
-          ),
-          WritePropagation(
-            on: TableUpdateQuery.onTableName('todo',
-                limitUpdateKind: UpdateKind.delete),
-            result: [
-              TableUpdate('reminder', kind: UpdateKind.delete),
-            ],
-          ),
-          WritePropagation(
-            on: TableUpdateQuery.onTableName('todo',
-                limitUpdateKind: UpdateKind.update),
-            result: [
-              TableUpdate('reminder', kind: UpdateKind.update),
-            ],
-          ),
-        ],
-      );
 }
 
 typedef $$TodoTableCreateCompanionBuilder = TodoCompanion Function({
@@ -1394,39 +1355,6 @@ typedef $$TodoTableUpdateCompanionBuilder = TodoCompanion Function({
   Value<List<String>> tags,
   Value<int> rowid,
 });
-
-final class $$TodoTableReferences
-    extends BaseReferences<_$SharedDatabase, $TodoTable, TodoData> {
-  $$TodoTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$CommentTable, List<CommentData>>
-      _commentRefsTable(_$SharedDatabase db) =>
-          MultiTypedResultKey.fromTable(db.comment,
-              aliasName: $_aliasNameGenerator(db.todo.id, db.comment.todo));
-
-  $$CommentTableProcessedTableManager get commentRefs {
-    final manager = $$CommentTableTableManager($_db, $_db.comment)
-        .filter((f) => f.todo.id($_item.id));
-
-    final cache = $_typedResult.readTableOrNull(_commentRefsTable($_db));
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
-  }
-
-  static MultiTypedResultKey<$ReminderTable, List<ReminderData>>
-      _reminderRefsTable(_$SharedDatabase db) =>
-          MultiTypedResultKey.fromTable(db.reminder,
-              aliasName: $_aliasNameGenerator(db.todo.id, db.reminder.todo));
-
-  $$ReminderTableProcessedTableManager get reminderRefs {
-    final manager = $$ReminderTableTableManager($_db, $_db.reminder)
-        .filter((f) => f.todo.id($_item.id));
-
-    final cache = $_typedResult.readTableOrNull(_reminderRefsTable($_db));
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: cache));
-  }
-}
 
 class $$TodoTableFilterComposer extends Composer<_$SharedDatabase, $TodoTable> {
   $$TodoTableFilterComposer({
@@ -1464,48 +1392,6 @@ class $$TodoTableFilterComposer extends Composer<_$SharedDatabase, $TodoTable> {
       $composableBuilder(
           column: $table.tags,
           builder: (column) => ColumnWithTypeConverterFilters(column));
-
-  Expression<bool> commentRefs(
-      Expression<bool> Function($$CommentTableFilterComposer f) f) {
-    final $$CommentTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.comment,
-        getReferencedColumn: (t) => t.todo,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$CommentTableFilterComposer(
-              $db: $db,
-              $table: $db.comment,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
-
-  Expression<bool> reminderRefs(
-      Expression<bool> Function($$ReminderTableFilterComposer f) f) {
-    final $$ReminderTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.reminder,
-        getReferencedColumn: (t) => t.todo,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$ReminderTableFilterComposer(
-              $db: $db,
-              $table: $db.reminder,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
 }
 
 class $$TodoTableOrderingComposer
@@ -1581,48 +1467,6 @@ class $$TodoTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<List<String>, String> get tags =>
       $composableBuilder(column: $table.tags, builder: (column) => column);
-
-  Expression<T> commentRefs<T extends Object>(
-      Expression<T> Function($$CommentTableAnnotationComposer a) f) {
-    final $$CommentTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.comment,
-        getReferencedColumn: (t) => t.todo,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$CommentTableAnnotationComposer(
-              $db: $db,
-              $table: $db.comment,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
-
-  Expression<T> reminderRefs<T extends Object>(
-      Expression<T> Function($$ReminderTableAnnotationComposer a) f) {
-    final $$ReminderTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.id,
-        referencedTable: $db.reminder,
-        getReferencedColumn: (t) => t.todo,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$ReminderTableAnnotationComposer(
-              $db: $db,
-              $table: $db.reminder,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return f(composer);
-  }
 }
 
 class $$TodoTableTableManager extends RootTableManager<
@@ -1634,9 +1478,9 @@ class $$TodoTableTableManager extends RootTableManager<
     $$TodoTableAnnotationComposer,
     $$TodoTableCreateCompanionBuilder,
     $$TodoTableUpdateCompanionBuilder,
-    (TodoData, $$TodoTableReferences),
+    (TodoData, BaseReferences<_$SharedDatabase, $TodoTable, TodoData>),
     TodoData,
-    PrefetchHooks Function({bool commentRefs, bool reminderRefs})> {
+    PrefetchHooks Function()> {
   $$TodoTableTableManager(_$SharedDatabase db, $TodoTable table)
       : super(TableManagerState(
           db: db,
@@ -1696,45 +1540,9 @@ class $$TodoTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$TodoTableReferences(db, table, e)))
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({commentRefs = false, reminderRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (commentRefs) db.comment,
-                if (reminderRefs) db.reminder
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (commentRefs)
-                    await $_getPrefetchedData(
-                        currentTable: table,
-                        referencedTable:
-                            $$TodoTableReferences._commentRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$TodoTableReferences(db, table, p0).commentRefs,
-                        referencedItemsForCurrentItem:
-                            (item, referencedItems) =>
-                                referencedItems.where((e) => e.todo == item.id),
-                        typedResults: items),
-                  if (reminderRefs)
-                    await $_getPrefetchedData(
-                        currentTable: table,
-                        referencedTable:
-                            $$TodoTableReferences._reminderRefsTable(db),
-                        managerFromTypedResult: (p0) =>
-                            $$TodoTableReferences(db, table, p0).reminderRefs,
-                        referencedItemsForCurrentItem:
-                            (item, referencedItems) =>
-                                referencedItems.where((e) => e.todo == item.id),
-                        typedResults: items)
-                ];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ));
 }
 
@@ -1747,9 +1555,9 @@ typedef $$TodoTableProcessedTableManager = ProcessedTableManager<
     $$TodoTableAnnotationComposer,
     $$TodoTableCreateCompanionBuilder,
     $$TodoTableUpdateCompanionBuilder,
-    (TodoData, $$TodoTableReferences),
+    (TodoData, BaseReferences<_$SharedDatabase, $TodoTable, TodoData>),
     TodoData,
-    PrefetchHooks Function({bool commentRefs, bool reminderRefs})>;
+    PrefetchHooks Function()>;
 typedef $$ProjectTableCreateCompanionBuilder = ProjectCompanion Function({
   Value<String> id,
   required String title,
@@ -1902,23 +1710,6 @@ typedef $$CommentTableUpdateCompanionBuilder = CommentCompanion Function({
   Value<int> rowid,
 });
 
-final class $$CommentTableReferences
-    extends BaseReferences<_$SharedDatabase, $CommentTable, CommentData> {
-  $$CommentTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $TodoTable _todoTable(_$SharedDatabase db) =>
-      db.todo.createAlias($_aliasNameGenerator(db.comment.todo, db.todo.id));
-
-  $$TodoTableProcessedTableManager get todo {
-    final manager = $$TodoTableTableManager($_db, $_db.todo)
-        .filter((f) => f.id($_item.todo));
-    final item = $_typedResult.readTableOrNull(_todoTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
-  }
-}
-
 class $$CommentTableFilterComposer
     extends Composer<_$SharedDatabase, $CommentTable> {
   $$CommentTableFilterComposer({
@@ -1939,28 +1730,11 @@ class $$CommentTableFilterComposer
           column: $table.type,
           builder: (column) => ColumnWithTypeConverterFilters(column));
 
+  ColumnFilters<String> get todo => $composableBuilder(
+      column: $table.todo, builder: (column) => ColumnFilters(column));
+
   ColumnFilters<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime, builder: (column) => ColumnFilters(column));
-
-  $$TodoTableFilterComposer get todo {
-    final $$TodoTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.todo,
-        referencedTable: $db.todo,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TodoTableFilterComposer(
-              $db: $db,
-              $table: $db.todo,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
 }
 
 class $$CommentTableOrderingComposer
@@ -1981,29 +1755,12 @@ class $$CommentTableOrderingComposer
   ColumnOrderings<String> get type => $composableBuilder(
       column: $table.type, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get todo => $composableBuilder(
+      column: $table.todo, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime,
       builder: (column) => ColumnOrderings(column));
-
-  $$TodoTableOrderingComposer get todo {
-    final $$TodoTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.todo,
-        referencedTable: $db.todo,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TodoTableOrderingComposer(
-              $db: $db,
-              $table: $db.todo,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
 }
 
 class $$CommentTableAnnotationComposer
@@ -2024,28 +1781,11 @@ class $$CommentTableAnnotationComposer
   GeneratedColumnWithTypeConverter<TodoCommentType, String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
 
+  GeneratedColumn<String> get todo =>
+      $composableBuilder(column: $table.todo, builder: (column) => column);
+
   GeneratedColumn<DateTime> get creationTime => $composableBuilder(
       column: $table.creationTime, builder: (column) => column);
-
-  $$TodoTableAnnotationComposer get todo {
-    final $$TodoTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.todo,
-        referencedTable: $db.todo,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TodoTableAnnotationComposer(
-              $db: $db,
-              $table: $db.todo,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
 }
 
 class $$CommentTableTableManager extends RootTableManager<
@@ -2057,9 +1797,9 @@ class $$CommentTableTableManager extends RootTableManager<
     $$CommentTableAnnotationComposer,
     $$CommentTableCreateCompanionBuilder,
     $$CommentTableUpdateCompanionBuilder,
-    (CommentData, $$CommentTableReferences),
+    (CommentData, BaseReferences<_$SharedDatabase, $CommentTable, CommentData>),
     CommentData,
-    PrefetchHooks Function({bool todo})> {
+    PrefetchHooks Function()> {
   $$CommentTableTableManager(_$SharedDatabase db, $CommentTable table)
       : super(TableManagerState(
           db: db,
@@ -2103,43 +1843,9 @@ class $$CommentTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$CommentTableReferences(db, table, e)))
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({todo = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                  T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic>>(state) {
-                if (todo) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.todo,
-                    referencedTable: $$CommentTableReferences._todoTable(db),
-                    referencedColumn:
-                        $$CommentTableReferences._todoTable(db).id,
-                  ) as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ));
 }
 
@@ -2152,9 +1858,9 @@ typedef $$CommentTableProcessedTableManager = ProcessedTableManager<
     $$CommentTableAnnotationComposer,
     $$CommentTableCreateCompanionBuilder,
     $$CommentTableUpdateCompanionBuilder,
-    (CommentData, $$CommentTableReferences),
+    (CommentData, BaseReferences<_$SharedDatabase, $CommentTable, CommentData>),
     CommentData,
-    PrefetchHooks Function({bool todo})>;
+    PrefetchHooks Function()>;
 typedef $$ReminderTableCreateCompanionBuilder = ReminderCompanion Function({
   Value<String> id,
   required String title,
@@ -2171,23 +1877,6 @@ typedef $$ReminderTableUpdateCompanionBuilder = ReminderCompanion Function({
   Value<String> todo,
   Value<int> rowid,
 });
-
-final class $$ReminderTableReferences
-    extends BaseReferences<_$SharedDatabase, $ReminderTable, ReminderData> {
-  $$ReminderTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $TodoTable _todoTable(_$SharedDatabase db) =>
-      db.todo.createAlias($_aliasNameGenerator(db.reminder.todo, db.todo.id));
-
-  $$TodoTableProcessedTableManager get todo {
-    final manager = $$TodoTableTableManager($_db, $_db.todo)
-        .filter((f) => f.id($_item.todo));
-    final item = $_typedResult.readTableOrNull(_todoTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
-  }
-}
 
 class $$ReminderTableFilterComposer
     extends Composer<_$SharedDatabase, $ReminderTable> {
@@ -2210,25 +1899,8 @@ class $$ReminderTableFilterComposer
   ColumnFilters<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnFilters(column));
 
-  $$TodoTableFilterComposer get todo {
-    final $$TodoTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.todo,
-        referencedTable: $db.todo,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TodoTableFilterComposer(
-              $db: $db,
-              $table: $db.todo,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
+  ColumnFilters<String> get todo => $composableBuilder(
+      column: $table.todo, builder: (column) => ColumnFilters(column));
 }
 
 class $$ReminderTableOrderingComposer
@@ -2252,25 +1924,8 @@ class $$ReminderTableOrderingComposer
   ColumnOrderings<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnOrderings(column));
 
-  $$TodoTableOrderingComposer get todo {
-    final $$TodoTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.todo,
-        referencedTable: $db.todo,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TodoTableOrderingComposer(
-              $db: $db,
-              $table: $db.todo,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
+  ColumnOrderings<String> get todo => $composableBuilder(
+      column: $table.todo, builder: (column) => ColumnOrderings(column));
 }
 
 class $$ReminderTableAnnotationComposer
@@ -2294,25 +1949,8 @@ class $$ReminderTableAnnotationComposer
   GeneratedColumn<bool> get completed =>
       $composableBuilder(column: $table.completed, builder: (column) => column);
 
-  $$TodoTableAnnotationComposer get todo {
-    final $$TodoTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.todo,
-        referencedTable: $db.todo,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$TodoTableAnnotationComposer(
-              $db: $db,
-              $table: $db.todo,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
+  GeneratedColumn<String> get todo =>
+      $composableBuilder(column: $table.todo, builder: (column) => column);
 }
 
 class $$ReminderTableTableManager extends RootTableManager<
@@ -2324,9 +1962,12 @@ class $$ReminderTableTableManager extends RootTableManager<
     $$ReminderTableAnnotationComposer,
     $$ReminderTableCreateCompanionBuilder,
     $$ReminderTableUpdateCompanionBuilder,
-    (ReminderData, $$ReminderTableReferences),
+    (
+      ReminderData,
+      BaseReferences<_$SharedDatabase, $ReminderTable, ReminderData>
+    ),
     ReminderData,
-    PrefetchHooks Function({bool todo})> {
+    PrefetchHooks Function()> {
   $$ReminderTableTableManager(_$SharedDatabase db, $ReminderTable table)
       : super(TableManagerState(
           db: db,
@@ -2370,43 +2011,9 @@ class $$ReminderTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) =>
-                  (e.readTable(table), $$ReminderTableReferences(db, table, e)))
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({todo = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                  T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic>>(state) {
-                if (todo) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.todo,
-                    referencedTable: $$ReminderTableReferences._todoTable(db),
-                    referencedColumn:
-                        $$ReminderTableReferences._todoTable(db).id,
-                  ) as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ));
 }
 
@@ -2419,9 +2026,12 @@ typedef $$ReminderTableProcessedTableManager = ProcessedTableManager<
     $$ReminderTableAnnotationComposer,
     $$ReminderTableCreateCompanionBuilder,
     $$ReminderTableUpdateCompanionBuilder,
-    (ReminderData, $$ReminderTableReferences),
+    (
+      ReminderData,
+      BaseReferences<_$SharedDatabase, $ReminderTable, ReminderData>
+    ),
     ReminderData,
-    PrefetchHooks Function({bool todo})>;
+    PrefetchHooks Function()>;
 
 class $SharedDatabaseManager {
   final _$SharedDatabase _db;

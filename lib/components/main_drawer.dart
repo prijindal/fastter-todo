@@ -59,14 +59,14 @@ class TodosNavigationListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LocalDbState, int>(
-      selector: (_, state) => filters.filtered(state.todos).length,
-      builder: (context, count, _) => NavigationListTile(
+    return Selector<LocalDbState, List<TodoData>>(
+      selector: (_, state) => filters.filtered(state.todos),
+      builder: (context, todos, _) => NavigationListTile(
         icon: icon,
         selectedIcon: selectedIcon,
         route: "/todos?${filters.queryString}",
         label: filters.createTitle(context),
-        trailing: count.toString(),
+        trailing: "${todos.where((a) => a.completed).length}/${todos.length}",
       ),
     );
   }

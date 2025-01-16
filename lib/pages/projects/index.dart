@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
+import '../../components/adaptive_scaffold.dart';
 import '../../components/main_drawer.dart';
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
@@ -39,7 +40,7 @@ class ProjectsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AdaptiveScaffold(
       appBar: AppBar(
         title: Text("Projects"),
       ),

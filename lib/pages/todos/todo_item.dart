@@ -41,11 +41,7 @@ class TodoItem extends StatelessWidget {
 
   void _deleteTodo(BuildContext context) async {
     await Provider.of<DbManager>(context, listen: false)
-        .database
-        .managers
-        .todo
-        .filter((tbl) => tbl.id.equals(todo.id))
-        .delete();
+        .deleteTodosByIds([todo.id]);
   }
 
   @override

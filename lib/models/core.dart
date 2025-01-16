@@ -50,12 +50,7 @@ class Comment extends Table {
   late final id = text().clientDefault(() => _uuid.v4())();
   late final content = blob()();
   late final type = textEnum<TodoCommentType>()();
-  late final todo = text().references(
-    Todo,
-    #id,
-    onUpdate: KeyAction.cascade,
-    onDelete: KeyAction.cascade,
-  )();
+  late final todo = text()();
   late final creationTime = dateTime().clientDefault(() => DateTime.now())();
 
   @override
@@ -67,12 +62,7 @@ class Reminder extends Table {
   late final title = text()();
   late final time = dateTime()();
   late final completed = boolean().clientDefault(() => false)();
-  late final todo = text().references(
-    Todo,
-    #id,
-    onUpdate: KeyAction.cascade,
-    onDelete: KeyAction.cascade,
-  )();
+  late final todo = text()();
 
   @override
   Set<Column> get primaryKey => {id};

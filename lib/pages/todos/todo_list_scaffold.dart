@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../components/adaptive_scaffold.dart';
 import '../../components/main_drawer.dart';
 import '../../helpers/todos_filters.dart';
 import '../../models/local_state.dart';
@@ -11,14 +12,14 @@ import 'todolist.dart';
 class TodoListScaffold extends StatefulWidget {
   const TodoListScaffold({
     super.key,
-    this.appBar,
+    required this.appBar,
     required this.filters,
   });
 
   final TodosFilters filters;
 
   /// An app bar to display at the top of the scaffold.
-  final PreferredSizeWidget? appBar;
+  final PreferredSizeWidget appBar;
 
   @override
   State<TodoListScaffold> createState() => _TodoListScaffoldState();
@@ -71,7 +72,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AdaptiveScaffold(
       appBar: widget.appBar,
       drawer: MainDrawer(),
       body: _buildBody(),

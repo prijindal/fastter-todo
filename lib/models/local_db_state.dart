@@ -64,7 +64,7 @@ class LocalDbState extends ChangeNotifier {
     // This is only really useful when our sqlite db is a remote one
     initFromLocalTempDb();
     initSubscriptions();
-    const duration = Duration(seconds: 2);
+    const duration = Duration(seconds: 10); // TODO: Make this configurable
     timer = Timer.periodic(duration, (_) => refresh());
   }
 
@@ -97,19 +97,7 @@ class LocalDbState extends ChangeNotifier {
     if (_isRefreshing) return;
     _isRefreshing = true;
     notifyListeners();
-    final counts = await Future.wait([
-      db.managers.todo.count(),
-      db.managers.project.count(),
-      db.managers.comment.count(),
-      db.managers.reminder.count(),
-    ]);
-    // Only refresh if counts are mismatched
-    if (counts[0] != todos.length ||
-        counts[1] != projects.length ||
-        counts[2] != comments.length ||
-        counts[3] != reminders.length) {
-      await _refreshData();
-    }
+    await _refreshData();
     await syncReminders();
     _isRefreshing = false;
     notifyListeners();

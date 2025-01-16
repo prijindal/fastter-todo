@@ -131,4 +131,13 @@ class DbManager extends ChangeNotifier {
     );
     notifyListeners();
   }
+
+  // These are helper methods for db deletion/updation etc
+  Future<void> deleteTodosByIds(List<String> ids) async {
+    await Future.wait([
+      database.managers.comment.filter((f) => f.todo.isIn(ids)).delete(),
+      database.managers.reminder.filter((f) => f.todo.isIn(ids)).delete(),
+      database.managers.todo.filter((f) => f.id.isIn(ids)).delete(),
+    ]);
+  }
 }
