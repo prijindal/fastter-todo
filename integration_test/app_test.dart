@@ -28,6 +28,7 @@ void main() {
       when(() => mockStackRouter.pushNamed(any())).thenAnswer((_) async {
         return null;
       });
+      when(() => mockStackRouter.currentUrl).thenReturn('/todos');
       // Load app widget.
       await tester.pumpWidget(
         MultiProvider(
@@ -57,7 +58,7 @@ void main() {
       );
 
       // Verify the counter starts at 0.
-      expect(find.text('All Todos'), findsOneWidget);
+      expect(find.text('All Todos'), findsNWidgets(2));
 
       // Finds the floating action button to tap on.
       final fab = find.byKey(const ValueKey('New Todo'));
