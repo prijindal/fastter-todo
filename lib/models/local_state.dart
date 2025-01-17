@@ -10,8 +10,17 @@ class LocalStateNotifier with ChangeNotifier {
   // Getters
   List<String> get selectedTodoIds => _selectedTodoIds;
 
-  void setSelectedTodoIds(List<String> value) {
-    _selectedTodoIds = value;
+  void clearSelectedTodoIds() {
+    _selectedTodoIds = [];
+    notifyListeners();
+  }
+
+  void toggleSelectedId(String value) {
+    if (_selectedTodoIds.contains(value)) {
+      _selectedTodoIds = _selectedTodoIds.where((a) => a != value).toList();
+    } else {
+      _selectedTodoIds = _selectedTodoIds..add(value);
+    }
     notifyListeners();
   }
 

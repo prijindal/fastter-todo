@@ -97,15 +97,7 @@ class TodoItem extends StatelessWidget {
           onTap: () {
             final localStateNotifier =
                 Provider.of<LocalStateNotifier>(context, listen: false);
-            if (selected) {
-              localStateNotifier.setSelectedTodoIds(localStateNotifier
-                  .selectedTodoIds
-                  .where((a) => a != todo.id)
-                  .toList());
-            } else {
-              localStateNotifier.setSelectedTodoIds(
-                  localStateNotifier.selectedTodoIds..add(todo.id));
-            }
+            localStateNotifier.toggleSelectedId(todo.id);
           },
           leading: TodoItemToggle(
             todo: todo,
@@ -120,11 +112,6 @@ class TodoItem extends StatelessWidget {
           ),
           title: Text(
             todo.title,
-            style: todo.completed
-                ? DefaultTextStyle.of(context).style.copyWith(
-                      decoration: TextDecoration.lineThrough,
-                    )
-                : null,
           ),
           subtitle: TodoItemSubtitle(
             todo: todo,
@@ -155,7 +142,7 @@ class TodoItemSubtitle extends StatelessWidget {
       );
   Widget _buildSubtitleFirstRow(
       BuildContext context, int comments, int reminders) {
-    final children = <Widget>[];
+    var children = <Widget>[];
     var mainAxisAlignment = MainAxisAlignment.spaceBetween;
     if (todo.dueDate != null) {
       children.add(_buildDueDate(context));
@@ -192,7 +179,13 @@ class TodoItemSubtitle extends StatelessWidget {
         ),
       );
     }
-    if (children.isEmpty) {
+    if (children.isNotEmpty) {
+      // If childrens are not empty, we will take all of them and wrap it inside a row
+      final subRow = Row(
+        children: children,
+      );
+      children = [subRow];
+    } else {
       // If children are empty, since there is only one element, which is going to be project, we display it at end
       mainAxisAlignment = MainAxisAlignment.end;
     }

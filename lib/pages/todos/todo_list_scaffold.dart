@@ -4,7 +4,10 @@ import 'package:provider/provider.dart';
 import '../../components/adaptive_scaffold.dart';
 import '../../components/main_drawer.dart';
 import '../../helpers/todos_filters.dart';
+import '../../models/core.dart';
+import '../../models/local_db_state.dart';
 import '../../models/local_state.dart';
+import '../todo/index.dart';
 import 'todoeditbar/index.dart';
 import 'todoinputbar.dart';
 import 'todolist.dart';
@@ -41,13 +44,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
     );
   }
 
-  Widget _buildList() {
-    return TodoList(
-      filters: widget.filters,
-    );
-  }
-
-  Widget? _buildBottom() {
+  Widget? _buildBottom(List<String> selectedTodoIds) {
     if (_showInput) {
       return TodoInputBar(
         initialProject: widget.filters.projectFilter,
@@ -58,26 +55,35 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
         },
       );
     }
-    final selectedEntriesEmpty =
-        Provider.of<LocalStateNotifier>(context).selectedTodoIds.isEmpty;
-    if (selectedEntriesEmpty) {
+    if (selectedTodoIds.isEmpty) {
       return null;
     }
     return TodoEditBar();
   }
 
-  Widget _buildBody() {
-    return _buildList();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScaffold(
-      appBar: widget.appBar,
-      drawer: MainDrawer(),
-      body: _buildBody(),
-      floatingActionButton: _showInput == true ? null : _buildFab(),
-      bottomSheet: _buildBottom(),
+    return Consumer<LocalStateNotifier>(
+      child: TodoList(
+        filters: widget.filters,
+      ),
+      builder: (_, localState, list) => AdaptiveScaffold(
+        appBar: widget.appBar,
+        drawer: MainDrawer(),
+        body: list!,
+        secondaryBody: localState.selectedTodoIds.length != 1
+            ? null
+            : Selector<LocalDbState, TodoData>(
+                selector: (_, state) => state.todos
+                    .where((a) => a.id == localState.selectedTodoIds.first)
+                    .first,
+                builder: (context, todo, __) => TodoEditBody(
+                  todo: todo,
+                ),
+              ),
+        floatingActionButton: _showInput == true ? null : _buildFab(),
+        bottomSheet: _buildBottom(localState.selectedTodoIds),
+      ),
     );
   }
 }

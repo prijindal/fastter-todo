@@ -1,9 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
+
+class FormBuilderProjectSelector extends StatelessWidget {
+  const FormBuilderProjectSelector({
+    super.key,
+    this.initialValue,
+    this.validator,
+    required this.name,
+    this.expanded = false,
+    this.decoration = const InputDecoration(),
+    this.onChanged,
+  });
+
+  final String? initialValue;
+  final String? Function(String?)? validator;
+  final String name;
+  final bool expanded;
+  final InputDecoration decoration;
+  final void Function(String?)? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return FormBuilderField<String>(
+      initialValue: initialValue,
+      name: name,
+      validator: validator,
+      builder: (FormFieldState<String> field) {
+        return InputDecorator(
+          decoration: decoration,
+          child: ProjectDropdown(
+            selectedProject: field.value == null
+                ? null
+                : Provider.of<LocalDbState>(context)
+                    .projects
+                    .firstWhere((a) => a.id == field.value),
+            expanded: expanded,
+            onSelected: (newEntry) {
+              field.didChange(newEntry?.id);
+              onChanged?.call(newEntry?.id);
+            },
+          ),
+        );
+      },
+    );
+  }
+}
 
 class ProjectDropdown extends StatelessWidget {
   const ProjectDropdown({
@@ -118,10 +164,9 @@ class _ProjectDropdown extends StatelessWidget {
     if (expanded) {
       return ListTile(
         key: _menuKey,
+        dense: true,
         leading: _buildIcon(),
-        title: const Text('Project'),
-        subtitle:
-            Text(selectedProject == null ? 'Inbox' : selectedProject!.title),
+        title: Text(selectedProject == null ? 'Inbox' : selectedProject!.title),
         onTap: () => _showMenu(context),
       );
     }

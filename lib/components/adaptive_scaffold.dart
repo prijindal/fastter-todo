@@ -8,6 +8,7 @@ class AdaptiveScaffold extends StatelessWidget {
     required this.body,
     this.bottomSheet,
     this.floatingActionButton,
+    this.secondaryBody,
   });
 
   final PreferredSizeWidget appBar;
@@ -15,11 +16,27 @@ class AdaptiveScaffold extends StatelessWidget {
   final Widget body;
   final Widget? bottomSheet;
   final Widget? floatingActionButton;
+  final Widget? secondaryBody;
+
+  Widget _buildBody() {
+    return Row(
+      children: [
+        Expanded(
+          child: body,
+        ),
+        if (secondaryBody != null) const VerticalDivider(width: 1),
+        if (secondaryBody != null)
+          Expanded(
+            child: secondaryBody!,
+          ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.sizeOf(context).width;
-    if (width >= 840) {
+    if (width >= 1280) {
       return Scaffold(
         body: Row(
           children: [
@@ -30,7 +47,7 @@ class AdaptiveScaffold extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   appBar,
-                  Flexible(child: body),
+                  Flexible(child: _buildBody()),
                 ],
               ),
             ),

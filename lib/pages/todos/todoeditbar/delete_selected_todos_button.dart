@@ -18,7 +18,7 @@ class DeleteSelectedTodosButton extends StatelessWidget {
     if (shouldDelete != null && shouldDelete && context.mounted) {
       await Provider.of<DbManager>(context, listen: false)
           .deleteTodosByIds(localStateNotifier.selectedTodoIds);
-      localStateNotifier.setSelectedTodoIds([]);
+      localStateNotifier.clearSelectedTodoIds();
     }
   }
 

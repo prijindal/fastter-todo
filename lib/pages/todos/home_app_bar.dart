@@ -66,13 +66,13 @@ class SelectedEntriesAppBar extends StatelessWidget {
         if (!didPop) {
           // If route did not pop, then it means that the selectedTodoIds is not empty,
           // We need to clear it
-          localStateNotifier.setSelectedTodoIds([]);
+          localStateNotifier.clearSelectedTodoIds();
         }
       },
       child: AppBar(
         leading: IconButton(
           onPressed: () {
-            localStateNotifier.setSelectedTodoIds([]);
+            localStateNotifier.clearSelectedTodoIds();
           },
           icon: Icon(Icons.arrow_back),
         ),
