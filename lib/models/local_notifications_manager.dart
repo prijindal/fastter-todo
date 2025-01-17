@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -76,6 +77,7 @@ class LocalNotificationsManager {
       final alarmPermission =
           await platformSpecificImplementation.requestExactAlarmsPermission() ??
               false;
+      await Permission.ignoreBatteryOptimizations.request();
       return notificationPermission && alarmPermission;
     } else if (Platform.isIOS) {
       return await flutterLocalNotificationsPlugin

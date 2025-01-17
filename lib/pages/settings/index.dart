@@ -1,13 +1,15 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
+import '../../components/adaptive_scaffold.dart';
+
 @RoutePage()
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return AdaptiveScaffold(
       appBar: AppBar(
         title: const Text("Settings"),
       ),
@@ -31,6 +33,12 @@ class SettingsScreen extends StatelessWidget {
           leading: const Icon(Icons.security),
           title: const Text("Security"),
           onTap: () => AutoRouter.of(context).pushNamed("/settings/security"),
+        ),
+        ListTile(
+          leading: const Icon(Icons.security_update),
+          title: const Text("Permissions"),
+          onTap: () =>
+              AutoRouter.of(context).pushNamed("/settings/permissions"),
         ),
         ListTile(
           leading: const Icon(Icons.help),
