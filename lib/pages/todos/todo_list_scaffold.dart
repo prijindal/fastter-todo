@@ -46,19 +46,31 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
 
   Widget? _buildBottom(List<String> selectedTodoIds) {
     if (_showInput) {
-      return TodoInputBar(
-        initialProject: widget.filters.projectFilter,
-        onBackButton: () {
-          setState(() {
-            _showInput = false;
-          });
-        },
-      );
+      return BottomSheet(onClosing: () {
+        setState(() {
+          _showInput = false;
+        });
+      }, builder: (context) {
+        return TodoInputBar(
+          initialProject: widget.filters.projectFilter,
+          onBackButton: () {
+            setState(() {
+              _showInput = false;
+            });
+          },
+        );
+      });
     }
     if (selectedTodoIds.isEmpty) {
       return null;
     }
-    return TodoEditBar();
+    return BottomSheet(
+      onClosing: () {
+        Provider.of<LocalStateNotifier>(context, listen: false)
+            .clearSelectedTodoIds();
+      },
+      builder: (_) => TodoEditBar(),
+    );
   }
 
   @override
