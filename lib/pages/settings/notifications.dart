@@ -21,6 +21,7 @@ class NotificationsSettingsScreen extends StatelessWidget {
           await Provider.of<LocalDbState>(context)
               .localNotificationsManager
               .init();
+          // ignore: use_build_context_synchronously
           return Provider.of<LocalDbState>(context)
               .localNotificationsManager
               .pendingNotificationRequests();
