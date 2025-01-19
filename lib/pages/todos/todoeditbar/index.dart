@@ -34,12 +34,52 @@ class TodoEditBar extends StatelessWidget {
       );
 }
 
-class _TodoEditBar extends StatelessWidget {
+class _TodoEditBar extends StatefulWidget {
   const _TodoEditBar({
     required this.selectedTodos,
   });
 
   final List<TodoData> selectedTodos;
+
+  @override
+  State<_TodoEditBar> createState() => _TodoEditBarState();
+}
+
+class _TodoEditBarState extends State<_TodoEditBar> {
+  bool _expanded = false;
+
+  Widget _buildExpanded() {
+    return ListView(
+      shrinkWrap: true,
+      children: [],
+    );
+  }
+
+  Widget _buildCollapsed() {
+    return TodoEditBarCollapsed(
+      selectedTodos: widget.selectedTodos,
+      onExpand: () {
+        setState(() {
+          _expanded = true;
+        });
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      _expanded ? _buildExpanded() : _buildCollapsed();
+}
+
+class TodoEditBarCollapsed extends StatelessWidget {
+  const TodoEditBarCollapsed({
+    super.key,
+    required this.selectedTodos,
+    required this.onExpand,
+  });
+
+  final List<TodoData> selectedTodos;
+  final VoidCallback onExpand;
 
   List<Widget> _buildButtons(BuildContext context) {
     if (selectedTodos.isEmpty) return [];
@@ -78,7 +118,11 @@ class _TodoEditBar extends StatelessWidget {
         ),
         // TODO
         // _SubtaskButton(context),
-        DeleteSelectedTodosButton()
+        DeleteSelectedTodosButton(),
+        // IconButton(
+        //   onPressed: onExpand,
+        //   icon: Icon(Icons.more),
+        // )
       ];
     }
     return <Widget>[
@@ -114,14 +158,16 @@ class _TodoEditBar extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8.0),
-        height: 50,
-        child: ListView(
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          // spacing: 8.0,
-          children: _buildButtons(context),
-        ),
-      );
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8.0),
+      height: 50,
+      child: ListView(
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        // spacing: 8.0,
+        children: _buildButtons(context),
+      ),
+    );
+  }
 }

@@ -147,6 +147,12 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               onChanged: _markEdited,
               decoration: InputDecoration(
                 labelText: 'Due Date',
+                suffix: IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    _formKey.currentState!.fields['dueDate']?.didChange(null);
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 10),
