@@ -41,6 +41,12 @@ class SettingsScreen extends StatelessWidget {
               AutoRouter.of(context).pushNamed("/settings/permissions"),
         ),
         ListTile(
+          leading: const Icon(Icons.notifications),
+          title: const Text("Scheduled notifications"),
+          onTap: () =>
+              AutoRouter.of(context).pushNamed("/settings/notifications"),
+        ),
+        ListTile(
           leading: const Icon(Icons.help),
           title: const Text("Help"),
           onTap: () => AutoRouter.of(context).pushNamed("/settings/help"),

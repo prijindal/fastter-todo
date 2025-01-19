@@ -67,6 +67,11 @@ class AppRouter extends RootStackRouter {
           transitionsBuilder: TransitionsBuilders.slideLeft,
         ),
         CustomRoute<void>(
+          path: "/settings/notifications",
+          page: NotificationsSettingsRoute.page,
+          transitionsBuilder: TransitionsBuilders.slideLeft,
+        ),
+        CustomRoute<void>(
           path: "/settings/security",
           page: SecuritySettingsRoute.page,
           transitionsBuilder: TransitionsBuilders.slideLeft,

@@ -22,8 +22,7 @@ class TodoRemindersScreen extends StatelessWidget {
   Widget build(BuildContext context) => Consumer<LocalDbState>(
         builder: (context, localDbState, _) => _TodoRemindersScreen(
           todo: localDbState.todos.firstWhere((f) => f.id == todoId),
-          reminders:
-              localDbState.reminders.where((a) => a.todo == todoId).toList(),
+          reminders: localDbState.getTodoReminders(todoId, false),
         ),
       );
 }
@@ -184,6 +183,8 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
                 children: widget.reminders.reversed
                     .map(
                       (todoReminder) => ListTile(
+                        enabled:
+                            todoReminder.time.compareTo(DateTime.now()) > 0,
                         title: Text(todoReminder.title),
                         subtitle: Text(_formattedTime(todoReminder)),
                         onLongPress: () => _toggleSelected(todoReminder),

@@ -11,7 +11,7 @@ import 'local_notifications_manager.dart';
 
 class LocalDbState extends ChangeNotifier {
   final SharedDatabase db;
-  final LocalNotificationsManager _localNotificationsManager =
+  final LocalNotificationsManager localNotificationsManager =
       LocalNotificationsManager();
 
   StreamSubscription<List<TodoData>>? _todosSubscription;
@@ -86,9 +86,9 @@ class LocalDbState extends ChangeNotifier {
 
   Future<void> syncReminders() async {
     if (reminders.isNotEmpty) {
-      final status = await _localNotificationsManager.register();
+      final status = await localNotificationsManager.register();
       if (status) {
-        await _localNotificationsManager.syncReminders(reminders);
+        await localNotificationsManager.syncReminders(reminders);
       }
     }
   }
@@ -166,6 +166,17 @@ class LocalDbState extends ChangeNotifier {
   List<String> getTodoTag(String id) {
     final todo = todos.firstWhere((element) => element.id == id);
     return todo.tags;
+  }
+
+  List<ReminderData> getTodoReminders(String id, [bool onlyPending = false]) {
+    if (onlyPending) {
+      final now = DateTime.now();
+      return reminders
+          .where((element) =>
+              element.todo == id && element.time.compareTo(now) >= 0)
+          .toList();
+    }
+    return reminders.where((element) => element.todo == id).toList();
   }
 
   Future<void> _readFromLocalDb<T extends drift.DataClass>(

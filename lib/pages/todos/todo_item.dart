@@ -208,7 +208,7 @@ class TodoItemSubtitle extends StatelessWidget {
     final firstRow = Selector<LocalDbState, List<int>>(
       selector: (_, state) => [
         state.comments.where((f) => f.todo == todo.id).length,
-        state.reminders.where((f) => f.todo == todo.id).length,
+        state.getTodoReminders(todo.id, true).length,
       ],
       builder: (context, counts, _) =>
           _buildSubtitleFirstRow(context, counts[0], counts[1]),

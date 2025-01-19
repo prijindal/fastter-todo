@@ -213,7 +213,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
             const SizedBox(height: 10),
             Selector<LocalDbState, int>(
               selector: (_, state) =>
-                  state.reminders.where((a) => a.todo == widget.todo.id).length,
+                  state.getTodoReminders(widget.todo.id, true).length,
               builder: (context, reminders, _) {
                 return ListTile(
                   title: Text("$reminders Reminders"),

@@ -116,10 +116,10 @@ class LocalNotificationsManager {
     return true;
   }
 
-  Future<List<PendingNotificationRequest>> _pendingNotificationRequests() =>
+  Future<List<PendingNotificationRequest>> pendingNotificationRequests() =>
       flutterLocalNotificationsPlugin.pendingNotificationRequests();
 
-  Future<void> _cancelNotification(int id) =>
+  Future<void> cancelNotification(int id) =>
       flutterLocalNotificationsPlugin.cancel(id);
 
   Future<void> _zonedSchedule(ReminderData reminder) =>
@@ -147,13 +147,13 @@ class LocalNotificationsManager {
   Future<void> syncReminders(List<ReminderData> reminders) async {
     if (!isSupported) return;
     if (!initialized) return;
-    final pendingNotifications = await _pendingNotificationRequests();
+    final pendingNotifications = await pendingNotificationRequests();
     for (var pendingNotification in pendingNotifications) {
       if (reminders
           .where((a) => a.id.hashCode == pendingNotification.id)
           .isEmpty) {
         // When reminder is not present, cancel notification
-        await _cancelNotification(pendingNotification.id);
+        await cancelNotification(pendingNotification.id);
       }
     }
     for (final reminder in reminders) {
