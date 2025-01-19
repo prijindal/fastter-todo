@@ -17,12 +17,17 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<LocalDbState>(
+    return Selector<LocalDbState,
+        ({bool isTodosInitialized, List<TodoData> todos})>(
+      selector: (context, state) => (
+        isTodosInitialized: state.isTodosInitialized,
+        todos: filters.filtered(state.todos)
+          ..sort(TodosSortingAlgorithm.base().compare)
+      ),
       builder: (context, state, _) => !state.isTodosInitialized
           ? Center(child: Text("Loading"))
           : _TodosList(
-              todos: filters.filtered(state.todos)
-                ..sort(TodosSortingAlgorithm.base().compare),
+              todos: state.todos,
             ),
     );
   }
@@ -46,6 +51,7 @@ class _TodosList extends StatelessWidget {
       itemBuilder: (context, index) {
         final todo = todos[index];
         return TodoItem(
+          key: Key("TodoItem${todo.id}"),
           todo: todo,
         );
       },

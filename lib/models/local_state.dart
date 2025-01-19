@@ -8,7 +8,7 @@ class LocalStateNotifier with ChangeNotifier {
   TodosSortingAlgorithm _todosSortingAlgorithm = TodosSortingAlgorithm.base();
 
   // Getters
-  List<String> get selectedTodoIds => _selectedTodoIds;
+  List<String> get selectedTodoIds => List.unmodifiable(_selectedTodoIds);
 
   void clearSelectedTodoIds() {
     _selectedTodoIds = [];

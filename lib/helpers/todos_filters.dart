@@ -53,7 +53,8 @@ class TodosFilters {
     this.daysAhead,
   });
 
-  List<TodoData> filtered(List<TodoData> todos) {
+  List<TodoData> filtered(List<TodoData> initialTodos) {
+    List<TodoData> todos = initialTodos.toList();
     // TODO: Compare, sorting order: priority, completed, dueDate
     if (projectFilter != null) {
       if (projectFilter == "inbox") {

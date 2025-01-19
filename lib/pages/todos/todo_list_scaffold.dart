@@ -32,7 +32,7 @@ class TodoListScaffold extends StatelessWidget {
           builder: (context) => TodoInputBar(
             initialProject: filters.projectFilter,
             onBackButton: () {
-              Navigator.of(context).pop();
+              Navigator.of(context).maybePop();
             },
           ),
         );

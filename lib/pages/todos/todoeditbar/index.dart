@@ -21,15 +21,15 @@ class TodoEditBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Selector<LocalStateNotifier, List<String>>(
-        selector: (context, localState) => localState.selectedTodoIds,
-        builder: (context, selectedTodoIds, _) =>
-            Selector<LocalDbState, List<TodoData>>(
-          selector: (_, state) =>
-              state.todos.where((a) => selectedTodoIds.contains(a.id)).toList(),
-          builder: (context, selectedTodos, _) => _TodoEditBar(
-            selectedTodos: selectedTodos,
-          ),
+      Selector2<LocalStateNotifier, LocalDbState, List<TodoData>>(
+        selector: (_, localState, dbState) {
+          final selectedTodoIds = localState.selectedTodoIds;
+          return dbState.todos
+              .where((a) => selectedTodoIds.contains(a.id))
+              .toList();
+        },
+        builder: (context, selectedTodos, _) => _TodoEditBar(
+          selectedTodos: selectedTodos,
         ),
       );
 }
@@ -135,9 +135,8 @@ class TodoEditBarCollapsed extends StatelessWidget {
       ),
       TagSelector(
         expanded: false,
-        selectedTags: selectedTodos.map((a) => a.tags).reduce(
-              (value, element) => value..addAll(element),
-            ),
+        selectedTags: Provider.of<LocalDbState>(context)
+            .getTodosTags(selectedTodos.map((a) => a.id).toList()),
         onSelected: (selectedTags) async =>
             await Provider.of<DbManager>(context, listen: false)
                 .database

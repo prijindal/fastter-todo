@@ -213,7 +213,7 @@ class TodoItemSubtitle extends StatelessWidget {
       builder: (context, counts, _) =>
           _buildSubtitleFirstRow(context, counts[0], counts[1]),
     );
-    final tags = todo.tags.toSet().toList();
+    final tags = Provider.of<LocalDbState>(context).getTodoTag(todo.id);
     if (tags.isEmpty) {
       return firstRow;
     } else {

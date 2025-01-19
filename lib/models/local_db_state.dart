@@ -28,18 +28,18 @@ class LocalDbState extends ChangeNotifier {
 
   final Map<String, List<drift.DataClass>> _localState = {};
 
-  List<TodoData> get todos => _isTodosInitialized
+  List<TodoData> get todos => List.unmodifiable(_isTodosInitialized
       ? _todos
-      : (_localState["todos"] as List<TodoData>?) ?? [];
-  List<ProjectData> get projects => _isProjectsInitialized
+      : (_localState["todos"] as List<TodoData>?) ?? []);
+  List<ProjectData> get projects => List.unmodifiable(_isProjectsInitialized
       ? _projects
-      : (_localState["projects"] as List<ProjectData>?) ?? [];
-  List<CommentData> get comments => _isCommentsInitialized
+      : (_localState["projects"] as List<ProjectData>?) ?? []);
+  List<CommentData> get comments => List.unmodifiable(_isCommentsInitialized
       ? _comments
-      : (_localState["comments"] as List<CommentData>?) ?? [];
-  List<ReminderData> get reminders => _isRemindersInitialized
+      : (_localState["comments"] as List<CommentData>?) ?? []);
+  List<ReminderData> get reminders => List.unmodifiable(_isRemindersInitialized
       ? _reminders
-      : (_localState["reminders"] as List<ReminderData>?) ?? [];
+      : (_localState["reminders"] as List<ReminderData>?) ?? []);
 
   bool _isTodosInitialized = false;
   bool _isProjectsInitialized = false;
@@ -77,10 +77,10 @@ class LocalDbState extends ChangeNotifier {
 
   Future<void> _refreshData() async {
     await Future.wait([
-      db.managers.todo.get().then((values) => _todos = values),
-      db.managers.project.get().then((values) => _projects = values),
-      db.managers.comment.get().then((values) => _comments = values),
-      db.managers.reminder.get().then((values) => _reminders = values),
+      db.managers.todo.get().then((values) => _todos = values.toList()),
+      db.managers.project.get().then((values) => _projects = values.toList()),
+      db.managers.comment.get().then((values) => _comments = values.toList()),
+      db.managers.reminder.get().then((values) => _reminders = values.toList()),
     ]);
   }
 
@@ -106,25 +106,25 @@ class LocalDbState extends ChangeNotifier {
   void initSubscriptions() {
     cancelSubscriptions();
     _todosSubscription = db.managers.todo.watch().listen((event) {
-      _todos = event;
+      _todos = List.unmodifiable(event.toList());
       _isTodosInitialized = true;
       notifyListeners();
       setLocalTempDb("todos", event);
     });
     _projectsSubscription = db.managers.project.watch().listen((event) {
-      _projects = event;
+      _projects = event.toList();
       _isProjectsInitialized = true;
       notifyListeners();
       setLocalTempDb("projects", event);
     });
     _commentsSubscription = db.managers.comment.watch().listen((event) {
-      _comments = event;
+      _comments = event.toList();
       _isCommentsInitialized = true;
       notifyListeners();
       setLocalTempDb("comments", event);
     });
     _remindersSubscription = db.managers.reminder.watch().listen((event) {
-      _reminders = event;
+      _reminders = event.toList();
       _isRemindersInitialized = true;
       notifyListeners();
       setLocalTempDb("reminders", event);
@@ -148,6 +148,24 @@ class LocalDbState extends ChangeNotifier {
       }
     }
     return tags;
+  }
+
+  List<String> getTodosTags(List<String> todoId) {
+    final selectedTodos = todos.where((element) => todoId.contains(element.id));
+    final List<String> tags = [];
+    for (var todo in selectedTodos) {
+      for (var tag in todo.tags) {
+        if (!tags.contains(tag)) {
+          tags.add(tag);
+        }
+      }
+    }
+    return tags;
+  }
+
+  List<String> getTodoTag(String id) {
+    final todo = todos.firstWhere((element) => element.id == id);
+    return todo.tags;
   }
 
   Future<void> _readFromLocalDb<T extends drift.DataClass>(
