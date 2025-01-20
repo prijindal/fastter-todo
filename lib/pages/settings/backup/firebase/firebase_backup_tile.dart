@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../firebase/firebase_init.dart' show User, FirebaseAuth;
 
 class FirebaseBackupTile extends StatefulWidget {
   const FirebaseBackupTile({super.key});

@@ -1,22 +1,18 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-
+import '../../../../firebase/firebase_init.dart';
 import '../../../../helpers/logger.dart';
 import '../../components/sync.dart';
 
-class FirebaseSync extends SyncBase<auth.User> {
-  auth.User? _user;
-  StreamSubscription<auth.User?>? _subscription;
+class FirebaseSync extends SyncBase<User> {
+  User? _user;
+  StreamSubscription<User?>? _subscription;
 
   FirebaseSync(super.ioGetter) {
     AppLogger.instance.d("Registering subscription");
     if (isSupported) {
-      _subscription =
-          auth.FirebaseAuth.instance.authStateChanges().listen((user) {
+      _subscription = FirebaseAuth.instance.authStateChanges().listen((user) {
         AppLogger.instance.d("Signed in");
         _user = user;
         notifyListeners();
@@ -34,10 +30,10 @@ class FirebaseSync extends SyncBase<auth.User> {
   bool get isSupported => Firebase.apps.isNotEmpty;
 
   @override
-  auth.User? get currentUser => _user;
+  User? get currentUser => _user;
 
   @override
-  Future<void> signOut() => auth.FirebaseAuth.instance.signOut();
+  Future<void> signOut() => FirebaseAuth.instance.signOut();
 
   @override
   Future<void> checkSignIn() async {

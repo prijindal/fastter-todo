@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import '../../../firebase_init.dart';
+import '../../../firebase/firebase_init.dart';
 import '../../../helpers/fileio.dart';
 import '../components/backup_encryption_tile.dart';
 import 'firebase/firebase_backup_tile.dart';

@@ -1,13 +1,27 @@
 import 'dart:io';
 
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_auth/firebase_auth.dart' show AuthCredential;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart'
+    show AuthProvider, AuthListener, EmailAuthProvider;
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
-import './firebase_options.dart';
-import 'helpers/logger.dart';
+import '../firebase_options.dart';
+import '../helpers/logger.dart';
+
+export 'package:firebase_auth/firebase_auth.dart'
+    show User, FirebaseAuth, AuthCredential, FirebaseException;
+export 'package:firebase_core/firebase_core.dart' show Firebase;
+export 'package:firebase_storage/firebase_storage.dart' show FirebaseStorage;
+export 'package:firebase_ui_auth/firebase_ui_auth.dart'
+    show SignInScreen, ProfileScreen, SignedOutAction;
+
+final List<AuthProvider<AuthListener, AuthCredential>> authProviders = [
+  EmailAuthProvider(),
+];
 
 Future<void> firebaseInit() async {
   await Firebase.initializeApp(

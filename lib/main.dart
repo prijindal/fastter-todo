@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import './app/app.dart';
-import './firebase_init.dart';
 import './helpers/logger.dart';
+import 'firebase/firebase_init.dart';
 
 void main() async {
   runApp(

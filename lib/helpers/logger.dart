@@ -1,6 +1,6 @@
 import 'package:logger/logger.dart';
 
-import '../firebase_init.dart';
+import '../firebase/firebase_init.dart';
 
 class AppLogger extends Logger {
   static AppLogger? _logger;
