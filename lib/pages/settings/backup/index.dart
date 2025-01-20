@@ -1,24 +1,10 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import '../../../firebase_init.dart';
 import '../../../helpers/fileio.dart';
-import '../../../helpers/logger.dart';
 import '../components/backup_encryption_tile.dart';
 import 'firebase/firebase_backup_tile.dart';
-
-bool isFirebaseInitialized() {
-  try {
-    return Firebase.apps.isNotEmpty;
-  } catch (e, stack) {
-    AppLogger.instance.e(
-      "Firebase.apps error",
-      error: e,
-      stackTrace: stack,
-    );
-    return false;
-  }
-}
 
 @RoutePage()
 class BackupSettingsScreen extends StatelessWidget {
