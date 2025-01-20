@@ -67,6 +67,7 @@ jobs:
             android/.gradle/
           key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('**/*.gradle*', 'pubspec.lock') }}
       - run: flutter pub get
+      - run: sh remove_firebase.sh
       - name: save release key
         env:
           KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}

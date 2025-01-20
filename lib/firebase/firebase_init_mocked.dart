@@ -5,9 +5,6 @@ import 'package:logger/logger.dart';
 import '../helpers/logger.dart';
 
 @immutable
-class FirebaseOptions {}
-
-@immutable
 class FirebaseException implements Exception {
   final String code;
   final String message;
