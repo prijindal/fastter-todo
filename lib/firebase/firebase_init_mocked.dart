@@ -4,7 +4,8 @@ import 'package:logger/logger.dart';
 
 import '../helpers/logger.dart';
 
-export 'package:firebase_storage/firebase_storage.dart' show FirebaseStorage;
+@immutable
+class FirebaseOptions {}
 
 @immutable
 class FirebaseException implements Exception {
@@ -28,6 +29,20 @@ class Firebase {
   static Firebase get instance => Firebase();
 
   static List<String> apps = [];
+}
+
+class Reference {
+  List<int> getData() {
+    return [];
+  }
+}
+
+class FirebaseStorage {
+  static FirebaseStorage get instance => FirebaseStorage();
+
+  Reference ref(String path) {
+    return Reference();
+  }
 }
 
 class FirebaseAuth {

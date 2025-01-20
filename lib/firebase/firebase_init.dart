@@ -14,7 +14,8 @@ import '../helpers/logger.dart';
 
 export 'package:firebase_auth/firebase_auth.dart'
     show User, FirebaseAuth, AuthCredential, FirebaseException;
-export 'package:firebase_core/firebase_core.dart' show Firebase;
+export 'package:firebase_core/firebase_core.dart'
+    show Firebase, FirebaseOptions;
 export 'package:firebase_storage/firebase_storage.dart' show FirebaseStorage;
 export 'package:firebase_ui_auth/firebase_ui_auth.dart'
     show SignInScreen, ProfileScreen, SignedOutAction;
