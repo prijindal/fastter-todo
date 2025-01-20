@@ -12,7 +12,7 @@ import 'todoeditbar/index.dart';
 import 'todoinputbar.dart';
 import 'todolist.dart';
 
-class TodoListScaffold extends StatelessWidget {
+class TodoListScaffold extends StatefulWidget {
   const TodoListScaffold({
     super.key,
     required this.appBar,
@@ -24,18 +24,22 @@ class TodoListScaffold extends StatelessWidget {
   /// An app bar to display at the top of the scaffold.
   final PreferredSizeWidget appBar;
 
-  Widget _buildFab(BuildContext context) {
+  @override
+  State<TodoListScaffold> createState() => _TodoListScaffoldState();
+}
+
+class _TodoListScaffoldState extends State<TodoListScaffold> {
+  bool _showInput = false;
+
+  Widget? _buildFab(List<String> selectedTodoIds) {
+    if (selectedTodoIds.isNotEmpty || _showInput) {
+      return null;
+    }
     return FloatingActionButton(
       onPressed: () {
-        showModalBottomSheet<void>(
-          context: context,
-          builder: (context) => TodoInputBar(
-            initialProject: filters.projectFilter,
-            onBackButton: () {
-              Navigator.of(context).maybePop();
-            },
-          ),
-        );
+        setState(() {
+          _showInput = true;
+        });
       },
       tooltip: 'New Todo',
       key: Key("New Todo"),
@@ -43,7 +47,24 @@ class TodoListScaffold extends StatelessWidget {
     );
   }
 
-  Widget? _buildBottom(BuildContext context, List<String> selectedTodoIds) {
+  Widget? _buildBottom(List<String> selectedTodoIds) {
+    if (_showInput) {
+      return BottomSheet(
+        onClosing: () {
+          setState(() {
+            _showInput = true;
+          });
+        },
+        builder: (context) => TodoInputBar(
+          initialProject: widget.filters.projectFilter,
+          onBackButton: () {
+            setState(() {
+              _showInput = false;
+            });
+          },
+        ),
+      );
+    }
     if (selectedTodoIds.isEmpty) {
       return null;
     }
@@ -60,10 +81,10 @@ class TodoListScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<LocalStateNotifier>(
       child: TodoList(
-        filters: filters,
+        filters: widget.filters,
       ),
       builder: (_, localState, list) => AdaptiveScaffold(
-        appBar: appBar,
+        appBar: widget.appBar,
         drawer: MainDrawer(),
         body: list!,
         secondaryBody: localState.selectedTodoIds.length != 1
@@ -76,9 +97,8 @@ class TodoListScaffold extends StatelessWidget {
                   todo: todo,
                 ),
               ),
-        floatingActionButton:
-            localState.selectedTodoIds.isNotEmpty ? null : _buildFab(context),
-        bottomSheet: _buildBottom(context, localState.selectedTodoIds),
+        floatingActionButton: _buildFab(localState.selectedTodoIds),
+        bottomSheet: _buildBottom(localState.selectedTodoIds),
       ),
     );
   }
