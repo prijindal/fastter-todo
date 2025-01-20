@@ -8,15 +8,21 @@ GitHub github = GitHub(auth: findAuthenticationFromEnvironment());
 var env = Platform.environment;
 
 String readVersionString() {
-  final versionCode = env["VERSION_CODE"] ?? env["GITHUB_RUN_NUMBER"];
-  if (versionCode == null) {
+  final runNumber = env["GITHUB_RUN_NUMBER"];
+  if (runNumber == null) {
     throw Error.safeToString("version code not found in environment variables");
   }
+  final incrementVersion = env["INCREMENT_VERSION"] ?? "185";
+  final versionCode = int.parse(runNumber) + int.parse(incrementVersion);
   final file = File("pubspec.yaml");
   final yaml = loadYaml(file.readAsStringSync());
   final version = Version.parse(yaml["version"] as String);
-  final finalVersion =
-      Version(version.major, version.minor, version.patch, build: versionCode);
+  final finalVersion = Version(
+    version.major,
+    version.minor,
+    version.patch,
+    build: versionCode.toString(),
+  );
   // ignore: avoid_print
   print(finalVersion);
   return finalVersion.toString();

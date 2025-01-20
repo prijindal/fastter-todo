@@ -67,7 +67,6 @@ jobs:
             android/.gradle/
           key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('**/*.gradle*', 'pubspec.lock') }}
       - run: flutter pub get
-      - run: export VERSION_CODE=`expr 185 + $GITHUB_RUN_NUMBER`
       - name: save release key
         env:
           KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}
@@ -79,7 +78,7 @@ jobs:
           echo "keyAlias=$KEY_ALIAS" >> android/key.properties
           echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
           echo "storePassword=$KEY_PASSWORD" >> android/key.properties
-          echo "VERSION_CODE=$VERSION_CODE" > android/version.properties
+          echo "VERSION_CODE=`expr 185 + $GITHUB_RUN_NUMBER`" > android/version.properties
       - run: flutter build apk --release --split-per-abi
       - uses: actions/upload-artifact@v4
         with:
