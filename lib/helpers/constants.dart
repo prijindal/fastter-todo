@@ -1,8 +1,6 @@
 const appThemeMode = "APP_THEME_MODE";
 const appColorSeed = "APP_COLOR_SEED";
 
-const hiddenLockedMode = "HIDDEN_LOCKED_MODE";
-final pinKey = "PIN";
 const backupEncryptionStatus = "BACKUP_ENCYRYPTION_STATUS";
 const backupEncryptionKey = "BACKUP_ENCYRYPTION_KEY";
 const lastUpdateTimeKey = "LAST_UPDATE_TIME_KEY";
