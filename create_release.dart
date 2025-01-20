@@ -51,17 +51,9 @@ void main(List<String> args) async {
         "Repo or version code or release paths not found in environment variables");
   }
   final slug = RepositorySlug.full(repo);
-  final commitSha = env["GITHUB_SHA"];
   // ignore: avoid_print
   print("Fetching releases for $repo");
-  final release = CreateRelease.from(
-    tagName: versionString,
-    name: versionString,
-    body: "Release $versionString",
-    targetCommitish: commitSha,
-    isDraft: false,
-    isPrerelease: false,
-  );
+  final release = CreateRelease(versionString);
   final createdRelease =
       await github.repositories.createRelease(slug, release, getIfExists: true);
   // ignore: avoid_print

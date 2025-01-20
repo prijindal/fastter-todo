@@ -100,6 +100,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_PATHS: build/app/outputs/apk/release/
+          INCREMENT_VERSION: 185
 
 
   android-with-firebase:
