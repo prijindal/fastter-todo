@@ -1,4 +1,6 @@
 // These are mock classes to be used when firebase is not present
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -29,9 +31,11 @@ class Firebase {
 }
 
 class Reference {
-  List<int> getData() {
+  Future<List<int>> getData() async {
     return [];
   }
+
+  Future<void> putData(Uint8List data) async {}
 }
 
 class FirebaseStorage {
