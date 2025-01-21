@@ -183,7 +183,7 @@ jobs:
       - run: flutter build appbundle --release
       - uses: actions/upload-artifact@v4
         with:
-          name: android-appbundle
+          name: google-play-android-appbundle
           path: |
             build/app/outputs/bundle/release/
             build/app/outputs/mapping/release/
@@ -197,7 +197,7 @@ jobs:
       - name: Download appbundle from android build
         uses: actions/download-artifact@v4
         with:
-          name: android-appbundle
+          name: google-play-android-appbundle
           path: build/app/
       - name: Upload to google play
         uses: r0adkll/upload-google-play@v1
