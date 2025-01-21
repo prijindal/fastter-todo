@@ -45,6 +45,7 @@ jobs:
 
   android-apk:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -96,16 +97,27 @@ jobs:
         with:
           name: android-output-metadata
           path: build/app/outputs/apk/release/output-metadata.json
+
+  android-release:
+    needs: [test-linux, android-apk]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download apks from android build
+        uses: actions/download-artifact@v4
+        with:
+          pattern: android-*
+          merge-multiple: true
+          path: build/android/
       - run: dart run create_release.dart
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_PATHS: build/app/outputs/apk/release/
           INCREMENT_VERSION: 186
 
-
   android-appbundle:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
