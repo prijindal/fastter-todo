@@ -99,7 +99,7 @@ jobs:
           path: build/app/outputs/apk/release/output-metadata.json
 
   github-release:
-    needs: [test-linux, android-apk, linux]
+    needs: [test-linux, android-apk, linux, windows]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
@@ -122,11 +122,16 @@ jobs:
         with:
           name: linux
           path: build/linux/
+      - name: Download windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: windows
+          path: build/windows/
       - run: flutter pub get
       - run: dart run create_release.dart
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_PATHS: build/android/,build/linux/
+          RELEASE_PATHS: build/android/,build/linux/,build/windows/
           INCREMENT_VERSION: 186
 
   android-appbundle:
@@ -262,7 +267,7 @@ jobs:
       
       - run: flutter pub get
       - run: flutter build linux --release
-      - run: tar -czvf linux.tar.gz build/linux/x64/release/bundle
+      - run: tar -czvf linux.tar.gz -C build/linux/x64/release/bundle build/linux/x64/release/bundle
       - uses: actions/upload-artifact@v4
         with:
           name: linux
