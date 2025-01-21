@@ -100,8 +100,8 @@ jobs:
           name: android-output-metadata
           path: build/app/outputs/apk/release/output-metadata.json
 
-  android-github-release:
-    needs: [test-linux, android-apk]
+  github-release:
+    needs: [test-linux, android-apk, linux, windows]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
@@ -119,65 +119,28 @@ jobs:
           pattern: android-*
           merge-multiple: true
           path: build/android/
-      - run: flutter pub get
-      - run: dart run create_release.dart
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_PATHS: build/android/
-          INCREMENT_VERSION: 186
-
-  windows-github-release:
-    needs: [test-linux, windows]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable" # or: 'beta', 'dev' or 'master'
-          architecture: x64 # optional, x64 or arm64
-          cache: true
-          cache-key: 'flutter-${{ github.job }}-:os:-:channel:-:version:-:arch:-:hash:'
-          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
-      - name: Download windows build
-        uses: actions/download-artifact@v4
-        with:
-          name: windows
-          path: build/windows/
-      - run: flutter pub get
-      - run: dart run create_release.dart
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_PATHS: build/windows/
-          INCREMENT_VERSION: 186
-
-  linux-github-release:
-    needs: [test-linux, linux]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable" # or: 'beta', 'dev' or 'master'
-          architecture: x64 # optional, x64 or arm64
-          cache: true
-          cache-key: 'flutter-${{ github.job }}-:os:-:channel:-:version:-:arch:-:hash:'
-          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
       - name: Download linux build
         uses: actions/download-artifact@v4
         with:
           name: linux
           path: build/linux/
-      - run: flutter pub get
+      - name: Download windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: windows
+          path: build/windows/
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: build/linux/*
+          subject-path: |
+            build/android/*
+            build/linux/*
+            build/windows/*
+      - run: flutter pub get
       - run: dart run create_release.dart
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_PATHS: build/linux/
+          RELEASE_PATHS: build/android/,build/linux/,build/windows/
           INCREMENT_VERSION: 186
 
   android-appbundle:
