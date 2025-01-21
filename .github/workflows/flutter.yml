@@ -267,7 +267,7 @@ jobs:
       
       - run: flutter pub get
       - run: flutter build linux --release
-      - run: tar -czvf linux.tar.gz -C build/linux/x64/release/bundle build/linux/x64/release/bundle
+      - run: tar -czvf linux.tar.gz -C build/linux/x64/release/bundle .
       - uses: actions/upload-artifact@v4
         with:
           name: linux
