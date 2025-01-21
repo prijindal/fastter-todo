@@ -45,7 +45,8 @@ class _TodoScreen extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             onPressed: () async {
-              await Provider.of<DbManager>(context).deleteTodosByIds([todo.id]);
+              await Provider.of<DbManager>(context, listen: false)
+                  .deleteTodosByIds([todo.id]);
               // ignore: use_build_context_synchronously
               await AutoRouter.of(context).maybePop();
             },

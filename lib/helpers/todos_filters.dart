@@ -54,17 +54,18 @@ class TodosFilters {
   });
 
   List<TodoData> filtered(List<TodoData> initialTodos) {
-    List<TodoData> todos = initialTodos.toList();
+    Iterable<TodoData> todos = initialTodos.toList();
+    todos = todos.where((a) => a.parent == null);
     // TODO: Compare, sorting order: priority, completed, dueDate
     if (projectFilter != null) {
       if (projectFilter == "inbox") {
-        todos = todos.where((t) => t.project == null).toList();
+        todos = todos.where((t) => t.project == null);
       } else {
-        todos = todos.where((t) => t.project == projectFilter).toList();
+        todos = todos.where((t) => t.project == projectFilter);
       }
     }
     if (tagFilter != null) {
-      todos = todos.where((t) => t.tags.contains(tagFilter)).toList();
+      todos = todos.where((t) => t.tags.contains(tagFilter));
     }
     if (daysAhead != null) {
       todos = todos
@@ -78,7 +79,7 @@ class TodosFilters {
           )
           .toList();
     }
-    return todos;
+    return todos.toList();
   }
 
   String createTitle(BuildContext context) {

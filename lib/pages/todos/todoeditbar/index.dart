@@ -15,6 +15,7 @@ import 'delete_selected_todos_button.dart';
 import 'edit_button.dart';
 import 'mark_completed_button.dart';
 import 'reminder_button.dart';
+import 'subtask_button.dart';
 
 class TodoEditBar extends StatelessWidget {
   const TodoEditBar({super.key});
@@ -117,7 +118,7 @@ class TodoEditBarCollapsed extends StatelessWidget {
           todo: selectedTodos.first,
         ),
         // TODO
-        // _SubtaskButton(context),
+        SubtaskButton(todo: selectedTodos.first),
         DeleteSelectedTodosButton(),
         // IconButton(
         //   onPressed: onExpand,

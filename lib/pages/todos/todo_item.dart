@@ -141,7 +141,7 @@ class TodoItemSubtitle extends StatelessWidget {
         ),
       );
   Widget _buildSubtitleFirstRow(
-      BuildContext context, int comments, int reminders) {
+      BuildContext context, int comments, int reminders, int childTodos) {
     var children = <Widget>[];
     var mainAxisAlignment = MainAxisAlignment.spaceBetween;
     if (todo.dueDate != null) {
@@ -179,6 +179,22 @@ class TodoItemSubtitle extends StatelessWidget {
         ),
       );
     }
+    if (childTodos > 0) {
+      children.add(
+        Container(
+          margin: const EdgeInsets.only(left: 4),
+          child: Row(
+            children: <Widget>[
+              const Icon(
+                Icons.format_strikethrough,
+                size: 20,
+              ),
+              Text(childTodos.toString()),
+            ],
+          ),
+        ),
+      );
+    }
     if (children.isNotEmpty) {
       // If childrens are not empty, we will take all of them and wrap it inside a row
       final subRow = Row(
@@ -205,13 +221,19 @@ class TodoItemSubtitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final firstRow = Selector<LocalDbState, List<int>>(
-      selector: (_, state) => [
-        state.comments.where((f) => f.todo == todo.id).length,
-        state.getTodoReminders(todo.id, true).length,
-      ],
-      builder: (context, counts, _) =>
-          _buildSubtitleFirstRow(context, counts[0], counts[1]),
+    final firstRow =
+        Selector<LocalDbState, ({int reminders, int comments, int childTodos})>(
+      selector: (_, state) => (
+        reminders: state.getTodoReminders(todo.id, true).length,
+        comments: state.comments.where((f) => f.todo == todo.id).length,
+        childTodos: state.todos.where((a) => a.parent == todo.id).length,
+      ),
+      builder: (context, counts, _) => _buildSubtitleFirstRow(
+        context,
+        counts.comments,
+        counts.reminders,
+        counts.childTodos,
+      ),
     );
     final tags = Provider.of<LocalDbState>(context).getTodoTag(todo.id);
     if (tags.isEmpty) {

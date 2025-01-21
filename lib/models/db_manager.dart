@@ -132,12 +132,24 @@ class DbManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteParentTodosByParentIds(List<String> parentIds) async {
+    final childTodos = await database.managers.todo
+        .filter((f) => f.parent.isIn(parentIds))
+        .get();
+    for (var childTodo in childTodos) {
+      AppLogger.instance.i("Deleting Child todo: ${childTodo.id}");
+      await deleteTodosByIds([childTodo.id]);
+    }
+  }
+
   // These are helper methods for db deletion/updation etc
   Future<void> deleteTodosByIds(List<String> ids) async {
+    AppLogger.instance.i("Deleting todos: ${ids.join(",")}");
     await Future.wait([
       database.managers.comment.filter((f) => f.todo.isIn(ids)).delete(),
       database.managers.reminder.filter((f) => f.todo.isIn(ids)).delete(),
       database.managers.todo.filter((f) => f.id.isIn(ids)).delete(),
+      deleteParentTodosByParentIds(ids),
     ]);
   }
 }

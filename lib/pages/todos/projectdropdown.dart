@@ -58,12 +58,14 @@ class ProjectDropdown extends StatelessWidget {
     this.selectedProject,
     this.onOpening,
     this.expanded = false,
+    this.enabled = false,
   });
 
   final bool expanded;
   final void Function(ProjectData?) onSelected;
   final ProjectData? selectedProject;
   final void Function()? onOpening;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +77,7 @@ class ProjectDropdown extends StatelessWidget {
         selectedProject: selectedProject,
         onOpening: onOpening,
         expanded: expanded,
+        enabled: enabled,
       ),
     );
   }
@@ -87,6 +90,7 @@ class _ProjectDropdown extends StatelessWidget {
     this.selectedProject,
     this.onOpening,
     this.expanded = false,
+    this.enabled = false,
   });
 
   final GlobalKey _menuKey = GlobalKey();
@@ -95,6 +99,7 @@ class _ProjectDropdown extends StatelessWidget {
   final void Function(ProjectData?) onSelected;
   final ProjectData? selectedProject;
   final void Function()? onOpening;
+  final bool enabled;
 
   RelativeRect _getPosition(BuildContext context) {
     if (onOpening != null) {
@@ -167,13 +172,13 @@ class _ProjectDropdown extends StatelessWidget {
         dense: true,
         leading: _buildIcon(),
         title: Text(selectedProject == null ? 'Inbox' : selectedProject!.title),
-        onTap: () => _showMenu(context),
+        onTap: enabled == false ? null : () => _showMenu(context),
       );
     }
     return IconButton(
       key: _menuKey,
       icon: _buildIcon(),
-      onPressed: () => _showMenu(context),
+      onPressed: enabled == false ? null : () => _showMenu(context),
       tooltip: 'Project',
     );
   }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/logger.dart';
 import '../../models/core.dart';
 import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
@@ -16,10 +17,15 @@ class TodoInputBar extends StatefulWidget {
     super.key,
     required this.onBackButton,
     this.initialProject,
+    this.allowProjectSelection = false,
+    this.parentTodo,
   });
 
   final void Function() onBackButton;
   final String? initialProject; // this will be a project id
+  final String?
+      parentTodo; // This will be the parent id which is added to the todo
+  final bool allowProjectSelection;
   @override
   State<TodoInputBar> createState() => _TodoInputBarState();
 }
@@ -72,23 +78,29 @@ class _TodoInputBarState extends State<TodoInputBar>
     if (dueDate != null) {
       dueDate = DateTime(dueDate!.year, dueDate!.month, dueDate!.day, 0, 0, 0);
     }
-    await Provider.of<DbManager>(context, listen: false)
-        .database
-        .managers
-        .todo
-        .create(
-          (o) => o(
-            title: titleInputController.text,
-            dueDate: drift.Value(dueDate),
-            project: drift.Value(project?.id),
-          ),
-        );
-    if (mounted) {
-      titleInputController.clear();
-      await _unFocusKeyboard();
+    try {
+      await Provider.of<DbManager>(context, listen: false)
+          .database
+          .managers
+          .todo
+          .create(
+            (o) => o(
+              title: titleInputController.text,
+              dueDate: drift.Value(dueDate),
+              project: drift.Value(project?.id),
+              parent: drift.Value(widget.parentTodo),
+            ),
+          );
       if (mounted) {
-        widget.onBackButton();
+        titleInputController.clear();
+        await _unFocusKeyboard();
+        if (mounted) {
+          widget.onBackButton();
+        }
       }
+    } catch (e) {
+      AppLogger.instance.e(e);
+      rethrow;
     }
   }
 
@@ -190,6 +202,7 @@ class _TodoInputBarState extends State<TodoInputBar>
             onPressed: _showDatePicker,
           ),
           ProjectDropdown(
+            enabled: widget.allowProjectSelection,
             selectedProject: project,
             onSelected: (selectedProject) {
               setState(() {

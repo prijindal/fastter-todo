@@ -34,6 +34,10 @@ class AppRouter extends RootStackRouter {
           page: TodoRoute.page,
         ),
         AutoRoute(
+          path: "/todochildren/:todoId",
+          page: TodoChildrenRoute.page,
+        ),
+        AutoRoute(
           path: "/todocomments/:todoId",
           page: TodoCommentsRoute.page,
         ),
