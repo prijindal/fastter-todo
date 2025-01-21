@@ -117,6 +117,7 @@ jobs:
           pattern: android-*
           merge-multiple: true
           path: build/android/
+      - run: flutter pub get
       - run: dart run create_release.dart
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
