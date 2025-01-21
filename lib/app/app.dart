@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +7,6 @@ import '../models/db_manager.dart';
 import '../models/local_db_state.dart';
 import '../models/local_state.dart';
 import '../models/settings.dart';
-import '../pages/settings/backup/firebase/firebase_sync.dart';
 import '../router/app_router.dart';
 
 class MyApp extends StatelessWidget {
@@ -68,11 +65,6 @@ class MyMaterialAppWrapper extends StatelessWidget {
             }
             return MultiProvider(
               providers: [
-                ChangeNotifierProvider<FirebaseSync>(
-                  create: (context) => FirebaseSync(
-                    () => dbSelector.io,
-                  ),
-                ),
                 ChangeNotifierProvider<LocalDbState>(
                   create: (context) => LocalDbState(
                     dbSelector.database,
@@ -91,7 +83,7 @@ class MyMaterialAppWrapper extends StatelessWidget {
   }
 }
 
-class MyMaterialApp extends StatefulWidget {
+class MyMaterialApp extends StatelessWidget {
   const MyMaterialApp({
     super.key,
     required this.settingsStorage,
@@ -100,48 +92,13 @@ class MyMaterialApp extends StatefulWidget {
   final SettingsStorageNotifier settingsStorage;
 
   @override
-  State<MyMaterialApp> createState() => _MyMaterialAppState();
-}
-
-class _MyMaterialAppState extends State<MyMaterialApp> {
-  // This widget is the root of your application.
-  final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
-      GlobalKey<ScaffoldMessengerState>();
-
-  @override
-  void initState() {
-    Timer(
-      const Duration(seconds: 1),
-      () => _initSync(),
-    );
-    Timer(
-      const Duration(seconds: 3),
-      () => _sync(),
-    );
-    super.initState();
-  }
-
-  Future<void> _initSync() async {
-    // This is just to initialize firebase and gdrive sync after firebase init is called
-    Provider.of<FirebaseSync>(context, listen: false);
-  }
-
-  Future<void> _sync() async {
-    await Future.wait([
-      Provider.of<FirebaseSync>(context, listen: false)
-          .sync(scaffoldMessengerKey.currentState, suppressErrors: true),
-    ]);
-  }
-
-  @override
   Widget build(BuildContext context) {
     AppLogger.instance.d("Building MyApp");
     return MaterialApp.router(
-      scaffoldMessengerKey: scaffoldMessengerKey,
       routerConfig: AppRouter.instance.config(),
-      theme: lightTheme(widget.settingsStorage.getBaseColor().color),
-      darkTheme: darkTheme(widget.settingsStorage.getBaseColor().color),
-      themeMode: widget.settingsStorage.getTheme(),
+      theme: lightTheme(settingsStorage.getBaseColor().color),
+      darkTheme: darkTheme(settingsStorage.getBaseColor().color),
+      themeMode: settingsStorage.getTheme(),
     );
   }
 }

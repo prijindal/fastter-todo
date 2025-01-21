@@ -37,13 +37,6 @@ dependencies:
   drift_flutter: ^0.2.4
   drift_hrana: ^1.0.2
   file_picker: ^8.1.7
-  firebase_analytics: ^11.4.0
-  firebase_app_check: ^0.3.1+7
-  firebase_auth: ^5.4.0
-  firebase_core: ^3.9.0
-  firebase_crashlytics: ^4.3.0
-  firebase_storage: ^12.3.7
-  firebase_ui_auth: ^1.16.0
   flex_color_picker: ^3.7.0
   flutter:
     sdk: flutter
@@ -99,7 +92,6 @@ flutter:
   assets:
    - assets/icon/ic_launcher.png
    - assets/icon/prijindal.png
-   - assets/icon/firebase.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

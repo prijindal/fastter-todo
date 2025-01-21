@@ -85,18 +85,5 @@ class AppRouter extends RootStackRouter {
           page: StylingSettingsRoute.page,
           transitionsBuilder: TransitionsBuilders.slideLeft,
         ),
-        CustomRoute<void>(
-          path: "/firebase/backup",
-          page: FirebaseBackupRoute.page,
-          transitionsBuilder: TransitionsBuilders.slideLeft,
-        ),
-        AutoRoute(
-          path: "/firebase/login",
-          page: FirebaseLoginRoute.page,
-        ),
-        AutoRoute(
-          path: "/firebase/profile",
-          page: FirebaseProfileRoute.page,
-        ),
       ];
 }

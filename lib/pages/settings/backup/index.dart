@@ -1,10 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import '../../../firebase/firebase_init.dart';
 import '../../../helpers/fileio.dart';
 import '../components/backup_encryption_tile.dart';
-import 'firebase/firebase_backup_tile.dart';
 
 @RoutePage()
 class BackupSettingsScreen extends StatelessWidget {
@@ -46,7 +44,6 @@ class CloudBackupTile extends StatelessWidget {
           title: Text("Cloud Backup"),
           dense: true,
         ),
-        if (isFirebaseInitialized()) const FirebaseBackupTile(),
         const BackupEncryptionTile(),
       ],
     );

@@ -43,7 +43,7 @@ jobs:
         env: 
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  android-without-firebase:
+  android-apk:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -67,7 +67,6 @@ jobs:
             android/.gradle/
           key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('**/*.gradle*', 'pubspec.lock') }}
       - run: flutter pub get
-      - run: sh remove_firebase.sh
       - name: save release key
         env:
           KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}
@@ -104,7 +103,7 @@ jobs:
           INCREMENT_VERSION: 186
 
 
-  android-with-firebase:
+  android-appbundle:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
@@ -128,7 +127,6 @@ jobs:
             build/
             android/.gradle/
           key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('**/*.gradle*', 'pubspec.lock') }}
-      - run: flutter pub global activate flutterfire_cli
       - run: flutter pub get
       - name: save release key
         env:
@@ -143,14 +141,6 @@ jobs:
           echo "storePassword=$KEY_PASSWORD" >> android/key.properties
           echo "VERSION_CODE=`expr 185 + $GITHUB_RUN_NUMBER`" > android/version.properties
 
-      - run: curl -sL https://firebase.tools | bash
-      - run: echo "$FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL" > google-application-credentials.json
-        env:
-          FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
-      - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=android --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build appbundle --release
       - uses: actions/upload-artifact@v4
         with:
@@ -161,7 +151,7 @@ jobs:
             build/app/intermediates/merged_native_libs/release/out/lib/
 
   android-publish:
-    needs: [test-linux, android-with-firebase]
+    needs: [test-linux, android-appbundle]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
@@ -199,16 +189,7 @@ jobs:
           path: build/
           key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
       
-      - run: flutter pub global activate flutterfire_cli
       - run: flutter pub get
-      - run: curl -sL https://firebase.tools | bash
-      - run: echo "$FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL" > google-application-credentials.json
-        env:
-          FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
-      - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=web --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build web --release
       - uses: actions/upload-artifact@v4
         with:
@@ -281,16 +262,7 @@ jobs:
           path: build/
           key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
       
-      - run: flutter pub global activate flutterfire_cli
       - run: flutter pub get
-      - run: curl -sL https://firebase.tools | bash
-      - run: echo "$FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL" > google-application-credentials.json
-        env:
-          FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
-      - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=macos --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build macos --release
       - uses: actions/upload-artifact@v4
         with:
@@ -317,16 +289,7 @@ jobs:
           path: build/
           key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
       
-      - run: flutter pub global activate flutterfire_cli
       - run: flutter pub get
-      - run: curl -sL https://firebase.tools | bash
-      - run: echo "$FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL" > google-application-credentials.json
-        env:
-          FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
-      - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=ios --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: flutter build ios --release --no-codesign --release
       - uses: actions/upload-artifact@v4
         with:
@@ -351,17 +314,7 @@ jobs:
           path: build/
           key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
       
-      - run: flutter pub global activate flutterfire_cli
       - run: flutter pub get
-      - run: npm install -g firebase-tools
-      - run: echo "$FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL" > google-application-credentials.json
-        shell: bash
-        env:
-          FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL: ${{secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL}}
-      - run: rm lib/firebase_options.dart
-      - run: flutterfire configure -y --platforms=windows --ios-bundle-id=com.prijindal.fastterTodo --macos-bundle-id=com.prijindal.fastterTodo --web-app-id=1:986771470665:web:7c4efac824caf0c8248298 --android-package-name=com.prijindal.fastter_todo --windows-app-id=1:986771470665:web:b13cc73f22fe39ff248298
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
       - run: dart run msix:create
       - uses: actions/upload-artifact@v4
         with:
