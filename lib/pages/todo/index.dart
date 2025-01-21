@@ -224,6 +224,18 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               },
             ),
             const SizedBox(height: 10),
+            Selector<LocalDbState, int>(
+              selector: (_, state) =>
+                  state.todos.where((a) => a.parent == widget.todo.id).length,
+              builder: (context, children, _) {
+                return ListTile(
+                  title: Text("$children Children"),
+                  onTap: () => AutoRouter.of(context)
+                      .pushNamed("/todochildren/${widget.todo.id}"),
+                );
+              },
+            ),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _isEdited == false
                   ? null

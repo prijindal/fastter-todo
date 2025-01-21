@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
+import '../todos/todo_item.dart';
 import '../todos/todoinputbar.dart';
 
 @RoutePage()
@@ -64,10 +65,14 @@ class _TodoSubTaskListState extends State<_TodoSubTaskList> {
     return ListView(
       shrinkWrap: true,
       children: [
-        ListTile(
-          title: Text(widget.todo.title),
-          onTap: () =>
-              AutoRouter.of(context).pushNamed("/todo/${widget.todo.id}"),
+        // ListTile(
+        //   title: Text(widget.todo.title),
+        //   onTap: () =>
+        //       AutoRouter.of(context).pushNamed("/todo/${widget.todo.id}"),
+        // ),
+        TodoItem(
+          todo: widget.todo,
+          allowSelection: false,
         ),
         Container(
           margin: const EdgeInsets.only(left: 24),

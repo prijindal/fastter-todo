@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -17,9 +18,52 @@ class TodoItem extends StatelessWidget {
   const TodoItem({
     super.key,
     required this.todo,
+    this.allowSelection = true,
+    this.dense = false,
   });
 
   final TodoData todo;
+  final bool allowSelection;
+  final bool dense;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!allowSelection) {
+      return _TodoItem(
+        todo: todo,
+        selected: false,
+        dense: true,
+        onTap: () => AutoRouter.of(context).pushNamed("/todo/${todo.id}"),
+      );
+    }
+    return Selector<LocalStateNotifier, bool>(
+      selector: (context, localState) =>
+          localState.selectedTodoIds.contains(todo.id),
+      builder: (context, selected, _) => _TodoItem(
+        todo: todo,
+        selected: selected,
+        onTap: () {
+          final localStateNotifier =
+              Provider.of<LocalStateNotifier>(context, listen: false);
+          localStateNotifier.toggleSelectedId(todo.id);
+        },
+      ),
+    );
+  }
+}
+
+class _TodoItem extends StatelessWidget {
+  const _TodoItem({
+    required this.todo,
+    required this.selected,
+    this.dense = false,
+    this.onTap,
+  });
+
+  final TodoData todo;
+  final bool selected;
+  final bool dense;
+  final void Function()? onTap;
 
   void _selectDate(BuildContext context) {
     todoSelectDate(context, todo.dueDate).then((dueDate) async {
@@ -89,33 +133,26 @@ class TodoItem extends StatelessWidget {
           ),
         ],
       ),
-      child: Selector<LocalStateNotifier, bool>(
-        selector: (context, localState) =>
-            localState.selectedTodoIds.contains(todo.id),
-        builder: (context, selected, _) => ListTile(
-          selected: selected,
-          onTap: () {
-            final localStateNotifier =
-                Provider.of<LocalStateNotifier>(context, listen: false);
-            localStateNotifier.toggleSelectedId(todo.id);
+      child: ListTile(
+        dense: dense,
+        selected: selected,
+        onTap: onTap,
+        leading: TodoItemToggle(
+          todo: todo,
+          toggleCompleted: (bool newValue) async {
+            await Provider.of<DbManager>(context, listen: false)
+                .database
+                .managers
+                .todo
+                .filter((tbl) => tbl.id.equals(todo.id))
+                .update((o) => o(completed: drift.Value(newValue)));
           },
-          leading: TodoItemToggle(
-            todo: todo,
-            toggleCompleted: (bool newValue) async {
-              await Provider.of<DbManager>(context, listen: false)
-                  .database
-                  .managers
-                  .todo
-                  .filter((tbl) => tbl.id.equals(todo.id))
-                  .update((o) => o(completed: drift.Value(newValue)));
-            },
-          ),
-          title: Text(
-            todo.title,
-          ),
-          subtitle: TodoItemSubtitle(
-            todo: todo,
-          ),
+        ),
+        title: Text(
+          todo.title,
+        ),
+        subtitle: TodoItemSubtitle(
+          todo: todo,
         ),
       ),
     );
