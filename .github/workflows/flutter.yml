@@ -284,8 +284,6 @@ jobs:
     
   macos:
     runs-on: macos-latest
-    # Skipping macos since we are not releasing
-    if: github.ref == 'refs/heads/**macos**'
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -307,7 +305,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: build/macos/Build/Products/Release
+          path: build/macos/Build/Products/Release/fastter_todo.app
 
   ios:
     runs-on: macos-latest
