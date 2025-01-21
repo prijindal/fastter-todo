@@ -75,7 +75,6 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
-  msix: ^3.16.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -120,18 +119,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-
-msix_config:
-  display_name: Fastter Todo
-  publisher_display_name: Priyanshu Jindal
-  publisher: CN=Priyanshu Jindal, O=Priyanshu Jindal, C=INDIA
-  identity_name: com.prijindal.FastterTodo
-  logo_path: assets/icon/ic_launcher.png
-  msix_version: 1.0.0.0
-  store: true
-  install_certificate: true
-  debug: false
-  toast_activator:
-    clsid: "d49b0314-ee7a-4626-bf79-97cdb8a991bb"
-    arguments: "msix-args"
-    display_name: "Flutter Local Notifications"
