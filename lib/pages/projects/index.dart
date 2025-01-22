@@ -27,12 +27,8 @@ class ProjectsScreen extends StatelessWidget {
       itemCount: projects.length,
       itemBuilder: (context, index) {
         final project = projects[index];
-        return ListTile(
-          leading: Icon(
-            Icons.group_work,
-            color: HexColor(project.color),
-          ),
-          title: Text(project.title),
+        return ProjectListTile(
+          project: project,
         );
       },
     );
@@ -59,6 +55,29 @@ class ProjectsScreen extends StatelessWidget {
         key: Key("New Journal"),
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+class ProjectListTile extends StatelessWidget {
+  const ProjectListTile({
+    super.key,
+    required this.project,
+    this.onTap,
+  });
+
+  final ProjectData project;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        Icons.group_work,
+        color: HexColor(project.color),
+      ),
+      title: Text(project.title),
+      onTap: onTap,
     );
   }
 }

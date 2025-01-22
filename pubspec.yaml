@@ -45,6 +45,7 @@ dependencies:
   flutter_keyboard_visibility: ^6.0.0
   flutter_local_notifications: ^18.0.1
   form_builder_validators: ^11.1.1
+  fuzzywuzzy: ^1.2.0
   github: ^9.24.0
   hexcolor: ^3.0.1
   http: ^1.2.2

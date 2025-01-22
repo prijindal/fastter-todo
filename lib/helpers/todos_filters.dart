@@ -29,6 +29,13 @@ class AppBarActions {
     );
   }
 
+  factory AppBarActions.search() {
+    return AppBarActions(
+      icon: Icon(Icons.search),
+      onPressed: (context) => AutoRouter.of(context).pushNamed("/search"),
+    );
+  }
+
   factory AppBarActions.forceRefresh() {
     return AppBarActions(
       icon: Selector<LocalDbState, bool>(
@@ -131,6 +138,7 @@ class TodosFilters {
     if (projectFilter != null && projectFilter != "inbox") {
       actions.add(AppBarActions.editProject(projectFilter!));
     }
+    actions.add(AppBarActions.search());
     actions.add(AppBarActions.forceRefresh());
     actions.add(AppBarActions.settings());
     return actions;

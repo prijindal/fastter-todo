@@ -45,6 +45,10 @@ class AppRouter extends RootStackRouter {
           path: "/todoreminders/:todoId",
           page: TodoRemindersRoute.page,
         ),
+        AutoRoute(
+          path: "/search",
+          page: SearchRoute.page,
+        ),
         CustomRoute<void>(
           path: "/settings",
           page: SettingsRoute.page,

@@ -7,6 +7,7 @@ import '../models/db_manager.dart';
 import '../models/local_db_state.dart';
 import '../models/local_state.dart';
 import '../models/settings.dart';
+import '../pages/loading/index.dart';
 import '../router/app_router.dart';
 
 class MyApp extends StatelessWidget {
@@ -45,21 +46,11 @@ class MyMaterialAppWrapper extends StatelessWidget {
                 theme: lightTheme(settingsStorage.getBaseColor().color),
                 darkTheme: darkTheme(settingsStorage.getBaseColor().color),
                 themeMode: settingsStorage.getTheme(),
-                home: Scaffold(
-                  appBar: AppBar(
-                    title: Text("Todos"),
-                    actions: [
-                      IconButton(
-                          onPressed: () async {
-                            await dbSelector.setLocal();
-                            await dbSelector.initDb();
-                          },
-                          icon: Icon(Icons.restore)),
-                    ],
-                  ),
-                  body: Center(
-                    child: Text("Loading"),
-                  ),
+                home: LoadingScreen(
+                  onRestore: () async {
+                    await dbSelector.setLocal();
+                    await dbSelector.initDb();
+                  },
                 ),
               );
             }
