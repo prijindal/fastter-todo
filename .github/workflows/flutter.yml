@@ -284,6 +284,8 @@ jobs:
     
   macos:
     runs-on: macos-latest
+    # Skipping macos since we are not releasing
+    if: github.ref == 'refs/heads/**macos**'
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2

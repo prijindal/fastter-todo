@@ -36,6 +36,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
   bool _showInput = false;
   final HotKey _hotKeyN = HotKey(
     key: PhysicalKeyboardKey.keyN,
+    modifiers: [HotKeyModifier.control],
     // Set hotkey scope (default is HotKeyScope.system)
     scope: HotKeyScope.inapp, // Set as inapp-wide hotkey.
   );

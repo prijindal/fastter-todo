@@ -47,6 +47,7 @@ enum DbSelectorType { local, remote }
 class DbManager extends ChangeNotifier {
   SharedDatabase? _database;
   DbSelectorType? _dbType;
+  RemoteDbSettings? remoteDbSettings;
 
   SharedDatabase get database {
     if (_database == null) {
@@ -83,6 +84,7 @@ class DbManager extends ChangeNotifier {
         throw Exception('Remote settings not initialized');
       }
       final remoteSettings = RemoteDbSettings.fromJson(remoteSettingsString);
+      remoteDbSettings = remoteSettings;
       AppLogger.instance.d(
           "Initiating remote database with implementation type ${remoteSettings.implementationType} with ${remoteSettings.url}");
       if (remoteSettings.implementationType ==

@@ -3,21 +3,21 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/logger.dart';
 import 'core.dart';
+import 'db_manager.dart';
 import 'local_notifications_manager.dart';
 
 class LocalDbState extends ChangeNotifier {
   final SharedDatabase db;
   final LocalNotificationsManager localNotificationsManager =
       LocalNotificationsManager();
+  final RemoteDbSettings? remoteDbSettings;
 
-  StreamSubscription<List<TodoData>>? _todosSubscription;
-  StreamSubscription<List<ProjectData>>? _projectsSubscription;
-  StreamSubscription<List<CommentData>>? _commentsSubscription;
-  StreamSubscription<List<ReminderData>>? _remindersSubscription;
+  List<StreamSubscription<List<int>>> _subscriptions = [];
 
   Timer? timer;
 
@@ -59,29 +59,20 @@ class LocalDbState extends ChangeNotifier {
       (_localState["comments"] != null || _isCommentsInitialized) &&
       (_localState["reminders"] != null || _isRemindersInitialized);
 
-  LocalDbState(this.db) {
+  LocalDbState(this.db, {this.remoteDbSettings}) {
     // Local state is first initialized with local storage, this makes sure that when we first do init, we have some data on ui
     // This is only really useful when our sqlite db is a remote one
     initFromLocalTempDb();
-    initSubscriptions();
-    const duration = Duration(seconds: 10); // TODO: Make this configurable
-    timer = Timer.periodic(duration, (_) => refresh());
+    initStream();
   }
 
   @override
   void dispose() {
-    cancelSubscriptions();
+    for (var subscription in _subscriptions) {
+      subscription.cancel();
+    }
     timer?.cancel();
     super.dispose();
-  }
-
-  Future<void> _refreshData() async {
-    await Future.wait([
-      db.managers.todo.get().then((values) => _todos = values.toList()),
-      db.managers.project.get().then((values) => _projects = values.toList()),
-      db.managers.comment.get().then((values) => _comments = values.toList()),
-      db.managers.reminder.get().then((values) => _reminders = values.toList()),
-    ]);
   }
 
   Future<void> syncReminders() async {
@@ -97,45 +88,93 @@ class LocalDbState extends ChangeNotifier {
     if (_isRefreshing) return;
     _isRefreshing = true;
     notifyListeners();
-    await _refreshData();
+    for (var subscription in _subscriptions) {
+      subscription.cancel();
+    }
+    await initStream();
     await syncReminders();
     _isRefreshing = false;
     notifyListeners();
   }
 
-  void initSubscriptions() {
-    cancelSubscriptions();
-    _todosSubscription = db.managers.todo.watch().listen((event) {
-      _todos = List.unmodifiable(event.toList());
-      _isTodosInitialized = true;
-      notifyListeners();
-      setLocalTempDb("todos", event);
-    });
-    _projectsSubscription = db.managers.project.watch().listen((event) {
-      _projects = event.toList();
-      _isProjectsInitialized = true;
-      notifyListeners();
-      setLocalTempDb("projects", event);
-    });
-    _commentsSubscription = db.managers.comment.watch().listen((event) {
-      _comments = event.toList();
-      _isCommentsInitialized = true;
-      notifyListeners();
-      setLocalTempDb("comments", event);
-    });
-    _remindersSubscription = db.managers.reminder.watch().listen((event) {
-      _reminders = event.toList();
-      _isRemindersInitialized = true;
-      notifyListeners();
-      setLocalTempDb("reminders", event);
-    });
+  Future<StreamSubscription<List<int>>?> _initStreamForTable(
+      String table, Future<void> Function(String) onChange,
+      [int attemptsLeft = 5]) async {
+    if (attemptsLeft == 0) {
+      AppLogger.instance.w("Retried limit exceeded, cancelling");
+      return null;
+    }
+    if (remoteDbSettings != null) {
+      final uri = Uri.parse(remoteDbSettings!.url);
+      final httpUri = Uri(
+        scheme: "https",
+        host: uri.host,
+        path: "/beta/listen",
+        queryParameters: {
+          "table": table,
+        },
+      );
+      AppLogger.instance.i("Starting to listen on stream for $table");
+      http.Request request = http.Request("GET", httpUri);
+      request.headers["Authorization"] = "Bearer ${remoteDbSettings!.token}";
+      try {
+        final response = await request.send();
+        StreamSubscription<List<int>> subscription =
+            response.stream.listen((event) {
+          final stringifed = String.fromCharCodes(event).trim();
+          if (stringifed == ":keep-alive") {
+            return;
+          }
+          onChange(stringifed);
+        });
+        return subscription;
+      } catch (e) {
+        AppLogger.instance.e("Error listening to stream for $table, $e");
+        return _initStreamForTable(table, onChange, attemptsLeft - 1);
+      }
+    } else {
+      return null;
+    }
   }
 
-  void cancelSubscriptions() {
-    _todosSubscription?.cancel();
-    _projectsSubscription?.cancel();
-    _commentsSubscription?.cancel();
-    _remindersSubscription?.cancel();
+  Future<StreamSubscription<List<int>>?> _refreshAndInitTable(
+      String table, Future<void> Function(String) onChange) async {
+    await onChange("init");
+    return await _initStreamForTable(table, onChange);
+  }
+
+  Future<void> initStream() async {
+    final subscriptions = await Future.wait([
+      _refreshAndInitTable("todo", (_) async {
+        final values = await db.managers.todo.get();
+        _todos = values.toList();
+        _isTodosInitialized = true;
+        notifyListeners();
+        setLocalTempDb("todos", values);
+      }),
+      _refreshAndInitTable("project", (_) async {
+        final values = await db.managers.project.get();
+        _projects = values.toList();
+        _isProjectsInitialized = true;
+        notifyListeners();
+        setLocalTempDb("projects", values);
+      }),
+      _refreshAndInitTable("reminder", (_) async {
+        final values = await db.managers.reminder.get();
+        _reminders = values.toList();
+        _isRemindersInitialized = true;
+        notifyListeners();
+        setLocalTempDb("reminders", values);
+      }),
+      _refreshAndInitTable("comment", (_) async {
+        final values = await db.managers.comment.get();
+        _comments = values.toList();
+        _isCommentsInitialized = true;
+        notifyListeners();
+        setLocalTempDb("comments", values);
+      }),
+    ]);
+    _subscriptions = subscriptions.where((a) => a != null).toList().cast();
   }
 
   List<String> get allTags {

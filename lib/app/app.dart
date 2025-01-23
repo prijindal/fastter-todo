@@ -63,6 +63,7 @@ class MyMaterialAppWrapper extends StatelessWidget {
                 ChangeNotifierProvider<LocalDbState>(
                   create: (context) => LocalDbState(
                     dbSelector.database,
+                    remoteDbSettings: dbSelector.remoteDbSettings,
                   ),
                 ),
               ],
