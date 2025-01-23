@@ -28,6 +28,7 @@ class BackendSettingsScreen extends StatelessWidget {
             try {
               await Provider.of<DbManager>(context, listen: false)
                   .resetDatabase();
+              // ignore: use_build_context_synchronously
               await Provider.of<LocalDbState>(context, listen: false).clear();
               await Restart.restartApp(
                 notificationTitle: 'Restarting App',

@@ -54,8 +54,12 @@ void main(List<String> args) async {
   // ignore: avoid_print
   print("Fetching releases for $repo");
   final release = CreateRelease(versionString);
-  final createdRelease =
-      await github.repositories.createRelease(slug, release, getIfExists: true);
+  release.isPrerelease = true;
+  final createdRelease = await github.repositories.createRelease(
+    slug,
+    release,
+    getIfExists: true,
+  );
   // ignore: avoid_print
   print("Created release");
   final releaseFilePaths = releasePaths.split(",");
