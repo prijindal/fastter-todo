@@ -51,10 +51,10 @@ class _TodosGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (todos.isEmpty) {
+    final pipelines = getPipelines(context);
+    if (pipelines.isEmpty) {
       return Center(child: Text("Add some entries"));
     }
-    final pipelines = getPipelines(context);
     return Scrollbar(
       controller: _scrollController,
       child: ListView.builder(
@@ -72,35 +72,53 @@ class _TodosGrid extends StatelessWidget {
               todos.where((todo) => todo.pipeline == status).toList();
           return SizedBox(
             width: 400,
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: ClampingScrollPhysics(),
-              padding: EdgeInsets.only(bottom: 60.0),
-              itemCount: filteredTodos.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 8.0,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Chip(
-                        label: Text(status),
-                      ),
-                      Text(filteredTodos.length.toString()),
-                    ],
-                  );
-                }
-                final todo = filteredTodos[index - 1];
-                return TodoItem(
-                  key: Key("TodoItem${todo.id}"),
-                  todo: todo,
-                );
-              },
-            ),
+            child: _buildList(filteredTodos, status),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildPipelineChip(List<TodoData> filteredTodos, String pipeline) {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 8.0,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Chip(
+          label: Text(pipeline),
+        ),
+        Text(filteredTodos.length.toString()),
+      ],
+    );
+  }
+
+  Widget _buildList(List<TodoData> filteredTodos, String pipeline) {
+    if (filteredTodos.isEmpty) {
+      return Column(
+        children: [
+          _buildPipelineChip(filteredTodos, pipeline),
+          Center(
+            child: Text("No entries"),
+          )
+        ],
+      );
+    }
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ClampingScrollPhysics(),
+      padding: EdgeInsets.only(bottom: 60.0),
+      itemCount: filteredTodos.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return _buildPipelineChip(filteredTodos, pipeline);
+        }
+        final todo = filteredTodos[index - 1];
+        return TodoItem(
+          key: Key("TodoItem${todo.id}"),
+          todo: todo,
+        );
+      },
     );
   }
 }

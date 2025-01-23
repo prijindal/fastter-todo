@@ -55,7 +55,11 @@ class _ProjectFormState extends State<ProjectForm> {
             decoration: InputDecoration(
               labelText: 'Title',
             ),
-            validator: FormBuilderValidators.required(),
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(),
+              FormBuilderValidators.minLength(3),
+              FormBuilderValidators.maxLength(15),
+            ]),
           ),
           FormBuilderPipelinesSelector(
             name: "pipelines",

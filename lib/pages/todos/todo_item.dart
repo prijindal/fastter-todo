@@ -9,6 +9,7 @@ import '../../models/core.dart';
 import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import '../../models/local_state.dart';
+import '../todo/index.dart';
 import 'confirmation_dialog.dart';
 import 'tagslist.dart';
 import 'todo_select_date.dart';
@@ -45,7 +46,23 @@ class TodoItem extends StatelessWidget {
         onTap: () {
           final localStateNotifier =
               Provider.of<LocalStateNotifier>(context, listen: false);
-          localStateNotifier.toggleSelectedId(todo.id);
+          if (localStateNotifier.todosView == TodosView.grid) {
+            showDialog<void>(
+              context: context,
+              builder: (context) {
+                return Dialog(
+                  child: Container(
+                    padding: const EdgeInsets.all(12.0),
+                    width: 600,
+                    height: 800,
+                    child: TodoEditBody(todo: todo),
+                  ),
+                );
+              },
+            );
+          } else {
+            localStateNotifier.toggleSelectedId(todo.id);
+          }
         },
       ),
     );
