@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../helpers/todos_sorting_algoritm.dart';
 
+enum TodosView {
+  list,
+  grid,
+}
+
 class LocalStateNotifier with ChangeNotifier {
   List<String> _selectedTodoIds = [];
 
   TodosSortingAlgorithm _todosSortingAlgorithm = TodosSortingAlgorithm.base();
+
+  TodosView _todosView = TodosView.list;
 
   // Getters
   List<String> get selectedTodoIds => List.unmodifiable(_selectedTodoIds);
@@ -29,6 +36,13 @@ class LocalStateNotifier with ChangeNotifier {
 
   void setTodosSortingAlgorithm(TodosSortingAlgorithm value) {
     _todosSortingAlgorithm = value;
+    notifyListeners();
+  }
+
+  TodosView get todosView => _todosView;
+
+  void setTodosView(TodosView value) {
+    _todosView = value;
     notifyListeners();
   }
 }

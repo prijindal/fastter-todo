@@ -9,6 +9,7 @@ import '../../models/local_db_state.dart';
 import '../../models/local_state.dart';
 import '../todo/index.dart';
 import 'todoeditbar/index.dart';
+import 'todogrid.dart';
 import 'todoinputbar.dart';
 import 'todolist.dart';
 
@@ -77,12 +78,24 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
     );
   }
 
+  Widget _buildBody() {
+    return Selector<LocalStateNotifier, TodosView>(
+        selector: (_, state) => state.todosView,
+        builder: (context, todosView, _) {
+          return todosView == TodosView.list
+              ? TodoList(
+                  filters: widget.filters,
+                )
+              : TodoGrid(
+                  filters: widget.filters,
+                );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<LocalStateNotifier>(
-      child: TodoList(
-        filters: widget.filters,
-      ),
+      child: _buildBody(),
       builder: (_, localState, list) => AdaptiveScaffold(
         appBar: widget.appBar,
         drawer: MainDrawer(),

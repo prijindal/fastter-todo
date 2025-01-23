@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../models/core.dart';
 import '../models/local_db_state.dart';
+import '../models/local_state.dart';
 
 class AppBarActions {
   final void Function(BuildContext context) onPressed;
@@ -13,6 +14,21 @@ class AppBarActions {
     required this.icon,
     required this.onPressed,
   });
+
+  factory AppBarActions.toggleView() {
+    return AppBarActions(
+      icon: Icon(Icons.list),
+      onPressed: (context) {
+        final localStateNotifier =
+            Provider.of<LocalStateNotifier>(context, listen: false);
+        Provider.of<LocalStateNotifier>(context, listen: false).setTodosView(
+          localStateNotifier.todosView == TodosView.list
+              ? TodosView.grid
+              : TodosView.list,
+        );
+      },
+    );
+  }
 
   factory AppBarActions.settings() {
     return AppBarActions(
@@ -139,6 +155,7 @@ class TodosFilters {
       actions.add(AppBarActions.editProject(projectFilter!));
     }
     actions.add(AppBarActions.search());
+    actions.add(AppBarActions.toggleView());
     actions.add(AppBarActions.forceRefresh());
     actions.add(AppBarActions.settings());
     return actions;
