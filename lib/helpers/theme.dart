@@ -10,6 +10,12 @@ ThemeData lightTheme(Color color) {
       labelStyle: TextStyle(color: Colors.black, fontSize: 16.0),
       hintStyle: TextStyle(color: Colors.black54),
     ),
+    listTileTheme: baseTheme.listTileTheme.copyWith(
+      subtitleTextStyle: TextStyle(
+        color: Colors.black54,
+        fontSize: 14,
+      ),
+    ),
   );
   return lightTheme;
 }
@@ -24,6 +30,12 @@ ThemeData darkTheme(Color color) {
     inputDecorationTheme: baseTheme.inputDecorationTheme.copyWith(
       labelStyle: TextStyle(color: Colors.white, fontSize: 16.0),
       hintStyle: TextStyle(color: Colors.white30),
+    ),
+    listTileTheme: baseTheme.listTileTheme.copyWith(
+      subtitleTextStyle: TextStyle(
+        color: Colors.white54,
+        fontSize: 14,
+      ),
     ),
   );
   return darkTheme;

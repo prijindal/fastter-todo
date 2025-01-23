@@ -115,6 +115,7 @@ class _TodoItem extends StatelessWidget {
   }
 
   Widget _buildListTile(BuildContext context) {
+    final tags = Provider.of<LocalDbState>(context).getTodoTag(todo.id);
     return ListTile(
       dense: dense,
       selected: selected,
@@ -130,8 +131,17 @@ class _TodoItem extends StatelessWidget {
               .update((o) => o(completed: drift.Value(newValue)));
         },
       ),
-      title: Text(
-        todo.title,
+      isThreeLine: tags.isNotEmpty,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            todo.title,
+          ),
+          SubtitleProject(
+            todo: todo,
+          ),
+        ],
       ),
       subtitle: TodoItemSubtitle(
         todo: todo,
@@ -192,39 +202,26 @@ class _TodoItem extends StatelessWidget {
   }
 }
 
-TextStyle _subtitleTextStyle(ThemeData theme) {
-  final style = theme.textTheme.bodyMedium ?? TextStyle();
-  final color = theme.disabledColor;
-  return style.copyWith(color: color);
-}
-
 class TodoItemSubtitle extends StatelessWidget {
   const TodoItemSubtitle({super.key, required this.todo});
 
   final TodoData todo;
 
-  Widget _buildDueDate(BuildContext context) => DefaultTextStyle(
-        style: _subtitleTextStyle(Theme.of(context)),
-        child: Flexible(
-          flex: 0,
-          child: Text(dueDateFormatter(todo.dueDate)),
-        ),
-      );
+  Widget _buildDueDate(BuildContext context) => Text(dueDateFormatter(
+        todo.dueDate,
+      ));
   Widget _buildSubtitleFirstRow(
       BuildContext context, int comments, int reminders, int childTodos) {
     var children = <Widget>[];
-    var mainAxisAlignment = MainAxisAlignment.spaceBetween;
-    children.add(
-      Chip(
-        label: Text(todo.pipeline),
-        visualDensity: VisualDensity(
-          vertical: -4,
-          horizontal: -4,
-        ),
-      ),
-    );
+    final iconSize =
+        (ListTileTheme.of(context).subtitleTextStyle?.fontSize ?? 12) + 2;
     if (todo.dueDate != null) {
-      children.add(_buildDueDate(context));
+      children.add(
+        Container(
+          margin: const EdgeInsets.only(left: 4),
+          child: _buildDueDate(context),
+        ),
+      );
     }
     if (reminders > 0) {
       children.add(
@@ -232,9 +229,9 @@ class TodoItemSubtitle extends StatelessWidget {
           margin: const EdgeInsets.only(left: 4),
           child: Row(
             children: <Widget>[
-              const Icon(
+              Icon(
                 Icons.alarm,
-                size: 20,
+                size: iconSize,
               ),
               Text(reminders.toString()),
             ],
@@ -248,9 +245,9 @@ class TodoItemSubtitle extends StatelessWidget {
           margin: const EdgeInsets.only(left: 4),
           child: Row(
             children: <Widget>[
-              const Icon(
+              Icon(
                 Icons.comment,
-                size: 20,
+                size: iconSize,
               ),
               Text(comments.toString()),
             ],
@@ -264,9 +261,9 @@ class TodoItemSubtitle extends StatelessWidget {
           margin: const EdgeInsets.only(left: 4),
           child: Row(
             children: <Widget>[
-              const Icon(
+              Icon(
                 Icons.format_strikethrough,
-                size: 20,
+                size: iconSize,
               ),
               Text(childTodos.toString()),
             ],
@@ -274,27 +271,17 @@ class TodoItemSubtitle extends StatelessWidget {
         ),
       );
     }
-    if (children.isNotEmpty) {
-      // If childrens are not empty, we will take all of them and wrap it inside a row
-      final subRow = Row(
-        children: children,
-      );
-      children = [subRow];
-    } else {
-      // If children are empty, since there is only one element, which is going to be project, we display it at end
-      mainAxisAlignment = MainAxisAlignment.end;
-    }
-    children.add(SubtitleProject(
-      todo: todo,
-    ));
-    if (children.isEmpty) {
-      return Container();
-    }
     return Row(
-      // direction: Axis.horizontal,
-      mainAxisAlignment: mainAxisAlignment,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: children,
+      children: [
+        Text(todo.pipeline),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: children,
+        )
+      ],
     );
   }
 
@@ -348,17 +335,17 @@ class SubtitleProject extends StatelessWidget {
   final TodoData todo;
 
   Flex _buildContainer(ProjectData? project) {
-    return Flex(
+    return Row(
       mainAxisSize: MainAxisSize.min,
-      direction: Axis.horizontal,
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 8),
           constraints: const BoxConstraints(maxWidth: 200, maxHeight: 40),
-          child: Text(
-            project?.title ?? "Inbox",
+          child: Text.rich(
+            TextSpan(text: project?.title ?? "Inbox"),
+            textScaler: TextScaler.linear(0.8),
           ),
         ),
         Icon(
@@ -372,21 +359,17 @@ class SubtitleProject extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTextStyle(
-      style: _subtitleTextStyle(Theme.of(context)),
-      child: Flexible(
-        flex: 1,
-        child: todo.project == null
-            ? _buildContainer(null)
-            : Selector<LocalDbState, ProjectData?>(
-                selector: (_, state) => state.projects
-                    .where((f) => f.id == todo.project)
-                    .firstOrNull,
-                builder: (context, project, _) {
-                  return _buildContainer(project);
-                },
-              ),
-      ),
+    return Flexible(
+      flex: 1,
+      child: todo.project == null
+          ? _buildContainer(null)
+          : Selector<LocalDbState, ProjectData?>(
+              selector: (_, state) =>
+                  state.projects.where((f) => f.id == todo.project).firstOrNull,
+              builder: (context, project, _) {
+                return _buildContainer(project);
+              },
+            ),
     );
   }
 }
