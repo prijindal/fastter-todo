@@ -25,6 +25,7 @@ class TodoGrid extends StatelessWidget {
           ? Center(child: Text("Loading"))
           : _TodosGrid(
               todos: state.todos,
+              filters: filters,
             ),
     );
   }
@@ -33,16 +34,27 @@ class TodoGrid extends StatelessWidget {
 class _TodosGrid extends StatelessWidget {
   _TodosGrid({
     required this.todos,
+    required this.filters,
   });
   final ScrollController _scrollController = ScrollController();
 
   final List<TodoData> todos;
+  final TodosFilters filters;
+
+  List<String> getStatuses(BuildContext context) {
+    if (filters.projectFilter != null && filters.projectFilter != "inbox") {
+      return Provider.of<LocalDbState>(context)
+          .getProjectStatuses(filters.projectFilter);
+    }
+    return todos.map((todo) => todo.status).toSet().toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (todos.isEmpty) {
       return Center(child: Text("Add some entries"));
     }
-    final statuses = todos.map((todo) => todo.status).toSet().toList();
+    final statuses = getStatuses(context);
     return Scrollbar(
       controller: _scrollController,
       child: ListView.builder(
@@ -64,9 +76,22 @@ class _TodosGrid extends StatelessWidget {
               shrinkWrap: true,
               physics: ClampingScrollPhysics(),
               padding: EdgeInsets.only(bottom: 60.0),
-              itemCount: filteredTodos.length,
+              itemCount: filteredTodos.length + 1,
               itemBuilder: (context, index) {
-                final todo = filteredTodos[index];
+                if (index == 0) {
+                  return Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 8.0,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Chip(
+                        label: Text(status),
+                      ),
+                      Text(filteredTodos.length.toString()),
+                    ],
+                  );
+                }
+                final todo = filteredTodos[index - 1];
                 return TodoItem(
                   key: Key("TodoItem${todo.id}"),
                   todo: todo,
