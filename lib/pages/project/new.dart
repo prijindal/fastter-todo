@@ -18,7 +18,7 @@ class NewProjectScreen extends StatelessWidget {
     BuildContext context, {
     String? title,
     Color? color,
-    List<String>? pendingStatus,
+    List<String>? pipelines,
   }) async {
     if (title == null || color == null) {
       return;
@@ -31,7 +31,7 @@ class NewProjectScreen extends StatelessWidget {
           (o) => o(
             color: color.hex,
             title: title,
-            pendingStatus: drift.Value(pendingStatus ?? [inboxPendingStatus]),
+            pipelines: drift.Value(pipelines ?? [defaultPipeline]),
           ),
         );
     // ignore: use_build_context_synchronously
@@ -44,11 +44,11 @@ class NewProjectScreen extends StatelessWidget {
           title: const Text('Add new project'),
         ),
         body: ProjectForm(
-          onSave: ({title, color, pendingStatus}) => _onSave(
+          onSave: ({title, color, pipelines}) => _onSave(
             context,
             title: title,
             color: color,
-            pendingStatus: pendingStatus,
+            pipelines: pipelines,
           ),
         ),
       );

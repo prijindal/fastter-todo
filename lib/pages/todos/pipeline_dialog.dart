@@ -3,18 +3,19 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import 'tagslist.dart';
 
-Future<String?> showStatusDialog(BuildContext context, List<String> statuses) =>
+Future<String?> showPipelineDialog(
+        BuildContext context, List<String> pipelines) =>
     showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Select status'),
+        title: const Text('Select pipeline'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: statuses
+          children: pipelines
               .map(
-                (status) => ListTile(
-                  title: Text(status),
-                  onTap: () => Navigator.of(context).pop(status),
+                (pipeline) => ListTile(
+                  title: Text(pipeline),
+                  onTap: () => Navigator.of(context).pop(pipeline),
                 ),
               )
               .toList(),
@@ -22,10 +23,10 @@ Future<String?> showStatusDialog(BuildContext context, List<String> statuses) =>
       ),
     );
 
-// A form builder widget which will create a dialog where you can input several statuses in a list
-// To select list of pending statuses for a project
-class FormBuilderStatusesSelector extends StatelessWidget {
-  const FormBuilderStatusesSelector({
+// A form builder widget which will create a dialog where you can input several pipelines in a list
+// To select list of pending pipelines for a project
+class FormBuilderPipelinesSelector extends StatelessWidget {
+  const FormBuilderPipelinesSelector({
     super.key,
     this.initialValue,
     this.validator,
@@ -51,8 +52,8 @@ class FormBuilderStatusesSelector extends StatelessWidget {
       builder: (FormFieldState<List<String>> field) {
         return InputDecorator(
           decoration: decoration,
-          child: StatusesSelector(
-            selectedStatuses: field.value,
+          child: PipelinesSelector(
+            selectedPipelines: field.value,
             expanded: expanded,
             onSelected: (newEntries) {
               field.didChange(newEntries);
@@ -65,28 +66,28 @@ class FormBuilderStatusesSelector extends StatelessWidget {
   }
 }
 
-class StatusesSelector extends StatelessWidget {
-  StatusesSelector({
+class PipelinesSelector extends StatelessWidget {
+  PipelinesSelector({
     super.key,
     required this.onSelected,
     this.expanded = false,
-    this.selectedStatuses,
+    this.selectedPipelines,
   });
 
   final GlobalKey _menuKey = GlobalKey();
   final void Function(List<String>) onSelected;
   final bool expanded;
-  final List<String>? selectedStatuses;
+  final List<String>? selectedPipelines;
 
   Future<void> _showMenu(BuildContext context) async {
-    final newSelectedStatuses = await showDialog<List<String>>(
+    final newSelectedPipelines = await showDialog<List<String>>(
       context: context,
-      builder: (context) => StatusesInputDialog(
-        selectedStatuses: selectedStatuses,
+      builder: (context) => PipelinesInputDialog(
+        selectedPipelines: selectedPipelines,
       ),
     );
-    if (newSelectedStatuses != null) {
-      onSelected(newSelectedStatuses);
+    if (newSelectedPipelines != null) {
+      onSelected(newSelectedPipelines);
     }
   }
 
@@ -100,7 +101,7 @@ class StatusesSelector extends StatelessWidget {
       return ListTile(
         key: _menuKey,
         dense: true,
-        title: TagsList(tags: selectedStatuses ?? []),
+        title: TagsList(tags: selectedPipelines ?? []),
         onTap: () => _showMenu(context),
       );
     }
@@ -108,37 +109,37 @@ class StatusesSelector extends StatelessWidget {
       key: _menuKey,
       icon: _buildIcon(context),
       onPressed: () => _showMenu(context),
-      tooltip: 'Statuses',
+      tooltip: 'Pipelines',
     );
   }
 }
 
-class StatusesInputDialog extends StatefulWidget {
-  const StatusesInputDialog({
+class PipelinesInputDialog extends StatefulWidget {
+  const PipelinesInputDialog({
     super.key,
-    List<String>? selectedStatuses = const <String>[],
-  }) : selectedStatuses = selectedStatuses ?? const <String>[];
+    List<String>? selectedPipelines = const <String>[],
+  }) : selectedPipelines = selectedPipelines ?? const <String>[];
 
-  final List<String> selectedStatuses;
+  final List<String> selectedPipelines;
 
   @override
-  State<StatusesInputDialog> createState() => _StatusesInputState();
+  State<PipelinesInputDialog> createState() => _PipelinesInputState();
 }
 
-class _StatusesInputState extends State<StatusesInputDialog> {
-  late List<String> _selectedStatuses = widget.selectedStatuses;
+class _PipelinesInputState extends State<PipelinesInputDialog> {
+  late List<String> _selectedPipelines = widget.selectedPipelines;
   final TextEditingController _textEditingController = TextEditingController();
 
-  void _removeStatus(String status) {
+  void _removePipeline(String pipeline) {
     setState(() {
-      _selectedStatuses = (_selectedStatuses.toList()..remove(status));
+      _selectedPipelines = (_selectedPipelines.toList()..remove(pipeline));
     });
   }
 
-  void _addNewStatus() {
+  void _addNewPipeline() {
     setState(() {
-      _selectedStatuses =
-          (_selectedStatuses.toList()..add(_textEditingController.text));
+      _selectedPipelines =
+          (_selectedPipelines.toList()..add(_textEditingController.text));
     });
   }
 
@@ -163,34 +164,34 @@ class _StatusesInputState extends State<StatusesInputDialog> {
                       controller: _textEditingController,
                       autofocus: true,
                       decoration: InputDecoration(
-                        hintText: "Add status",
+                        hintText: "Add pipeline",
                         border: InputBorder.none,
                       ),
                     ),
                   ),
                   IconButton(
-                    onPressed: _addNewStatus,
+                    onPressed: _addNewPipeline,
                     icon: Icon(Icons.add),
                   )
                 ],
               ),
             ),
             Divider(),
-            if (_selectedStatuses.isEmpty)
+            if (_selectedPipelines.isEmpty)
               Center(
-                child: Text("No statuses available, please add one"),
+                child: Text("No pipelines available, please add one"),
               ),
             Expanded(
               child: ListView.builder(
-                itemCount: _selectedStatuses.length,
+                itemCount: _selectedPipelines.length,
                 itemBuilder: (context, index) {
-                  final status = _selectedStatuses[index];
+                  final pipeline = _selectedPipelines[index];
                   return ListTile(
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
-                      onPressed: () => _removeStatus(status),
+                      onPressed: () => _removePipeline(pipeline),
                     ),
-                    title: Text(status),
+                    title: Text(pipeline),
                   );
                 },
               ),
@@ -213,7 +214,7 @@ class _StatusesInputState extends State<StatusesInputDialog> {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context)
-                          .pop<List<String>>(_selectedStatuses);
+                          .pop<List<String>>(_selectedPipelines);
                     },
                     child: Text("Confirm"),
                   ),

@@ -41,12 +41,12 @@ class _TodosGrid extends StatelessWidget {
   final List<TodoData> todos;
   final TodosFilters filters;
 
-  List<String> getStatuses(BuildContext context) {
+  List<String> getPipelines(BuildContext context) {
     if (filters.projectFilter != null && filters.projectFilter != "inbox") {
       return Provider.of<LocalDbState>(context)
-          .getProjectStatuses(filters.projectFilter);
+          .getProjectPipelines(filters.projectFilter);
     }
-    return todos.map((todo) => todo.status).toSet().toList();
+    return todos.map((todo) => todo.pipeline).toSet().toList();
   }
 
   @override
@@ -54,7 +54,7 @@ class _TodosGrid extends StatelessWidget {
     if (todos.isEmpty) {
       return Center(child: Text("Add some entries"));
     }
-    final statuses = getStatuses(context);
+    final pipelines = getPipelines(context);
     return Scrollbar(
       controller: _scrollController,
       child: ListView.builder(
@@ -63,13 +63,13 @@ class _TodosGrid extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.only(bottom: 60.0),
         // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        //   crossAxisCount: statuses.length,
+        //   crossAxisCount: pipelines.length,
         // ),
-        itemCount: statuses.length,
+        itemCount: pipelines.length,
         itemBuilder: (context, statusIndex) {
-          final status = statuses[statusIndex];
+          final status = pipelines[statusIndex];
           final filteredTodos =
-              todos.where((todo) => todo.status == status).toList();
+              todos.where((todo) => todo.pipeline == status).toList();
           return SizedBox(
             width: 400,
             child: ListView.builder(

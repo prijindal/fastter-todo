@@ -5,7 +5,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 import '../../models/core.dart';
-import '../todos/status_dialog.dart';
+import '../todos/pipeline_dialog.dart';
 
 class ProjectForm extends StatefulWidget {
   const ProjectForm({
@@ -13,17 +13,17 @@ class ProjectForm extends StatefulWidget {
     required this.onSave,
     this.title,
     this.color,
-    this.pendingStatus,
+    this.pipelines,
   });
 
   final void Function({
     String? title,
     Color? color,
-    List<String>? pendingStatus,
+    List<String>? pipelines,
   }) onSave;
   final String? title;
   final String? color;
-  final List<String>? pendingStatus;
+  final List<String>? pipelines;
 
   @override
   State<ProjectForm> createState() => _ProjectFormState();
@@ -37,7 +37,7 @@ class _ProjectFormState extends State<ProjectForm> {
       widget.onSave(
         title: project["title"] as String,
         color: project["color"] as Color?,
-        pendingStatus: project["pendingStatus"] as List<String>?,
+        pipelines: project["pipelines"] as List<String>?,
       );
     }
   }
@@ -57,12 +57,12 @@ class _ProjectFormState extends State<ProjectForm> {
             ),
             validator: FormBuilderValidators.required(),
           ),
-          FormBuilderStatusesSelector(
-            name: "pendingStatus",
-            initialValue: widget.pendingStatus ?? [inboxPendingStatus],
+          FormBuilderPipelinesSelector(
+            name: "pipelines",
+            initialValue: widget.pipelines ?? [defaultPipeline],
             expanded: true,
             decoration: InputDecoration(
-              labelText: 'Statuses',
+              labelText: 'Pipelines',
             ),
             validator: FormBuilderValidators.minLength(1),
           ),

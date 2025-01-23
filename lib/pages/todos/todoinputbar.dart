@@ -66,8 +66,8 @@ class _TodoInputBarState extends State<TodoInputBar>
       }
       final todo = _formKey.currentState!.value;
       final project = todo["project"] as String?;
-      final status = Provider.of<LocalDbState>(context, listen: false)
-          .getProjectStatuses(project)
+      final pipeline = Provider.of<LocalDbState>(context, listen: false)
+          .getProjectPipelines(project)
           .first;
       await Provider.of<DbManager>(context, listen: false)
           .database
@@ -79,7 +79,7 @@ class _TodoInputBarState extends State<TodoInputBar>
               project: drift.Value(project),
               dueDate: drift.Value(todo["dueDate"] as DateTime?),
               parent: drift.Value(widget.parentTodo),
-              status: drift.Value(status),
+              pipeline: drift.Value(pipeline),
             ),
           );
       _formKey.currentState!.reset();

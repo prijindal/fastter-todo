@@ -97,7 +97,8 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               priority: drift.Value(todo["priority"] as int),
               dueDate: drift.Value(todo["dueDate"] as DateTime?),
               tags: drift.Value(todo["tags"] as List<String>),
-              status: drift.Value(todo["status"] as String),
+              pipeline: drift.Value(todo["pipeline"] as String),
+              completed: drift.Value(todo["completed"] as bool),
             ),
           );
       widget.onSave?.call();
@@ -112,13 +113,13 @@ class _TodoEditBodyState extends State<TodoEditBody> {
 
   @override
   Widget build(BuildContext context) {
-    final possibleStatuses = Provider.of<LocalDbState>(context)
-        .getProjectStatuses(widget.todo.project);
+    final possiblePipelines = Provider.of<LocalDbState>(context)
+        .getProjectPipelines(widget.todo.project);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: FormBuilder(
         key: _formKey,
-        child: Column(
+        child: ListView(
           children: <Widget>[
             FormBuilderTextField(
               name: "title",
@@ -126,16 +127,22 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               onChanged: _markEdited,
               validator: FormBuilderValidators.required(),
             ),
+            FormBuilderCheckbox(
+              name: "completed",
+              title: Text('Completed'),
+              initialValue: widget.todo.completed,
+              onChanged: _markEdited,
+            ),
             FormBuilderDropdown<String>(
-              name: "status",
-              initialValue: possibleStatuses.contains(widget.todo.status)
-                  ? widget.todo.status
-                  : possibleStatuses.first,
+              name: "pipeline",
+              initialValue: possiblePipelines.contains(widget.todo.pipeline)
+                  ? widget.todo.pipeline
+                  : possiblePipelines.first,
               decoration: InputDecoration(
-                labelText: 'Status',
+                labelText: 'Pipeline',
               ),
               onChanged: _markEdited,
-              items: possibleStatuses
+              items: possiblePipelines
                   .map((a) => DropdownMenuItem<String>(
                         value: a,
                         child: Text(a),

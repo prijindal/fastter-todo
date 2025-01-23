@@ -14,16 +14,15 @@ part 'core.g.dart';
 
 const _uuid = Uuid();
 
-const inboxPendingStatus = "pending";
-const completedStatus = "completed";
+const defaultPipeline = "todo";
 
 class Project extends Table {
   late final id = text().clientDefault(() => _uuid.v4())();
   late final title = text()();
   late final color = text()();
-  late final pendingStatus = text()
+  late final pipelines = text()
       .map(const StringListConverter())
-      .clientDefault(() => jsonEncode([inboxPendingStatus]))();
+      .clientDefault(() => jsonEncode([defaultPipeline]))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -33,9 +32,8 @@ class Todo extends Table {
   late final id = text().clientDefault(() => _uuid.v4())();
   late final title = text()();
   late final priority = integer().clientDefault(() => 1)();
-  late final status = text().clientDefault(() => inboxPendingStatus)();
-  late final completed =
-      boolean().generatedAs(status.equals(completedStatus))();
+  late final pipeline = text().clientDefault(() => defaultPipeline)();
+  late final completed = boolean().clientDefault(() => false)();
   late final dueDate = dateTime().nullable()();
   late final creationTime = dateTime().clientDefault(() => DateTime.now())();
   late final project = text().nullable()();

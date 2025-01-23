@@ -150,17 +150,14 @@ class LocalDbState extends ChangeNotifier {
     return tags;
   }
 
-  // Get all possible statuses of a project id
-  List<String> getProjectStatuses(String? id, [bool onlyPending = false]) {
+  // Get all possible pipelines of a project id
+  List<String> getProjectPipelines(String? id) {
     var status = <String>[];
     if (id == null) {
-      status = [inboxPendingStatus, completedStatus];
+      status = [defaultPipeline];
     } else {
       final project = projects.firstWhere((element) => element.id == id);
-      status = project.pendingStatus;
-    }
-    if (!onlyPending) {
-      status.add(completedStatus);
+      status = project.pipelines;
     }
     return status;
   }

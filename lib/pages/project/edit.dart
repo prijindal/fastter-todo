@@ -42,7 +42,7 @@ class _EditProjectScreen extends StatelessWidget {
     BuildContext context, {
     String? title,
     Color? color,
-    List<String>? pendingStatus,
+    List<String>? pipelines,
   }) async {
     await Provider.of<DbManager>(context, listen: false)
         .database
@@ -53,7 +53,7 @@ class _EditProjectScreen extends StatelessWidget {
           (o) => o(
             color: drift.Value(color?.hex ?? project.color),
             title: drift.Value(title ?? project.title),
-            pendingStatus: drift.Value(pendingStatus ?? project.pendingStatus),
+            pipelines: drift.Value(pipelines ?? project.pipelines),
           ),
         );
     // ignore: use_build_context_synchronously
@@ -68,12 +68,12 @@ class _EditProjectScreen extends StatelessWidget {
         body: ProjectForm(
           title: project.title,
           color: project.color,
-          pendingStatus: project.pendingStatus,
-          onSave: ({title, color, pendingStatus}) => _onSave(
+          pipelines: project.pipelines,
+          onSave: ({title, color, pipelines}) => _onSave(
             context,
             title: title,
             color: color,
-            pendingStatus: pendingStatus,
+            pipelines: pipelines,
           ),
         ),
       );

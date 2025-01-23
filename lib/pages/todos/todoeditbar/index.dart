@@ -115,7 +115,7 @@ class TodoEditBarCollapsed extends StatelessWidget {
         ChangePriorityButton(
           selectedTodos: selectedTodos,
         ),
-        ChangeStatusButton(
+        ChangePipelineButton(
           selectedTodos: selectedTodos,
         ),
         ReminderButton(
@@ -157,7 +157,7 @@ class TodoEditBarCollapsed extends StatelessWidget {
       ChangePriorityButton(
         selectedTodos: selectedTodos,
       ),
-      ChangeStatusButton(
+      ChangePipelineButton(
         selectedTodos: selectedTodos,
       ),
       DeleteSelectedTodosButton()

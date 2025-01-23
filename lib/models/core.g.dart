@@ -28,23 +28,24 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       clientDefault: () => 1);
-  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  static const VerificationMeta _pipelineMeta =
+      const VerificationMeta('pipeline');
   @override
-  late final GeneratedColumn<String> status = GeneratedColumn<String>(
-      'status', aliasedName, false,
+  late final GeneratedColumn<String> pipeline = GeneratedColumn<String>(
+      'pipeline', aliasedName, false,
       type: DriftSqlType.string,
       requiredDuringInsert: false,
-      clientDefault: () => inboxPendingStatus);
+      clientDefault: () => defaultPipeline);
   static const VerificationMeta _completedMeta =
       const VerificationMeta('completed');
   @override
   late final GeneratedColumn<bool> completed = GeneratedColumn<bool>(
       'completed', aliasedName, false,
-      generatedAs: GeneratedAs(status.equals(completedStatus), false),
       type: DriftSqlType.bool,
       requiredDuringInsert: false,
       defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("completed" IN (0, 1))'));
+          GeneratedColumn.constraintIsAlways('CHECK ("completed" IN (0, 1))'),
+      clientDefault: () => false);
   static const VerificationMeta _dueDateMeta =
       const VerificationMeta('dueDate');
   @override
@@ -83,7 +84,7 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
         id,
         title,
         priority,
-        status,
+        pipeline,
         completed,
         dueDate,
         creationTime,
@@ -114,9 +115,9 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
       context.handle(_priorityMeta,
           priority.isAcceptableOrUnknown(data['priority']!, _priorityMeta));
     }
-    if (data.containsKey('status')) {
-      context.handle(_statusMeta,
-          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+    if (data.containsKey('pipeline')) {
+      context.handle(_pipelineMeta,
+          pipeline.isAcceptableOrUnknown(data['pipeline']!, _pipelineMeta));
     }
     if (data.containsKey('completed')) {
       context.handle(_completedMeta,
@@ -156,8 +157,8 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       priority: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}priority'])!,
-      status: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
+      pipeline: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}pipeline'])!,
       completed: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
       dueDate: attachedDatabase.typeMapping
@@ -186,7 +187,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
   final String id;
   final String title;
   final int priority;
-  final String status;
+  final String pipeline;
   final bool completed;
   final DateTime? dueDate;
   final DateTime creationTime;
@@ -197,7 +198,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       {required this.id,
       required this.title,
       required this.priority,
-      required this.status,
+      required this.pipeline,
       required this.completed,
       this.dueDate,
       required this.creationTime,
@@ -210,7 +211,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
     map['id'] = Variable<String>(id);
     map['title'] = Variable<String>(title);
     map['priority'] = Variable<int>(priority);
-    map['status'] = Variable<String>(status);
+    map['pipeline'] = Variable<String>(pipeline);
+    map['completed'] = Variable<bool>(completed);
     if (!nullToAbsent || dueDate != null) {
       map['due_date'] = Variable<DateTime>(dueDate);
     }
@@ -232,7 +234,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       id: Value(id),
       title: Value(title),
       priority: Value(priority),
-      status: Value(status),
+      pipeline: Value(pipeline),
+      completed: Value(completed),
       dueDate: dueDate == null && nullToAbsent
           ? const Value.absent()
           : Value(dueDate),
@@ -253,7 +256,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       priority: serializer.fromJson<int>(json['priority']),
-      status: serializer.fromJson<String>(json['status']),
+      pipeline: serializer.fromJson<String>(json['pipeline']),
       completed: serializer.fromJson<bool>(json['completed']),
       dueDate: serializer.fromJson<DateTime?>(json['dueDate']),
       creationTime: serializer.fromJson<DateTime>(json['creationTime']),
@@ -270,7 +273,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
       'priority': serializer.toJson<int>(priority),
-      'status': serializer.toJson<String>(status),
+      'pipeline': serializer.toJson<String>(pipeline),
       'completed': serializer.toJson<bool>(completed),
       'dueDate': serializer.toJson<DateTime?>(dueDate),
       'creationTime': serializer.toJson<DateTime>(creationTime),
@@ -284,7 +287,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
           {String? id,
           String? title,
           int? priority,
-          String? status,
+          String? pipeline,
           bool? completed,
           Value<DateTime?> dueDate = const Value.absent(),
           DateTime? creationTime,
@@ -295,7 +298,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
         id: id ?? this.id,
         title: title ?? this.title,
         priority: priority ?? this.priority,
-        status: status ?? this.status,
+        pipeline: pipeline ?? this.pipeline,
         completed: completed ?? this.completed,
         dueDate: dueDate.present ? dueDate.value : this.dueDate,
         creationTime: creationTime ?? this.creationTime,
@@ -303,13 +306,30 @@ class TodoData extends DataClass implements Insertable<TodoData> {
         parent: parent.present ? parent.value : this.parent,
         tags: tags ?? this.tags,
       );
+  TodoData copyWithCompanion(TodoCompanion data) {
+    return TodoData(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      priority: data.priority.present ? data.priority.value : this.priority,
+      pipeline: data.pipeline.present ? data.pipeline.value : this.pipeline,
+      completed: data.completed.present ? data.completed.value : this.completed,
+      dueDate: data.dueDate.present ? data.dueDate.value : this.dueDate,
+      creationTime: data.creationTime.present
+          ? data.creationTime.value
+          : this.creationTime,
+      project: data.project.present ? data.project.value : this.project,
+      parent: data.parent.present ? data.parent.value : this.parent,
+      tags: data.tags.present ? data.tags.value : this.tags,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('TodoData(')
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('priority: $priority, ')
-          ..write('status: $status, ')
+          ..write('pipeline: $pipeline, ')
           ..write('completed: $completed, ')
           ..write('dueDate: $dueDate, ')
           ..write('creationTime: $creationTime, ')
@@ -321,7 +341,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, priority, status, completed,
+  int get hashCode => Object.hash(id, title, priority, pipeline, completed,
       dueDate, creationTime, project, parent, tags);
   @override
   bool operator ==(Object other) =>
@@ -330,7 +350,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
           other.id == this.id &&
           other.title == this.title &&
           other.priority == this.priority &&
-          other.status == this.status &&
+          other.pipeline == this.pipeline &&
           other.completed == this.completed &&
           other.dueDate == this.dueDate &&
           other.creationTime == this.creationTime &&
@@ -343,7 +363,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
   final Value<String> id;
   final Value<String> title;
   final Value<int> priority;
-  final Value<String> status;
+  final Value<String> pipeline;
+  final Value<bool> completed;
   final Value<DateTime?> dueDate;
   final Value<DateTime> creationTime;
   final Value<String?> project;
@@ -354,7 +375,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.priority = const Value.absent(),
-    this.status = const Value.absent(),
+    this.pipeline = const Value.absent(),
+    this.completed = const Value.absent(),
     this.dueDate = const Value.absent(),
     this.creationTime = const Value.absent(),
     this.project = const Value.absent(),
@@ -366,7 +388,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
     this.id = const Value.absent(),
     required String title,
     this.priority = const Value.absent(),
-    this.status = const Value.absent(),
+    this.pipeline = const Value.absent(),
+    this.completed = const Value.absent(),
     this.dueDate = const Value.absent(),
     this.creationTime = const Value.absent(),
     this.project = const Value.absent(),
@@ -378,7 +401,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
     Expression<String>? id,
     Expression<String>? title,
     Expression<int>? priority,
-    Expression<String>? status,
+    Expression<String>? pipeline,
+    Expression<bool>? completed,
     Expression<DateTime>? dueDate,
     Expression<DateTime>? creationTime,
     Expression<String>? project,
@@ -390,7 +414,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
       if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (priority != null) 'priority': priority,
-      if (status != null) 'status': status,
+      if (pipeline != null) 'pipeline': pipeline,
+      if (completed != null) 'completed': completed,
       if (dueDate != null) 'due_date': dueDate,
       if (creationTime != null) 'creation_time': creationTime,
       if (project != null) 'project': project,
@@ -404,7 +429,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
       {Value<String>? id,
       Value<String>? title,
       Value<int>? priority,
-      Value<String>? status,
+      Value<String>? pipeline,
+      Value<bool>? completed,
       Value<DateTime?>? dueDate,
       Value<DateTime>? creationTime,
       Value<String?>? project,
@@ -415,7 +441,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
       id: id ?? this.id,
       title: title ?? this.title,
       priority: priority ?? this.priority,
-      status: status ?? this.status,
+      pipeline: pipeline ?? this.pipeline,
+      completed: completed ?? this.completed,
       dueDate: dueDate ?? this.dueDate,
       creationTime: creationTime ?? this.creationTime,
       project: project ?? this.project,
@@ -437,8 +464,11 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
     if (priority.present) {
       map['priority'] = Variable<int>(priority.value);
     }
-    if (status.present) {
-      map['status'] = Variable<String>(status.value);
+    if (pipeline.present) {
+      map['pipeline'] = Variable<String>(pipeline.value);
+    }
+    if (completed.present) {
+      map['completed'] = Variable<bool>(completed.value);
     }
     if (dueDate.present) {
       map['due_date'] = Variable<DateTime>(dueDate.value);
@@ -468,7 +498,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('priority: $priority, ')
-          ..write('status: $status, ')
+          ..write('pipeline: $pipeline, ')
+          ..write('completed: $completed, ')
           ..write('dueDate: $dueDate, ')
           ..write('creationTime: $creationTime, ')
           ..write('project: $project, ')
@@ -502,18 +533,17 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
   late final GeneratedColumn<String> color = GeneratedColumn<String>(
       'color', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _pendingStatusMeta =
-      const VerificationMeta('pendingStatus');
+  static const VerificationMeta _pipelinesMeta =
+      const VerificationMeta('pipelines');
   @override
-  late final GeneratedColumnWithTypeConverter<List<String>, String>
-      pendingStatus = GeneratedColumn<String>(
-              'pending_status', aliasedName, false,
+  late final GeneratedColumnWithTypeConverter<List<String>, String> pipelines =
+      GeneratedColumn<String>('pipelines', aliasedName, false,
               type: DriftSqlType.string,
               requiredDuringInsert: false,
-              clientDefault: () => jsonEncode([inboxPendingStatus]))
-          .withConverter<List<String>>($ProjectTable.$converterpendingStatus);
+              clientDefault: () => jsonEncode([defaultPipeline]))
+          .withConverter<List<String>>($ProjectTable.$converterpipelines);
   @override
-  List<GeneratedColumn> get $columns => [id, title, color, pendingStatus];
+  List<GeneratedColumn> get $columns => [id, title, color, pipelines];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -539,7 +569,7 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
     } else if (isInserting) {
       context.missing(_colorMeta);
     }
-    context.handle(_pendingStatusMeta, const VerificationResult.success());
+    context.handle(_pipelinesMeta, const VerificationResult.success());
     return context;
   }
 
@@ -555,9 +585,9 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       color: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}color'])!,
-      pendingStatus: $ProjectTable.$converterpendingStatus.fromSql(
-          attachedDatabase.typeMapping.read(
-              DriftSqlType.string, data['${effectivePrefix}pending_status'])!),
+      pipelines: $ProjectTable.$converterpipelines.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}pipelines'])!),
     );
   }
 
@@ -566,20 +596,20 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
     return $ProjectTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<List<String>, String, String>
-      $converterpendingStatus = const StringListConverter();
+  static JsonTypeConverter2<List<String>, String, String> $converterpipelines =
+      const StringListConverter();
 }
 
 class ProjectData extends DataClass implements Insertable<ProjectData> {
   final String id;
   final String title;
   final String color;
-  final List<String> pendingStatus;
+  final List<String> pipelines;
   const ProjectData(
       {required this.id,
       required this.title,
       required this.color,
-      required this.pendingStatus});
+      required this.pipelines});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -587,8 +617,8 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
     map['title'] = Variable<String>(title);
     map['color'] = Variable<String>(color);
     {
-      map['pending_status'] = Variable<String>(
-          $ProjectTable.$converterpendingStatus.toSql(pendingStatus));
+      map['pipelines'] =
+          Variable<String>($ProjectTable.$converterpipelines.toSql(pipelines));
     }
     return map;
   }
@@ -598,7 +628,7 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
       id: Value(id),
       title: Value(title),
       color: Value(color),
-      pendingStatus: Value(pendingStatus),
+      pipelines: Value(pipelines),
     );
   }
 
@@ -609,8 +639,8 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
       id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       color: serializer.fromJson<String>(json['color']),
-      pendingStatus: $ProjectTable.$converterpendingStatus
-          .fromJson(serializer.fromJson<String>(json['pendingStatus'])),
+      pipelines: $ProjectTable.$converterpipelines
+          .fromJson(serializer.fromJson<String>(json['pipelines'])),
     );
   }
   @override
@@ -620,8 +650,8 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
       'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
       'color': serializer.toJson<String>(color),
-      'pendingStatus': serializer.toJson<String>(
-          $ProjectTable.$converterpendingStatus.toJson(pendingStatus)),
+      'pipelines': serializer
+          .toJson<String>($ProjectTable.$converterpipelines.toJson(pipelines)),
     };
   }
 
@@ -629,21 +659,19 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
           {String? id,
           String? title,
           String? color,
-          List<String>? pendingStatus}) =>
+          List<String>? pipelines}) =>
       ProjectData(
         id: id ?? this.id,
         title: title ?? this.title,
         color: color ?? this.color,
-        pendingStatus: pendingStatus ?? this.pendingStatus,
+        pipelines: pipelines ?? this.pipelines,
       );
   ProjectData copyWithCompanion(ProjectCompanion data) {
     return ProjectData(
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
       color: data.color.present ? data.color.value : this.color,
-      pendingStatus: data.pendingStatus.present
-          ? data.pendingStatus.value
-          : this.pendingStatus,
+      pipelines: data.pipelines.present ? data.pipelines.value : this.pipelines,
     );
   }
 
@@ -653,13 +681,13 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('color: $color, ')
-          ..write('pendingStatus: $pendingStatus')
+          ..write('pipelines: $pipelines')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, color, pendingStatus);
+  int get hashCode => Object.hash(id, title, color, pipelines);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -667,27 +695,27 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
           other.id == this.id &&
           other.title == this.title &&
           other.color == this.color &&
-          other.pendingStatus == this.pendingStatus);
+          other.pipelines == this.pipelines);
 }
 
 class ProjectCompanion extends UpdateCompanion<ProjectData> {
   final Value<String> id;
   final Value<String> title;
   final Value<String> color;
-  final Value<List<String>> pendingStatus;
+  final Value<List<String>> pipelines;
   final Value<int> rowid;
   const ProjectCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.color = const Value.absent(),
-    this.pendingStatus = const Value.absent(),
+    this.pipelines = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ProjectCompanion.insert({
     this.id = const Value.absent(),
     required String title,
     required String color,
-    this.pendingStatus = const Value.absent(),
+    this.pipelines = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : title = Value(title),
         color = Value(color);
@@ -695,14 +723,14 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
     Expression<String>? id,
     Expression<String>? title,
     Expression<String>? color,
-    Expression<String>? pendingStatus,
+    Expression<String>? pipelines,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (color != null) 'color': color,
-      if (pendingStatus != null) 'pending_status': pendingStatus,
+      if (pipelines != null) 'pipelines': pipelines,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -711,13 +739,13 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
       {Value<String>? id,
       Value<String>? title,
       Value<String>? color,
-      Value<List<String>>? pendingStatus,
+      Value<List<String>>? pipelines,
       Value<int>? rowid}) {
     return ProjectCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
       color: color ?? this.color,
-      pendingStatus: pendingStatus ?? this.pendingStatus,
+      pipelines: pipelines ?? this.pipelines,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -734,9 +762,9 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
     if (color.present) {
       map['color'] = Variable<String>(color.value);
     }
-    if (pendingStatus.present) {
-      map['pending_status'] = Variable<String>(
-          $ProjectTable.$converterpendingStatus.toSql(pendingStatus.value));
+    if (pipelines.present) {
+      map['pipelines'] = Variable<String>(
+          $ProjectTable.$converterpipelines.toSql(pipelines.value));
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -750,7 +778,7 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('color: $color, ')
-          ..write('pendingStatus: $pendingStatus, ')
+          ..write('pipelines: $pipelines, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1393,7 +1421,8 @@ typedef $$TodoTableCreateCompanionBuilder = TodoCompanion Function({
   Value<String> id,
   required String title,
   Value<int> priority,
-  Value<String> status,
+  Value<String> pipeline,
+  Value<bool> completed,
   Value<DateTime?> dueDate,
   Value<DateTime> creationTime,
   Value<String?> project,
@@ -1405,7 +1434,8 @@ typedef $$TodoTableUpdateCompanionBuilder = TodoCompanion Function({
   Value<String> id,
   Value<String> title,
   Value<int> priority,
-  Value<String> status,
+  Value<String> pipeline,
+  Value<bool> completed,
   Value<DateTime?> dueDate,
   Value<DateTime> creationTime,
   Value<String?> project,
@@ -1431,8 +1461,8 @@ class $$TodoTableFilterComposer extends Composer<_$SharedDatabase, $TodoTable> {
   ColumnFilters<int> get priority => $composableBuilder(
       column: $table.priority, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get status => $composableBuilder(
-      column: $table.status, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get pipeline => $composableBuilder(
+      column: $table.pipeline, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnFilters(column));
@@ -1473,8 +1503,8 @@ class $$TodoTableOrderingComposer
   ColumnOrderings<int> get priority => $composableBuilder(
       column: $table.priority, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get status => $composableBuilder(
-      column: $table.status, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get pipeline => $composableBuilder(
+      column: $table.pipeline, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnOrderings(column));
@@ -1514,8 +1544,8 @@ class $$TodoTableAnnotationComposer
   GeneratedColumn<int> get priority =>
       $composableBuilder(column: $table.priority, builder: (column) => column);
 
-  GeneratedColumn<String> get status =>
-      $composableBuilder(column: $table.status, builder: (column) => column);
+  GeneratedColumn<String> get pipeline =>
+      $composableBuilder(column: $table.pipeline, builder: (column) => column);
 
   GeneratedColumn<bool> get completed =>
       $composableBuilder(column: $table.completed, builder: (column) => column);
@@ -1562,7 +1592,8 @@ class $$TodoTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<int> priority = const Value.absent(),
-            Value<String> status = const Value.absent(),
+            Value<String> pipeline = const Value.absent(),
+            Value<bool> completed = const Value.absent(),
             Value<DateTime?> dueDate = const Value.absent(),
             Value<DateTime> creationTime = const Value.absent(),
             Value<String?> project = const Value.absent(),
@@ -1574,7 +1605,8 @@ class $$TodoTableTableManager extends RootTableManager<
             id: id,
             title: title,
             priority: priority,
-            status: status,
+            pipeline: pipeline,
+            completed: completed,
             dueDate: dueDate,
             creationTime: creationTime,
             project: project,
@@ -1586,7 +1618,8 @@ class $$TodoTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             required String title,
             Value<int> priority = const Value.absent(),
-            Value<String> status = const Value.absent(),
+            Value<String> pipeline = const Value.absent(),
+            Value<bool> completed = const Value.absent(),
             Value<DateTime?> dueDate = const Value.absent(),
             Value<DateTime> creationTime = const Value.absent(),
             Value<String?> project = const Value.absent(),
@@ -1598,7 +1631,8 @@ class $$TodoTableTableManager extends RootTableManager<
             id: id,
             title: title,
             priority: priority,
-            status: status,
+            pipeline: pipeline,
+            completed: completed,
             dueDate: dueDate,
             creationTime: creationTime,
             project: project,
@@ -1629,14 +1663,14 @@ typedef $$ProjectTableCreateCompanionBuilder = ProjectCompanion Function({
   Value<String> id,
   required String title,
   required String color,
-  Value<List<String>> pendingStatus,
+  Value<List<String>> pipelines,
   Value<int> rowid,
 });
 typedef $$ProjectTableUpdateCompanionBuilder = ProjectCompanion Function({
   Value<String> id,
   Value<String> title,
   Value<String> color,
-  Value<List<String>> pendingStatus,
+  Value<List<String>> pipelines,
   Value<int> rowid,
 });
 
@@ -1659,8 +1693,8 @@ class $$ProjectTableFilterComposer
       column: $table.color, builder: (column) => ColumnFilters(column));
 
   ColumnWithTypeConverterFilters<List<String>, List<String>, String>
-      get pendingStatus => $composableBuilder(
-          column: $table.pendingStatus,
+      get pipelines => $composableBuilder(
+          column: $table.pipelines,
           builder: (column) => ColumnWithTypeConverterFilters(column));
 }
 
@@ -1682,9 +1716,8 @@ class $$ProjectTableOrderingComposer
   ColumnOrderings<String> get color => $composableBuilder(
       column: $table.color, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get pendingStatus => $composableBuilder(
-      column: $table.pendingStatus,
-      builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get pipelines => $composableBuilder(
+      column: $table.pipelines, builder: (column) => ColumnOrderings(column));
 }
 
 class $$ProjectTableAnnotationComposer
@@ -1705,9 +1738,8 @@ class $$ProjectTableAnnotationComposer
   GeneratedColumn<String> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<List<String>, String> get pendingStatus =>
-      $composableBuilder(
-          column: $table.pendingStatus, builder: (column) => column);
+  GeneratedColumnWithTypeConverter<List<String>, String> get pipelines =>
+      $composableBuilder(column: $table.pipelines, builder: (column) => column);
 }
 
 class $$ProjectTableTableManager extends RootTableManager<
@@ -1736,28 +1768,28 @@ class $$ProjectTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<String> color = const Value.absent(),
-            Value<List<String>> pendingStatus = const Value.absent(),
+            Value<List<String>> pipelines = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ProjectCompanion(
             id: id,
             title: title,
             color: color,
-            pendingStatus: pendingStatus,
+            pipelines: pipelines,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             Value<String> id = const Value.absent(),
             required String title,
             required String color,
-            Value<List<String>> pendingStatus = const Value.absent(),
+            Value<List<String>> pipelines = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               ProjectCompanion.insert(
             id: id,
             title: title,
             color: color,
-            pendingStatus: pendingStatus,
+            pipelines: pipelines,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

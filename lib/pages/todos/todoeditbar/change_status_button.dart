@@ -5,22 +5,22 @@ import 'package:provider/provider.dart';
 import '../../../models/core.dart';
 import '../../../models/db_manager.dart';
 import '../../../models/local_db_state.dart';
-import '../status_dialog.dart';
+import '../pipeline_dialog.dart';
 
-class ChangeStatusButton extends StatelessWidget {
-  const ChangeStatusButton({super.key, required this.selectedTodos});
+class ChangePipelineButton extends StatelessWidget {
+  const ChangePipelineButton({super.key, required this.selectedTodos});
   final List<TodoData> selectedTodos;
 
-  List<String> getAllStatuses(BuildContext context) {
+  List<String> getAllPipelines(BuildContext context) {
     Set<String>? todos;
     for (var todo in selectedTodos) {
-      final projectStatus = Provider.of<LocalDbState>(context, listen: false)
-          .getProjectStatuses(todo.project)
+      final projectPipeline = Provider.of<LocalDbState>(context, listen: false)
+          .getProjectPipelines(todo.project)
           .toSet();
       if (todos == null) {
-        todos = projectStatus;
+        todos = projectPipeline;
       } else {
-        todos = todos.intersection(projectStatus);
+        todos = todos.intersection(projectPipeline);
       }
     }
     return todos?.toList() ?? [];
@@ -30,20 +30,21 @@ class ChangeStatusButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.checklist),
-      onPressed: () => _selectStatus(context),
-      tooltip: 'Status',
+      onPressed: () => _selectPipeline(context),
+      tooltip: 'Pipeline',
     );
   }
 
-  void _selectStatus(BuildContext context) async {
-    final status = await showStatusDialog(context, getAllStatuses(context));
-    if (status != null && context.mounted) {
+  void _selectPipeline(BuildContext context) async {
+    final pipeline =
+        await showPipelineDialog(context, getAllPipelines(context));
+    if (pipeline != null && context.mounted) {
       await Provider.of<DbManager>(context, listen: false)
           .database
           .managers
           .todo
           .filter((f) => f.id.isIn(selectedTodos.map((a) => a.id)))
-          .update((o) => o(status: drift.Value(status)));
+          .update((o) => o(pipeline: drift.Value(pipeline)));
     }
   }
 }
