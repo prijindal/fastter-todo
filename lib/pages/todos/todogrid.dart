@@ -119,6 +119,7 @@ class _TodosGrid extends StatelessWidget {
         }
         final todo = filteredTodos[index - 1];
         return TodoItem(
+          dismissible: false,
           key: Key("TodoItem${todo.id}"),
           todo: todo,
         );

@@ -23,11 +23,13 @@ class TodoItem extends StatelessWidget {
     required this.todo,
     this.allowSelection = true,
     this.dense = false,
+    this.dismissible = true,
   });
 
   final TodoData todo;
   final bool allowSelection;
   final bool dense;
+  final bool dismissible;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class TodoItem extends StatelessWidget {
         todo: todo,
         selected: false,
         dense: true,
+        dismissible: dismissible,
         onTap: () => AutoRouter.of(context).pushNamed("/todo/${todo.id}"),
       );
     }
@@ -45,6 +48,8 @@ class TodoItem extends StatelessWidget {
       builder: (context, selected, _) => _TodoItem(
         todo: todo,
         selected: selected,
+        dismissible: dismissible,
+        dense: dense,
         onTap: () {
           final localStateNotifier =
               Provider.of<LocalStateNotifier>(context, listen: false);
@@ -76,12 +81,14 @@ class _TodoItem extends StatelessWidget {
     required this.todo,
     required this.selected,
     this.dense = false,
+    this.dismissible = true,
     this.onTap,
   });
 
   final TodoData todo;
   final bool selected;
   final bool dense;
+  final bool dismissible;
   final void Function()? onTap;
 
   void _selectDate(BuildContext context) {
@@ -107,8 +114,36 @@ class _TodoItem extends StatelessWidget {
         .deleteTodosByIds([todo.id]);
   }
 
+  Widget _buildListTile(BuildContext context) {
+    return ListTile(
+      dense: dense,
+      selected: selected,
+      onTap: onTap,
+      leading: TodoItemToggle(
+        todo: todo,
+        toggleCompleted: (bool newValue) async {
+          await Provider.of<DbManager>(context, listen: false)
+              .database
+              .managers
+              .todo
+              .filter((tbl) => tbl.id.equals(todo.id))
+              .update((o) => o(completed: drift.Value(newValue)));
+        },
+      ),
+      title: Text(
+        todo.title,
+      ),
+      subtitle: TodoItemSubtitle(
+        todo: todo,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (dismissible == false) {
+      return _buildListTile(context);
+    }
     return Dismissible(
       key: Key(todo.id),
       confirmDismiss: (direction) async {
@@ -152,28 +187,7 @@ class _TodoItem extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
-        dense: dense,
-        selected: selected,
-        onTap: onTap,
-        leading: TodoItemToggle(
-          todo: todo,
-          toggleCompleted: (bool newValue) async {
-            await Provider.of<DbManager>(context, listen: false)
-                .database
-                .managers
-                .todo
-                .filter((tbl) => tbl.id.equals(todo.id))
-                .update((o) => o(completed: drift.Value(newValue)));
-          },
-        ),
-        title: Text(
-          todo.title,
-        ),
-        subtitle: TodoItemSubtitle(
-          todo: todo,
-        ),
-      ),
+      child: _buildListTile(context),
     );
   }
 }
