@@ -210,6 +210,10 @@ class LocalDbState extends ChangeNotifier {
     }
   }
 
+  Future<void> _clearFromLocalDb(String table) async {
+    await SharedPreferencesAsync().remove("LocalTempDb$table");
+  }
+
   void initFromLocalTempDb() async {
     await Future.wait([
       _readFromLocalDb<TodoData>("todos", TodoData.fromJson),
@@ -223,5 +227,19 @@ class LocalDbState extends ChangeNotifier {
   Future<void> setLocalTempDb(String table, List<drift.DataClass> items) async {
     await SharedPreferencesAsync().setString(
         "LocalTempDb$table", jsonEncode(items.map((a) => a.toJson()).toList()));
+  }
+
+  Future<void> clear() async {
+    await Future.wait([
+      _clearFromLocalDb("todos"),
+      _clearFromLocalDb("projects"),
+      _clearFromLocalDb("comments"),
+      _clearFromLocalDb("reminders"),
+    ]);
+    _todos = [];
+    _projects = [];
+    _comments = [];
+    _reminders = [];
+    notifyListeners();
   }
 }

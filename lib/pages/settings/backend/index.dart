@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 
 import '../../../models/db_manager.dart';
+import '../../../models/local_db_state.dart';
 
 @RoutePage()
 class BackendSettingsScreen extends StatelessWidget {
@@ -27,6 +28,7 @@ class BackendSettingsScreen extends StatelessWidget {
             try {
               await Provider.of<DbManager>(context, listen: false)
                   .resetDatabase();
+              await Provider.of<LocalDbState>(context, listen: false).clear();
               await Restart.restartApp(
                 notificationTitle: 'Restarting App',
                 notificationBody: 'Please tap here to open the app again.',
@@ -120,7 +122,7 @@ class BackendImplementationTile extends StatelessWidget {
           await dbSelector.setLocal();
         }
         await dbSelector.initDb();
-        Restart.restartApp(
+        await Restart.restartApp(
           notificationTitle: 'Restarting App',
           notificationBody: 'Please tap here to open the app again.',
         );
