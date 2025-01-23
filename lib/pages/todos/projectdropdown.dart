@@ -33,7 +33,8 @@ class FormBuilderProjectSelector extends StatelessWidget {
           ? null
           : Provider.of<LocalDbState>(context)
               .projects
-              .firstWhere((a) => a.id == field.value),
+              .where((a) => a.id == field.value)
+              .firstOrNull,
       expanded: expanded,
       onSelected: (newEntry) {
         field.didChange(newEntry?.id);

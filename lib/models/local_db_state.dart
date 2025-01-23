@@ -156,7 +156,10 @@ class LocalDbState extends ChangeNotifier {
     if (id == null) {
       status = [defaultPipeline];
     } else {
-      final project = projects.firstWhere((element) => element.id == id);
+      final project = projects.where((element) => element.id == id).firstOrNull;
+      if (project == null) {
+        return [defaultPipeline];
+      }
       status = project.pipelines;
     }
     return status;

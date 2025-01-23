@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../helpers/logger.dart';
 import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
+import 'pipeline_dialog.dart';
 import 'projectdropdown.dart';
 import 'todo_select_date.dart';
 
@@ -66,9 +67,13 @@ class _TodoInputBarState extends State<TodoInputBar>
       }
       final todo = _formKey.currentState!.value;
       final project = todo["project"] as String?;
-      final pipeline = Provider.of<LocalDbState>(context, listen: false)
-          .getProjectPipelines(project)
-          .first;
+      final pipelines = Provider.of<LocalDbState>(context, listen: false)
+          .getProjectPipelines(project);
+      final selectedPipeline = todo["pipeline"] as String?;
+      final pipeline =
+          selectedPipeline != null && pipelines.contains(selectedPipeline)
+              ? selectedPipeline
+              : pipelines.first;
       await Provider.of<DbManager>(context, listen: false)
           .database
           .managers
@@ -166,6 +171,38 @@ class _TodoInputBarState extends State<TodoInputBar>
         ),
       );
 
+  Widget _buildPipelineButton() {
+    final pipelines = Provider.of<LocalDbState>(context).getProjectPipelines(
+        (_formKey.currentState?.instantValue['project'] ??
+            widget.initialProject) as String?);
+    return FormBuilderField<String>(
+      name: "pipeline",
+      initialValue: pipelines.first,
+      builder: (FormFieldState<String> field) {
+        final pipelines = Provider.of<LocalDbState>(context)
+            .getProjectPipelines(
+                _formKey.currentState?.instantValue['project'] as String?);
+        return TextButton(
+          child: Text(field.value ?? pipelines.first),
+          onPressed: () {
+            setState(() {
+              _isPreventClose = true;
+            });
+            showPipelineDialog(context, pipelines).then((date) {
+              setState(() {
+                if (date != null) {
+                  field.didChange(date);
+                }
+                _isPreventClose = false;
+                _focusKeyboard();
+              });
+            });
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildButtons() => Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
@@ -204,6 +241,7 @@ class _TodoInputBarState extends State<TodoInputBar>
               });
             },
           ),
+          _buildPipelineButton(),
           Flexible(
             child: Container(),
           ),
