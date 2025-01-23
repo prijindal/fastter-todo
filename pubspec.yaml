@@ -48,6 +48,7 @@ dependencies:
   fuzzywuzzy: ^1.2.0
   github: ^9.24.0
   hexcolor: ^3.0.1
+  hotkey_manager: ^0.2.3
   http: ^1.2.2
   intl: ^0.19.0
   logger: ^2.5.0

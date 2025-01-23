@@ -63,10 +63,6 @@ class _TodosGrid extends StatelessWidget {
         controller: _scrollController,
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.only(bottom: 60.0),
-        // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        //   crossAxisCount: pipelines.length,
-        // ),
         itemCount: pipelines.length,
         itemBuilder: (context, statusIndex) {
           final status = pipelines[statusIndex];

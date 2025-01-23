@@ -169,6 +169,9 @@ class _TodoInputBarState extends State<TodoInputBar>
             },
           ),
         ),
+        onSubmitted: (_) {
+          _onSave();
+        },
       );
 
   Widget _buildPipelineButton() {
