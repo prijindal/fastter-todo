@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -70,8 +72,10 @@ class _TodosGrid extends StatelessWidget {
           final status = pipelines[statusIndex];
           final filteredTodos =
               todos.where((todo) => todo.pipeline == status).toList();
+
+          final mediaQuery = MediaQuery.sizeOf(context);
           return SizedBox(
-            width: 400,
+            width: min(mediaQuery.width, 600),
             child: _buildList(filteredTodos, status),
           );
         },

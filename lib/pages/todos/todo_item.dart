@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
@@ -47,15 +49,15 @@ class TodoItem extends StatelessWidget {
           final localStateNotifier =
               Provider.of<LocalStateNotifier>(context, listen: false);
           if (localStateNotifier.todosView == TodosView.grid) {
+            final mediaQuery = MediaQuery.sizeOf(context);
             showDialog<void>(
               context: context,
               builder: (context) {
                 return Dialog(
-                  child: Container(
-                    padding: const EdgeInsets.all(12.0),
-                    width: 600,
-                    height: 800,
-                    child: TodoEditBody(todo: todo),
+                  child: SizedBox(
+                    width: min(600, mediaQuery.width),
+                    height: min(800, mediaQuery.height),
+                    child: TodosScreenScaffold(todo: todo),
                   ),
                 );
               },

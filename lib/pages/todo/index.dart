@@ -24,14 +24,15 @@ class TodoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Selector<LocalDbState, TodoData>(
         selector: (_, state) => state.todos.where((a) => a.id == todoId).first,
-        builder: (context, todo, _) => _TodoScreen(
+        builder: (context, todo, _) => TodosScreenScaffold(
           todo: todo,
         ),
       );
 }
 
-class _TodoScreen extends StatelessWidget {
-  const _TodoScreen({
+class TodosScreenScaffold extends StatelessWidget {
+  const TodosScreenScaffold({
+    super.key,
     required this.todo,
   });
 
