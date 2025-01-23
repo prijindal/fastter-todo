@@ -21,6 +21,24 @@ class BackendSettingsScreen extends StatelessWidget {
           dense: true,
         ),
         const BackendImplementationTile(),
+        ListTile(
+          title: Text("Reset Database"),
+          onTap: () async {
+            try {
+              await Provider.of<DbManager>(context, listen: false)
+                  .resetDatabase();
+              await Restart.restartApp(
+                notificationTitle: 'Restarting App',
+                notificationBody: 'Please tap here to open the app again.',
+              );
+            } catch (e) {
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Error: $e"),
+              ));
+            }
+          },
+        ),
       ]),
     );
   }

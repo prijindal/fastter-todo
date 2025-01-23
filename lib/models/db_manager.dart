@@ -106,6 +106,17 @@ class DbManager extends ChangeNotifier {
     _addWatcher();
   }
 
+  // This will drop all the tables in the database and recreate it
+  Future<void> resetDatabase() async {
+    await database.customStatement("PRAGMA writable_schema = 1;");
+    await database.customStatement(
+        "delete from sqlite_master where type in ('table', 'index', 'trigger');");
+    await database.customStatement("PRAGMA writable_schema = 0;");
+    await database.customStatement("VACUUM;");
+    await database.customStatement("PRAGMA INTEGRITY_CHECK;");
+    await database.customStatement("PRAGMA user_version = 0;");
+  }
+
   Future<void> _addWatcher() async {
     if (_database == null) return;
     final stream = _database!.tableUpdates();
