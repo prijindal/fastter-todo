@@ -29,6 +29,8 @@ class ProjectsScreen extends StatelessWidget {
         final project = projects[index];
         return ProjectListTile(
           project: project,
+          onTap: () =>
+              AutoRouter.of(context).pushNamed("/project/${project.id}"),
         );
       },
     );

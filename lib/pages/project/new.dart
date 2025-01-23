@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/db_manager.dart';
@@ -9,9 +8,11 @@ import 'form.dart';
 
 @RoutePage()
 class NewProjectScreen extends StatelessWidget {
-  const NewProjectScreen({super.key});
+  const NewProjectScreen({
+    super.key,
+  });
 
-  void _onSave(BuildContext context, {String? title, HexColor? color}) async {
+  void _onSave(BuildContext context, {String? title, Color? color}) async {
     if (title == null || color == null) {
       return;
     }
@@ -35,7 +36,7 @@ class NewProjectScreen extends StatelessWidget {
           title: const Text('Add new project'),
         ),
         body: ProjectForm(
-          onSave: ({title, color}) => _onSave(
+          onSave: ({title, color, parent}) => _onSave(
             context,
             title: title,
             color: color,

@@ -97,7 +97,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               priority: drift.Value(todo["priority"] as int),
               dueDate: drift.Value(todo["dueDate"] as DateTime?),
               tags: drift.Value(todo["tags"] as List<String>),
-              completed: drift.Value(todo["completed"] as bool),
+              status: drift.Value(todo["status"] as String),
             ),
           );
       widget.onSave?.call();
@@ -112,17 +112,27 @@ class _TodoEditBodyState extends State<TodoEditBody> {
 
   @override
   Widget build(BuildContext context) {
+    final pendingStatus = Provider.of<LocalDbState>(context)
+        .getProjectStatuses(widget.todo.project);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: FormBuilder(
         key: _formKey,
         child: Column(
           children: <Widget>[
-            FormBuilderCheckbox(
-              name: "completed",
-              title: Text('Completed'),
-              initialValue: widget.todo.completed,
+            FormBuilderDropdown<String>(
+              name: "status",
+              initialValue: widget.todo.status,
+              decoration: InputDecoration(
+                labelText: 'Status',
+              ),
               onChanged: _markEdited,
+              items: pendingStatus
+                  .map((a) => DropdownMenuItem<String>(
+                        value: a,
+                        child: Text(a),
+                      ))
+                  .toList(),
             ),
             FormBuilderTextField(
               name: "title",

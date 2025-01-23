@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
@@ -39,7 +38,7 @@ class _EditProjectScreen extends StatelessWidget {
 
   final ProjectData project;
 
-  void _onSave(BuildContext context, {String? title, HexColor? color}) async {
+  void _onSave(BuildContext context, {String? title, Color? color}) async {
     await Provider.of<DbManager>(context, listen: false)
         .database
         .managers
@@ -63,7 +62,7 @@ class _EditProjectScreen extends StatelessWidget {
         body: ProjectForm(
           title: project.title,
           color: project.color,
-          onSave: ({title, color}) => _onSave(
+          onSave: ({title, color, parent}) => _onSave(
             context,
             title: title,
             color: color,

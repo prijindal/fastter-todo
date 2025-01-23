@@ -13,16 +13,34 @@ class FormBuilderProjectSelector extends StatelessWidget {
     this.validator,
     required this.name,
     this.expanded = false,
-    this.decoration = const InputDecoration(),
+    this.decoration,
     this.onChanged,
+    this.onOpening,
   });
 
   final String? initialValue;
   final String? Function(String?)? validator;
   final String name;
   final bool expanded;
-  final InputDecoration decoration;
+  final InputDecoration? decoration;
   final void Function(String?)? onChanged;
+  final void Function()? onOpening;
+
+  Widget _buildDropDown(BuildContext context, FormFieldState<String> field) {
+    return ProjectDropdown(
+      enabled: true,
+      selectedProject: field.value == null
+          ? null
+          : Provider.of<LocalDbState>(context)
+              .projects
+              .firstWhere((a) => a.id == field.value),
+      expanded: expanded,
+      onSelected: (newEntry) {
+        field.didChange(newEntry?.id);
+        onChanged?.call(newEntry?.id);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,20 +49,12 @@ class FormBuilderProjectSelector extends StatelessWidget {
       name: name,
       validator: validator,
       builder: (FormFieldState<String> field) {
+        if (decoration == null) {
+          return _buildDropDown(context, field);
+        }
         return InputDecorator(
-          decoration: decoration,
-          child: ProjectDropdown(
-            selectedProject: field.value == null
-                ? null
-                : Provider.of<LocalDbState>(context)
-                    .projects
-                    .firstWhere((a) => a.id == field.value),
-            expanded: expanded,
-            onSelected: (newEntry) {
-              field.didChange(newEntry?.id);
-              onChanged?.call(newEntry?.id);
-            },
-          ),
+          decoration: decoration!,
+          child: _buildDropDown(context, field),
         );
       },
     );

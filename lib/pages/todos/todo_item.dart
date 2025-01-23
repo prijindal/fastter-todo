@@ -140,12 +140,19 @@ class _TodoItem extends StatelessWidget {
         leading: TodoItemToggle(
           todo: todo,
           toggleCompleted: (bool newValue) async {
+            String newStatus = completedStatus;
+            if (newValue == false) {
+              // Find the first pendingStatus of the project
+              final statuses = Provider.of<LocalDbState>(context, listen: false)
+                  .getProjectStatuses(todo.project);
+              newStatus = statuses[0];
+            }
             await Provider.of<DbManager>(context, listen: false)
                 .database
                 .managers
                 .todo
                 .filter((tbl) => tbl.id.equals(todo.id))
-                .update((o) => o(completed: drift.Value(newValue)));
+                .update((o) => o(status: drift.Value(newStatus)));
           },
         ),
         title: Text(
@@ -181,6 +188,17 @@ class TodoItemSubtitle extends StatelessWidget {
       BuildContext context, int comments, int reminders, int childTodos) {
     var children = <Widget>[];
     var mainAxisAlignment = MainAxisAlignment.spaceBetween;
+    children.add(
+      Chip(
+        label: Text(todo.status),
+        backgroundColor:
+            todo.completed ? Colors.blueGrey : Theme.of(context).primaryColor,
+        visualDensity: VisualDensity(
+          vertical: -4,
+          horizontal: -4,
+        ),
+      ),
+    );
     if (todo.dueDate != null) {
       children.add(_buildDueDate(context));
     }

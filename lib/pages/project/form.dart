@@ -1,5 +1,7 @@
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 class ProjectForm extends StatefulWidget {
@@ -10,7 +12,7 @@ class ProjectForm extends StatefulWidget {
     this.color,
   });
 
-  final void Function({String? title, HexColor? color}) onSave;
+  final void Function({String? title, Color? color}) onSave;
   final String? title;
   final String? color;
 
@@ -19,49 +21,100 @@ class ProjectForm extends StatefulWidget {
 }
 
 class _ProjectFormState extends State<ProjectForm> {
-  late TextEditingController titleController =
-      TextEditingController(text: widget.title);
-
-  late HexColor _currentColor = HexColor(widget.color ?? "#FFFFFF");
+  final _formKey = GlobalKey<FormBuilderState>();
+  void _onSave() {
+    if (_formKey.currentState?.saveAndValidate() == true) {
+      final project = _formKey.currentState!.value;
+      widget.onSave(
+        title: project["title"] as String,
+        color: project["color"] as Color?,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        TextField(
-          autofocus: true,
-          controller: titleController,
-          decoration: InputDecoration(
-            labelText: 'Title',
+    return FormBuilder(
+      key: _formKey,
+      child: ListView(
+        children: [
+          FormBuilderTextField(
+            name: "title",
+            initialValue: widget.title,
+            autofocus: true,
+            decoration: InputDecoration(
+              labelText: 'Title',
+            ),
+            validator: FormBuilderValidators.required(),
           ),
-        ),
-        ColorPicker(
-          // Use the screenPickerColor as start and active color.
-          color: _currentColor,
-          // Update the screenPickerColor using the callback.
-          onColorChanged: (Color color) => setState(
-            () => _currentColor = HexColor(color.hex),
+          FormColorPicker(
+            name: "color",
+            initialValue: widget.color == null ? null : HexColor(widget.color!),
+            decoration: InputDecoration(
+              labelText: 'Color',
+            ),
+            validator: FormBuilderValidators.required(),
           ),
-          width: 44,
-          height: 44,
-          borderRadius: 22,
-          heading: Text(
-            'Select color',
-            style: Theme.of(context).textTheme.headlineSmall,
+          ElevatedButton(
+            onPressed: _onSave,
+            child: Text("Save"),
           ),
-          subheading: Text(
-            'Select color shade',
-            style: Theme.of(context).textTheme.titleSmall,
+        ],
+      ),
+    );
+  }
+}
+
+class FormColorPicker extends StatelessWidget {
+  const FormColorPicker({
+    super.key,
+    this.initialValue,
+    this.validator,
+    required this.name,
+    this.expanded = false,
+    this.decoration = const InputDecoration(),
+    this.onChanged,
+  });
+
+  final Color? initialValue;
+  final String? Function(Color?)? validator;
+  final String name;
+  final bool expanded;
+  final InputDecoration decoration;
+  final void Function(Color?)? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return FormBuilderField<Color>(
+      initialValue: initialValue,
+      name: name,
+      validator: validator,
+      builder: (FormFieldState<Color> field) {
+        return InputDecorator(
+          decoration: decoration,
+          child: ColorPicker(
+            // Use the screenPickerColor as start and active color.
+            color: field.value ?? Colors.black,
+            // Update the screenPickerColor using the callback.
+            onColorChanged: (Color color) {
+              field.didChange(color);
+              onChanged?.call(color);
+            },
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            heading: Text(
+              'Select color',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            subheading: Text(
+              'Select color shade',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
           ),
-        ),
-        MaterialButton(
-          onPressed: () => widget.onSave(
-            color: _currentColor,
-            title: titleController.text,
-          ),
-          child: Text("Save"),
-        ),
-      ],
+        );
+      },
     );
   }
 }

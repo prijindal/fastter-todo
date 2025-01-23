@@ -65,11 +65,6 @@ class _TodoSubTaskListState extends State<_TodoSubTaskList> {
     return ListView(
       shrinkWrap: true,
       children: [
-        // ListTile(
-        //   title: Text(widget.todo.title),
-        //   onTap: () =>
-        //       AutoRouter.of(context).pushNamed("/todo/${widget.todo.id}"),
-        // ),
         TodoItem(
           todo: widget.todo,
           allowSelection: false,

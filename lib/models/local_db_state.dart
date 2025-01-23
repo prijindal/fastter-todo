@@ -150,6 +150,15 @@ class LocalDbState extends ChangeNotifier {
     return tags;
   }
 
+  // Get all possible statuses of a project id
+  List<String> getProjectStatuses(String? id) {
+    if (id == null) {
+      return [inboxPendingStatus, completedStatus];
+    }
+    final project = projects.firstWhere((element) => element.id == id);
+    return [...project.pendingStatus, completedStatus];
+  }
+
   List<String> getTodosTags(List<String> todoId) {
     final selectedTodos = todos.where((element) => todoId.contains(element.id));
     final List<String> tags = [];

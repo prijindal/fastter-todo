@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/logger.dart';
-import '../../models/core.dart';
 import '../../models/db_manager.dart';
-import '../../models/local_db_state.dart';
 import 'projectdropdown.dart';
 import 'todo_select_date.dart';
 
@@ -32,18 +32,18 @@ class TodoInputBar extends StatefulWidget {
 
 class _TodoInputBarState extends State<TodoInputBar>
     with WidgetsBindingObserver {
-  final TextEditingController titleInputController =
-      TextEditingController(text: '');
+  final _formKey = GlobalKey<FormBuilderState>();
+  // final TextEditingController titleInputController =
+  //     TextEditingController(text: '');
   final FocusNode _titleFocusNode = FocusNode();
-  DateTime? dueDate;
+  // DateTime? dueDate;
   bool _isPreventClose = false;
   StreamSubscription<bool>? subscribingId;
-  ProjectData? project;
+  // ProjectData? project;
 
   @override
   void initState() {
     super.initState();
-    _initialValues();
     WidgetsBinding.instance.addObserver(this);
     var keyboardVisibilityController = KeyboardVisibilityController();
     subscribingId = keyboardVisibilityController.onChange.listen((visible) {
@@ -62,37 +62,26 @@ class _TodoInputBarState extends State<TodoInputBar>
     super.dispose();
   }
 
-  Future<void> _initialValues() async {
-    if (widget.initialProject != null && widget.initialProject != "inbox") {
-      final project = Provider.of<LocalDbState>(context, listen: false)
-          .projects
-          .where((f) => f.id == widget.initialProject)
-          .firstOrNull;
-      setState(() {
-        this.project = project;
-      });
-    }
-  }
-
   void _onSave() async {
-    if (dueDate != null) {
-      dueDate = DateTime(dueDate!.year, dueDate!.month, dueDate!.day, 0, 0, 0);
-    }
     try {
+      if (_formKey.currentState?.saveAndValidate() == false) {
+        return;
+      }
+      final todo = _formKey.currentState!.value;
       await Provider.of<DbManager>(context, listen: false)
           .database
           .managers
           .todo
           .create(
             (o) => o(
-              title: titleInputController.text,
-              dueDate: drift.Value(dueDate),
-              project: drift.Value(project?.id),
+              title: todo["title"] as String,
+              project: drift.Value(todo["project"] as String?),
+              dueDate: drift.Value(todo["dueDate"] as DateTime?),
               parent: drift.Value(widget.parentTodo),
             ),
           );
+      _formKey.currentState!.reset();
       if (mounted) {
-        titleInputController.clear();
         await _unFocusKeyboard();
         if (mounted) {
           widget.onBackButton();
@@ -115,7 +104,8 @@ class _TodoInputBarState extends State<TodoInputBar>
     if (_isPreventClose) {
       return;
     }
-    if (titleInputController.text.isNotEmpty) {
+    final title = _formKey.currentState?.instantValue['title'] as String?;
+    if (title != null && title != "") {
       setState(() {
         _isPreventClose = true;
       });
@@ -153,25 +143,12 @@ class _TodoInputBarState extends State<TodoInputBar>
     }
   }
 
-  void _showDatePicker() {
-    setState(() {
-      _isPreventClose = true;
-    });
-    todoSelectDate(context).then((date) {
-      setState(() {
-        if (date != null) {
-          dueDate = date;
-        }
-        _isPreventClose = false;
-        _focusKeyboard();
-      });
-    });
-  }
-
-  Widget _buildInput() => TextFormField(
-        controller: titleInputController,
+  Widget _buildInput() => FormBuilderTextField(
+        name: "title",
         focusNode: _titleFocusNode,
+        initialValue: "",
         autofocus: true,
+        validator: FormBuilderValidators.required(),
         decoration: InputDecoration(
           labelText: 'Add a task',
           contentPadding: const EdgeInsets.only(left: 10, bottom: 10),
@@ -180,35 +157,45 @@ class _TodoInputBarState extends State<TodoInputBar>
               Icons.close,
             ),
             onPressed: () {
-              titleInputController.clear();
+              _formKey.currentState!.fields['title']?.didChange(null);
               _unFocusKeyboard();
             },
           ),
         ),
-        onFieldSubmitted: (title) {
-          _onSave();
-        },
       );
 
   Widget _buildButtons() => Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.calendar_today,
-              color: dueDate == null ? null : Colors.redAccent,
-            ),
-            onPressed: _showDatePicker,
-          ),
-          ProjectDropdown(
-            enabled: widget.allowProjectSelection,
-            selectedProject: project,
-            onSelected: (selectedProject) {
-              setState(() {
-                project = selectedProject;
-              });
+          FormBuilderField<DateTime?>(
+            name: "dueDate",
+            initialValue: null,
+            builder: (FormFieldState<DateTime?> field) {
+              return IconButton(
+                icon: Icon(Icons.calendar_today),
+                color: field.value == null ? null : Colors.redAccent,
+                onPressed: () {
+                  setState(() {
+                    _isPreventClose = true;
+                  });
+                  todoSelectDate(context).then((date) {
+                    setState(() {
+                      if (date != null) {
+                        field.didChange(date);
+                      }
+                      _isPreventClose = false;
+                      _focusKeyboard();
+                    });
+                  });
+                },
+              );
             },
+          ),
+          FormBuilderProjectSelector(
+            name: "project",
+            initialValue: widget.initialProject,
+            expanded: false,
             onOpening: () {
               setState(() {
                 _isPreventClose = true;
@@ -229,7 +216,8 @@ class _TodoInputBarState extends State<TodoInputBar>
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
-      child: Form(
+      child: FormBuilder(
+        key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
