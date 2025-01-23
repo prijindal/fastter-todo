@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../helpers/constants.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
 import '../models/db_manager.dart';
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.sizeOf(context).width;
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<DbManager>(
@@ -24,7 +26,9 @@ class MyApp extends StatelessWidget {
           create: (context) => SettingsStorageNotifier(),
         ),
         ChangeNotifierProvider<LocalStateNotifier>(
-          create: (_) => LocalStateNotifier(),
+          create: (_) => LocalStateNotifier(
+            todosView: width >= breakpoint ? TodosView.grid : TodosView.list,
+          ),
         ),
       ],
       child: MyMaterialAppWrapper(),

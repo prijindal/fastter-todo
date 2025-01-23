@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../helpers/constants.dart';
+
 class AdaptiveScaffold extends StatelessWidget {
   const AdaptiveScaffold({
     super.key,
@@ -63,7 +65,7 @@ class AdaptiveScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.sizeOf(context).width;
-    if (width >= 1280 && drawer != null) {
+    if (width >= breakpoint && drawer != null) {
       return _buildWithSideDrawer();
     }
     return Scaffold(
@@ -71,7 +73,7 @@ class AdaptiveScaffold extends StatelessWidget {
       drawer: drawer,
       body: Center(
         child: SizedBox(
-          width: min(width, 1280),
+          width: min(width, breakpoint.toDouble()),
           child: body,
         ),
       ),

@@ -14,6 +14,15 @@ class LocalStateNotifier with ChangeNotifier {
 
   TodosView _todosView = TodosView.list;
 
+  LocalStateNotifier({
+    List<String>? selectedTodoIds,
+    TodosSortingAlgorithm? todosSortingAlgorithm,
+    TodosView? todosView,
+  })  : _selectedTodoIds = selectedTodoIds ?? [],
+        _todosSortingAlgorithm =
+            todosSortingAlgorithm ?? TodosSortingAlgorithm.base(),
+        _todosView = todosView ?? TodosView.list;
+
   // Getters
   List<String> get selectedTodoIds => List.unmodifiable(_selectedTodoIds);
 

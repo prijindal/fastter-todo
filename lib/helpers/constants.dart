@@ -8,3 +8,5 @@ const dbName = "fastter_todo";
 const dbExportJsonName = "fastter_todo.db.json";
 const dbExportArchiveName = "fastter_todo.db.zip";
 const dbLastUpdatedName = "fastter_todo.last_updated_date.txt";
+
+int breakpoint = 1280;
