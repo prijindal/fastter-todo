@@ -144,7 +144,7 @@ class _TodoItem extends StatelessWidget {
             if (newValue == false) {
               // Find the first pendingStatus of the project
               final statuses = Provider.of<LocalDbState>(context, listen: false)
-                  .getProjectStatuses(todo.project);
+                  .getProjectStatuses(todo.project, true);
               newStatus = statuses[0];
             }
             await Provider.of<DbManager>(context, listen: false)

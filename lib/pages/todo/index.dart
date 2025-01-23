@@ -112,7 +112,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
 
   @override
   Widget build(BuildContext context) {
-    final pendingStatus = Provider.of<LocalDbState>(context)
+    final possibleStatuses = Provider.of<LocalDbState>(context)
         .getProjectStatuses(widget.todo.project);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -120,6 +120,12 @@ class _TodoEditBodyState extends State<TodoEditBody> {
         key: _formKey,
         child: Column(
           children: <Widget>[
+            FormBuilderTextField(
+              name: "title",
+              initialValue: widget.todo.title,
+              onChanged: _markEdited,
+              validator: FormBuilderValidators.required(),
+            ),
             FormBuilderDropdown<String>(
               name: "status",
               initialValue: widget.todo.status,
@@ -127,18 +133,12 @@ class _TodoEditBodyState extends State<TodoEditBody> {
                 labelText: 'Status',
               ),
               onChanged: _markEdited,
-              items: pendingStatus
+              items: possibleStatuses
                   .map((a) => DropdownMenuItem<String>(
                         value: a,
                         child: Text(a),
                       ))
                   .toList(),
-            ),
-            FormBuilderTextField(
-              name: "title",
-              initialValue: widget.todo.title,
-              onChanged: _markEdited,
-              validator: FormBuilderValidators.required(),
             ),
             const SizedBox(height: 10),
             FormBuilderProjectSelector(

@@ -1,8 +1,10 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:drift/drift.dart' as drift;
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/core.dart';
 import '../../models/db_manager.dart';
 import 'form.dart';
 
@@ -12,7 +14,12 @@ class NewProjectScreen extends StatelessWidget {
     super.key,
   });
 
-  void _onSave(BuildContext context, {String? title, Color? color}) async {
+  void _onSave(
+    BuildContext context, {
+    String? title,
+    Color? color,
+    List<String>? pendingStatus,
+  }) async {
     if (title == null || color == null) {
       return;
     }
@@ -24,6 +31,7 @@ class NewProjectScreen extends StatelessWidget {
           (o) => o(
             color: color.hex,
             title: title,
+            pendingStatus: drift.Value(pendingStatus ?? [inboxPendingStatus]),
           ),
         );
     // ignore: use_build_context_synchronously
@@ -36,10 +44,11 @@ class NewProjectScreen extends StatelessWidget {
           title: const Text('Add new project'),
         ),
         body: ProjectForm(
-          onSave: ({title, color, parent}) => _onSave(
+          onSave: ({title, color, pendingStatus}) => _onSave(
             context,
             title: title,
             color: color,
+            pendingStatus: pendingStatus,
           ),
         ),
       );

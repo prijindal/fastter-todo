@@ -10,6 +10,7 @@ import '../tagselector.dart';
 import 'change_date_button.dart';
 import 'change_priority_button.dart';
 import 'change_project_button.dart';
+import 'change_status_button..dart';
 import 'comment_button.dart';
 import 'delete_selected_todos_button.dart';
 import 'edit_button.dart';
@@ -114,6 +115,9 @@ class TodoEditBarCollapsed extends StatelessWidget {
         ChangePriorityButton(
           selectedTodos: selectedTodos,
         ),
+        ChangeStatusButton(
+          selectedTodos: selectedTodos,
+        ),
         ReminderButton(
           todo: selectedTodos.first,
         ),
@@ -151,6 +155,9 @@ class TodoEditBarCollapsed extends StatelessWidget {
                 ),
       ),
       ChangePriorityButton(
+        selectedTodos: selectedTodos,
+      ),
+      ChangeStatusButton(
         selectedTodos: selectedTodos,
       ),
       DeleteSelectedTodosButton()

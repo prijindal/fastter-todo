@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../helpers/logger.dart';
 import '../../models/db_manager.dart';
+import '../../models/local_db_state.dart';
 import 'projectdropdown.dart';
 import 'todo_select_date.dart';
 
@@ -33,13 +34,9 @@ class TodoInputBar extends StatefulWidget {
 class _TodoInputBarState extends State<TodoInputBar>
     with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormBuilderState>();
-  // final TextEditingController titleInputController =
-  //     TextEditingController(text: '');
   final FocusNode _titleFocusNode = FocusNode();
-  // DateTime? dueDate;
   bool _isPreventClose = false;
   StreamSubscription<bool>? subscribingId;
-  // ProjectData? project;
 
   @override
   void initState() {
@@ -68,6 +65,10 @@ class _TodoInputBarState extends State<TodoInputBar>
         return;
       }
       final todo = _formKey.currentState!.value;
+      final project = todo["project"] as String?;
+      final status = Provider.of<LocalDbState>(context, listen: false)
+          .getProjectStatuses(project)
+          .first;
       await Provider.of<DbManager>(context, listen: false)
           .database
           .managers
@@ -75,9 +76,10 @@ class _TodoInputBarState extends State<TodoInputBar>
           .create(
             (o) => o(
               title: todo["title"] as String,
-              project: drift.Value(todo["project"] as String?),
+              project: drift.Value(project),
               dueDate: drift.Value(todo["dueDate"] as DateTime?),
               parent: drift.Value(widget.parentTodo),
+              status: drift.Value(status),
             ),
           );
       _formKey.currentState!.reset();

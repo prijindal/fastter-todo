@@ -151,12 +151,18 @@ class LocalDbState extends ChangeNotifier {
   }
 
   // Get all possible statuses of a project id
-  List<String> getProjectStatuses(String? id) {
+  List<String> getProjectStatuses(String? id, [bool onlyPending = false]) {
+    var status = <String>[];
     if (id == null) {
-      return [inboxPendingStatus, completedStatus];
+      status = [inboxPendingStatus, completedStatus];
+    } else {
+      final project = projects.firstWhere((element) => element.id == id);
+      status = project.pendingStatus;
     }
-    final project = projects.firstWhere((element) => element.id == id);
-    return [...project.pendingStatus, completedStatus];
+    if (!onlyPending) {
+      status.add(completedStatus);
+    }
+    return status;
   }
 
   List<String> getTodosTags(List<String> todoId) {
