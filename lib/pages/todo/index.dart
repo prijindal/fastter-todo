@@ -128,7 +128,9 @@ class _TodoEditBodyState extends State<TodoEditBody> {
             ),
             FormBuilderDropdown<String>(
               name: "status",
-              initialValue: widget.todo.status,
+              initialValue: possibleStatuses.contains(widget.todo.status)
+                  ? widget.todo.status
+                  : possibleStatuses.first,
               decoration: InputDecoration(
                 labelText: 'Status',
               ),
