@@ -7,7 +7,7 @@ import '../../helpers/todos_filters.dart';
 import '../../helpers/todos_sorting_algoritm.dart';
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
-import 'todo_item.dart';
+import 'todolistview.dart';
 
 class TodoGrid extends StatelessWidget {
   const TodoGrid({super.key, required this.filters});
@@ -94,32 +94,15 @@ class _TodosGrid extends StatelessWidget {
   }
 
   Widget _buildList(List<TodoData> filteredTodos, String pipeline) {
-    if (filteredTodos.isEmpty) {
-      return Column(
-        children: [
-          _buildPipelineChip(filteredTodos, pipeline),
-          Center(
-            child: Text("No entries"),
-          )
-        ],
-      );
-    }
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      padding: EdgeInsets.only(bottom: 60.0),
-      itemCount: filteredTodos.length + 1,
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return _buildPipelineChip(filteredTodos, pipeline);
-        }
-        final todo = filteredTodos[index - 1];
-        return TodoItem(
-          dismissible: false,
-          key: Key("TodoItem${todo.id}"),
-          todo: todo,
-        );
-      },
+    return ListView(
+      shrinkWrap: false,
+      children: [
+        _buildPipelineChip(filteredTodos, pipeline),
+        TodosListView(
+          todos: filteredTodos,
+          shrinkWrap: true,
+        ),
+      ],
     );
   }
 }
