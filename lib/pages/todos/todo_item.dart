@@ -134,7 +134,7 @@ class _TodoItem extends StatelessWidget {
       isThreeLine: tags.isNotEmpty,
       title: Wrap(
         alignment: WrapAlignment.spaceBetween,
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Text(
             todo.title,
@@ -360,17 +360,14 @@ class SubtitleProject extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Flexible(
-      flex: 1,
-      child: todo.project == null
-          ? _buildContainer(null)
-          : Selector<LocalDbState, ProjectData?>(
-              selector: (_, state) =>
-                  state.projects.where((f) => f.id == todo.project).firstOrNull,
-              builder: (context, project, _) {
-                return _buildContainer(project);
-              },
-            ),
-    );
+    return todo.project == null
+        ? _buildContainer(null)
+        : Selector<LocalDbState, ProjectData?>(
+            selector: (_, state) =>
+                state.projects.where((f) => f.id == todo.project).firstOrNull,
+            builder: (context, project, _) {
+              return _buildContainer(project);
+            },
+          );
   }
 }
