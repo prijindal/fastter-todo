@@ -40,6 +40,7 @@ class ChangeProjectButton extends StatelessWidget {
       builder: (context, project, _) => ProjectDropdown(
         onSelected: (p) => _onChangeProject(p, context),
         selectedProject: project,
+        enabled: true,
       ),
     );
   }

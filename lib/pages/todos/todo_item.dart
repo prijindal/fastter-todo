@@ -132,8 +132,9 @@ class _TodoItem extends StatelessWidget {
         },
       ),
       isThreeLine: tags.isNotEmpty,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      title: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             todo.title,
@@ -341,7 +342,7 @@ class SubtitleProject extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8),
+          margin: const EdgeInsets.only(right: 8),
           constraints: const BoxConstraints(maxWidth: 200, maxHeight: 40),
           child: Text.rich(
             TextSpan(text: project?.title ?? "Inbox"),
