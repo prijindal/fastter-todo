@@ -36,6 +36,7 @@ class FormBuilderProjectSelector extends StatelessWidget {
               .where((a) => a.id == field.value)
               .firstOrNull,
       expanded: expanded,
+      onOpening: onOpening,
       onSelected: (newEntry) {
         field.didChange(newEntry?.id);
         onChanged?.call(newEntry?.id);

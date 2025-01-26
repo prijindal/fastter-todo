@@ -243,6 +243,12 @@ class _TodoInputBarState extends State<TodoInputBar>
                 _isPreventClose = true;
               });
             },
+            onChanged: (_) {
+              setState(() {
+                _isPreventClose = false;
+                _focusKeyboard();
+              });
+            },
           ),
           _buildPipelineButton(),
           Flexible(
