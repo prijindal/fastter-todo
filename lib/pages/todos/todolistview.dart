@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
+import '../../models/local_db_state.dart';
 import 'todo_item.dart';
 
 class TodosListView extends StatefulWidget {
@@ -8,10 +10,16 @@ class TodosListView extends StatefulWidget {
     super.key,
     required this.todos,
     this.shrinkWrap = false,
+    this.dismissible = true,
+    required this.todoItemTapBehaviour,
+    this.showChildren = false,
   });
 
   final List<TodoData> todos;
   final bool shrinkWrap;
+  final bool dismissible;
+  final TodoItemTapBehaviour todoItemTapBehaviour;
+  final bool showChildren;
 
   @override
   State<TodosListView> createState() => _TodosListViewState();
@@ -70,9 +78,50 @@ class _TodosListViewState extends State<TodosListView> {
           index = index - 1;
         }
         final todo = widget.todos[index];
+        if (widget.showChildren) {
+          final children = Provider.of<LocalDbState>(context)
+              .todos
+              .where((a) => a.parent == todo.id)
+              .toList();
+          return Card(
+            elevation: 4,
+            child: Column(
+              children: [
+                TodoItem(
+                  key: Key("TodoItem${todo.id}"),
+                  todo: todo,
+                  dismissible: widget.dismissible,
+                  tapBehaviour: widget.todoItemTapBehaviour,
+                ),
+                if (children.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.only(
+                      left: 24.0,
+                      bottom: 8.0,
+                    ),
+                    child: Column(
+                      children: children
+                          .map(
+                            (a) => TodoItem(
+                              todo: a,
+                              dense: true,
+                              tapBehaviour: TodoItemTapBehaviour.nothing,
+                              dismissible: false,
+                              elements: [],
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  )
+              ],
+            ),
+          );
+        }
         return TodoItem(
           key: Key("TodoItem${todo.id}"),
           todo: todo,
+          dismissible: widget.dismissible,
+          tapBehaviour: widget.todoItemTapBehaviour,
         );
       },
     );

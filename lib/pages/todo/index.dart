@@ -315,8 +315,9 @@ class _TodoEditBodyState extends State<TodoEditBody> {
                       .map((todo) => TodoItem(
                             todo: todo,
                             dense: true,
-                            allowSelection: false,
+                            tapBehaviour: TodoItemTapBehaviour.nothing,
                             dismissible: false,
+                            elements: [],
                           ))
                       .toList(),
                 );

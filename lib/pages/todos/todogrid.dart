@@ -7,6 +7,7 @@ import '../../helpers/todos_filters.dart';
 import '../../helpers/todos_sorting_algoritm.dart';
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
+import 'todo_item.dart';
 import 'todolistview.dart';
 
 class TodoGrid extends StatelessWidget {
@@ -99,8 +100,11 @@ class _TodosGrid extends StatelessWidget {
       children: [
         _buildPipelineChip(filteredTodos, pipeline),
         TodosListView(
+          dismissible: false,
           todos: filteredTodos,
           shrinkWrap: true,
+          todoItemTapBehaviour: TodoItemTapBehaviour.openTodo,
+          showChildren: true,
         ),
       ],
     );

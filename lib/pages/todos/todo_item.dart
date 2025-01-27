@@ -14,49 +14,75 @@ import 'tagslist.dart';
 import 'todo_select_date.dart';
 import 'todoitemtoggle.dart';
 
+enum TodoItemElements {
+  pipeline,
+  project,
+  dueDate,
+  comments,
+  reminders,
+  children,
+  tags
+}
+
+enum TodoItemTapBehaviour {
+  openTodo,
+  toggleSelection,
+  nothing;
+}
+
 class TodoItem extends StatelessWidget {
   const TodoItem({
     super.key,
     required this.todo,
-    this.allowSelection = true,
+    this.tapBehaviour = TodoItemTapBehaviour.toggleSelection,
     this.dense = false,
     this.dismissible = true,
+    this.elements = const [
+      TodoItemElements.pipeline,
+      TodoItemElements.project,
+      TodoItemElements.dueDate,
+      TodoItemElements.comments,
+      TodoItemElements.reminders,
+      TodoItemElements.children,
+      TodoItemElements.tags
+    ],
   });
 
   final TodoData todo;
-  final bool allowSelection;
   final bool dense;
   final bool dismissible;
+  final TodoItemTapBehaviour tapBehaviour;
+  final List<TodoItemElements> elements;
 
   @override
   Widget build(BuildContext context) {
-    if (!allowSelection) {
-      return _TodoItem(
-        todo: todo,
-        selected: false,
-        dense: true,
-        dismissible: dismissible,
-        onTap: () => TodoScreen.open(context, todo),
+    if (tapBehaviour == TodoItemTapBehaviour.toggleSelection) {
+      return Selector<LocalStateNotifier, bool>(
+        selector: (context, localState) =>
+            localState.selectedTodoIds.contains(todo.id),
+        builder: (context, selected, _) => _TodoItem(
+          todo: todo,
+          selected: selected,
+          dismissible: dismissible,
+          dense: dense,
+          elements: elements,
+          onTap: () {
+            final localStateNotifier =
+                Provider.of<LocalStateNotifier>(context, listen: false);
+            localStateNotifier.toggleSelectedId(todo.id);
+          },
+        ),
       );
     }
-    return Selector<LocalStateNotifier, bool>(
-      selector: (context, localState) =>
-          localState.selectedTodoIds.contains(todo.id),
-      builder: (context, selected, _) => _TodoItem(
-        todo: todo,
-        selected: selected,
-        dismissible: dismissible,
-        dense: dense,
-        onTap: () {
-          final localStateNotifier =
-              Provider.of<LocalStateNotifier>(context, listen: false);
-          if (localStateNotifier.todosView == TodosView.grid) {
-            TodoScreen.open(context, todo);
-          } else {
-            localStateNotifier.toggleSelectedId(todo.id);
-          }
-        },
-      ),
+    return _TodoItem(
+      todo: todo,
+      selected: false,
+      dense: dense,
+      dismissible: dismissible,
+      elements: elements,
+      onTap: tapBehaviour == TodoItemTapBehaviour.nothing
+          ? null
+          : () => TodoScreen.open(context, todo),
     );
   }
 }
@@ -68,12 +94,14 @@ class _TodoItem extends StatelessWidget {
     this.dense = false,
     this.dismissible = true,
     this.onTap,
+    required this.elements,
   });
 
   final TodoData todo;
   final bool selected;
   final bool dense;
   final bool dismissible;
+  final List<TodoItemElements> elements;
   final void Function()? onTap;
 
   void _selectDate(BuildContext context) {
@@ -115,13 +143,33 @@ class _TodoItem extends StatelessWidget {
               .update((o) => o(completed: drift.Value(newValue)));
         },
       ),
-      isThreeLine: true,
+      isThreeLine: elements.isNotEmpty,
       title: Text(
         todo.title,
       ),
-      subtitle: TodoItemSubtitle(
-        todo: todo,
-      ),
+      subtitle: elements.isEmpty
+          ? null
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _TodoItemFirstRow(
+                  todo: todo,
+                  project: elements.contains(TodoItemElements.project),
+                  pipeline: elements.contains(TodoItemElements.project),
+                ),
+                _TodoItemSecondRow(
+                  todo: todo,
+                  showDueDate: elements.contains(TodoItemElements.dueDate),
+                  showReminders: elements.contains(TodoItemElements.reminders),
+                  showComments: elements.contains(TodoItemElements.comments),
+                  showChildren: elements.contains(TodoItemElements.children),
+                ),
+                if (elements.contains(TodoItemElements.tags))
+                  _TodoItemThirdRow(
+                    todo: todo,
+                  ),
+              ],
+            ),
     );
   }
 
@@ -178,17 +226,56 @@ class _TodoItem extends StatelessWidget {
   }
 }
 
-class TodoItemSubtitle extends StatelessWidget {
-  const TodoItemSubtitle({super.key, required this.todo});
+// First row displays pipeline and project
+class _TodoItemFirstRow extends StatelessWidget {
+  const _TodoItemFirstRow({
+    required this.todo,
+    required this.pipeline,
+    required this.project,
+  });
 
   final TodoData todo;
+  final bool pipeline;
+  final bool project;
+
+  @override
+  Widget build(BuildContext context) {
+    if (![pipeline, project].contains(true)) {
+      return Container();
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (pipeline) Text(todo.pipeline),
+        if (project) _SubtitleProject(todo: todo),
+      ],
+    );
+  }
+}
+
+// Second row displays due date, reminders, comments, and child todos
+class _TodoItemSecondRow extends StatelessWidget {
+  const _TodoItemSecondRow({
+    required this.todo,
+    required this.showDueDate,
+    required this.showReminders,
+    required this.showComments,
+    required this.showChildren,
+  });
+
+  final TodoData todo;
+  final bool showDueDate;
+  final bool showReminders;
+  final bool showComments;
+  final bool showChildren;
 
   Widget _buildSecondRow(
       BuildContext context, int comments, int reminders, int childTodos) {
     var children = <Widget>[];
     final iconSize =
         (ListTileTheme.of(context).subtitleTextStyle?.fontSize ?? 12) + 2;
-    if (todo.dueDate != null) {
+    if (todo.dueDate != null && showDueDate) {
       children.add(
         Container(
           margin: const EdgeInsets.only(left: 4),
@@ -200,7 +287,7 @@ class TodoItemSubtitle extends StatelessWidget {
         ),
       );
     }
-    if (reminders > 0) {
+    if (reminders > 0 && showReminders) {
       children.add(
         Container(
           margin: const EdgeInsets.only(left: 4),
@@ -216,7 +303,7 @@ class TodoItemSubtitle extends StatelessWidget {
         ),
       );
     }
-    if (comments > 0) {
+    if (comments > 0 && showComments) {
       children.add(
         Container(
           margin: const EdgeInsets.only(left: 4),
@@ -232,7 +319,7 @@ class TodoItemSubtitle extends StatelessWidget {
         ),
       );
     }
-    if (childTodos > 0) {
+    if (childTodos > 0 && showChildren) {
       children.add(
         Container(
           margin: const EdgeInsets.only(left: 4),
@@ -258,22 +345,10 @@ class TodoItemSubtitle extends StatelessWidget {
     );
   }
 
-  Widget _buildFirstRow(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(todo.pipeline),
-        SubtitleProject(todo: todo),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final firstRow = _buildFirstRow(context);
-    final secondRow =
-        Selector<LocalDbState, ({int reminders, int comments, int childTodos})>(
+    return Selector<LocalDbState,
+        ({int reminders, int comments, int childTodos})>(
       selector: (_, state) => (
         reminders: state.getTodoReminders(todo.id, true).length,
         comments: state.comments.where((f) => f.todo == todo.id).length,
@@ -288,30 +363,41 @@ class TodoItemSubtitle extends StatelessWidget {
         counts.childTodos,
       ),
     );
-    final tags = Provider.of<LocalDbState>(context).getTodoTag(todo.id);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        firstRow,
-        secondRow,
-        if (tags.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(top: 4),
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width - 100,
-            ),
-            child: TagsList(
-              tags: tags,
-            ),
-          )
-      ],
+  }
+}
+
+// Third row displays tags
+class _TodoItemThirdRow extends StatelessWidget {
+  const _TodoItemThirdRow({
+    required this.todo,
+  });
+
+  final TodoData todo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<LocalDbState, List<String>>(
+      selector: (context, state) => state.getTodoTag(todo.id),
+      builder: (context, tags, _) {
+        if (tags.isEmpty) {
+          return Container();
+        }
+        return Container(
+          margin: const EdgeInsets.only(top: 4),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width - 100,
+          ),
+          child: TagsList(
+            tags: tags,
+          ),
+        );
+      },
     );
   }
 }
 
-class SubtitleProject extends StatelessWidget {
-  const SubtitleProject({
-    super.key,
+class _SubtitleProject extends StatelessWidget {
+  const _SubtitleProject({
     required this.todo,
   });
 

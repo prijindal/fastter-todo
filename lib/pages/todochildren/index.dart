@@ -67,7 +67,10 @@ class _TodoSubTaskListState extends State<_TodoSubTaskList> {
       children: [
         TodoItem(
           todo: widget.todo,
-          allowSelection: false,
+          dense: true,
+          tapBehaviour: TodoItemTapBehaviour.nothing,
+          dismissible: false,
+          elements: [],
         ),
         Container(
           margin: const EdgeInsets.only(left: 24),

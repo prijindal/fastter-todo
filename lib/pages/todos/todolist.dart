@@ -5,6 +5,7 @@ import '../../helpers/todos_filters.dart';
 import '../../helpers/todos_sorting_algoritm.dart';
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
+import 'todo_item.dart';
 import 'todolistview.dart';
 
 class TodoList extends StatelessWidget {
@@ -28,6 +29,7 @@ class TodoList extends StatelessWidget {
           ? Center(child: Text("Loading"))
           : TodosListView(
               todos: state.todos,
+              todoItemTapBehaviour: TodoItemTapBehaviour.toggleSelection,
             ),
     );
   }
