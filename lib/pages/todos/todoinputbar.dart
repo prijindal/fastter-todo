@@ -155,7 +155,11 @@ class _TodoInputBarState extends State<TodoInputBar>
         focusNode: _titleFocusNode,
         initialValue: "",
         autofocus: true,
-        validator: FormBuilderValidators.required(),
+        validator: FormBuilderValidators.compose([
+          FormBuilderValidators.required(),
+          FormBuilderValidators.minLength(3),
+          FormBuilderValidators.maxLength(50),
+        ]),
         decoration: InputDecoration(
           labelText: 'Add a task',
           contentPadding: const EdgeInsets.only(left: 10, bottom: 10),

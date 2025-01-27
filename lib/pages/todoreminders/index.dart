@@ -9,6 +9,35 @@ import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import '../todos/todo_select_date.dart';
 
+Future<void> newReminder(BuildContext context, String todoId) async {
+  final now = DateTime.now();
+  final dateResponse = await todoSelectDate(context, now, false, now);
+  if (dateResponse != null && context.mounted) {
+    final date = dateResponse;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(minute: now.minute, hour: now.hour),
+    );
+    if (time != null) {
+      final newTime =
+          DateTime(date.year, date.month, date.day, time.hour, time.minute);
+      // ignore: use_build_context_synchronously
+      await Provider.of<DbManager>(context, listen: false)
+          .database
+          .managers
+          .reminder
+          .create((o) => o(
+                time: newTime.toUtc(),
+                title: "New Reminder",
+                todo: todoId,
+                completed: drift.Value(false),
+              ));
+      // ignore: use_build_context_synchronously
+      await Provider.of<LocalDbState>(context, listen: false).refresh();
+    }
+  }
+}
+
 @RoutePage()
 class TodoRemindersScreen extends StatelessWidget {
   const TodoRemindersScreen({
@@ -39,35 +68,6 @@ class _TodoRemindersScreen extends StatefulWidget {
 
 class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
   List<String> _selectedReminders = [];
-
-  Future<void> _newReminder(BuildContext context) async {
-    final now = DateTime.now();
-    final dateResponse = await todoSelectDate(context, now, false, now);
-    if (dateResponse != null && context.mounted) {
-      final date = dateResponse;
-      final time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay(minute: now.minute, hour: now.hour),
-      );
-      if (time != null) {
-        final newTime =
-            DateTime(date.year, date.month, date.day, time.hour, time.minute);
-        // ignore: use_build_context_synchronously
-        await Provider.of<DbManager>(context, listen: false)
-            .database
-            .managers
-            .reminder
-            .create((o) => o(
-                  time: newTime.toUtc(),
-                  title: "New Reminder",
-                  todo: widget.todo.id,
-                  completed: drift.Value(false),
-                ));
-        // ignore: use_build_context_synchronously
-        await Provider.of<LocalDbState>(context, listen: false).refresh();
-      }
-    }
-  }
 
   void _toggleSelected(ReminderData todoReminder) {
     setState(() {
@@ -124,9 +124,6 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
     }
   }
 
-  String _formattedTime(ReminderData todoReminder) =>
-      DateFormat('EEE dd MMM y, hh:mm a').format(todoReminder.time.toLocal());
-
   void _onClear() {
     setState(() {
       _selectedReminders = [];
@@ -158,7 +155,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
         ),
         body: _buildBody(),
         floatingActionButton: FloatingActionButton(
-          onPressed: () => _newReminder(context),
+          onPressed: () => newReminder(context, widget.todo.id),
           child: const Icon(Icons.add),
         ),
       ),
@@ -182,11 +179,8 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
               child: Column(
                 children: widget.reminders.reversed
                     .map(
-                      (todoReminder) => ListTile(
-                        enabled:
-                            todoReminder.time.compareTo(DateTime.now()) > 0,
-                        title: Text(todoReminder.title),
-                        subtitle: Text(_formattedTime(todoReminder)),
+                      (todoReminder) => TodoReminderTile(
+                        reminder: todoReminder,
                         onLongPress: () => _toggleSelected(todoReminder),
                         onTap: _selectedReminders.isEmpty
                             ? () {}
@@ -199,6 +193,39 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
             ),
           ),
       ],
+    );
+  }
+}
+
+class TodoReminderTile extends StatelessWidget {
+  const TodoReminderTile({
+    super.key,
+    this.onTap,
+    this.onLongPress,
+    this.selected = false,
+    this.dense = false,
+    required this.reminder,
+  });
+
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final bool selected;
+  final bool dense;
+  final ReminderData reminder;
+
+  String _formattedTime(ReminderData todoReminder) =>
+      DateFormat('EEE dd MMM y, hh:mm a').format(todoReminder.time.toLocal());
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: dense,
+      enabled: reminder.time.compareTo(DateTime.now()) > 0,
+      title: Text(reminder.title),
+      subtitle: Text(_formattedTime(reminder)),
+      onLongPress: onLongPress,
+      onTap: onTap,
+      selected: selected,
     );
   }
 }

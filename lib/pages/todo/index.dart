@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
@@ -5,12 +7,16 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
+import '../../helpers/breakpoints.dart';
 import '../../models/core.dart';
 import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
+import '../todocomments/todo_comment_item.dart';
+import '../todoreminders/index.dart';
 import '../todos/priority_dialog.dart';
 import '../todos/projectdropdown.dart';
 import '../todos/tagselector.dart';
+import '../todos/todo_item.dart';
 
 @RoutePage()
 class TodoScreen extends StatelessWidget {
@@ -20,6 +26,26 @@ class TodoScreen extends StatelessWidget {
   });
 
   final String todoId;
+
+  static Future<void> open(BuildContext context, TodoData todo) async {
+    if (isDesktop) {
+      final mediaQuery = MediaQuery.sizeOf(context);
+      showDialog<void>(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: SizedBox(
+              width: min(600, mediaQuery.width),
+              height: min(800, mediaQuery.height),
+              child: TodosScreenScaffold(todo: todo),
+            ),
+          );
+        },
+      );
+    } else {
+      await AutoRouter.of(context).pushNamed("/todo/${todo.id}");
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Selector<LocalDbState, TodoData>(
@@ -126,7 +152,11 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               name: "title",
               initialValue: widget.todo.title,
               onChanged: _markEdited,
-              validator: FormBuilderValidators.required(),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(),
+                FormBuilderValidators.minLength(3),
+                FormBuilderValidators.maxLength(50),
+              ]),
             ),
             FormBuilderCheckbox(
               name: "completed",
@@ -220,38 +250,75 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               ),
             ),
             const SizedBox(height: 10),
-            Selector<LocalDbState, int>(
-              selector: (_, state) =>
-                  state.comments.where((a) => a.todo == widget.todo.id).length,
+            Selector<LocalDbState, List<CommentData>>(
+              selector: (_, state) => state.comments
+                  .where((a) => a.todo == widget.todo.id)
+                  .toList(),
               builder: (context, comments, _) {
-                return ListTile(
-                  title: Text("$comments Comments"),
-                  onTap: () => AutoRouter.of(context)
-                      .pushNamed("/todocomments/${widget.todo.id}"),
+                return ExpansionTile(
+                  leading: IconButton(
+                    onPressed: () => AutoRouter.of(context)
+                        .pushNamed("/todocomments/${widget.todo.id}"),
+                    icon: const Icon(Icons.list),
+                  ),
+                  initiallyExpanded: true,
+                  enabled: comments.isNotEmpty,
+                  title: Text("${comments.length} Comments"),
+                  children: comments
+                      .map((comment) => TodoCommentItem(
+                            todoComment: comment,
+                            dense: true,
+                            dismissible: false,
+                          ))
+                      .toList(),
                 );
               },
             ),
             const SizedBox(height: 10),
-            Selector<LocalDbState, int>(
+            Selector<LocalDbState, List<ReminderData>>(
               selector: (_, state) =>
-                  state.getTodoReminders(widget.todo.id, true).length,
+                  state.getTodoReminders(widget.todo.id, true),
               builder: (context, reminders, _) {
-                return ListTile(
-                  title: Text("$reminders Reminders"),
-                  onTap: () => AutoRouter.of(context)
-                      .pushNamed("/todoreminders/${widget.todo.id}"),
+                return ExpansionTile(
+                  leading: IconButton(
+                    onPressed: () => AutoRouter.of(context)
+                        .pushNamed("/todoreminders/${widget.todo.id}"),
+                    icon: const Icon(Icons.list),
+                  ),
+                  initiallyExpanded: true,
+                  enabled: reminders.isNotEmpty,
+                  title: Text("${reminders.length} Reminders"),
+                  children: reminders
+                      .map((reminder) => TodoReminderTile(
+                            reminder: reminder,
+                            dense: true,
+                          ))
+                      .toList(),
                 );
               },
             ),
             const SizedBox(height: 10),
-            Selector<LocalDbState, int>(
+            Selector<LocalDbState, List<TodoData>>(
               selector: (_, state) =>
-                  state.todos.where((a) => a.parent == widget.todo.id).length,
+                  state.todos.where((a) => a.parent == widget.todo.id).toList(),
               builder: (context, children, _) {
-                return ListTile(
-                  title: Text("$children Children"),
-                  onTap: () => AutoRouter.of(context)
-                      .pushNamed("/todochildren/${widget.todo.id}"),
+                return ExpansionTile(
+                  leading: IconButton(
+                    onPressed: () => AutoRouter.of(context)
+                        .pushNamed("/todochildren/${widget.todo.id}"),
+                    icon: const Icon(Icons.list),
+                  ),
+                  initiallyExpanded: true,
+                  enabled: children.isNotEmpty,
+                  title: Text("${children.length} Children"),
+                  children: children
+                      .map((todo) => TodoItem(
+                            todo: todo,
+                            dense: true,
+                            allowSelection: false,
+                            dismissible: false,
+                          ))
+                      .toList(),
                 );
               },
             ),

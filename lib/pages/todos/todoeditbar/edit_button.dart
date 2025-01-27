@@ -1,7 +1,7 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/core.dart';
+import '../../todo/index.dart';
 
 class EditButton extends StatelessWidget {
   const EditButton({super.key, required this.todo});
@@ -13,7 +13,7 @@ class EditButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.edit),
       onPressed: () {
-        AutoRouter.of(context).pushNamed("/todo/${todo.id}");
+        TodoScreen.open(context, todo);
       },
       tooltip: 'Edit Todo',
     );

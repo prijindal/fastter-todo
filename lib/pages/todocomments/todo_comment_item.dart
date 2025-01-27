@@ -9,15 +9,19 @@ class TodoCommentItem extends StatelessWidget {
   const TodoCommentItem({
     super.key,
     required this.todoComment,
-    required this.onLongPress,
-    required this.onTap,
-    required this.selected,
+    this.onLongPress,
+    this.onTap,
+    this.selected = false,
+    this.dense = false,
+    this.dismissible = true,
   });
 
   final CommentData todoComment;
-  final VoidCallback onLongPress;
-  final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onTap;
   final bool selected;
+  final bool dense;
+  final bool dismissible;
 
   @override
   Widget build(BuildContext context) => _TodoCommentItem(
@@ -33,6 +37,8 @@ class TodoCommentItem extends StatelessWidget {
         onLongPress: onLongPress,
         onTap: onTap,
         selected: selected,
+        dense: dense,
+        dismissible: dismissible,
       );
 }
 
@@ -43,13 +49,17 @@ class _TodoCommentItem extends StatelessWidget {
     required this.onLongPress,
     required this.onTap,
     required this.selected,
+    this.dense = false,
+    this.dismissible = true,
   });
 
   final CommentData todoComment;
   final Future<void> Function() deleteComment;
-  final VoidCallback onLongPress;
-  final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onTap;
   final bool selected;
+  final bool dense;
+  final bool dismissible;
 
   Future<bool?> _confirmDelete(BuildContext context) => showDialog<bool>(
         context: context,
@@ -95,43 +105,53 @@ class _TodoCommentItem extends StatelessWidget {
     await deleteComment();
   }
 
+  Widget _buildListTile(BuildContext context) {
+    return ListTile(
+      dense: dense,
+      onLongPress: onLongPress,
+      onTap: onTap,
+      selected: selected,
+      title: _buildContent(context),
+      subtitle: Text(dateFromNowFormatter(todoComment.creationTime)),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) => Dismissible(
-        key: Key(todoComment.id),
-        confirmDismiss: (direction) => _confirmDelete(context),
-        onDismissed: (direction) => _onDismissed(context, direction),
-        background: Flex(
-          direction: Axis.horizontal,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: const Icon(Icons.delete),
-            ),
-            Flexible(
-              child: Container(),
-            ),
-          ],
-        ),
-        secondaryBackground: Flex(
-          direction: Axis.horizontal,
-          children: [
-            Flexible(
-              child: Container(),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: const Icon(Icons.delete),
-            ),
-          ],
-        ),
-        child: Card(
-          child: ListTile(
-            onLongPress: onLongPress,
-            onTap: onTap,
-            selected: selected,
-            title: _buildContent(context),
-            subtitle: Text(dateFromNowFormatter(todoComment.creationTime)),
+  Widget build(BuildContext context) {
+    if (!dismissible) {
+      return _buildListTile(context);
+    }
+    return Dismissible(
+      key: Key(todoComment.id),
+      confirmDismiss: (direction) => _confirmDelete(context),
+      onDismissed: (direction) => _onDismissed(context, direction),
+      background: Flex(
+        direction: Axis.horizontal,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: const Icon(Icons.delete),
           ),
-        ),
-      );
+          Flexible(
+            child: Container(),
+          ),
+        ],
+      ),
+      secondaryBackground: Flex(
+        direction: Axis.horizontal,
+        children: [
+          Flexible(
+            child: Container(),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: const Icon(Icons.delete),
+          ),
+        ],
+      ),
+      child: Card(
+        child: _buildListTile(context),
+      ),
+    );
+  }
 }

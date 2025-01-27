@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -39,7 +36,7 @@ class TodoItem extends StatelessWidget {
         selected: false,
         dense: true,
         dismissible: dismissible,
-        onTap: () => AutoRouter.of(context).pushNamed("/todo/${todo.id}"),
+        onTap: () => TodoScreen.open(context, todo),
       );
     }
     return Selector<LocalStateNotifier, bool>(
@@ -54,19 +51,7 @@ class TodoItem extends StatelessWidget {
           final localStateNotifier =
               Provider.of<LocalStateNotifier>(context, listen: false);
           if (localStateNotifier.todosView == TodosView.grid) {
-            final mediaQuery = MediaQuery.sizeOf(context);
-            showDialog<void>(
-              context: context,
-              builder: (context) {
-                return Dialog(
-                  child: SizedBox(
-                    width: min(600, mediaQuery.width),
-                    height: min(800, mediaQuery.height),
-                    child: TodosScreenScaffold(todo: todo),
-                  ),
-                );
-              },
-            );
+            TodoScreen.open(context, todo);
           } else {
             localStateNotifier.toggleSelectedId(todo.id);
           }
@@ -115,7 +100,6 @@ class _TodoItem extends StatelessWidget {
   }
 
   Widget _buildListTile(BuildContext context) {
-    final tags = Provider.of<LocalDbState>(context).getTodoTag(todo.id);
     return ListTile(
       dense: dense,
       selected: selected,
@@ -131,18 +115,9 @@ class _TodoItem extends StatelessWidget {
               .update((o) => o(completed: drift.Value(newValue)));
         },
       ),
-      isThreeLine: tags.isNotEmpty,
-      title: Wrap(
-        alignment: WrapAlignment.spaceBetween,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          Text(
-            todo.title,
-          ),
-          SubtitleProject(
-            todo: todo,
-          ),
-        ],
+      isThreeLine: true,
+      title: Text(
+        todo.title,
       ),
       subtitle: TodoItemSubtitle(
         todo: todo,
@@ -208,10 +183,7 @@ class TodoItemSubtitle extends StatelessWidget {
 
   final TodoData todo;
 
-  Widget _buildDueDate(BuildContext context) => Text(dueDateFormatter(
-        todo.dueDate,
-      ));
-  Widget _buildSubtitleFirstRow(
+  Widget _buildSecondRow(
       BuildContext context, int comments, int reminders, int childTodos) {
     var children = <Widget>[];
     final iconSize =
@@ -220,7 +192,11 @@ class TodoItemSubtitle extends StatelessWidget {
       children.add(
         Container(
           margin: const EdgeInsets.only(left: 4),
-          child: _buildDueDate(context),
+          child: Text(
+            dueDateFormatter(
+              todo.dueDate,
+            ),
+          ),
         ),
       );
     }
@@ -272,30 +248,40 @@ class TodoItemSubtitle extends StatelessWidget {
         ),
       );
     }
+    if (children.isEmpty) {
+      return Container();
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: children,
+    );
+  }
+
+  Widget _buildFirstRow(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(todo.pipeline),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: children,
-        )
+        SubtitleProject(todo: todo),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final firstRow =
+    final firstRow = _buildFirstRow(context);
+    final secondRow =
         Selector<LocalDbState, ({int reminders, int comments, int childTodos})>(
       selector: (_, state) => (
         reminders: state.getTodoReminders(todo.id, true).length,
         comments: state.comments.where((f) => f.todo == todo.id).length,
-        childTodos: state.todos.where((a) => a.parent == todo.id).length,
+        childTodos: state.todos
+            .where((a) => a.parent == todo.id && a.completed == false)
+            .length,
       ),
-      builder: (context, counts, _) => _buildSubtitleFirstRow(
+      builder: (context, counts, _) => _buildSecondRow(
         context,
         counts.comments,
         counts.reminders,
@@ -303,15 +289,12 @@ class TodoItemSubtitle extends StatelessWidget {
       ),
     );
     final tags = Provider.of<LocalDbState>(context).getTodoTag(todo.id);
-    if (tags.isEmpty) {
-      return firstRow;
-    } else {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            child: firstRow,
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        firstRow,
+        secondRow,
+        if (tags.isNotEmpty)
           Container(
             margin: const EdgeInsets.only(top: 4),
             constraints: BoxConstraints(
@@ -321,9 +304,8 @@ class TodoItemSubtitle extends StatelessWidget {
               tags: tags,
             ),
           )
-        ],
-      );
-    }
+      ],
+    );
   }
 }
 
