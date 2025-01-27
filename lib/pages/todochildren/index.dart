@@ -68,7 +68,7 @@ class _TodoSubTaskListState extends State<_TodoSubTaskList> {
         TodoItem(
           todo: widget.todo,
           dense: true,
-          tapBehaviour: TodoItemTapBehaviour.nothing,
+          tapBehaviour: TodoItemTapBehaviour.openTodo,
           dismissible: false,
           elements: [],
         ),
@@ -104,6 +104,7 @@ class _TodoSubTaskListState extends State<_TodoSubTaskList> {
                   parentTodo: widget.todo.id,
                   initialProject: widget.todo.project,
                   allowProjectSelection: false,
+                  initialPipeline: widget.todo.pipeline,
                   onBackButton: () {
                     setState(() {
                       _adding = false;

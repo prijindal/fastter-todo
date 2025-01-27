@@ -17,6 +17,7 @@ import '../todos/priority_dialog.dart';
 import '../todos/projectdropdown.dart';
 import '../todos/tagselector.dart';
 import '../todos/todo_item.dart';
+import '../todos/todoinputbar.dart';
 
 @RoutePage()
 class TodoScreen extends StatelessWidget {
@@ -280,10 +281,19 @@ class _TodoEditBodyState extends State<TodoEditBody> {
                   state.getTodoReminders(widget.todo.id, true),
               builder: (context, reminders, _) {
                 return ExpansionTile(
-                  leading: IconButton(
-                    onPressed: () => AutoRouter.of(context)
-                        .pushNamed("/todoreminders/${widget.todo.id}"),
-                    icon: const Icon(Icons.list),
+                  leading: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () => AutoRouter.of(context)
+                            .pushNamed("/todoreminders/${widget.todo.id}"),
+                        icon: const Icon(Icons.list),
+                      ),
+                      IconButton(
+                        onPressed: () => newReminder(context, widget.todo.id),
+                        icon: const Icon(Icons.add),
+                      ),
+                    ],
                   ),
                   initiallyExpanded: true,
                   enabled: reminders.isNotEmpty,
@@ -298,31 +308,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               },
             ),
             const SizedBox(height: 10),
-            Selector<LocalDbState, List<TodoData>>(
-              selector: (_, state) =>
-                  state.todos.where((a) => a.parent == widget.todo.id).toList(),
-              builder: (context, children, _) {
-                return ExpansionTile(
-                  leading: IconButton(
-                    onPressed: () => AutoRouter.of(context)
-                        .pushNamed("/todochildren/${widget.todo.id}"),
-                    icon: const Icon(Icons.list),
-                  ),
-                  initiallyExpanded: true,
-                  enabled: children.isNotEmpty,
-                  title: Text("${children.length} Children"),
-                  children: children
-                      .map((todo) => TodoItem(
-                            todo: todo,
-                            dense: true,
-                            tapBehaviour: TodoItemTapBehaviour.nothing,
-                            dismissible: false,
-                            elements: [],
-                          ))
-                      .toList(),
-                );
-              },
-            ),
+            _ExpansionTodoChildren(todo: widget.todo),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _isEdited == false
@@ -335,6 +321,75 @@ class _TodoEditBodyState extends State<TodoEditBody> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ExpansionTodoChildren extends StatefulWidget {
+  const _ExpansionTodoChildren({
+    required this.todo,
+  });
+
+  final TodoData todo;
+
+  @override
+  State<_ExpansionTodoChildren> createState() => _ExpansionTodoChildrenState();
+}
+
+class _ExpansionTodoChildrenState extends State<_ExpansionTodoChildren> {
+  bool _adding = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Selector<LocalDbState, List<TodoData>>(
+      selector: (_, state) =>
+          state.todos.where((a) => a.parent == widget.todo.id).toList(),
+      builder: (context, children, _) {
+        return ExpansionTile(
+          leading: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () => AutoRouter.of(context)
+                    .pushNamed("/todochildren/${widget.todo.id}"),
+                icon: const Icon(Icons.list),
+              ),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _adding = true;
+                  });
+                },
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          ),
+          initiallyExpanded: true,
+          enabled: children.isNotEmpty,
+          title: Text("${children.length} Children"),
+          children: [
+            ...children.map((todo) => TodoItem(
+                  todo: todo,
+                  dense: true,
+                  tapBehaviour: TodoItemTapBehaviour.openTodo,
+                  dismissible: false,
+                  elements: [],
+                )),
+            if (_adding)
+              TodoInputBar(
+                parentTodo: widget.todo.id,
+                initialProject: widget.todo.project,
+                allowProjectSelection: false,
+                initialPipeline: widget.todo.pipeline,
+                onBackButton: () {
+                  setState(() {
+                    _adding = false;
+                  });
+                },
+              ),
+          ],
+        );
+      },
     );
   }
 }

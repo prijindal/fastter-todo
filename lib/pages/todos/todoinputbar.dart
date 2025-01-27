@@ -19,12 +19,14 @@ class TodoInputBar extends StatefulWidget {
     super.key,
     required this.onBackButton,
     this.initialProject,
+    this.initialPipeline,
     this.allowProjectSelection = false,
     this.parentTodo,
   });
 
   final void Function() onBackButton;
   final String? initialProject; // this will be a project id
+  final String? initialPipeline; // this will be a pipeline id
   final String?
       parentTodo; // This will be the parent id which is added to the todo
   final bool allowProjectSelection;
@@ -184,7 +186,7 @@ class _TodoInputBarState extends State<TodoInputBar>
             widget.initialProject) as String?);
     return FormBuilderField<String>(
       name: "pipeline",
-      initialValue: pipelines.first,
+      initialValue: widget.initialPipeline ?? pipelines.first,
       builder: (FormFieldState<String> field) {
         final pipelines = Provider.of<LocalDbState>(context)
             .getProjectPipelines(
