@@ -33,7 +33,7 @@ class TodoList extends StatelessWidget {
               todos: state.todos,
               todoItemTapBehaviour: state.isSelected
                   ? TodoItemTapBehaviour.toggleSelection
-                  : TodoItemTapBehaviour.openTodoPage,
+                  : TodoItemTapBehaviour.openTodoBottomSheet,
               todoItemLongPressBehaviour: TodoItemTapBehaviour.toggleSelection,
             ),
     );

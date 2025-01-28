@@ -34,12 +34,12 @@ class TodoScreen extends StatelessWidget {
     // TODO: Improve this, rather than a full page, make something like todoinputbar
     await showModalBottomSheet<void>(
       context: context,
-      builder: (context) => TodosScreenScaffold(
+      builder: (context) => TodoModifyBar(
         todo: todo,
-        elements: elements(todo),
-        // onSave: () {
-        //   AutoRouter.of(context).maybePop();
-        // },
+        allowProjectSelection: true,
+        onBackButton: () {
+          AutoRouter.of(context).maybePop();
+        },
       ),
     );
   }

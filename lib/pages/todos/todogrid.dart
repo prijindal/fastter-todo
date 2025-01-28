@@ -109,7 +109,7 @@ class _TodosGrid extends StatelessWidget {
                 shrinkWrap: true,
                 todoItemTapBehaviour: isSelected
                     ? TodoItemTapBehaviour.toggleSelection
-                    : TodoItemTapBehaviour.openTodoPage,
+                    : TodoItemTapBehaviour.openTodoBottomSheet,
                 todoItemLongPressBehaviour:
                     TodoItemTapBehaviour.toggleSelection,
                 showChildren: true,
