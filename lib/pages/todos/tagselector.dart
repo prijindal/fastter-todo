@@ -11,8 +11,9 @@ class FormBuilderTagSelector extends StatelessWidget {
     this.validator,
     required this.name,
     this.expanded = false,
-    this.decoration = const InputDecoration(),
+    this.decoration,
     this.onChanged,
+    this.onOpening,
     this.enabled = true,
   });
 
@@ -21,8 +22,22 @@ class FormBuilderTagSelector extends StatelessWidget {
   final String name;
   final bool expanded;
   final bool enabled;
-  final InputDecoration decoration;
+  final InputDecoration? decoration;
+  final void Function()? onOpening;
   final void Function(List<String>)? onChanged;
+
+  Widget _buildDropDown(FormFieldState<List<String>> field) {
+    return TagSelector(
+      enabled: enabled,
+      selectedTags: field.value,
+      expanded: expanded,
+      onOpening: onOpening,
+      onSelected: (newEntries) {
+        field.didChange(newEntries);
+        onChanged?.call(newEntries);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,17 +47,12 @@ class FormBuilderTagSelector extends StatelessWidget {
       name: name,
       validator: validator,
       builder: (FormFieldState<List<String>> field) {
+        if (decoration == null) {
+          return _buildDropDown(field);
+        }
         return InputDecorator(
-          decoration: decoration,
-          child: TagSelector(
-            enabled: enabled,
-            selectedTags: field.value,
-            expanded: expanded,
-            onSelected: (newEntries) {
-              field.didChange(newEntries);
-              onChanged?.call(newEntries);
-            },
-          ),
+          decoration: decoration!,
+          child: _buildDropDown(field),
         );
       },
     );
@@ -54,17 +64,20 @@ class TagSelector extends StatelessWidget {
     super.key,
     required this.onSelected,
     this.expanded = false,
+    this.onOpening,
     this.selectedTags,
     this.enabled = true,
   });
 
   final GlobalKey _menuKey = GlobalKey();
   final void Function(List<String>) onSelected;
+  final void Function()? onOpening;
   final bool expanded;
   final bool enabled;
   final List<String>? selectedTags;
 
   Future<void> _showMenu(BuildContext context) async {
+    onOpening?.call();
     final newSelectedTags = await showDialog<List<String>>(
       context: context,
       builder: (context) => TagSelectorDialog(

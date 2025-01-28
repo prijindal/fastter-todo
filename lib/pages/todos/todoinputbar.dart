@@ -11,7 +11,9 @@ import '../../helpers/logger.dart';
 import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import 'pipeline_dialog.dart';
+import 'priority_dialog.dart';
 import 'projectdropdown.dart';
+import 'tagselector.dart';
 import 'todo_select_date.dart';
 
 class TodoInputBar extends StatefulWidget {
@@ -87,6 +89,7 @@ class _TodoInputBarState extends State<TodoInputBar>
               dueDate: drift.Value(todo["dueDate"] as DateTime?),
               parent: drift.Value(widget.parentTodo),
               pipeline: drift.Value(pipeline),
+              priority: drift.Value(todo["priority"] as int? ?? 1),
             ),
           );
       _formKey.currentState!.reset();
@@ -212,6 +215,35 @@ class _TodoInputBarState extends State<TodoInputBar>
     );
   }
 
+  Widget _buildPriorityButton() {
+    return FormBuilderField<int>(
+      name: "priority",
+      initialValue: 1,
+      builder: (FormFieldState<int> field) {
+        return IconButton(
+          icon: Text(
+            field.value.toString(),
+          ),
+          color: priorityColors[(field.value ?? 1) - 1],
+          onPressed: () {
+            setState(() {
+              _isPreventClose = true;
+            });
+            showPriorityDialog(context).then((date) {
+              setState(() {
+                if (date != null) {
+                  field.didChange(date);
+                }
+                _isPreventClose = false;
+                _focusKeyboard();
+              });
+            });
+          },
+        );
+      },
+    );
+  }
+
   Widget _buildButtons() => Flex(
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
@@ -257,6 +289,22 @@ class _TodoInputBarState extends State<TodoInputBar>
             },
           ),
           _buildPipelineButton(),
+          _buildPriorityButton(),
+          FormBuilderTagSelector(
+            name: "tags",
+            expanded: false,
+            onOpening: () {
+              setState(() {
+                _isPreventClose = true;
+              });
+            },
+            onChanged: (_) {
+              setState(() {
+                _isPreventClose = false;
+                _focusKeyboard();
+              });
+            },
+          ),
           Flexible(
             child: Container(),
           ),
