@@ -90,6 +90,7 @@ class _TodoInputBarState extends State<TodoInputBar>
               parent: drift.Value(widget.parentTodo),
               pipeline: drift.Value(pipeline),
               priority: drift.Value(todo["priority"] as int? ?? 1),
+              tags: drift.Value(todo["tags"] as List<String>? ?? []),
             ),
           );
       _formKey.currentState!.reset();
