@@ -13,18 +13,21 @@ class FormBuilderTagSelector extends StatelessWidget {
     this.expanded = false,
     this.decoration = const InputDecoration(),
     this.onChanged,
+    this.enabled = true,
   });
 
   final List<String>? initialValue;
   final String? Function(List<String>?)? validator;
   final String name;
   final bool expanded;
+  final bool enabled;
   final InputDecoration decoration;
   final void Function(List<String>)? onChanged;
 
   @override
   Widget build(BuildContext context) {
     return FormBuilderField<List<String>>(
+      enabled: enabled,
       initialValue: initialValue,
       name: name,
       validator: validator,
@@ -32,6 +35,7 @@ class FormBuilderTagSelector extends StatelessWidget {
         return InputDecorator(
           decoration: decoration,
           child: TagSelector(
+            enabled: enabled,
             selectedTags: field.value,
             expanded: expanded,
             onSelected: (newEntries) {
@@ -51,11 +55,13 @@ class TagSelector extends StatelessWidget {
     required this.onSelected,
     this.expanded = false,
     this.selectedTags,
+    this.enabled = true,
   });
 
   final GlobalKey _menuKey = GlobalKey();
   final void Function(List<String>) onSelected;
   final bool expanded;
+  final bool enabled;
   final List<String>? selectedTags;
 
   Future<void> _showMenu(BuildContext context) async {
@@ -78,16 +84,17 @@ class TagSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     if (expanded) {
       return ListTile(
+        enabled: enabled,
         key: _menuKey,
         dense: true,
         title: TagsList(tags: selectedTags ?? []),
-        onTap: () => _showMenu(context),
+        onTap: enabled == false ? null : () => _showMenu(context),
       );
     }
     return IconButton(
       key: _menuKey,
       icon: _buildIcon(context),
-      onPressed: () => _showMenu(context),
+      onPressed: enabled == false ? null : () => _showMenu(context),
       tooltip: 'Tags',
     );
   }

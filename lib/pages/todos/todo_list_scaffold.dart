@@ -7,10 +7,7 @@ import '../../components/adaptive_scaffold.dart';
 import '../../components/main_drawer.dart';
 import '../../helpers/breakpoints.dart';
 import '../../helpers/todos_filters.dart';
-import '../../models/core.dart';
-import '../../models/local_db_state.dart';
 import '../../models/local_state.dart';
-import '../todo/index.dart';
 import 'todoeditbar/index.dart';
 import 'todogrid.dart';
 import 'todoinputbar.dart';
@@ -79,8 +76,8 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
     }
   }
 
-  Widget? _buildFab(List<String> selectedTodoIds) {
-    if (selectedTodoIds.isNotEmpty || _showInput) {
+  Widget? _buildFab(bool isSelected) {
+    if (isSelected || _showInput) {
       return null;
     }
     return FloatingActionButton(
@@ -95,7 +92,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
     );
   }
 
-  Widget? _buildBottom(List<String> selectedTodoIds) {
+  Widget? _buildBottom(bool isSelected) {
     if (_showInput) {
       return BottomSheet(
         onClosing: () {
@@ -113,7 +110,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
         ),
       );
     }
-    if (selectedTodoIds.isEmpty) {
+    if (isSelected == false) {
       return null;
     }
     return BottomSheet(
@@ -147,18 +144,8 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
         appBar: widget.appBar,
         drawer: MainDrawer(),
         body: list!,
-        secondaryBody: localState.selectedTodoIds.length != 1
-            ? null
-            : Selector<LocalDbState, TodoData>(
-                selector: (_, state) => state.todos
-                    .where((a) => a.id == localState.selectedTodoIds.first)
-                    .first,
-                builder: (context, todo, __) => TodoEditBody(
-                  todo: todo,
-                ),
-              ),
-        floatingActionButton: _buildFab(localState.selectedTodoIds),
-        bottomSheet: _buildBottom(localState.selectedTodoIds),
+        floatingActionButton: _buildFab(localState.selectedTodoIds.isNotEmpty),
+        bottomSheet: _buildBottom(localState.selectedTodoIds.isNotEmpty),
       ),
     );
   }

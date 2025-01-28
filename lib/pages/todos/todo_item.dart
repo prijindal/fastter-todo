@@ -11,21 +11,13 @@ import '../../models/local_state.dart';
 import '../todo/index.dart';
 import 'confirmation_dialog.dart';
 import 'tagslist.dart';
+import 'todo_item_elements.dart';
 import 'todo_select_date.dart';
 import 'todoitemtoggle.dart';
 
-enum TodoItemElements {
-  pipeline,
-  project,
-  dueDate,
-  comments,
-  reminders,
-  children,
-  tags
-}
-
 enum TodoItemTapBehaviour {
-  openTodo,
+  openTodoPage,
+  openTodoBottomSheet,
   toggleSelection,
   nothing;
 }
@@ -34,29 +26,42 @@ class TodoItem extends StatelessWidget {
   const TodoItem({
     super.key,
     required this.todo,
-    this.tapBehaviour = TodoItemTapBehaviour.toggleSelection,
+    required this.tapBehaviour,
+    this.longPressBehaviour = TodoItemTapBehaviour.nothing,
     this.dense = false,
     this.dismissible = true,
-    this.elements = const [
-      TodoItemElements.pipeline,
-      TodoItemElements.project,
-      TodoItemElements.dueDate,
-      TodoItemElements.comments,
-      TodoItemElements.reminders,
-      TodoItemElements.children,
-      TodoItemElements.tags
-    ],
+    this.elements = allTodoItemElements,
   });
 
   final TodoData todo;
   final bool dense;
   final bool dismissible;
   final TodoItemTapBehaviour tapBehaviour;
+  final TodoItemTapBehaviour longPressBehaviour;
   final List<TodoItemElements> elements;
+
+  static VoidCallback? action(
+      TodoItemTapBehaviour behaviour, BuildContext context, TodoData todo) {
+    switch (behaviour) {
+      case TodoItemTapBehaviour.openTodoPage:
+        return () => TodoScreen.openPage(context, todo);
+      case TodoItemTapBehaviour.openTodoBottomSheet:
+        return () => TodoScreen.openBottomSheet(context, todo);
+      case TodoItemTapBehaviour.toggleSelection:
+        return () {
+          final localStateNotifier =
+              Provider.of<LocalStateNotifier>(context, listen: false);
+          localStateNotifier.toggleSelectedId(todo.id);
+        };
+      case TodoItemTapBehaviour.nothing:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (tapBehaviour == TodoItemTapBehaviour.toggleSelection) {
+    if (tapBehaviour == TodoItemTapBehaviour.toggleSelection ||
+        longPressBehaviour == TodoItemTapBehaviour.toggleSelection) {
       return Selector<LocalStateNotifier, bool>(
         selector: (context, localState) =>
             localState.selectedTodoIds.contains(todo.id),
@@ -66,11 +71,8 @@ class TodoItem extends StatelessWidget {
           dismissible: dismissible,
           dense: dense,
           elements: elements,
-          onTap: () {
-            final localStateNotifier =
-                Provider.of<LocalStateNotifier>(context, listen: false);
-            localStateNotifier.toggleSelectedId(todo.id);
-          },
+          onTap: action(tapBehaviour, context, todo),
+          onLongPress: action(longPressBehaviour, context, todo),
         ),
       );
     }
@@ -80,9 +82,8 @@ class TodoItem extends StatelessWidget {
       dense: dense,
       dismissible: dismissible,
       elements: elements,
-      onTap: tapBehaviour == TodoItemTapBehaviour.nothing
-          ? null
-          : () => TodoScreen.open(context, todo),
+      onTap: action(tapBehaviour, context, todo),
+      onLongPress: action(longPressBehaviour, context, todo),
     );
   }
 }
@@ -94,6 +95,7 @@ class _TodoItem extends StatelessWidget {
     this.dense = false,
     this.dismissible = true,
     this.onTap,
+    this.onLongPress,
     required this.elements,
   });
 
@@ -103,6 +105,7 @@ class _TodoItem extends StatelessWidget {
   final bool dismissible;
   final List<TodoItemElements> elements;
   final void Function()? onTap;
+  final void Function()? onLongPress;
 
   void _selectDate(BuildContext context) {
     todoSelectDate(context, todo.dueDate).then((dueDate) async {
@@ -132,6 +135,7 @@ class _TodoItem extends StatelessWidget {
       dense: dense,
       selected: selected,
       onTap: onTap,
+      onLongPress: onLongPress,
       leading: TodoItemToggle(
         todo: todo,
         toggleCompleted: (bool newValue) async {

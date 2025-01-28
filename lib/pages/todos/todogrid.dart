@@ -7,6 +7,7 @@ import '../../helpers/todos_filters.dart';
 import '../../helpers/todos_sorting_algoritm.dart';
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
+import '../../models/local_state.dart';
 import 'todo_item.dart';
 import 'todolistview.dart';
 
@@ -99,13 +100,21 @@ class _TodosGrid extends StatelessWidget {
       shrinkWrap: false,
       children: [
         _buildPipelineChip(filteredTodos, pipeline),
-        TodosListView(
-          dismissible: false,
-          todos: filteredTodos,
-          shrinkWrap: true,
-          todoItemTapBehaviour: TodoItemTapBehaviour.openTodo,
-          showChildren: true,
-        ),
+        Selector<LocalStateNotifier, bool>(
+            selector: (_, state) => state.selectedTodoIds.isNotEmpty,
+            builder: (context, isSelected, _) {
+              return TodosListView(
+                dismissible: false,
+                todos: filteredTodos,
+                shrinkWrap: true,
+                todoItemTapBehaviour: isSelected
+                    ? TodoItemTapBehaviour.toggleSelection
+                    : TodoItemTapBehaviour.openTodoPage,
+                todoItemLongPressBehaviour:
+                    TodoItemTapBehaviour.toggleSelection,
+                showChildren: true,
+              );
+            }),
       ],
     );
   }

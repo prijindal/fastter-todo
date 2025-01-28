@@ -12,7 +12,6 @@ class AdaptiveScaffold extends StatelessWidget {
     required this.body,
     this.bottomSheet,
     this.floatingActionButton,
-    this.secondaryBody,
   });
 
   final PreferredSizeWidget appBar;
@@ -20,22 +19,6 @@ class AdaptiveScaffold extends StatelessWidget {
   final Widget body;
   final Widget? bottomSheet;
   final Widget? floatingActionButton;
-  final Widget? secondaryBody;
-
-  Widget _buildBody() {
-    return Row(
-      children: [
-        Expanded(
-          child: body,
-        ),
-        if (secondaryBody != null) const VerticalDivider(width: 1),
-        if (secondaryBody != null)
-          Expanded(
-            child: secondaryBody!,
-          ),
-      ],
-    );
-  }
 
   Widget _buildWithSideDrawer() {
     // In this view, drawer is displayed on the left hand side, and appbar is only on top of body
@@ -50,7 +33,7 @@ class AdaptiveScaffold extends StatelessWidget {
               children: [
                 appBar,
                 Flexible(
-                  child: _buildBody(),
+                  child: body,
                 ),
               ],
             ),

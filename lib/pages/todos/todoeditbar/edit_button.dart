@@ -13,7 +13,7 @@ class EditButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.edit),
       onPressed: () {
-        TodoScreen.open(context, todo);
+        TodoScreen.openPage(context, todo);
       },
       tooltip: 'Edit Todo',
     );

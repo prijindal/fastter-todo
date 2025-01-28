@@ -17,6 +17,7 @@ import '../todos/priority_dialog.dart';
 import '../todos/projectdropdown.dart';
 import '../todos/tagselector.dart';
 import '../todos/todo_item.dart';
+import '../todos/todo_item_elements.dart';
 import '../todos/todoinputbar.dart';
 
 @RoutePage()
@@ -28,7 +29,22 @@ class TodoScreen extends StatelessWidget {
 
   final String todoId;
 
-  static Future<void> open(BuildContext context, TodoData todo) async {
+  static Future<void> openBottomSheet(
+      BuildContext context, TodoData todo) async {
+    // TODO: Improve this, rather than a full page, make something like todoinputbar
+    await showModalBottomSheet<void>(
+      context: context,
+      builder: (context) => TodosScreenScaffold(
+        todo: todo,
+        elements: elements(todo),
+        // onSave: () {
+        //   AutoRouter.of(context).maybePop();
+        // },
+      ),
+    );
+  }
+
+  static Future<void> openPage(BuildContext context, TodoData todo) async {
     if (isDesktop) {
       final mediaQuery = MediaQuery.sizeOf(context);
       showDialog<void>(
@@ -38,7 +54,10 @@ class TodoScreen extends StatelessWidget {
             child: SizedBox(
               width: min(600, mediaQuery.width),
               height: min(800, mediaQuery.height),
-              child: TodosScreenScaffold(todo: todo),
+              child: TodosScreenScaffold(
+                todo: todo,
+                elements: elements(todo),
+              ),
             ),
           );
         },
@@ -48,11 +67,20 @@ class TodoScreen extends StatelessWidget {
     }
   }
 
+  static List<TodoItemElements> elements(TodoData todo) {
+    if (todo.parent == null) {
+      return allTodoItemElements;
+    } else {
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Selector<LocalDbState, TodoData>(
         selector: (_, state) => state.todos.where((a) => a.id == todoId).first,
         builder: (context, todo, _) => TodosScreenScaffold(
           todo: todo,
+          elements: elements(todo),
         ),
       );
 }
@@ -61,9 +89,11 @@ class TodosScreenScaffold extends StatelessWidget {
   const TodosScreenScaffold({
     super.key,
     required this.todo,
+    required this.elements,
   });
 
   final TodoData todo;
+  final List<TodoItemElements> elements;
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +117,7 @@ class TodosScreenScaffold extends StatelessWidget {
         onSave: () {
           AutoRouter.of(context).maybePop();
         },
+        elements: elements,
       ),
     );
   }
@@ -97,10 +128,12 @@ class TodoEditBody extends StatefulWidget {
     super.key,
     required this.todo,
     this.onSave,
+    required this.elements,
   });
 
   final TodoData todo;
   final VoidCallback? onSave;
+  final List<TodoItemElements> elements;
 
   @override
   State<TodoEditBody> createState() => _TodoEditBodyState();
@@ -165,150 +198,159 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               initialValue: widget.todo.completed,
               onChanged: _markEdited,
             ),
-            FormBuilderDropdown<String>(
-              name: "pipeline",
-              initialValue: possiblePipelines.contains(widget.todo.pipeline)
-                  ? widget.todo.pipeline
-                  : possiblePipelines.first,
-              decoration: InputDecoration(
-                labelText: 'Pipeline',
+            if (widget.elements.contains(TodoItemElements.pipeline))
+              FormBuilderDropdown<String>(
+                enabled: widget.elements.contains(TodoItemElements.pipeline),
+                name: "pipeline",
+                initialValue: possiblePipelines.contains(widget.todo.pipeline)
+                    ? widget.todo.pipeline
+                    : possiblePipelines.first,
+                decoration: InputDecoration(
+                  labelText: 'Pipeline',
+                ),
+                onChanged: _markEdited,
+                items: possiblePipelines
+                    .map((a) => DropdownMenuItem<String>(
+                          value: a,
+                          child: Text(a),
+                        ))
+                    .toList(),
               ),
-              onChanged: _markEdited,
-              items: possiblePipelines
-                  .map((a) => DropdownMenuItem<String>(
-                        value: a,
-                        child: Text(a),
-                      ))
-                  .toList(),
-            ),
             const SizedBox(height: 10),
-            FormBuilderProjectSelector(
-              name: "project",
-              initialValue: widget.todo.project,
-              expanded: true,
-              onChanged: _markEdited,
-              decoration: InputDecoration(
-                labelText: 'Project',
-              ),
-            ),
-            const SizedBox(height: 10),
-            FormBuilderDateTimePicker(
-              name: "dueDate",
-              inputType: InputType.date,
-              initialValue: widget.todo.dueDate,
-              onChanged: _markEdited,
-              decoration: InputDecoration(
-                labelText: 'Due Date',
-                suffix: IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    _formKey.currentState!.fields['dueDate']?.didChange(null);
-                  },
+            if (widget.elements.contains(TodoItemElements.project))
+              FormBuilderProjectSelector(
+                name: "project",
+                initialValue: widget.todo.project,
+                expanded: true,
+                onChanged: _markEdited,
+                decoration: InputDecoration(
+                  labelText: 'Project',
                 ),
               ),
-            ),
             const SizedBox(height: 10),
-            FormBuilderDropdown<int>(
-              name: "priority",
-              initialValue: widget.todo.priority,
-              decoration: InputDecoration(
-                labelText: 'Priority',
+            if (widget.elements.contains(TodoItemElements.dueDate))
+              FormBuilderDateTimePicker(
+                name: "dueDate",
+                inputType: InputType.date,
+                initialValue: widget.todo.dueDate,
+                onChanged: _markEdited,
+                decoration: InputDecoration(
+                  labelText: 'Due Date',
+                  suffix: IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      _formKey.currentState!.fields['dueDate']?.didChange(null);
+                    },
+                  ),
+                ),
               ),
-              onChanged: _markEdited,
-              items: priorityColors.map(
-                (p) {
-                  final value = priorityColors.indexOf(p) + 1;
-                  return DropdownMenuItem<int>(
-                    value: value,
-                    child: Wrap(
-                      spacing: 8.0,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: p,
+            const SizedBox(height: 10),
+            if (widget.elements.contains(TodoItemElements.priority))
+              FormBuilderDropdown<int>(
+                name: "priority",
+                initialValue: widget.todo.priority,
+                decoration: InputDecoration(
+                  labelText: 'Priority',
+                ),
+                onChanged: _markEdited,
+                items: priorityColors.map(
+                  (p) {
+                    final value = priorityColors.indexOf(p) + 1;
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Wrap(
+                        spacing: 8.0,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: p,
+                            ),
                           ),
+                          Text(
+                            'Priority $value',
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ).toList(),
+              ),
+            const SizedBox(height: 10),
+            if (widget.elements.contains(TodoItemElements.tags))
+              FormBuilderTagSelector(
+                name: "tags",
+                initialValue: widget.todo.tags,
+                expanded: true,
+                onChanged: _markEdited,
+                decoration: InputDecoration(
+                  labelText: 'Tags',
+                ),
+              ),
+            const SizedBox(height: 10),
+            if (widget.elements.contains(TodoItemElements.comments))
+              Selector<LocalDbState, List<CommentData>>(
+                selector: (_, state) => state.comments
+                    .where((a) => a.todo == widget.todo.id)
+                    .toList(),
+                builder: (context, comments, _) {
+                  return ExpansionTile(
+                    leading: IconButton(
+                      onPressed: () => AutoRouter.of(context)
+                          .pushNamed("/todocomments/${widget.todo.id}"),
+                      icon: const Icon(Icons.list),
+                    ),
+                    initiallyExpanded: true,
+                    enabled: comments.isNotEmpty,
+                    title: Text("${comments.length} Comments"),
+                    children: comments
+                        .map((comment) => TodoCommentItem(
+                              todoComment: comment,
+                              dense: true,
+                              dismissible: false,
+                            ))
+                        .toList(),
+                  );
+                },
+              ),
+            const SizedBox(height: 10),
+            if (widget.elements.contains(TodoItemElements.reminders))
+              Selector<LocalDbState, List<ReminderData>>(
+                selector: (_, state) =>
+                    state.getTodoReminders(widget.todo.id, true),
+                builder: (context, reminders, _) {
+                  return ExpansionTile(
+                    leading: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: () => AutoRouter.of(context)
+                              .pushNamed("/todoreminders/${widget.todo.id}"),
+                          icon: const Icon(Icons.list),
                         ),
-                        Text(
-                          'Priority $value',
+                        IconButton(
+                          onPressed: () => newReminder(context, widget.todo.id),
+                          icon: const Icon(Icons.add),
                         ),
                       ],
                     ),
+                    initiallyExpanded: true,
+                    enabled: reminders.isNotEmpty,
+                    title: Text("${reminders.length} Reminders"),
+                    children: reminders
+                        .map((reminder) => TodoReminderTile(
+                              reminder: reminder,
+                              dense: true,
+                            ))
+                        .toList(),
                   );
                 },
-              ).toList(),
-            ),
-            const SizedBox(height: 10),
-            FormBuilderTagSelector(
-              name: "tags",
-              initialValue: widget.todo.tags,
-              expanded: true,
-              onChanged: _markEdited,
-              decoration: InputDecoration(
-                labelText: 'Tags',
               ),
-            ),
             const SizedBox(height: 10),
-            Selector<LocalDbState, List<CommentData>>(
-              selector: (_, state) => state.comments
-                  .where((a) => a.todo == widget.todo.id)
-                  .toList(),
-              builder: (context, comments, _) {
-                return ExpansionTile(
-                  leading: IconButton(
-                    onPressed: () => AutoRouter.of(context)
-                        .pushNamed("/todocomments/${widget.todo.id}"),
-                    icon: const Icon(Icons.list),
-                  ),
-                  initiallyExpanded: true,
-                  enabled: comments.isNotEmpty,
-                  title: Text("${comments.length} Comments"),
-                  children: comments
-                      .map((comment) => TodoCommentItem(
-                            todoComment: comment,
-                            dense: true,
-                            dismissible: false,
-                          ))
-                      .toList(),
-                );
-              },
-            ),
-            const SizedBox(height: 10),
-            Selector<LocalDbState, List<ReminderData>>(
-              selector: (_, state) =>
-                  state.getTodoReminders(widget.todo.id, true),
-              builder: (context, reminders, _) {
-                return ExpansionTile(
-                  leading: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: () => AutoRouter.of(context)
-                            .pushNamed("/todoreminders/${widget.todo.id}"),
-                        icon: const Icon(Icons.list),
-                      ),
-                      IconButton(
-                        onPressed: () => newReminder(context, widget.todo.id),
-                        icon: const Icon(Icons.add),
-                      ),
-                    ],
-                  ),
-                  initiallyExpanded: true,
-                  enabled: reminders.isNotEmpty,
-                  title: Text("${reminders.length} Reminders"),
-                  children: reminders
-                      .map((reminder) => TodoReminderTile(
-                            reminder: reminder,
-                            dense: true,
-                          ))
-                      .toList(),
-                );
-              },
-            ),
-            const SizedBox(height: 10),
-            _ExpansionTodoChildren(todo: widget.todo),
+            if (widget.elements.contains(TodoItemElements.children))
+              _ExpansionTodoChildren(todo: widget.todo),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _isEdited == false
@@ -371,7 +413,7 @@ class _ExpansionTodoChildrenState extends State<_ExpansionTodoChildren> {
             ...children.map((todo) => TodoItem(
                   todo: todo,
                   dense: true,
-                  tapBehaviour: TodoItemTapBehaviour.openTodo,
+                  tapBehaviour: TodoItemTapBehaviour.openTodoPage,
                   dismissible: false,
                   elements: [],
                 )),

@@ -37,6 +37,7 @@ class _TodoChildrenScreen extends StatelessWidget {
       ),
       body: _TodoSubTaskList(
         todo: todo,
+        allowAddition: true,
       ),
     );
   }
@@ -45,9 +46,11 @@ class _TodoChildrenScreen extends StatelessWidget {
 class _TodoSubTaskList extends StatefulWidget {
   const _TodoSubTaskList({
     required this.todo,
+    required this.allowAddition,
   });
 
   final TodoData todo;
+  final bool allowAddition;
 
   @override
   State<_TodoSubTaskList> createState() => _TodoSubTaskListState();
@@ -68,7 +71,7 @@ class _TodoSubTaskListState extends State<_TodoSubTaskList> {
         TodoItem(
           todo: widget.todo,
           dense: true,
-          tapBehaviour: TodoItemTapBehaviour.openTodo,
+          tapBehaviour: TodoItemTapBehaviour.openTodoPage,
           dismissible: false,
           elements: [],
         ),
@@ -88,9 +91,10 @@ class _TodoSubTaskListState extends State<_TodoSubTaskList> {
               ...children.map(
                 (a) => _TodoSubTaskList(
                   todo: a,
+                  allowAddition: false,
                 ),
               ),
-              if (!_adding)
+              if (!_adding && widget.allowAddition)
                 IconButton(
                   onPressed: () {
                     setState(() {

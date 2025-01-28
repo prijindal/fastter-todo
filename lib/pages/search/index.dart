@@ -31,7 +31,7 @@ class _SearchScreenState extends State<SearchScreen>
       getter: (todo) => todo.title.toLowerCase(),
       itemBuilder: (item) => TodoItem(
         todo: item.choice,
-        tapBehaviour: TodoItemTapBehaviour.openTodo,
+        tapBehaviour: TodoItemTapBehaviour.openTodoPage,
         dense: true,
         dismissible: false,
       ),

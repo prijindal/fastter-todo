@@ -16,19 +16,21 @@ class FormBuilderProjectSelector extends StatelessWidget {
     this.decoration,
     this.onChanged,
     this.onOpening,
+    this.enabled = true,
   });
 
   final String? initialValue;
   final String? Function(String?)? validator;
   final String name;
   final bool expanded;
+  final bool enabled;
   final InputDecoration? decoration;
   final void Function(String?)? onChanged;
   final void Function()? onOpening;
 
   Widget _buildDropDown(BuildContext context, FormFieldState<String> field) {
     return ProjectDropdown(
-      enabled: true,
+      enabled: enabled,
       selectedProject: field.value == null
           ? null
           : Provider.of<LocalDbState>(context)
@@ -47,6 +49,7 @@ class FormBuilderProjectSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FormBuilderField<String>(
+      enabled: enabled,
       initialValue: initialValue,
       name: name,
       validator: validator,
@@ -180,6 +183,7 @@ class _ProjectDropdown extends StatelessWidget {
   Widget build(BuildContext context) {
     if (expanded) {
       return ListTile(
+        enabled: enabled,
         key: _menuKey,
         dense: true,
         leading: _buildIcon(),

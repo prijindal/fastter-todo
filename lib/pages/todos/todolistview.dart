@@ -13,12 +13,14 @@ class TodosListView extends StatefulWidget {
     this.dismissible = true,
     required this.todoItemTapBehaviour,
     this.showChildren = false,
+    required this.todoItemLongPressBehaviour,
   });
 
   final List<TodoData> todos;
   final bool shrinkWrap;
   final bool dismissible;
   final TodoItemTapBehaviour todoItemTapBehaviour;
+  final TodoItemTapBehaviour todoItemLongPressBehaviour;
   final bool showChildren;
 
   @override
@@ -92,6 +94,7 @@ class _TodosListViewState extends State<TodosListView> {
                   todo: todo,
                   dismissible: widget.dismissible,
                   tapBehaviour: widget.todoItemTapBehaviour,
+                  longPressBehaviour: widget.todoItemLongPressBehaviour,
                 ),
                 if (children.isNotEmpty)
                   Container(
@@ -105,7 +108,7 @@ class _TodosListViewState extends State<TodosListView> {
                             (a) => TodoItem(
                               todo: a,
                               dense: true,
-                              tapBehaviour: TodoItemTapBehaviour.nothing,
+                              tapBehaviour: TodoItemTapBehaviour.openTodoPage,
                               dismissible: false,
                               elements: [],
                             ),
@@ -122,6 +125,7 @@ class _TodosListViewState extends State<TodosListView> {
           todo: todo,
           dismissible: widget.dismissible,
           tapBehaviour: widget.todoItemTapBehaviour,
+          longPressBehaviour: widget.todoItemLongPressBehaviour,
         );
       },
     );
