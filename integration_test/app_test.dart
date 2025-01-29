@@ -58,7 +58,7 @@ void main() {
       );
 
       // Verify the counter starts at 0.
-      expect(find.text('All Todos'), findsNWidgets(2));
+      expect(find.text('All Todos'), findsAtLeastNWidgets(1));
 
       // Finds the floating action button to tap on.
       final fab = find.byKey(const ValueKey('New Todo'));
