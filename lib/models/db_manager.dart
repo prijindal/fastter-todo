@@ -61,8 +61,23 @@ class DbManager extends ChangeNotifier {
 
   bool get isInitialized => _database != null;
 
-  DbManager() {
-    initDb();
+  DbManager();
+
+  factory DbManager.autoInit() {
+    final dbManager = DbManager();
+    dbManager.initDb();
+    return dbManager;
+  }
+
+  factory DbManager.localOnly() {
+    final dbManager = DbManager();
+    dbManager.initLocal();
+    return dbManager;
+  }
+
+  void initLocal() {
+    AppLogger.instance.d("Initiating local database");
+    _database = SharedDatabase.local();
   }
 
   Future<void> initDb() async {
@@ -75,8 +90,7 @@ class DbManager extends ChangeNotifier {
         : DbSelectorType.values.asNameMap()[implementationString] ??
             DbSelectorType.local;
     if (_dbType == DbSelectorType.local) {
-      AppLogger.instance.d("Initiating local database");
-      _database = SharedDatabase.local();
+      initLocal();
     } else {
       final remoteSettingsString =
           await SharedPreferencesAsync().getString(dbRemoteSettings);

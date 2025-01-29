@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:fastter_todo/models/core.dart';
 import 'package:fastter_todo/models/db_manager.dart';
 import 'package:fastter_todo/models/local_db_state.dart';
 import 'package:fastter_todo/models/local_state.dart';
@@ -22,19 +21,19 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('end-to-end test', () {
-    testWidgets('tap on the floating action button, verify counter',
-        (tester) async {
+    testWidgets('Create a todo and verify that it got created', (tester) async {
       final mockStackRouter = MockStackRouter();
       when(() => mockStackRouter.pushNamed(any())).thenAnswer((_) async {
         return null;
       });
       when(() => mockStackRouter.currentUrl).thenReturn('/todos');
       // Load app widget.
+      var dbManager = DbManager.localOnly();
       await tester.pumpWidget(
         MultiProvider(
           providers: [
             ChangeNotifierProvider<DbManager>(
-              create: (context) => DbManager(),
+              create: (context) => dbManager,
             ),
             ChangeNotifierProvider<SettingsStorageNotifier>(
               create: (context) => SettingsStorageNotifier(),
@@ -43,7 +42,7 @@ void main() {
               create: (_) => LocalStateNotifier(),
             ),
             ChangeNotifierProvider<LocalDbState>(
-              create: (_) => LocalDbState(SharedDatabase.local()),
+              create: (_) => LocalDbState(dbManager.database),
             ),
           ],
           child: MaterialApp(
@@ -64,13 +63,26 @@ void main() {
       final fab = find.byKey(const ValueKey('New Todo'));
 
       // Emulate a tap on the floating action button.
+      debugPrint("Tapping on the FAB");
       await tester.tap(fab);
-
-      // Trigger a frame.
       await tester.pumpAndSettle();
 
-      // Verify the counter increments by 1.
-      // expect(find.text('1'), findsOneWidget);
+      final todoInput = find.byKey(const ValueKey("TodoInputBarTitleForm"));
+
+      expect(todoInput, findsOneWidget);
+
+      debugPrint("Entering text on form");
+      await tester.enterText(todoInput, "A Sample todo");
+      await tester.pumpAndSettle();
+
+      final addIcon = find.byKey(const ValueKey("TodoInputBarSendButton"));
+
+      debugPrint("Tapping add icon button");
+      await tester.tap(addIcon);
+      await tester.pumpAndSettle();
+
+      debugPrint("Finding the added todo");
+      expect(find.text('A Sample todo'), findsNWidgets(1));
     });
   });
 }

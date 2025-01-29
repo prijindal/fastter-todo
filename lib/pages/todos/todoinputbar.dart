@@ -286,6 +286,7 @@ class _TodoInputBarState extends State<_TodoInputBar>
 
   Widget _buildInput() => FormBuilderTextField(
         name: "title",
+        key: Key("TodoInputBarTitleForm"),
         focusNode: _titleFocusNode,
         initialValue: widget.initialTitle ?? "",
         autofocus: true,
@@ -441,6 +442,7 @@ class _TodoInputBarState extends State<_TodoInputBar>
             child: Container(),
           ),
           IconButton(
+            key: const Key("TodoInputBarSendButton"),
             icon: const Icon(Icons.send),
             onPressed: _onSave,
           )

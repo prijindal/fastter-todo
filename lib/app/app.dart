@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<DbManager>(
-          create: (context) => DbManager(),
+          create: (context) => DbManager.autoInit(),
         ),
         ChangeNotifierProvider<SettingsStorageNotifier>(
           create: (context) => SettingsStorageNotifier(),
