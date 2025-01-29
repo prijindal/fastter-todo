@@ -8,6 +8,34 @@ permissions:
   attestations: write
 
 jobs:
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable" # or: 'beta', 'dev' or 'master'
+          architecture: x64 # optional, x64 or arm64
+          cache: true
+          cache-key: 'flutter-${{ github.job }}-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
+      
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: build/
+          key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
+      
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test integration_test -d windows -r github --coverage
+      - uses: codecov/codecov-action@v5
+        with:
+          flags: windows
+        env: 
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   test-android:
     runs-on: ubuntu-latest
     steps:
@@ -156,7 +184,7 @@ jobs:
           path: build/app/outputs/apk/release/output-metadata.json
 
   github-release:
-    needs: [test-linux, android-apk, linux, windows]
+    needs: [test-linux, test-android, android-apk, linux, windows]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
@@ -245,7 +273,7 @@ jobs:
             build/app/intermediates/merged_native_libs/release/out/lib/
 
   google-play-publish:
-    needs: [test-linux, android-appbundle]
+    needs: [test-android, android-appbundle]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
