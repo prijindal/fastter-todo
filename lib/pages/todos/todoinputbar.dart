@@ -11,16 +11,12 @@ import '../../helpers/logger.dart';
 import '../../models/core.dart';
 import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
-import 'confirmation_dialog.dart';
 import 'pipeline_dialog.dart';
 import 'priority_dialog.dart';
 import 'projectdropdown.dart';
 import 'tagselector.dart';
 import 'todo_select_date.dart';
-import 'todoeditbar/comment_button.dart';
 import 'todoeditbar/edit_button.dart';
-import 'todoeditbar/reminder_button.dart';
-import 'todoeditbar/subtask_button.dart';
 
 class TodoModifyBar extends StatelessWidget {
   const TodoModifyBar({
@@ -48,29 +44,6 @@ class TodoModifyBar extends StatelessWidget {
         parentTodo: todo.parent,
         leadingButtons: [],
         trailingButtons: [
-          CommentButton(
-            todo: todo,
-          ),
-          ReminderButton(
-            todo: todo,
-          ),
-          SubtaskButton(
-            todo: todo,
-          ),
-          IconButton(
-            onPressed: () async {
-              final shouldDelete = await showDialog<bool>(
-                context: context,
-                builder: (context) => ConfirmationDialog(),
-              );
-              if (shouldDelete != null && shouldDelete && context.mounted) {
-                await Provider.of<DbManager>(context, listen: false)
-                    .deleteTodosByIds([todo.id]);
-                onBackButton();
-              }
-            },
-            icon: Icon(Icons.delete),
-          ),
           EditButton(
             todo: todo,
           ),
@@ -273,7 +246,7 @@ class _TodoInputBarState extends State<_TodoInputBar>
       return;
     }
     final title = _formKey.currentState?.instantValue['title'] as String?;
-    if (title != null && title != "" && checkTitle) {
+    if (title != null && title != widget.initialTitle && checkTitle) {
       setState(() {
         _isPreventClose = true;
       });
