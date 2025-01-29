@@ -30,6 +30,18 @@ jobs:
           key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
       - run: flutter --version
       - run: flutter pub get
+      - name: save release key
+        env:
+          KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEY_FILE_BASE64" | base64 -d > "$(pwd)/release.keystore"
+          echo "storeFile=$(pwd)/release.keystore" >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+          echo "storePassword=$KEY_PASSWORD" >> android/key.properties
+          echo "VERSION_CODE=`expr 185 + $GITHUB_RUN_NUMBER`" > android/version.properties
       - run: flutter analyze
 
       - name: Enable KVM
@@ -41,7 +53,7 @@ jobs:
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: 35
           script: flutter test integration_test -d android -r github --coverage
       - uses: codecov/codecov-action@v5
         with:
