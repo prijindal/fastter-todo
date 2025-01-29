@@ -184,7 +184,7 @@ jobs:
           path: build/app/outputs/apk/release/output-metadata.json
 
   github-release:
-    needs: [test-linux, test-android, android-apk, linux, windows]
+    needs: [test-linux, test-windows, test-android, android-apk, linux, windows]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
