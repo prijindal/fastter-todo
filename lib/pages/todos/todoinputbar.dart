@@ -319,7 +319,7 @@ class _TodoInputBarState extends State<_TodoInputBar>
         validator: FormBuilderValidators.compose([
           FormBuilderValidators.required(),
           FormBuilderValidators.minLength(3),
-          FormBuilderValidators.maxLength(50),
+          FormBuilderValidators.maxLength(100),
         ]),
         decoration: InputDecoration(
           labelText: widget.labelText,

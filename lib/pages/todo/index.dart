@@ -33,6 +33,8 @@ class TodoScreen extends StatelessWidget {
       BuildContext context, TodoData todo) async {
     // TODO: Improve this, rather than a full page, make something like todoinputbar
     await showModalBottomSheet<void>(
+      isScrollControlled: true,
+      enableDrag: false,
       context: context,
       builder: (context) => TodoModifyBar(
         todo: todo,
@@ -189,7 +191,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.required(),
                 FormBuilderValidators.minLength(3),
-                FormBuilderValidators.maxLength(50),
+                FormBuilderValidators.maxLength(100),
               ]),
             ),
             FormBuilderCheckbox(
