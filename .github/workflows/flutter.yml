@@ -8,6 +8,89 @@ permissions:
   attestations: write
 
 jobs:
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable" # or: 'beta', 'dev' or 'master'
+          architecture: x64 # optional, x64 or arm64
+          cache: true
+          cache-key: 'flutter-${{ github.job }}-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
+      
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: build/
+          key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
+      
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test integration_test -d windows -r github --coverage
+      - uses: codecov/codecov-action@v5
+        with:
+          flags: windows
+        env: 
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  test-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable" # or: 'beta', 'dev' or 'master'
+          architecture: x64 # optional, x64 or arm64
+          cache: true
+          cache-key: 'flutter-${{ github.job }}-:os:-:channel:-:version:-:arch:-:hash:'
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
+      
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            build
+            ~/.gradle
+          key: ${{ runner.os }}-flutter-${{ github.job }}-${{ hashFiles('pubspec.lock') }}
+      - run: flutter --version
+      - run: flutter pub get
+      - name: save release key
+        env:
+          KEY_FILE_BASE64: ${{ secrets.KEY_FILE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEY_FILE_BASE64" | base64 -d > "$(pwd)/release.keystore"
+          echo "storeFile=$(pwd)/release.keystore" >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+          echo "storePassword=$KEY_PASSWORD" >> android/key.properties
+          echo "VERSION_CODE=`expr 185 + $GITHUB_RUN_NUMBER`" > android/version.properties
+      - run: flutter analyze
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: default
+          arch: x86_64
+          script: flutter test integration_test -d android -r github --coverage
+      - uses: codecov/codecov-action@v5
+        with:
+          flags: android
+        env: 
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   test-linux:
     runs-on: ubuntu-22.04 # libwebkit2gtk-4.1 is not compatible with flutter
     steps:
@@ -101,7 +184,7 @@ jobs:
           path: build/app/outputs/apk/release/output-metadata.json
 
   github-release:
-    needs: [test-linux, android-apk, linux, windows]
+    needs: [test-linux, test-windows, test-android, android-apk, linux, windows]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
@@ -190,7 +273,7 @@ jobs:
             build/app/intermediates/merged_native_libs/release/out/lib/
 
   google-play-publish:
-    needs: [test-linux, android-appbundle]
+    needs: [test-android, android-appbundle]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
