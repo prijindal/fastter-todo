@@ -138,7 +138,7 @@ class _TodoInputBar extends StatefulWidget {
     this.allowProjectSelection = false,
     this.parentTodo,
     required this.onSave,
-    this.initialTitle,
+    this.initialTitle = "",
     this.initialDueDate,
     this.initialPriority,
     this.initialTags,
@@ -150,7 +150,7 @@ class _TodoInputBar extends StatefulWidget {
   final List<Widget> trailingButtons;
   final String? initialProject; // this will be a project id
   final String? initialPipeline; // this will be a pipeline id
-  final String? initialTitle;
+  final String initialTitle;
   final DateTime? initialDueDate;
   final int? initialPriority;
   final List<String>? initialTags;
@@ -288,7 +288,7 @@ class _TodoInputBarState extends State<_TodoInputBar>
         name: "title",
         key: Key("TodoInputBarTitleForm"),
         focusNode: _titleFocusNode,
-        initialValue: widget.initialTitle ?? "",
+        initialValue: widget.initialTitle,
         autofocus: true,
         validator: FormBuilderValidators.compose([
           FormBuilderValidators.required(),
