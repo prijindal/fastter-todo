@@ -95,6 +95,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
   Widget? _buildBottom(bool isSelected) {
     if (_showInput) {
       return BottomSheet(
+        enableDrag: false,
         onClosing: () {
           setState(() {
             _showInput = true;
@@ -114,6 +115,7 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
       return null;
     }
     return BottomSheet(
+      enableDrag: false,
       onClosing: () {
         Provider.of<LocalStateNotifier>(context, listen: false)
             .clearSelectedTodoIds();

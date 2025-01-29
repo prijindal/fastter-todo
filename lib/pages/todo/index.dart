@@ -36,12 +36,15 @@ class TodoScreen extends StatelessWidget {
       isScrollControlled: true,
       enableDrag: false,
       context: context,
-      builder: (context) => TodoModifyBar(
-        todo: todo,
-        allowProjectSelection: true,
-        onBackButton: () {
-          AutoRouter.of(context).maybePop();
-        },
+      builder: (context) => Padding(
+        padding: MediaQuery.of(context).viewInsets,
+        child: TodoModifyBar(
+          todo: todo,
+          allowProjectSelection: true,
+          onBackButton: () {
+            AutoRouter.of(context).maybePop();
+          },
+        ),
       ),
     );
   }
