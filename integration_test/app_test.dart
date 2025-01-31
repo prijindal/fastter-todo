@@ -6,6 +6,7 @@ import 'package:fastter_todo/models/settings.dart';
 import 'package:fastter_todo/pages/todos/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
@@ -28,21 +29,19 @@ void main() {
       });
       when(() => mockStackRouter.currentUrl).thenReturn('/todos');
       // Load app widget.
-      var dbManager = DbManager.localOnly();
+      GetIt.I.registerSingleton<DbManager>(DbManager.localOnly());
+      GetIt.I.registerSingleton<SettingsStorageNotifier>(
+          SettingsStorageNotifier());
+      GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier());
+      GetIt.I.registerSingleton<LocalDbState>(
+        LocalDbState(),
+      );
+      await GetIt.I.allReady();
       await tester.pumpWidget(
         MultiProvider(
           providers: [
-            ChangeNotifierProvider<DbManager>(
-              create: (context) => dbManager,
-            ),
-            ChangeNotifierProvider<SettingsStorageNotifier>(
-              create: (context) => SettingsStorageNotifier(),
-            ),
-            ChangeNotifierProvider<LocalStateNotifier>(
-              create: (_) => LocalStateNotifier(),
-            ),
             ChangeNotifierProvider<LocalDbState>(
-              create: (_) => LocalDbState(dbManager.database),
+              create: (_) => LocalDbState(),
             ),
           ],
           child: MaterialApp(
