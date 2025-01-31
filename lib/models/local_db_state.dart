@@ -17,7 +17,7 @@ class LocalDbState extends ChangeNotifier {
       LocalNotificationsManager();
   final RemoteDbSettings? remoteDbSettings;
 
-  List<StreamSubscription<List<int>>> _subscriptions = [];
+  List<StreamSubscription<List<dynamic>>> _subscriptions = [];
 
   Timer? timer;
 
@@ -246,6 +246,7 @@ class LocalDbState extends ChangeNotifier {
   }
 
   void initFromLocalTempDb() async {
+    if (remoteDbSettings == null) return;
     await Future.wait([
       _readFromLocalDb<TodoData>("todo", TodoData.fromJson),
       _readFromLocalDb<ProjectData>("project", ProjectData.fromJson),
@@ -256,6 +257,7 @@ class LocalDbState extends ChangeNotifier {
   }
 
   Future<void> setLocalTempDb(String table, List<drift.DataClass> items) async {
+    if (remoteDbSettings == null) return;
     await SharedPreferencesAsync().setString(
         "LocalTempDb$table", jsonEncode(items.map((a) => a.toJson()).toList()));
   }

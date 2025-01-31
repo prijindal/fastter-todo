@@ -80,6 +80,9 @@ void main() {
       debugPrint("Tapping add icon button");
       await tester.tap(addIcon);
       await tester.pumpAndSettle();
+
+      expect(find.text("A Sample todo"), findsOneWidget);
+      await tester.pumpAndSettle(const Duration(seconds: 1));
     });
   });
 }
