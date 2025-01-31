@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../helpers/todos_filters.dart';
@@ -12,27 +11,24 @@ import '../../models/local_state.dart';
 import 'todo_item.dart';
 import 'todolistview.dart';
 
-class TodoGrid extends StatelessWidget {
+class TodoGrid extends WatchingWidget {
   const TodoGrid({super.key, required this.filters});
 
   final TodosFilters filters;
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LocalDbState,
-        ({bool isTodosInitialized, List<TodoData> todos})>(
-      selector: (context, state) => (
-        isTodosInitialized: state.isTodosInitialized,
-        todos: filters.filtered(state.todos)
-          ..sort(TodosSortingAlgorithm.base().compare)
-      ),
-      builder: (context, state, _) => !state.isTodosInitialized
-          ? Center(child: Text("Loading"))
-          : _TodosGrid(
-              todos: state.todos,
-              filters: filters,
-            ),
-    );
+    final isTodosInitialized =
+        watchPropertyValue(((LocalDbState state) => state.isTodosInitialized));
+    final todos = watchPropertyValue((LocalDbState state) =>
+        filters.filtered(state.todos)
+          ..sort(TodosSortingAlgorithm.base().compare));
+    return !isTodosInitialized
+        ? Center(child: Text("Loading"))
+        : _TodosGrid(
+            todos: todos,
+            filters: filters,
+          );
   }
 }
 
@@ -48,8 +44,7 @@ class _TodosGrid extends WatchingWidget {
 
   List<String> getPipelines(BuildContext context) {
     if (filters.projectFilter != null && filters.projectFilter != "inbox") {
-      return Provider.of<LocalDbState>(context)
-          .getProjectPipelines(filters.projectFilter);
+      return GetIt.I<LocalDbState>().getProjectPipelines(filters.projectFilter);
     }
     return todos.map((todo) => todo.pipeline).toSet().toList();
   }

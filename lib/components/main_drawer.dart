@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../helpers/todos_filters.dart';
-import '../models/core.dart';
 import '../models/local_db_state.dart';
 import '../router/app_router.dart';
 
@@ -46,7 +44,7 @@ class NavigationListTile extends StatelessWidget {
 }
 
 // List tile to specifically navigate to todos page
-class TodosNavigationListTile extends StatelessWidget {
+class TodosNavigationListTile extends WatchingWidget {
   const TodosNavigationListTile({
     super.key,
     required this.filters,
@@ -60,25 +58,17 @@ class TodosNavigationListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LocalDbState,
-        ({int completed, int total, String queryString})>(
-      selector: (_, state) {
-        final filtered = filters.filtered(state.todos);
-        return (
-          completed: filtered.where((a) => a.completed).length,
-          total: filtered.length,
-          queryString: filters.queryString,
-        );
-      },
-      builder: (context, todos, _) => NavigationListTile(
-        icon: icon,
-        selectedIcon: selectedIcon,
-        route: todos.queryString.isEmpty
-            ? "/todos"
-            : "/todos?${todos.queryString}",
-        label: filters.createTitle(context),
-        trailing: "${todos.completed}/${todos.total}",
-      ),
+    final filtered = watchPropertyValue(
+        (LocalDbState state) => filters.filtered(state.todos));
+    final completed = filtered.where((a) => a.completed).length;
+    final total = filtered.length;
+    final queryString = filters.queryString;
+    return NavigationListTile(
+      icon: icon,
+      selectedIcon: selectedIcon,
+      route: queryString.isEmpty ? "/todos" : "/todos?$queryString",
+      label: filters.createTitle(context),
+      trailing: "$completed/$total",
     );
   }
 }
@@ -88,10 +78,53 @@ class MainDrawer extends StatelessWidget {
     super.key,
   });
 
-  Widget _buildProjectsDestination(
-      BuildContext context, List<ProjectData>? projects) {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          TodosNavigationListTile(
+            filters: TodosFilters(projectFilter: "inbox"),
+            icon: Icon(Icons.inbox_outlined),
+            selectedIcon: Icon(Icons.inbox),
+          ),
+          TodosNavigationListTile(
+            filters: TodosFilters(),
+            icon: Icon(Icons.select_all_outlined),
+            selectedIcon: Icon(Icons.select_all),
+          ),
+          TodosNavigationListTile(
+            filters: TodosFilters(daysAhead: 1),
+            icon: Icon(Icons.calendar_today_outlined),
+            selectedIcon: Icon(Icons.calendar_today),
+          ),
+          TodosNavigationListTile(
+            filters: TodosFilters(daysAhead: 7),
+            icon: Icon(Icons.calendar_view_day_outlined),
+            selectedIcon: Icon(Icons.calendar_view_day),
+          ),
+          ProjectExpansionTile(),
+          TagsExpansionTile(),
+          NavigationListTile(
+            route: "/settings",
+            icon: Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings),
+            label: "Settings",
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProjectExpansionTile extends WatchingWidget {
+  const ProjectExpansionTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final projects = watchPropertyValue((LocalDbState state) => state.projects);
     final children = <Widget>[];
-    if (projects != null) {
+    if (projects.isNotEmpty) {
       children.addAll(projects
           .map(
             (project) => TodosNavigationListTile(
@@ -133,10 +166,16 @@ class MainDrawer extends StatelessWidget {
       children: children,
     );
   }
+}
 
-  Widget _buildTagsDestination(BuildContext context, List<String>? tags) {
+class TagsExpansionTile extends WatchingWidget {
+  const TagsExpansionTile({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final tags = watchPropertyValue((LocalDbState state) => state.allTags);
     final children = <Widget>[];
-    if (tags != null) {
+    if (tags.isNotEmpty) {
       children.addAll(tags
           .map(
             (tag) => TodosNavigationListTile(
@@ -158,54 +197,6 @@ class MainDrawer extends StatelessWidget {
       leading: Icon(Icons.tag),
       title: Text("Tags"),
       children: children,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        children: [
-          TodosNavigationListTile(
-            filters: TodosFilters(projectFilter: "inbox"),
-            icon: Icon(Icons.inbox_outlined),
-            selectedIcon: Icon(Icons.inbox),
-          ),
-          TodosNavigationListTile(
-            filters: TodosFilters(),
-            icon: Icon(Icons.select_all_outlined),
-            selectedIcon: Icon(Icons.select_all),
-          ),
-          TodosNavigationListTile(
-            filters: TodosFilters(daysAhead: 1),
-            icon: Icon(Icons.calendar_today_outlined),
-            selectedIcon: Icon(Icons.calendar_today),
-          ),
-          TodosNavigationListTile(
-            filters: TodosFilters(daysAhead: 7),
-            icon: Icon(Icons.calendar_view_day_outlined),
-            selectedIcon: Icon(Icons.calendar_view_day),
-          ),
-          Selector<LocalDbState, List<ProjectData>>(
-            selector: (_, state) => state.projects,
-            builder: (context, projects, _) {
-              return _buildProjectsDestination(context, projects);
-            },
-          ),
-          Selector<LocalDbState, List<String>>(
-            selector: (_, state) => state.allTags,
-            builder: (context, tags, _) {
-              return _buildTagsDestination(context, tags);
-            },
-          ),
-          NavigationListTile(
-            route: "/settings",
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: "Settings",
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
@@ -33,7 +33,7 @@ class FormBuilderProjectSelector extends StatelessWidget {
       enabled: enabled,
       selectedProject: field.value == null
           ? null
-          : Provider.of<LocalDbState>(context)
+          : GetIt.I<LocalDbState>()
               .projects
               .where((a) => a.id == field.value)
               .firstOrNull,
@@ -66,7 +66,7 @@ class FormBuilderProjectSelector extends StatelessWidget {
   }
 }
 
-class ProjectDropdown extends StatelessWidget {
+class ProjectDropdown extends WatchingWidget {
   const ProjectDropdown({
     super.key,
     required this.onSelected,
@@ -84,16 +84,14 @@ class ProjectDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LocalDbState, List<ProjectData>>(
-      selector: (_, state) => state.projects,
-      builder: (context, projects, _) => _ProjectDropdown(
-        projects: projects,
-        onSelected: onSelected,
-        selectedProject: selectedProject,
-        onOpening: onOpening,
-        expanded: expanded,
-        enabled: enabled,
-      ),
+    final projects = watchPropertyValue((LocalDbState state) => state.projects);
+    return _ProjectDropdown(
+      projects: projects,
+      onSelected: onSelected,
+      selectedProject: selectedProject,
+      onOpening: onOpening,
+      expanded: expanded,
+      enabled: enabled,
     );
   }
 }

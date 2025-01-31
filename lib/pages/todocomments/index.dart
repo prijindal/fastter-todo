@@ -1,9 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../models/core.dart';
 import '../../models/db_manager.dart';
@@ -12,7 +11,7 @@ import 'todo_comment_input.dart';
 import 'todo_comment_item.dart';
 
 @RoutePage()
-class TodoCommentsScreen extends StatelessWidget {
+class TodoCommentsScreen extends WatchingWidget {
   const TodoCommentsScreen({
     super.key,
     @PathParam() required this.todoId,
@@ -21,13 +20,16 @@ class TodoCommentsScreen extends StatelessWidget {
   final String todoId;
 
   @override
-  Widget build(BuildContext context) => Consumer<LocalDbState>(
-        builder: (context, localDbState, _) => _TodoCommentsScreen(
-          todo: localDbState.todos.firstWhere((f) => f.id == todoId),
-          todoComments:
-              localDbState.comments.where((a) => a.todo == todoId).toList(),
-        ),
-      );
+  Widget build(BuildContext context) {
+    final comments = watchPropertyValue((LocalDbState state) =>
+        state.comments.where((a) => a.todo == todoId).toList());
+    final todo = watchPropertyValue(
+        (LocalDbState state) => state.todos.firstWhere((f) => f.id == todoId));
+    return _TodoCommentsScreen(
+      todo: todo,
+      todoComments: comments,
+    );
+  }
 }
 
 class _TodoCommentsScreen extends StatefulWidget {

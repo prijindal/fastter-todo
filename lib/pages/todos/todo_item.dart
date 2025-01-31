@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:provider/provider.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../helpers/date_fomatters.dart';
@@ -256,7 +255,7 @@ class _TodoItemFirstRow extends StatelessWidget {
 }
 
 // Second row displays due date, reminders, comments, and child todos
-class _TodoItemSecondRow extends StatelessWidget {
+class _TodoItemSecondRow extends WatchingWidget {
   const _TodoItemSecondRow({
     required this.todo,
     required this.showDueDate,
@@ -348,27 +347,24 @@ class _TodoItemSecondRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LocalDbState,
-        ({int reminders, int comments, int childTodos})>(
-      selector: (_, state) => (
-        reminders: state.getTodoReminders(todo.id, true).length,
-        comments: state.comments.where((f) => f.todo == todo.id).length,
-        childTodos: state.todos
-            .where((a) => a.parent == todo.id && a.completed == false)
-            .length,
-      ),
-      builder: (context, counts, _) => _buildSecondRow(
-        context,
-        counts.comments,
-        counts.reminders,
-        counts.childTodos,
-      ),
+    final reminders = watchPropertyValue(
+        (LocalDbState state) => state.getTodoReminders(todo.id, true).length);
+    final comments = watchPropertyValue((LocalDbState state) =>
+        state.comments.where((f) => f.todo == todo.id).length);
+    final childTodos = watchPropertyValue((LocalDbState state) => state.todos
+        .where((a) => a.parent == todo.id && a.completed == false)
+        .length);
+    return _buildSecondRow(
+      context,
+      comments,
+      reminders,
+      childTodos,
     );
   }
 }
 
 // Third row displays tags
-class _TodoItemThirdRow extends StatelessWidget {
+class _TodoItemThirdRow extends WatchingWidget {
   const _TodoItemThirdRow({
     required this.todo,
   });
@@ -377,27 +373,24 @@ class _TodoItemThirdRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LocalDbState, List<String>>(
-      selector: (context, state) => state.getTodoTag(todo.id),
-      builder: (context, tags, _) {
-        if (tags.isEmpty) {
-          return Container();
-        }
-        return Container(
-          margin: const EdgeInsets.only(top: 4),
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width - 100,
-          ),
-          child: TagsList(
-            tags: tags,
-          ),
-        );
-      },
+    final tags =
+        watchPropertyValue((LocalDbState state) => state.getTodoTag(todo.id));
+    if (tags.isEmpty) {
+      return Container();
+    }
+    return Container(
+      margin: const EdgeInsets.only(top: 4),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width - 100,
+      ),
+      child: TagsList(
+        tags: tags,
+      ),
     );
   }
 }
 
-class _SubtitleProject extends StatelessWidget {
+class _SubtitleProject extends WatchingWidget {
   const _SubtitleProject({
     required this.todo,
   });
@@ -429,14 +422,8 @@ class _SubtitleProject extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return todo.project == null
-        ? _buildContainer(null)
-        : Selector<LocalDbState, ProjectData?>(
-            selector: (_, state) =>
-                state.projects.where((f) => f.id == todo.project).firstOrNull,
-            builder: (context, project, _) {
-              return _buildContainer(project);
-            },
-          );
+    final project = watchPropertyValue((LocalDbState state) =>
+        state.projects.where((f) => f.id == todo.project).firstOrNull);
+    return _buildContainer(project);
   }
 }

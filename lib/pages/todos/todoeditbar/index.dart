@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../../models/core.dart';
@@ -26,15 +25,10 @@ class TodoEditBar extends WatchingWidget {
   Widget build(BuildContext context) {
     final selectedTodoIds =
         watchPropertyValue((LocalStateNotifier state) => state.selectedTodoIds);
-    return Selector<LocalDbState, List<TodoData>>(
-      selector: (_, dbState) {
-        return dbState.todos
-            .where((a) => selectedTodoIds.contains(a.id))
-            .toList();
-      },
-      builder: (context, selectedTodos, _) => _TodoEditBar(
-        selectedTodos: selectedTodos,
-      ),
+    final selectedTodos = watchPropertyValue((LocalDbState state) =>
+        state.todos.where((a) => selectedTodoIds.contains(a.id)).toList());
+    return _TodoEditBar(
+      selectedTodos: selectedTodos,
     );
   }
 }
@@ -76,7 +70,7 @@ class _TodoEditBarState extends State<_TodoEditBar> {
       _expanded ? _buildExpanded() : _buildCollapsed();
 }
 
-class TodoEditBarCollapsed extends StatelessWidget {
+class TodoEditBarCollapsed extends WatchingWidget {
   const TodoEditBarCollapsed({
     super.key,
     required this.selectedTodos,
@@ -86,7 +80,7 @@ class TodoEditBarCollapsed extends StatelessWidget {
   final List<TodoData> selectedTodos;
   final VoidCallback onExpand;
 
-  List<Widget> _buildButtons(BuildContext context) {
+  List<Widget> _buildButtons(BuildContext context, List<String> selectedTags) {
     if (selectedTodos.isEmpty) return [];
     if (selectedTodos.length <= 1) {
       return <Widget>[
@@ -142,8 +136,7 @@ class TodoEditBarCollapsed extends StatelessWidget {
       ),
       TagSelector(
         expanded: false,
-        selectedTags: Provider.of<LocalDbState>(context)
-            .getTodosTags(selectedTodos.map((a) => a.id).toList()),
+        selectedTags: selectedTags,
         onSelected: (selectedTags) async => await GetIt.I<DbManager>()
             .database
             .managers
@@ -167,6 +160,8 @@ class TodoEditBarCollapsed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedTags = watchPropertyValue((LocalDbState state) =>
+        state.getTodosTags(selectedTodos.map((a) => a.id).toList()));
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8.0),
       height: 50,
@@ -174,7 +169,7 @@ class TodoEditBarCollapsed extends StatelessWidget {
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         // spacing: 8.0,
-        children: _buildButtons(context),
+        children: _buildButtons(context, selectedTags),
       ),
     );
   }

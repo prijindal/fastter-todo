@@ -6,7 +6,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
 
 import '../../helpers/logger.dart';
 import '../../models/core.dart';
@@ -207,8 +206,7 @@ class _TodoInputBarState extends State<_TodoInputBar>
       }
       final todo = _formKey.currentState!.value;
       final project = todo["project"] as String?;
-      final pipelines = Provider.of<LocalDbState>(context, listen: false)
-          .getProjectPipelines(project);
+      final pipelines = GetIt.I<LocalDbState>().getProjectPipelines(project);
       final selectedPipeline = todo["pipeline"] as String?;
       final pipeline =
           selectedPipeline != null && pipelines.contains(selectedPipeline)
@@ -338,16 +336,15 @@ class _TodoInputBarState extends State<_TodoInputBar>
       );
 
   Widget _buildPipelineButton() {
-    final pipelines = Provider.of<LocalDbState>(context).getProjectPipelines(
+    final pipelines = GetIt.I<LocalDbState>().getProjectPipelines(
         (_formKey.currentState?.instantValue['project'] ??
             widget.initialProject) as String?);
     return FormBuilderField<String>(
       name: "pipeline",
       initialValue: widget.initialPipeline ?? pipelines.first,
       builder: (FormFieldState<String> field) {
-        final pipelines = Provider.of<LocalDbState>(context)
-            .getProjectPipelines(
-                _formKey.currentState?.instantValue['project'] as String?);
+        final pipelines = GetIt.I<LocalDbState>().getProjectPipelines(
+            _formKey.currentState?.instantValue['project'] as String?);
         return TextButton(
           child: Text(field.value ?? pipelines.first),
           onPressed: () {

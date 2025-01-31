@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
@@ -81,43 +81,11 @@ class _TodosListViewState extends State<TodosListView> {
         }
         final todo = widget.todos[index];
         if (widget.showChildren) {
-          final children = Provider.of<LocalDbState>(context)
-              .todos
-              .where((a) => a.parent == todo.id)
-              .toList();
-          return Card(
-            elevation: 4,
-            child: Column(
-              children: [
-                TodoItem(
-                  key: Key("TodoItem${todo.id}"),
-                  todo: todo,
-                  dismissible: widget.dismissible,
-                  tapBehaviour: widget.todoItemTapBehaviour,
-                  longPressBehaviour: widget.todoItemLongPressBehaviour,
-                ),
-                if (children.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.only(
-                      left: 24.0,
-                      bottom: 8.0,
-                    ),
-                    child: Column(
-                      children: children
-                          .map(
-                            (a) => TodoItem(
-                              todo: a,
-                              dense: true,
-                              tapBehaviour: TodoItemTapBehaviour.openTodoPage,
-                              dismissible: false,
-                              elements: [],
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  )
-              ],
-            ),
+          return _TodoItemCardWithChildren(
+            todo: todo,
+            dismissible: widget.dismissible,
+            todoItemTapBehaviour: widget.todoItemTapBehaviour,
+            todoItemLongPressBehaviour: widget.todoItemLongPressBehaviour,
           );
         }
         return TodoItem(
@@ -128,6 +96,59 @@ class _TodosListViewState extends State<TodosListView> {
           longPressBehaviour: widget.todoItemLongPressBehaviour,
         );
       },
+    );
+  }
+}
+
+class _TodoItemCardWithChildren extends WatchingWidget {
+  const _TodoItemCardWithChildren(
+      {required this.todo,
+      required this.dismissible,
+      required this.todoItemTapBehaviour,
+      required this.todoItemLongPressBehaviour});
+
+  final TodoData todo;
+  final bool dismissible;
+  final TodoItemTapBehaviour todoItemTapBehaviour;
+  final TodoItemTapBehaviour todoItemLongPressBehaviour;
+
+  @override
+  Widget build(BuildContext context) {
+    final children = watchPropertyValue((LocalDbState state) =>
+        state.todos.where((a) => a.parent == todo.id).toList());
+    return Card(
+      elevation: 4,
+      child: Column(
+        children: [
+          TodoItem(
+            key: Key("TodoItem${todo.id}"),
+            todo: todo,
+            dismissible: dismissible,
+            tapBehaviour: todoItemTapBehaviour,
+            longPressBehaviour: todoItemLongPressBehaviour,
+          ),
+          if (children.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.only(
+                left: 24.0,
+                bottom: 8.0,
+              ),
+              child: Column(
+                children: children
+                    .map(
+                      (a) => TodoItem(
+                        todo: a,
+                        dense: true,
+                        tapBehaviour: TodoItemTapBehaviour.openTodoPage,
+                        dismissible: false,
+                        elements: [],
+                      ),
+                    )
+                    .toList(),
+              ),
+            )
+        ],
+      ),
     );
   }
 }

@@ -1,14 +1,13 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../../models/core.dart';
 import '../../../models/db_manager.dart';
 import '../../../models/local_db_state.dart';
 import '../projectdropdown.dart';
 
-class ChangeProjectButton extends StatelessWidget {
+class ChangeProjectButton extends WatchingWidget {
   const ChangeProjectButton({
     super.key,
     required this.selectedTodos,
@@ -28,21 +27,19 @@ class ChangeProjectButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final project = watchPropertyValue((LocalDbState state) => state.projects
+        .where((p) => p.id == selectedTodos.first.project)
+        .firstOrNull);
     if (selectedTodos.isEmpty) {
       return ProjectDropdown(
         onSelected: (p) => _onChangeProject(p, context),
         selectedProject: null,
       );
     }
-    return Selector<LocalDbState, ProjectData?>(
-      selector: (_, state) => state.projects
-          .where((p) => p.id == selectedTodos.first.project)
-          .firstOrNull,
-      builder: (context, project, _) => ProjectDropdown(
-        onSelected: (p) => _onChangeProject(p, context),
-        selectedProject: project,
-        enabled: true,
-      ),
+    return ProjectDropdown(
+      onSelected: (p) => _onChangeProject(p, context),
+      selectedProject: project,
+      enabled: true,
     );
   }
 }

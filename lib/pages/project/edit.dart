@@ -2,8 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../models/core.dart';
 import '../../models/db_manager.dart';
@@ -11,7 +10,7 @@ import '../../models/local_db_state.dart';
 import 'form.dart';
 
 @RoutePage()
-class EditProjectScreen extends StatelessWidget {
+class EditProjectScreen extends WatchingWidget {
   const EditProjectScreen({
     super.key,
     @pathParam required this.projectId,
@@ -20,15 +19,13 @@ class EditProjectScreen extends StatelessWidget {
   final String projectId;
   @override
   Widget build(BuildContext context) {
-    return Selector<LocalDbState, ProjectData?>(
-      selector: (_, state) =>
-          state.projects.where((a) => a.id == projectId).firstOrNull,
-      builder: (_, project, __) => project == null
-          ? Scaffold(body: Center(child: Text("Loading...")))
-          : _EditProjectScreen(
-              project: project,
-            ),
-    );
+    final project = watchPropertyValue((LocalDbState state) =>
+        state.projects.where((a) => a.id == projectId).firstOrNull);
+    return project == null
+        ? Scaffold(body: Center(child: Text("Loading...")))
+        : _EditProjectScreen(
+            project: project,
+          );
   }
 }
 

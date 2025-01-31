@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
 
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
@@ -41,14 +40,7 @@ class MyApp extends StatelessWidget {
                 child: LoadingScreen(),
               ),
             ))
-          : MultiProvider(
-              providers: [
-                ChangeNotifierProvider<LocalDbState>(
-                  create: (context) => GetIt.I<LocalDbState>(),
-                ),
-              ],
-              child: MyMaterialApp(),
-            ),
+          : MyMaterialApp(),
     );
   }
 }

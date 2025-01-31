@@ -1,7 +1,6 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 
 import '../../../models/db_manager.dart';
@@ -29,7 +28,7 @@ class BackendSettingsScreen extends StatelessWidget {
             try {
               await GetIt.I<DbManager>().resetDatabase();
               // ignore: use_build_context_synchronously
-              await Provider.of<LocalDbState>(context, listen: false).clear();
+              await GetIt.I<LocalDbState>().clear();
               await Restart.restartApp(
                 notificationTitle: 'Restarting App',
                 notificationBody: 'Please tap here to open the app again.',

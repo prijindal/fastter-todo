@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:fuzzywuzzy/fuzzywuzzy.dart';
 import 'package:fuzzywuzzy/model/extracted_result.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
@@ -27,7 +27,7 @@ class _SearchScreenState extends State<SearchScreen>
   Widget _todoTab() {
     return _SearchedList<TodoData>(
       searchText: _searchText,
-      allData: Provider.of<LocalDbState>(context, listen: false).todos,
+      allData: GetIt.I<LocalDbState>().todos,
       getter: (todo) => todo.title.toLowerCase(),
       itemBuilder: (item) => TodoItem(
         todo: item.choice,
@@ -41,7 +41,7 @@ class _SearchScreenState extends State<SearchScreen>
   Widget _projectsTab() {
     return _SearchedList<ProjectData>(
       searchText: _searchText,
-      allData: Provider.of<LocalDbState>(context, listen: false).projects,
+      allData: GetIt.I<LocalDbState>().projects,
       getter: (project) => project.title.toString().toLowerCase(),
       itemBuilder: (item) => ProjectListTile(
         project: item.choice,
@@ -55,7 +55,7 @@ class _SearchScreenState extends State<SearchScreen>
   Widget _commentsTab() {
     return _SearchedList<CommentData>(
       searchText: _searchText,
-      allData: Provider.of<LocalDbState>(context, listen: false).comments,
+      allData: GetIt.I<LocalDbState>().comments,
       getter: (comment) => comment.content.toString().toLowerCase(),
       itemBuilder: (item) => TodoCommentItem(
         todoComment: item.choice,

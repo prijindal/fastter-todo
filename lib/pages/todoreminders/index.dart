@@ -1,9 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../models/core.dart';
 import '../../models/db_manager.dart';
@@ -30,13 +29,13 @@ Future<void> newReminder(BuildContext context, String todoId) async {
             completed: drift.Value(false),
           ));
       // ignore: use_build_context_synchronously
-      await Provider.of<LocalDbState>(context, listen: false).refresh();
+      await GetIt.I<LocalDbState>().refresh();
     }
   }
 }
 
 @RoutePage()
-class TodoRemindersScreen extends StatelessWidget {
+class TodoRemindersScreen extends WatchingWidget {
   const TodoRemindersScreen({
     super.key,
     @PathParam() required this.todoId,
@@ -45,12 +44,16 @@ class TodoRemindersScreen extends StatelessWidget {
   final String todoId;
 
   @override
-  Widget build(BuildContext context) => Consumer<LocalDbState>(
-        builder: (context, localDbState, _) => _TodoRemindersScreen(
-          todo: localDbState.todos.firstWhere((f) => f.id == todoId),
-          reminders: localDbState.getTodoReminders(todoId, false),
-        ),
-      );
+  Widget build(BuildContext context) {
+    final reminders = watchPropertyValue(
+        (LocalDbState state) => state.getTodoReminders(todoId, false));
+    final todo = watchPropertyValue(
+        (LocalDbState state) => state.todos.firstWhere((f) => f.id == todoId));
+    return _TodoRemindersScreen(
+      todo: todo,
+      reminders: reminders,
+    );
+  }
 }
 
 class _TodoRemindersScreen extends StatefulWidget {
@@ -103,7 +106,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
           .filter((f) => f.id.isIn(_selectedReminders))
           .delete();
       // ignore: use_build_context_synchronously
-      await Provider.of<LocalDbState>(context, listen: false).refresh();
+      await GetIt.I<LocalDbState>().refresh();
     }
   }
 

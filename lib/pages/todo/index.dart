@@ -5,8 +5,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../helpers/breakpoints.dart';
 import '../../models/core.dart';
@@ -81,13 +80,14 @@ class TodoScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => Selector<LocalDbState, TodoData>(
-        selector: (_, state) => state.todos.where((a) => a.id == todoId).first,
-        builder: (context, todo, _) => TodosScreenScaffold(
-          todo: todo,
-          elements: elements(todo),
-        ),
-      );
+  Widget build(BuildContext context) {
+    final todo =
+        GetIt.I<LocalDbState>().todos.where((a) => a.id == todoId).first;
+    return TodosScreenScaffold(
+      todo: todo,
+      elements: elements(todo),
+    );
+  }
 }
 
 class TodosScreenScaffold extends StatelessWidget {
@@ -178,8 +178,8 @@ class _TodoEditBodyState extends State<TodoEditBody> {
 
   @override
   Widget build(BuildContext context) {
-    final possiblePipelines = Provider.of<LocalDbState>(context)
-        .getProjectPipelines(widget.todo.project);
+    final possiblePipelines =
+        GetIt.I<LocalDbState>().getProjectPipelines(widget.todo.project);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: FormBuilder(
@@ -295,62 +295,13 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               ),
             const SizedBox(height: 10),
             if (widget.elements.contains(TodoItemElements.comments))
-              Selector<LocalDbState, List<CommentData>>(
-                selector: (_, state) => state.comments
-                    .where((a) => a.todo == widget.todo.id)
-                    .toList(),
-                builder: (context, comments, _) {
-                  return ExpansionTile(
-                    leading: IconButton(
-                      onPressed: () => AutoRouter.of(context)
-                          .pushNamed("/todocomments/${widget.todo.id}"),
-                      icon: const Icon(Icons.list),
-                    ),
-                    initiallyExpanded: true,
-                    enabled: comments.isNotEmpty,
-                    title: Text("${comments.length} Comments"),
-                    children: comments
-                        .map((comment) => TodoCommentItem(
-                              todoComment: comment,
-                              dense: true,
-                              dismissible: false,
-                            ))
-                        .toList(),
-                  );
-                },
+              _ExpansionTodoComment(
+                todo: widget.todo,
               ),
             const SizedBox(height: 10),
             if (widget.elements.contains(TodoItemElements.reminders))
-              Selector<LocalDbState, List<ReminderData>>(
-                selector: (_, state) =>
-                    state.getTodoReminders(widget.todo.id, true),
-                builder: (context, reminders, _) {
-                  return ExpansionTile(
-                    leading: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () => AutoRouter.of(context)
-                              .pushNamed("/todoreminders/${widget.todo.id}"),
-                          icon: const Icon(Icons.list),
-                        ),
-                        IconButton(
-                          onPressed: () => newReminder(context, widget.todo.id),
-                          icon: const Icon(Icons.add),
-                        ),
-                      ],
-                    ),
-                    initiallyExpanded: true,
-                    enabled: reminders.isNotEmpty,
-                    title: Text("${reminders.length} Reminders"),
-                    children: reminders
-                        .map((reminder) => TodoReminderTile(
-                              reminder: reminder,
-                              dense: true,
-                            ))
-                        .toList(),
-                  );
-                },
+              _ExpansionTodoReminder(
+                todo: widget.todo,
               ),
             const SizedBox(height: 10),
             if (widget.elements.contains(TodoItemElements.children))
@@ -371,7 +322,71 @@ class _TodoEditBodyState extends State<TodoEditBody> {
   }
 }
 
-class _ExpansionTodoChildren extends StatefulWidget {
+class _ExpansionTodoComment extends WatchingWidget {
+  const _ExpansionTodoComment({required this.todo});
+  final TodoData todo;
+
+  @override
+  Widget build(BuildContext context) {
+    final comments = watchPropertyValue((LocalDbState state) =>
+        state.comments.where((a) => a.todo == todo.id).toList());
+    return ExpansionTile(
+      leading: IconButton(
+        onPressed: () =>
+            AutoRouter.of(context).pushNamed("/todocomments/${todo.id}"),
+        icon: const Icon(Icons.list),
+      ),
+      initiallyExpanded: true,
+      enabled: comments.isNotEmpty,
+      title: Text("${comments.length} Comments"),
+      children: comments
+          .map((comment) => TodoCommentItem(
+                todoComment: comment,
+                dense: true,
+                dismissible: false,
+              ))
+          .toList(),
+    );
+  }
+}
+
+class _ExpansionTodoReminder extends WatchingWidget {
+  const _ExpansionTodoReminder({required this.todo});
+  final TodoData todo;
+
+  @override
+  Widget build(BuildContext context) {
+    final reminders = watchPropertyValue(
+        (LocalDbState state) => state.getTodoReminders(todo.id, true));
+    return ExpansionTile(
+      leading: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: () =>
+                AutoRouter.of(context).pushNamed("/todoreminders/${todo.id}"),
+            icon: const Icon(Icons.list),
+          ),
+          IconButton(
+            onPressed: () => newReminder(context, todo.id),
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
+      initiallyExpanded: true,
+      enabled: reminders.isNotEmpty,
+      title: Text("${reminders.length} Reminders"),
+      children: reminders
+          .map((reminder) => TodoReminderTile(
+                reminder: reminder,
+                dense: true,
+              ))
+          .toList(),
+    );
+  }
+}
+
+class _ExpansionTodoChildren extends WatchingStatefulWidget {
   const _ExpansionTodoChildren({
     required this.todo,
   });
@@ -387,55 +402,51 @@ class _ExpansionTodoChildrenState extends State<_ExpansionTodoChildren> {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LocalDbState, List<TodoData>>(
-      selector: (_, state) =>
-          state.todos.where((a) => a.parent == widget.todo.id).toList(),
-      builder: (context, children, _) {
-        return ExpansionTile(
-          leading: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                onPressed: () => AutoRouter.of(context)
-                    .pushNamed("/todochildren/${widget.todo.id}"),
-                icon: const Icon(Icons.list),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    _adding = true;
-                  });
-                },
-                icon: const Icon(Icons.add),
-              ),
-            ],
+    final children = watchPropertyValue((LocalDbState state) =>
+        state.todos.where((a) => a.parent == widget.todo.id).toList());
+    return ExpansionTile(
+      leading: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: () => AutoRouter.of(context)
+                .pushNamed("/todochildren/${widget.todo.id}"),
+            icon: const Icon(Icons.list),
           ),
-          initiallyExpanded: true,
-          enabled: children.isNotEmpty,
-          title: Text("${children.length} Children"),
-          children: [
-            ...children.map((todo) => TodoItem(
-                  todo: todo,
-                  dense: true,
-                  tapBehaviour: TodoItemTapBehaviour.openTodoPage,
-                  dismissible: false,
-                  elements: [],
-                )),
-            if (_adding)
-              TodoInputBar(
-                parentTodo: widget.todo.id,
-                initialProject: widget.todo.project,
-                additionalFields: false,
-                initialPipeline: widget.todo.pipeline,
-                onBackButton: () {
-                  setState(() {
-                    _adding = false;
-                  });
-                },
-              ),
-          ],
-        );
-      },
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _adding = true;
+              });
+            },
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
+      initiallyExpanded: true,
+      enabled: children.isNotEmpty,
+      title: Text("${children.length} Children"),
+      children: [
+        ...children.map((todo) => TodoItem(
+              todo: todo,
+              dense: true,
+              tapBehaviour: TodoItemTapBehaviour.openTodoPage,
+              dismissible: false,
+              elements: [],
+            )),
+        if (_adding)
+          TodoInputBar(
+            parentTodo: widget.todo.id,
+            initialProject: widget.todo.project,
+            additionalFields: false,
+            initialPipeline: widget.todo.pipeline,
+            onBackButton: () {
+              setState(() {
+                _adding = false;
+              });
+            },
+          ),
+      ],
     );
   }
 }

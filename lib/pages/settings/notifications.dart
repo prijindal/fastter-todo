@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../components/adaptive_scaffold.dart';
 import '../../models/local_db_state.dart';
@@ -18,11 +18,9 @@ class NotificationsSettingsScreen extends StatelessWidget {
       ),
       body: FutureBuilder<List<PendingNotificationRequest>>(
         future: () async {
-          await Provider.of<LocalDbState>(context)
-              .localNotificationsManager
-              .init();
+          await GetIt.I<LocalDbState>().localNotificationsManager.init();
           // ignore: use_build_context_synchronously
-          return Provider.of<LocalDbState>(context)
+          return GetIt.I<LocalDbState>()
               .localNotificationsManager
               .pendingNotificationRequests();
         }(),
@@ -36,7 +34,7 @@ class NotificationsSettingsScreen extends StatelessWidget {
               trailing: IconButton(
                 icon: const Icon(Icons.delete),
                 onPressed: () {
-                  Provider.of<LocalDbState>(context, listen: false)
+                  GetIt.I<LocalDbState>()
                       .localNotificationsManager
                       .cancelNotification(notification.id);
                 },

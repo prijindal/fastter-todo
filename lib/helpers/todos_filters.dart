@@ -1,7 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
 
 import '../models/core.dart';
 import '../models/local_db_state.dart';
@@ -54,13 +53,9 @@ class AppBarActions {
 
   factory AppBarActions.forceRefresh() {
     return AppBarActions(
-      icon: Selector<LocalDbState, bool>(
-        selector: (_, state) => state.isRefreshing || !state.isInitialized,
-        builder: (context, isRefreshing, _) =>
-            isRefreshing ? Icon(Icons.sync) : Icon(Icons.refresh),
-      ),
-      onPressed: (context) =>
-          Provider.of<LocalDbState>(context, listen: false).refresh(),
+      // TODO: Display refreshing status
+      icon: Icon(Icons.refresh),
+      onPressed: (context) => GetIt.I<LocalDbState>().refresh(),
     );
   }
 }
@@ -123,7 +118,7 @@ class TodosFilters {
         return "Inbox";
       } else {
         // ignore: use_build_context_synchronously
-        final project = Provider.of<LocalDbState>(context, listen: false)
+        final project = GetIt.I<LocalDbState>()
             .projects
             .where((f) => f.id == projectFilter)
             .firstOrNull;

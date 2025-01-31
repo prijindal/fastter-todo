@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
 import '../../../models/db_manager.dart';
@@ -15,9 +14,8 @@ class ChangePipelineButton extends StatelessWidget {
   List<String> getAllPipelines(BuildContext context) {
     Set<String>? todos;
     for (var todo in selectedTodos) {
-      final projectPipeline = Provider.of<LocalDbState>(context, listen: false)
-          .getProjectPipelines(todo.project)
-          .toSet();
+      final projectPipeline =
+          GetIt.I<LocalDbState>().getProjectPipelines(todo.project).toSet();
       if (todos == null) {
         todos = projectPipeline;
       } else {
