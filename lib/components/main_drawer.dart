@@ -1,11 +1,12 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 
 import '../helpers/todos_filters.dart';
 import '../models/core.dart';
 import '../models/local_db_state.dart';
+import '../router/app_router.dart';
 
 class NavigationListTile extends StatelessWidget {
   const NavigationListTile({
@@ -25,8 +26,8 @@ class NavigationListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final autoRouter = AutoRouter.of(context);
-    final selected = autoRouter.currentUrl == route;
+    AppRouter appRouter = GetIt.I<AppRouter>();
+    final selected = appRouter.currentUrl == route;
     return ListTile(
       title: Text(label),
       selected: selected,
@@ -35,7 +36,7 @@ class NavigationListTile extends StatelessWidget {
       onTap: route == null
           ? null
           : () async {
-              await autoRouter.navigateNamed(route!);
+              await appRouter.navigateNamed(route!);
               if (context.mounted && Scaffold.of(context).isDrawerOpen) {
                 Scaffold.of(context).closeDrawer();
               }

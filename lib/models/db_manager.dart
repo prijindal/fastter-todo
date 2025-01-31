@@ -63,9 +63,9 @@ class DbManager extends ChangeNotifier {
 
   DbManager();
 
-  factory DbManager.autoInit() {
+  static Future<DbManager> autoInit() async {
     final dbManager = DbManager();
-    dbManager.initDb();
+    await dbManager.initDb();
     return dbManager;
   }
 

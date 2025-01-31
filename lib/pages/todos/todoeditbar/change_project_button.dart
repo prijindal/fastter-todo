@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
@@ -17,7 +18,7 @@ class ChangeProjectButton extends StatelessWidget {
 
   Future<void> _onChangeProject(
       ProjectData? project, BuildContext context) async {
-    await Provider.of<DbManager>(context, listen: false)
+    await GetIt.I<DbManager>()
         .database
         .managers
         .todo

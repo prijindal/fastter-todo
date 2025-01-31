@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../helpers/todos_filters.dart';
 import '../../helpers/todos_sorting_algoritm.dart';
@@ -35,7 +36,7 @@ class TodoGrid extends StatelessWidget {
   }
 }
 
-class _TodosGrid extends StatelessWidget {
+class _TodosGrid extends WatchingWidget {
   _TodosGrid({
     required this.todos,
     required this.filters,
@@ -55,6 +56,9 @@ class _TodosGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSelected = watchPropertyValue(
+        ((LocalStateNotifier state) => state.selectedTodoIds.isNotEmpty));
+
     final pipelines = getPipelines(context);
     if (pipelines.isEmpty) {
       return Center(child: Text("Add some entries"));
@@ -74,7 +78,7 @@ class _TodosGrid extends StatelessWidget {
           final mediaQuery = MediaQuery.sizeOf(context);
           return SizedBox(
             width: min(mediaQuery.width, 600),
-            child: _buildList(filteredTodos, status),
+            child: _buildList(filteredTodos, status, isSelected),
           );
         },
       ),
@@ -95,26 +99,22 @@ class _TodosGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildList(List<TodoData> filteredTodos, String pipeline) {
+  Widget _buildList(
+      List<TodoData> filteredTodos, String pipeline, bool isSelected) {
     return ListView(
       shrinkWrap: false,
       children: [
         _buildPipelineChip(filteredTodos, pipeline),
-        Selector<LocalStateNotifier, bool>(
-            selector: (_, state) => state.selectedTodoIds.isNotEmpty,
-            builder: (context, isSelected, _) {
-              return TodosListView(
-                dismissible: false,
-                todos: filteredTodos,
-                shrinkWrap: true,
-                todoItemTapBehaviour: isSelected
-                    ? TodoItemTapBehaviour.toggleSelection
-                    : TodoItemTapBehaviour.openTodoBottomSheet,
-                todoItemLongPressBehaviour:
-                    TodoItemTapBehaviour.toggleSelection,
-                showChildren: true,
-              );
-            }),
+        TodosListView(
+          dismissible: false,
+          todos: filteredTodos,
+          shrinkWrap: true,
+          todoItemTapBehaviour: isSelected
+              ? TodoItemTapBehaviour.toggleSelection
+              : TodoItemTapBehaviour.openTodoBottomSheet,
+          todoItemLongPressBehaviour: TodoItemTapBehaviour.toggleSelection,
+          showChildren: true,
+        ),
       ],
     );
   }

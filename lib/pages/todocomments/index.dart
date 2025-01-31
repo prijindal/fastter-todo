@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -170,7 +171,7 @@ class TodoCommentsAppBar extends StatelessWidget
       ),
     );
     if (shouldDelete == true && context.mounted) {
-      await Provider.of<DbManager>(context, listen: false)
+      await GetIt.I<DbManager>()
           .database
           .managers
           .comment

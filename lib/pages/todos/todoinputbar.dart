@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/logger.dart';
@@ -62,7 +63,7 @@ class TodoModifyBar extends StatelessWidget {
           int? priority,
           List<String>? tags,
         }) async {
-          await Provider.of<DbManager>(context, listen: false)
+          await GetIt.I<DbManager>()
               .database
               .managers
               .todo
@@ -114,11 +115,7 @@ class TodoInputBar extends StatelessWidget {
           int priority = 1,
           List<String> tags = const [],
         }) async {
-          await Provider.of<DbManager>(context, listen: false)
-              .database
-              .managers
-              .todo
-              .create(
+          await GetIt.I<DbManager>().database.managers.todo.create(
                 (o) => o(
                   title: title,
                   project: drift.Value(project),

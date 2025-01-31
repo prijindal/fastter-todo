@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../models/core.dart';
 import '../../models/db_manager.dart';
@@ -23,11 +23,7 @@ class NewProjectScreen extends StatelessWidget {
     if (title == null || color == null) {
       return;
     }
-    await Provider.of<DbManager>(context, listen: false)
-        .database
-        .managers
-        .project
-        .create(
+    await GetIt.I<DbManager>().database.managers.project.create(
           (o) => o(
             color: color.hex,
             title: title,

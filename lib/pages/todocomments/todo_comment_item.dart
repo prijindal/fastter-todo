@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../helpers/date_fomatters.dart';
 import '../../models/core.dart';
@@ -27,7 +27,7 @@ class TodoCommentItem extends StatelessWidget {
   Widget build(BuildContext context) => _TodoCommentItem(
         todoComment: todoComment,
         deleteComment: () async {
-          await Provider.of<DbManager>(context, listen: false)
+          await GetIt.I<DbManager>()
               .database
               .managers
               .comment

@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../models/core.dart';
 import '../../models/db_manager.dart';
@@ -31,11 +31,7 @@ class _TodoCommentInputState extends State<TodoCommentInput> {
       final comment = _formKey.currentState!.value;
       final content =
           Uint8List.fromList((comment["content"] as String).codeUnits);
-      await Provider.of<DbManager>(context, listen: false)
-          .database
-          .managers
-          .comment
-          .create(
+      await GetIt.I<DbManager>().database.managers.comment.create(
             (f) => f(
               type: TodoCommentType.text,
               content: content,

@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../../models/db_manager.dart';
 import '../../../models/local_state.dart';
@@ -9,9 +9,8 @@ class MarkCompletedButton extends StatelessWidget {
   const MarkCompletedButton({super.key});
 
   void _onMarkCompleted(BuildContext context) async {
-    final localStateNotifier =
-        Provider.of<LocalStateNotifier>(context, listen: false);
-    await Provider.of<DbManager>(context, listen: false)
+    final localStateNotifier = GetIt.I<LocalStateNotifier>();
+    await GetIt.I<DbManager>()
         .database
         .managers
         .todo

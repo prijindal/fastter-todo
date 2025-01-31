@@ -6,16 +6,15 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'package:get_it/get_it.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 
 import '../models/db_manager.dart';
 import 'constants.dart';
 
 void downloadContent(BuildContext context) async {
-  final encoded =
-      await Provider.of<DbManager>(context, listen: false).io.extractDbJson();
+  final encoded = await GetIt.I<DbManager>().io.extractDbJson();
   if (Platform.isAndroid || Platform.isIOS) {
     final params = SaveFileDialogParams(
       data: Uint8List.fromList(encoded.codeUnits),
@@ -62,9 +61,7 @@ void uploadContent(BuildContext context) async {
     }
     if (jsonEncoded != null && context.mounted) {
       try {
-        await Provider.of<DbManager>(context, listen: false)
-            .io
-            .jsonToDb(jsonEncoded);
+        await GetIt.I<DbManager>().io.jsonToDb(jsonEncoded);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

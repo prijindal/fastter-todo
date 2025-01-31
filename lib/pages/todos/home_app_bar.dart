@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../helpers/todos_filters.dart';
 import '../../models/local_state.dart';
 import 'todoeditbar/delete_selected_todos_button.dart';
 
-class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
+class HomeAppBar extends WatchingWidget implements PreferredSizeWidget {
   const HomeAppBar({
     super.key,
     required this.filters,
@@ -18,14 +18,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<LocalStateNotifier, bool>(
-      builder: (context, selectedEntriesEmpty, _) => selectedEntriesEmpty
-          ? MainAppBar(
-              filters: filters,
-            )
-          : const SelectedEntriesAppBar(),
-      selector: (_, localState) => localState.selectedTodoIds.isEmpty,
-    );
+    final selectedEntriesEmpty = watchPropertyValue(
+        (LocalStateNotifier localState) => localState.selectedTodoIds.isEmpty);
+    return selectedEntriesEmpty
+        ? MainAppBar(
+            filters: filters,
+          )
+        : const SelectedEntriesAppBar();
   }
 }
 
@@ -54,12 +53,12 @@ class MainAppBar extends StatelessWidget {
   }
 }
 
-class SelectedEntriesAppBar extends StatelessWidget {
+class SelectedEntriesAppBar extends WatchingWidget {
   const SelectedEntriesAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final localStateNotifier = Provider.of<LocalStateNotifier>(context);
+    final localStateNotifier = watchIt<LocalStateNotifier>();
     return PopScope(
       canPop: localStateNotifier.selectedTodoIds.isEmpty,
       onPopInvokedWithResult: (didPop, _) {

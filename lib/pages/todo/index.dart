@@ -5,6 +5,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import '../../helpers/breakpoints.dart';
@@ -107,8 +108,7 @@ class TodosScreenScaffold extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             onPressed: () async {
-              await Provider.of<DbManager>(context, listen: false)
-                  .deleteTodosByIds([todo.id]);
+              await GetIt.I<DbManager>().deleteTodosByIds([todo.id]);
               // ignore: use_build_context_synchronously
               await AutoRouter.of(context).maybePop();
             },
@@ -150,7 +150,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
   void _save() async {
     if (_formKey.currentState?.saveAndValidate() == true) {
       final todo = _formKey.currentState!.value;
-      await Provider.of<DbManager>(context, listen: false)
+      await GetIt.I<DbManager>()
           .database
           .managers
           .todo

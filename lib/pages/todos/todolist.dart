@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../helpers/todos_filters.dart';
 import '../../helpers/todos_sorting_algoritm.dart';
@@ -9,7 +10,7 @@ import '../../models/local_state.dart';
 import 'todo_item.dart';
 import 'todolistview.dart';
 
-class TodoList extends StatelessWidget {
+class TodoList extends WatchingWidget {
   const TodoList({
     super.key,
     required this.filters,
@@ -19,19 +20,20 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector2<LocalDbState, LocalStateNotifier,
-        ({bool isTodosInitialized, List<TodoData> todos, bool isSelected})>(
-      selector: (context, dbState, localState) => (
+    final isSelected = watchPropertyValue((LocalStateNotifier localState) =>
+        localState.selectedTodoIds.isNotEmpty);
+    return Selector<LocalDbState,
+        ({bool isTodosInitialized, List<TodoData> todos})>(
+      selector: (context, dbState) => (
         isTodosInitialized: dbState.isTodosInitialized,
         todos: filters.filtered(dbState.todos)
           ..sort(TodosSortingAlgorithm.base().compare),
-        isSelected: localState.selectedTodoIds.isNotEmpty
       ),
       builder: (context, state, _) => !state.isTodosInitialized
           ? Center(child: Text("Loading"))
           : TodosListView(
               todos: state.todos,
-              todoItemTapBehaviour: state.isSelected
+              todoItemTapBehaviour: isSelected
                   ? TodoItemTapBehaviour.toggleSelection
                   : TodoItemTapBehaviour.openTodoBottomSheet,
               todoItemLongPressBehaviour: TodoItemTapBehaviour.toggleSelection,

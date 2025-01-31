@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../../models/core.dart';
 import '../../../models/db_manager.dart';
@@ -18,22 +19,24 @@ import 'mark_completed_button.dart';
 import 'reminder_button.dart';
 import 'subtask_button.dart';
 
-class TodoEditBar extends StatelessWidget {
+class TodoEditBar extends WatchingWidget {
   const TodoEditBar({super.key});
 
   @override
-  Widget build(BuildContext context) =>
-      Selector2<LocalStateNotifier, LocalDbState, List<TodoData>>(
-        selector: (_, localState, dbState) {
-          final selectedTodoIds = localState.selectedTodoIds;
-          return dbState.todos
-              .where((a) => selectedTodoIds.contains(a.id))
-              .toList();
-        },
-        builder: (context, selectedTodos, _) => _TodoEditBar(
-          selectedTodos: selectedTodos,
-        ),
-      );
+  Widget build(BuildContext context) {
+    final selectedTodoIds =
+        watchPropertyValue((LocalStateNotifier state) => state.selectedTodoIds);
+    return Selector<LocalDbState, List<TodoData>>(
+      selector: (_, dbState) {
+        return dbState.todos
+            .where((a) => selectedTodoIds.contains(a.id))
+            .toList();
+      },
+      builder: (context, selectedTodos, _) => _TodoEditBar(
+        selectedTodos: selectedTodos,
+      ),
+    );
+  }
 }
 
 class _TodoEditBar extends StatefulWidget {
@@ -100,17 +103,16 @@ class TodoEditBarCollapsed extends StatelessWidget {
         TagSelector(
           expanded: false,
           selectedTags: selectedTodos.first.tags,
-          onSelected: (selectedTags) async =>
-              await Provider.of<DbManager>(context, listen: false)
-                  .database
-                  .managers
-                  .todo
-                  .filter((f) => f.id.equals(selectedTodos.first.id))
-                  .update(
-                    (o) => o(
-                      tags: drift.Value(selectedTags),
-                    ),
-                  ),
+          onSelected: (selectedTags) async => await GetIt.I<DbManager>()
+              .database
+              .managers
+              .todo
+              .filter((f) => f.id.equals(selectedTodos.first.id))
+              .update(
+                (o) => o(
+                  tags: drift.Value(selectedTags),
+                ),
+              ),
         ),
         ChangePriorityButton(
           selectedTodos: selectedTodos,
@@ -142,17 +144,16 @@ class TodoEditBarCollapsed extends StatelessWidget {
         expanded: false,
         selectedTags: Provider.of<LocalDbState>(context)
             .getTodosTags(selectedTodos.map((a) => a.id).toList()),
-        onSelected: (selectedTags) async =>
-            await Provider.of<DbManager>(context, listen: false)
-                .database
-                .managers
-                .todo
-                .filter((f) => f.id.isIn(selectedTodos.map((a) => a.id)))
-                .update(
-                  (o) => o(
-                    tags: drift.Value(selectedTags),
-                  ),
-                ),
+        onSelected: (selectedTags) async => await GetIt.I<DbManager>()
+            .database
+            .managers
+            .todo
+            .filter((f) => f.id.isIn(selectedTodos.map((a) => a.id)))
+            .update(
+              (o) => o(
+                tags: drift.Value(selectedTags),
+              ),
+            ),
       ),
       ChangePriorityButton(
         selectedTodos: selectedTodos,

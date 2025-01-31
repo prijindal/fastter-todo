@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../components/adaptive_scaffold.dart';
 import '../../components/main_drawer.dart';
@@ -13,7 +13,7 @@ import 'todogrid.dart';
 import 'todoinputbar.dart';
 import 'todolist.dart';
 
-class TodoListScaffold extends StatefulWidget {
+class TodoListScaffold extends WatchingStatefulWidget {
   const TodoListScaffold({
     super.key,
     required this.appBar,
@@ -119,38 +119,35 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
     return BottomSheet(
       enableDrag: false,
       onClosing: () {
-        Provider.of<LocalStateNotifier>(context, listen: false)
-            .clearSelectedTodoIds();
+        GetIt.I<LocalStateNotifier>().clearSelectedTodoIds();
       },
       builder: (_) => TodoEditBar(),
     );
   }
 
   Widget _buildBody() {
-    return Selector<LocalStateNotifier, TodosView>(
-        selector: (_, state) => state.todosView,
-        builder: (context, todosView, _) {
-          return todosView == TodosView.list
-              ? TodoList(
-                  filters: widget.filters,
-                )
-              : TodoGrid(
-                  filters: widget.filters,
-                );
-        });
+    final todosView =
+        watchPropertyValue((LocalStateNotifier state) => state.todosView);
+    return todosView == TodosView.list
+        ? TodoList(
+            filters: widget.filters,
+          )
+        : TodoGrid(
+            filters: widget.filters,
+          );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<LocalStateNotifier>(
-      child: _buildBody(),
-      builder: (_, localState, list) => AdaptiveScaffold(
-        appBar: widget.appBar,
-        drawer: MainDrawer(),
-        body: list!,
-        floatingActionButton: _buildFab(localState.selectedTodoIds.isNotEmpty),
-        bottomSheet: _buildBottom(localState.selectedTodoIds.isNotEmpty),
-      ),
+    final isSelectedNotEmpty = watchPropertyValue((LocalStateNotifier state) {
+      return state.selectedTodoIds.isNotEmpty;
+    });
+    return AdaptiveScaffold(
+      appBar: widget.appBar,
+      drawer: MainDrawer(),
+      body: _buildBody(),
+      floatingActionButton: _buildFab(isSelectedNotEmpty),
+      bottomSheet: _buildBottom(isSelectedNotEmpty),
     );
   }
 }

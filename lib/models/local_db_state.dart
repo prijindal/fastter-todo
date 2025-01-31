@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/widgets.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,10 +13,12 @@ import 'db_manager.dart';
 import 'local_notifications_manager.dart';
 
 class LocalDbState extends ChangeNotifier {
-  final SharedDatabase db;
+  DbManager get dbManager => GetIt.I<DbManager>();
+  SharedDatabase get db => dbManager.database;
+  RemoteDbSettings? get remoteDbSettings => dbManager.remoteDbSettings;
+
   final LocalNotificationsManager localNotificationsManager =
       LocalNotificationsManager();
-  final RemoteDbSettings? remoteDbSettings;
 
   List<StreamSubscription<List<dynamic>>> _subscriptions = [];
 
@@ -52,7 +55,7 @@ class LocalDbState extends ChangeNotifier {
       (_localState["comment"] != null || (_initialized["comment"] ?? false)) &&
       (_localState["reminder"] != null || (_initialized["reminder"] ?? false));
 
-  LocalDbState(this.db, {this.remoteDbSettings}) {
+  LocalDbState() {
     // Local state is first initialized with local storage, this makes sure that when we first do init, we have some data on ui
     // This is only really useful when our sqlite db is a remote one
     initFromLocalTempDb();

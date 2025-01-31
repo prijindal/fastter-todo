@@ -484,6 +484,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  functional_listener:
+    dependency: transitive
+    description:
+      name: functional_listener
+      sha256: c096db771b4ce7ba0f886cc4a761044b11e8276a7bc24cfc812dc4b2bc6f5b16
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   fuzzywuzzy:
     dependency: "direct main"
     description:
@@ -492,6 +500,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  get_it:
+    dependency: "direct main"
+    description:
+      name: get_it
+      sha256: f126a3e286b7f5b578bf436d5592968706c4c1de28a228b870ce375d9f743103
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.0.3"
   github:
     dependency: "direct main"
     description:
@@ -1278,6 +1294,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "14.3.0"
+  watch_it:
+    dependency: "direct main"
+    description:
+      name: watch_it
+      sha256: "8ce7e442a65ef81db155dc505594f1856660fa5dd068471a1fe9c5eeaced9b93"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.6.2"
   watcher:
     dependency: transitive
     description:

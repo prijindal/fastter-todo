@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/core.dart';
@@ -39,7 +40,7 @@ class ChangePipelineButton extends StatelessWidget {
     final pipeline =
         await showPipelineDialog(context, getAllPipelines(context));
     if (pipeline != null && context.mounted) {
-      await Provider.of<DbManager>(context, listen: false)
+      await GetIt.I<DbManager>()
           .database
           .managers
           .todo

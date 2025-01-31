@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 import '../../../models/core.dart';
 import '../../../models/db_manager.dart';
@@ -33,7 +33,7 @@ class ChangePriorityButton extends StatelessWidget {
   void _selectPriority(BuildContext context) async {
     final priority = await showPriorityDialog(context);
     if (priority != null && context.mounted) {
-      await Provider.of<DbManager>(context, listen: false)
+      await GetIt.I<DbManager>()
           .database
           .managers
           .todo

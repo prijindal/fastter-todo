@@ -1,5 +1,6 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 
@@ -26,8 +27,7 @@ class BackendSettingsScreen extends StatelessWidget {
           title: Text("Reset Database"),
           onTap: () async {
             try {
-              await Provider.of<DbManager>(context, listen: false)
-                  .resetDatabase();
+              await GetIt.I<DbManager>().resetDatabase();
               // ignore: use_build_context_synchronously
               await Provider.of<LocalDbState>(context, listen: false).clear();
               await Restart.restartApp(
@@ -99,7 +99,7 @@ class BackendImplementationTile extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context) {
-    final dbSelector = Provider.of<DbManager>(context, listen: false);
+    final dbSelector = GetIt.I<DbManager>();
     final dbType = dbSelector.dbType;
     return DropdownButton<DbSelectorType>(
       value: dbType,

@@ -128,7 +128,7 @@ class PipelinesInputDialog extends StatefulWidget {
 }
 
 class _PipelinesInputState extends State<PipelinesInputDialog> {
-  late List<String> _selectedPipelines = widget.selectedPipelines;
+  late List<String> _selectedPipelines = widget.selectedPipelines.toList();
   final _formKey = GlobalKey<FormBuilderState>();
 
   void _removePipeline(String pipeline) {
@@ -145,6 +145,17 @@ class _PipelinesInputState extends State<PipelinesInputDialog> {
       });
       _formKey.currentState!.reset();
     }
+  }
+
+  void _onReorderPipeline(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      // removing the item at oldIndex will shorten the list by 1.
+      newIndex -= 1;
+    }
+    setState(() {
+      final element = _selectedPipelines.removeAt(oldIndex);
+      _selectedPipelines.insert(newIndex, element);
+    });
   }
 
   @override
@@ -195,11 +206,13 @@ class _PipelinesInputState extends State<PipelinesInputDialog> {
                 child: Text("No pipelines available, please add one"),
               ),
             Expanded(
-              child: ListView.builder(
+              child: ReorderableListView.builder(
+                onReorder: _onReorderPipeline,
                 itemCount: _selectedPipelines.length,
                 itemBuilder: (context, index) {
                   final pipeline = _selectedPipelines[index];
                   return ListTile(
+                    key: Key("Pipeline$pipeline"),
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () => _removePipeline(pipeline),

@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../helpers/date_fomatters.dart';
 import '../../models/core.dart';
@@ -22,7 +23,7 @@ enum TodoItemTapBehaviour {
   nothing;
 }
 
-class TodoItem extends StatelessWidget {
+class TodoItem extends WatchingWidget {
   const TodoItem({
     super.key,
     required this.todo,
@@ -49,8 +50,7 @@ class TodoItem extends StatelessWidget {
         return () => TodoScreen.openBottomSheet(context, todo);
       case TodoItemTapBehaviour.toggleSelection:
         return () {
-          final localStateNotifier =
-              Provider.of<LocalStateNotifier>(context, listen: false);
+          final localStateNotifier = GetIt.I<LocalStateNotifier>();
           localStateNotifier.toggleSelectedId(todo.id);
         };
       case TodoItemTapBehaviour.nothing:
@@ -62,18 +62,16 @@ class TodoItem extends StatelessWidget {
   Widget build(BuildContext context) {
     if (tapBehaviour == TodoItemTapBehaviour.toggleSelection ||
         longPressBehaviour == TodoItemTapBehaviour.toggleSelection) {
-      return Selector<LocalStateNotifier, bool>(
-        selector: (context, localState) =>
-            localState.selectedTodoIds.contains(todo.id),
-        builder: (context, selected, _) => _TodoItem(
-          todo: todo,
-          selected: selected,
-          dismissible: dismissible,
-          dense: dense,
-          elements: elements,
-          onTap: action(tapBehaviour, context, todo),
-          onLongPress: action(longPressBehaviour, context, todo),
-        ),
+      final selected = watchPropertyValue((LocalStateNotifier localState) =>
+          localState.selectedTodoIds.contains(todo.id));
+      return _TodoItem(
+        todo: todo,
+        selected: selected,
+        dismissible: dismissible,
+        dense: dense,
+        elements: elements,
+        onTap: action(tapBehaviour, context, todo),
+        onLongPress: action(longPressBehaviour, context, todo),
       );
     }
     return _TodoItem(
@@ -110,7 +108,7 @@ class _TodoItem extends StatelessWidget {
   void _selectDate(BuildContext context) {
     todoSelectDate(context, todo.dueDate).then((dueDate) async {
       if (dueDate != null && context.mounted) {
-        await Provider.of<DbManager>(context, listen: false)
+        await GetIt.I<DbManager>()
             .database
             .managers
             .todo
@@ -126,8 +124,7 @@ class _TodoItem extends StatelessWidget {
       );
 
   void _deleteTodo(BuildContext context) async {
-    await Provider.of<DbManager>(context, listen: false)
-        .deleteTodosByIds([todo.id]);
+    await GetIt.I<DbManager>().deleteTodosByIds([todo.id]);
   }
 
   Widget _buildListTile(BuildContext context) {
@@ -139,7 +136,7 @@ class _TodoItem extends StatelessWidget {
       leading: TodoItemToggle(
         todo: todo,
         toggleCompleted: (bool newValue) async {
-          await Provider.of<DbManager>(context, listen: false)
+          await GetIt.I<DbManager>()
               .database
               .managers
               .todo

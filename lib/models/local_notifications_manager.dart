@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get_it/get_it.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../helpers/logger.dart';
+import '../router/app_router.dart';
 import 'core.dart';
 
 class LocalNotificationsManager {
@@ -45,8 +47,8 @@ class LocalNotificationsManager {
       AppLogger.instance.d(
           "Received notification: ${details.id}, payload: ${details.payload}");
       if (details.payload != null) {
-        // TODO: Fix this navigation
-        // AppRouter.instance.navigateNamed(details.payload!);
+        AppRouter appRouter = GetIt.I<AppRouter>();
+        appRouter.navigateNamed(details.payload!);
       }
     });
     flutterLocalNotificationsPlugin
@@ -56,9 +58,8 @@ class LocalNotificationsManager {
           notification.didNotificationLaunchApp &&
           notification.notificationResponse != null &&
           notification.notificationResponse!.payload != null) {
-        // AppRouter.instance.navigateNamed(
-        //   notification.notificationResponse!.payload!,
-        // );
+        AppRouter appRouter = GetIt.I<AppRouter>();
+        appRouter.navigateNamed(notification.notificationResponse!.payload!);
       }
     });
   }

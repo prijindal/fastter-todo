@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -22,16 +23,12 @@ Future<void> newReminder(BuildContext context, String todoId) async {
       final newTime =
           DateTime(date.year, date.month, date.day, time.hour, time.minute);
       // ignore: use_build_context_synchronously
-      await Provider.of<DbManager>(context, listen: false)
-          .database
-          .managers
-          .reminder
-          .create((o) => o(
-                time: newTime.toUtc(),
-                title: "New Reminder",
-                todo: todoId,
-                completed: drift.Value(false),
-              ));
+      await GetIt.I<DbManager>().database.managers.reminder.create((o) => o(
+            time: newTime.toUtc(),
+            title: "New Reminder",
+            todo: todoId,
+            completed: drift.Value(false),
+          ));
       // ignore: use_build_context_synchronously
       await Provider.of<LocalDbState>(context, listen: false).refresh();
     }
@@ -99,7 +96,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
       ),
     );
     if (shouldDelete == true && context.mounted) {
-      await Provider.of<DbManager>(context, listen: false)
+      await GetIt.I<DbManager>()
           .database
           .managers
           .reminder

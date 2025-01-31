@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
@@ -44,7 +45,7 @@ class _EditProjectScreen extends StatelessWidget {
     Color? color,
     List<String>? pipelines,
   }) async {
-    await Provider.of<DbManager>(context, listen: false)
+    await GetIt.I<DbManager>()
         .database
         .managers
         .project
