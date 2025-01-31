@@ -102,7 +102,9 @@ class _TodoListScaffoldState extends State<TodoListScaffold> {
           });
         },
         builder: (context) => TodoInputBar(
-          initialProject: widget.filters.projectFilter,
+          initialProject: widget.filters.projectFilter != "inbox"
+              ? widget.filters.projectFilter
+              : null,
           onBackButton: () {
             setState(() {
               _showInput = false;

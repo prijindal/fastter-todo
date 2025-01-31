@@ -119,7 +119,6 @@ class DbManager extends ChangeNotifier {
       }
     }
     notifyListeners();
-    _addWatcher();
   }
 
   // This will drop all the tables in the database and recreate it
@@ -129,15 +128,6 @@ class DbManager extends ChangeNotifier {
     await database.customStatement("DROP TABLE todo;");
     await database.customStatement("DROP TABLE project;");
     await database.customStatement("PRAGMA user_version = 0;");
-  }
-
-  Future<void> _addWatcher() async {
-    if (_database == null) return;
-    final stream = _database!.tableUpdates();
-    await for (final events in stream) {
-      AppLogger.instance.d(events);
-      await io.updateLastUpdatedTime();
-    }
   }
 
   Future<void> setLocal() async {

@@ -21,49 +21,42 @@ class LocalDbState extends ChangeNotifier {
 
   Timer? timer;
 
-  List<TodoData> _todos = [];
-  List<ProjectData> _projects = [];
-  List<CommentData> _comments = [];
-  List<ReminderData> _reminders = [];
-
   final Map<String, List<drift.DataClass>> _localState = {};
 
-  List<TodoData> get todos => List.unmodifiable(_isTodosInitialized
-      ? _todos
-      : (_localState["todos"] as List<TodoData>?) ?? []);
-  List<ProjectData> get projects => List.unmodifiable(_isProjectsInitialized
-      ? _projects
-      : (_localState["projects"] as List<ProjectData>?) ?? []);
-  List<CommentData> get comments => List.unmodifiable(_isCommentsInitialized
-      ? _comments
-      : (_localState["comments"] as List<CommentData>?) ?? []);
-  List<ReminderData> get reminders => List.unmodifiable(_isRemindersInitialized
-      ? _reminders
-      : (_localState["reminders"] as List<ReminderData>?) ?? []);
+  List<TodoData> get todos =>
+      List.unmodifiable((_localState["todo"] as List<TodoData>?) ?? []);
+  List<ProjectData> get projects =>
+      List.unmodifiable((_localState["project"] as List<ProjectData>?) ?? []);
+  List<CommentData> get comments =>
+      List.unmodifiable((_localState["comment"] as List<CommentData>?) ?? []);
+  List<ReminderData> get reminders =>
+      List.unmodifiable((_localState["reminder"] as List<ReminderData>?) ?? []);
 
-  bool _isTodosInitialized = false;
-  bool _isProjectsInitialized = false;
-  bool _isCommentsInitialized = false;
-  bool _isRemindersInitialized = false;
+  final Map<String, bool> _initialized = {
+    "todo": false,
+    "project": false,
+    "comment": false,
+    "reminder": false,
+  };
 
   bool _isRefreshing = false;
 
   bool get isRefreshing => _isRefreshing;
 
   bool get isTodosInitialized =>
-      _localState["todos"] != null || _isTodosInitialized;
+      _localState["todo"] != null || (_initialized["todo"] ?? false);
 
   bool get isInitialized =>
-      (_localState["todos"] != null || _isTodosInitialized) &&
-      (_localState["projects"] != null || _isProjectsInitialized) &&
-      (_localState["comments"] != null || _isCommentsInitialized) &&
-      (_localState["reminders"] != null || _isRemindersInitialized);
+      (_localState["todo"] != null || (_initialized["todo"] ?? false)) &&
+      (_localState["project"] != null || (_initialized["project"] ?? false)) &&
+      (_localState["comment"] != null || (_initialized["comment"] ?? false)) &&
+      (_localState["reminder"] != null || (_initialized["reminder"] ?? false));
 
   LocalDbState(this.db, {this.remoteDbSettings}) {
     // Local state is first initialized with local storage, this makes sure that when we first do init, we have some data on ui
     // This is only really useful when our sqlite db is a remote one
     initFromLocalTempDb();
-    initStream();
+    initFromDb();
   }
 
   @override
@@ -91,7 +84,7 @@ class LocalDbState extends ChangeNotifier {
     for (var subscription in _subscriptions) {
       subscription.cancel();
     }
-    await initStream();
+    await initFromDb();
     await syncReminders();
     _isRefreshing = false;
     notifyListeners();
@@ -104,75 +97,73 @@ class LocalDbState extends ChangeNotifier {
       AppLogger.instance.w("Retried limit exceeded, cancelling");
       return null;
     }
-    if (remoteDbSettings != null) {
-      final uri = Uri.parse(remoteDbSettings!.url);
-      final httpUri = Uri(
-        scheme: "https",
-        host: uri.host,
-        path: "/beta/listen",
-        queryParameters: {
-          "table": table,
-        },
-      );
-      AppLogger.instance.i("Starting to listen on stream for $table");
-      http.Request request = http.Request("GET", httpUri);
-      request.headers["Authorization"] = "Bearer ${remoteDbSettings!.token}";
-      try {
-        final response = await request.send();
-        StreamSubscription<List<int>> subscription =
-            response.stream.listen((event) {
-          final stringifed = String.fromCharCodes(event).trim();
-          if (stringifed == ":keep-alive") {
-            return;
-          }
-          onChange(stringifed);
-        });
-        return subscription;
-      } catch (e) {
-        AppLogger.instance.e("Error listening to stream for $table, $e");
-        return _initStreamForTable(table, onChange, attemptsLeft - 1);
-      }
-    } else {
-      return null;
+    final uri = Uri.parse(remoteDbSettings!.url);
+    final httpUri = Uri(
+      scheme: "https",
+      host: uri.host,
+      path: "/beta/listen",
+      queryParameters: {
+        "table": table,
+      },
+    );
+    AppLogger.instance.i("Starting to listen on stream for $table");
+    http.Request request = http.Request("GET", httpUri);
+    request.headers["Authorization"] = "Bearer ${remoteDbSettings!.token}";
+    try {
+      final response = await request.send();
+      StreamSubscription<List<int>> subscription =
+          response.stream.listen((event) {
+        final stringifed = String.fromCharCodes(event).trim();
+        if (stringifed == ":keep-alive") {
+          return;
+        }
+        onChange(stringifed);
+      });
+      return subscription;
+    } catch (e) {
+      AppLogger.instance.e("Error listening to stream for $table, $e");
+      return _initStreamForTable(table, onChange, attemptsLeft - 1);
     }
   }
 
-  Future<StreamSubscription<List<int>>?> _refreshAndInitTable(
-      String table, Future<void> Function(String) onChange) async {
-    await onChange("init");
-    return await _initStreamForTable(table, onChange);
+  Future<void> onChange<T extends drift.DataClass>(
+    drift.RootTableManager<dynamic, dynamic, dynamic, dynamic, dynamic, dynamic,
+            dynamic, dynamic, dynamic, T, dynamic>
+        manager,
+    String table,
+  ) async {
+    final values = await manager.get();
+    _localState[table] = values.toList();
+    _initialized[table] = true;
+    notifyListeners();
+    setLocalTempDb(table, values);
   }
 
-  Future<void> initStream() async {
+  Future<StreamSubscription<List<dynamic>>?>
+      _refreshAndInitTable<T extends drift.DataClass>(
+    drift.RootTableManager<dynamic, dynamic, dynamic, dynamic, dynamic, dynamic,
+            dynamic, dynamic, dynamic, T, dynamic>
+        manager,
+    String table,
+  ) async {
+    await onChange(manager, table);
+    if (remoteDbSettings == null) {
+      return manager.watch().listen((_) async {
+        await onChange(manager, table);
+      });
+    } else {
+      return await _initStreamForTable(table, (_) async {
+        await onChange(manager, table);
+      });
+    }
+  }
+
+  Future<void> initFromDb() async {
     final subscriptions = await Future.wait([
-      _refreshAndInitTable("todo", (_) async {
-        final values = await db.managers.todo.get();
-        _todos = values.toList();
-        _isTodosInitialized = true;
-        notifyListeners();
-        setLocalTempDb("todos", values);
-      }),
-      _refreshAndInitTable("project", (_) async {
-        final values = await db.managers.project.get();
-        _projects = values.toList();
-        _isProjectsInitialized = true;
-        notifyListeners();
-        setLocalTempDb("projects", values);
-      }),
-      _refreshAndInitTable("reminder", (_) async {
-        final values = await db.managers.reminder.get();
-        _reminders = values.toList();
-        _isRemindersInitialized = true;
-        notifyListeners();
-        setLocalTempDb("reminders", values);
-      }),
-      _refreshAndInitTable("comment", (_) async {
-        final values = await db.managers.comment.get();
-        _comments = values.toList();
-        _isCommentsInitialized = true;
-        notifyListeners();
-        setLocalTempDb("comments", values);
-      }),
+      _refreshAndInitTable(db.managers.todo, "todo"),
+      _refreshAndInitTable(db.managers.project, "project"),
+      _refreshAndInitTable(db.managers.reminder, "reminder"),
+      _refreshAndInitTable(db.managers.comment, "comment"),
     ]);
     _subscriptions = subscriptions.where((a) => a != null).toList().cast();
   }
@@ -199,6 +190,7 @@ class LocalDbState extends ChangeNotifier {
       if (project == null) {
         return [defaultPipeline];
       }
+
       status = project.pipelines;
     }
     return status;
@@ -255,10 +247,10 @@ class LocalDbState extends ChangeNotifier {
 
   void initFromLocalTempDb() async {
     await Future.wait([
-      _readFromLocalDb<TodoData>("todos", TodoData.fromJson),
-      _readFromLocalDb<ProjectData>("projects", ProjectData.fromJson),
-      _readFromLocalDb<CommentData>("comments", CommentData.fromJson),
-      _readFromLocalDb<ReminderData>("reminders", ReminderData.fromJson),
+      _readFromLocalDb<TodoData>("todo", TodoData.fromJson),
+      _readFromLocalDb<ProjectData>("project", ProjectData.fromJson),
+      _readFromLocalDb<CommentData>("comment", CommentData.fromJson),
+      _readFromLocalDb<ReminderData>("reminder", ReminderData.fromJson),
     ]);
     await syncReminders();
   }
@@ -270,15 +262,15 @@ class LocalDbState extends ChangeNotifier {
 
   Future<void> clear() async {
     await Future.wait([
-      _clearFromLocalDb("todos"),
-      _clearFromLocalDb("projects"),
-      _clearFromLocalDb("comments"),
-      _clearFromLocalDb("reminders"),
+      _clearFromLocalDb("todo"),
+      _clearFromLocalDb("project"),
+      _clearFromLocalDb("comment"),
+      _clearFromLocalDb("reminder"),
     ]);
-    _todos = [];
-    _projects = [];
-    _comments = [];
-    _reminders = [];
+    _localState["todo"] = [];
+    _localState["project"] = [];
+    _localState["comment"] = [];
+    _localState["reminder"] = [];
     notifyListeners();
   }
 }
