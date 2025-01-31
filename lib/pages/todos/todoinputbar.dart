@@ -11,12 +11,12 @@ import '../../helpers/logger.dart';
 import '../../models/core.dart';
 import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
+import '../todo/index.dart';
 import 'pipeline_dialog.dart';
 import 'priority_dialog.dart';
 import 'projectdropdown.dart';
 import 'tagselector.dart';
 import 'todo_select_date.dart';
-import 'todoeditbar/edit_button.dart';
 
 class TodoModifyBar extends StatelessWidget {
   const TodoModifyBar({
@@ -43,8 +43,14 @@ class TodoModifyBar extends StatelessWidget {
         parentTodo: todo.parent,
         leadingButtons: [],
         trailingButtons: [
-          EditButton(
-            todo: todo,
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () async {
+              await Navigator.of(context).maybePop();
+              // ignore: use_build_context_synchronously
+              TodoScreen.openPage(context, todo);
+            },
+            tooltip: 'Edit Todo',
           ),
         ],
         additionalFields: additionalFields,
