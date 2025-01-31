@@ -58,24 +58,25 @@ class SelectedEntriesAppBar extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
-    final localStateNotifier = watchIt<LocalStateNotifier>();
+    final selectedLength = watchPropertyValue(
+        (LocalStateNotifier localState) => localState.selectedTodoIds.length);
     return PopScope(
-      canPop: localStateNotifier.selectedTodoIds.isEmpty,
+      canPop: selectedLength == 0,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) {
           // If route did not pop, then it means that the selectedTodoIds is not empty,
           // We need to clear it
-          localStateNotifier.clearSelectedTodoIds();
+          GetIt.I<LocalStateNotifier>().clearSelectedTodoIds();
         }
       },
       child: AppBar(
         leading: IconButton(
           onPressed: () {
-            localStateNotifier.clearSelectedTodoIds();
+            GetIt.I<LocalStateNotifier>().clearSelectedTodoIds();
           },
           icon: Icon(Icons.arrow_back),
         ),
-        title: Text("${localStateNotifier.selectedTodoIds.length} Selected"),
+        title: Text("$selectedLength Selected"),
         actions: [
           DeleteSelectedTodosButton(),
         ],

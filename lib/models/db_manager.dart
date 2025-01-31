@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/dbio.dart';
@@ -44,7 +43,7 @@ class RemoteDbSettings {
 
 enum DbSelectorType { local, remote }
 
-class DbManager extends ChangeNotifier {
+class DbManager {
   SharedDatabase? _database;
   DbSelectorType? _dbType;
   RemoteDbSettings? remoteDbSettings;
@@ -118,7 +117,6 @@ class DbManager extends ChangeNotifier {
         // );
       }
     }
-    notifyListeners();
   }
 
   // This will drop all the tables in the database and recreate it
@@ -132,7 +130,6 @@ class DbManager extends ChangeNotifier {
 
   Future<void> setLocal() async {
     await SharedPreferencesAsync().setString(dbImplementationKey, 'local');
-    notifyListeners();
   }
 
   Future<void> setRemote(RemoteDbSettings settings) async {
@@ -144,7 +141,6 @@ class DbManager extends ChangeNotifier {
       dbRemoteSettings,
       settings.toJson(),
     );
-    notifyListeners();
   }
 
   Future<void> deleteParentTodosByParentIds(List<String> parentIds) async {

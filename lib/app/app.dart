@@ -66,8 +66,7 @@ class MyMaterialApp extends StatelessWidget {
   Widget build(BuildContext context) {
     AppLogger.instance.d("Building MyApp");
     return MaterialApp.router(
-      routerConfig:
-          GetIt.I<AppRouter>().config(reevaluateListenable: dbManager),
+      routerConfig: GetIt.I<AppRouter>().config(),
       theme: lightTheme(settingsStorage.getBaseColor().color),
       darkTheme: darkTheme(settingsStorage.getBaseColor().color),
       themeMode: settingsStorage.getTheme(),

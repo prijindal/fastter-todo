@@ -4,6 +4,7 @@ import 'package:fastter_todo/models/local_db_state.dart';
 import 'package:fastter_todo/models/local_state.dart';
 import 'package:fastter_todo/models/settings.dart';
 import 'package:fastter_todo/pages/todos/index.dart';
+import 'package:fastter_todo/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -35,6 +36,9 @@ void main() {
       GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier());
       GetIt.I.registerSingleton<LocalDbState>(
         LocalDbState(),
+      );
+      GetIt.I.registerSingleton<AppRouter>(
+        AppRouter(),
       );
       await GetIt.I.allReady();
       await tester.pumpWidget(
