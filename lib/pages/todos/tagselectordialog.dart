@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/local_db_state.dart';
@@ -18,7 +20,7 @@ class TagSelectorDialog extends StatefulWidget {
 class _TagSelectionState extends State<TagSelectorDialog> {
   late List<String> _selectedTags = widget.selectedTags;
   List<String> _allTags = [];
-  final TextEditingController _textEditingController = TextEditingController();
+  final _formKey = GlobalKey<FormBuilderState>();
 
   @override
   void initState() {
@@ -44,11 +46,14 @@ class _TagSelectionState extends State<TagSelectorDialog> {
   }
 
   void _addNewTag() {
-    setState(() {
-      _allTags = (_allTags.toList()..add(_textEditingController.text));
-      _selectedTags =
-          (_selectedTags.toList()..add(_textEditingController.text));
-    });
+    if (_formKey.currentState?.saveAndValidate() == true) {
+      final tag = (_formKey.currentState!.value["tag"] as String);
+      setState(() {
+        _allTags = (_allTags.toList()..add(tag));
+        _selectedTags = (_selectedTags.toList()..add(tag));
+      });
+      _formKey.currentState!.reset();
+    }
   }
 
   @override
@@ -64,24 +69,33 @@ class _TagSelectionState extends State<TagSelectorDialog> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(18.0, 24.0, 22.0, 0.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _textEditingController,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        hintText: "Add tag",
-                        border: InputBorder.none,
+              child: FormBuilder(
+                key: _formKey,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: FormBuilderTextField(
+                        name: "tag",
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          hintText: "Add tag",
+                          border: InputBorder.none,
+                        ),
+                        onSubmitted: (_) => _addNewTag(),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(),
+                          FormBuilderValidators.minLength(3),
+                          FormBuilderValidators.maxLength(15),
+                        ]),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: _addNewTag,
-                    icon: Icon(Icons.add),
-                  )
-                ],
+                    IconButton(
+                      onPressed: _addNewTag,
+                      icon: Icon(Icons.add),
+                    )
+                  ],
+                ),
               ),
             ),
             Divider(),

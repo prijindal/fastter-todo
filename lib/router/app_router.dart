@@ -102,11 +102,6 @@ class AppRouter extends RootStackRouter {
           transitionsBuilder: TransitionsBuilders.slideLeft,
         ),
         CustomRoute<void>(
-          path: "/settings/security",
-          page: SecuritySettingsRoute.page,
-          transitionsBuilder: TransitionsBuilders.slideLeft,
-        ),
-        CustomRoute<void>(
           path: "/settings/styling",
           page: StylingSettingsRoute.page,
           transitionsBuilder: TransitionsBuilders.slideLeft,

@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../../../helpers/fileio.dart';
-import '../components/backup_encryption_tile.dart';
 
 @RoutePage()
 class BackupSettingsScreen extends StatelessWidget {
@@ -27,25 +26,7 @@ class BackupSettingsScreen extends StatelessWidget {
           title: const Text("Upload from file"),
           onTap: () => uploadContent(context),
         ),
-        const CloudBackupTile(),
       ]),
-    );
-  }
-}
-
-class CloudBackupTile extends StatelessWidget {
-  const CloudBackupTile({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const ListTile(
-          title: Text("Cloud Backup"),
-          dense: true,
-        ),
-        const BackupEncryptionTile(),
-      ],
     );
   }
 }

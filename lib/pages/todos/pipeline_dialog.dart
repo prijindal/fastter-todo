@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 import 'tagslist.dart';
 
@@ -128,7 +129,7 @@ class PipelinesInputDialog extends StatefulWidget {
 
 class _PipelinesInputState extends State<PipelinesInputDialog> {
   late List<String> _selectedPipelines = widget.selectedPipelines;
-  final TextEditingController _textEditingController = TextEditingController();
+  final _formKey = GlobalKey<FormBuilderState>();
 
   void _removePipeline(String pipeline) {
     setState(() {
@@ -137,10 +138,13 @@ class _PipelinesInputState extends State<PipelinesInputDialog> {
   }
 
   void _addNewPipeline() {
-    setState(() {
-      _selectedPipelines =
-          (_selectedPipelines.toList()..add(_textEditingController.text));
-    });
+    if (_formKey.currentState?.saveAndValidate() == true) {
+      final pipeline = (_formKey.currentState!.value["pipeline"] as String);
+      setState(() {
+        _selectedPipelines = (_selectedPipelines.toList()..add(pipeline));
+      });
+      _formKey.currentState!.reset();
+    }
   }
 
   @override
@@ -156,24 +160,33 @@ class _PipelinesInputState extends State<PipelinesInputDialog> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(18.0, 24.0, 22.0, 0.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _textEditingController,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        hintText: "Add pipeline",
-                        border: InputBorder.none,
+              child: FormBuilder(
+                key: _formKey,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: FormBuilderTextField(
+                        name: "pipeline",
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          hintText: "Add pipeline",
+                          border: InputBorder.none,
+                        ),
+                        onSubmitted: (_) => _addNewPipeline(),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(),
+                          FormBuilderValidators.minLength(3),
+                          FormBuilderValidators.maxLength(15),
+                        ]),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: _addNewPipeline,
-                    icon: Icon(Icons.add),
-                  )
-                ],
+                    IconButton(
+                      onPressed: _addNewPipeline,
+                      icon: Icon(Icons.add),
+                    )
+                  ],
+                ),
               ),
             ),
             Divider(),

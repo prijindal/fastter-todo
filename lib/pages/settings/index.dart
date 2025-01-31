@@ -30,11 +30,6 @@ class SettingsScreen extends StatelessWidget {
           onTap: () => AutoRouter.of(context).pushNamed("/settings/backup"),
         ),
         ListTile(
-          leading: const Icon(Icons.security),
-          title: const Text("Security"),
-          onTap: () => AutoRouter.of(context).pushNamed("/settings/security"),
-        ),
-        ListTile(
           leading: const Icon(Icons.security_update),
           title: const Text("Permissions"),
           onTap: () =>

@@ -2,6 +2,8 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/core.dart';
@@ -22,21 +24,26 @@ class TodoCommentInput extends StatefulWidget {
 }
 
 class _TodoCommentInputState extends State<TodoCommentInput> {
-  TextEditingController commentContentController = TextEditingController();
+  final _formKey = GlobalKey<FormBuilderState>();
 
   void _addComment() async {
-    await Provider.of<DbManager>(context, listen: false)
-        .database
-        .managers
-        .comment
-        .create(
-          (f) => f(
-            type: TodoCommentType.text,
-            content:
-                Uint8List.fromList(commentContentController.text.codeUnits),
-            todo: widget.todo.id,
-          ),
-        );
+    if (_formKey.currentState?.saveAndValidate() == true) {
+      final comment = _formKey.currentState!.value;
+      final content =
+          Uint8List.fromList((comment["content"] as String).codeUnits);
+      await Provider.of<DbManager>(context, listen: false)
+          .database
+          .managers
+          .comment
+          .create(
+            (f) => f(
+              type: TodoCommentType.text,
+              content: content,
+              todo: widget.todo.id,
+            ),
+          );
+      _formKey.currentState!.reset();
+    }
   }
 
   @override
@@ -45,24 +52,23 @@ class _TodoCommentInputState extends State<TodoCommentInput> {
       child: Container(
         width: min(480, MediaQuery.of(context).size.width - 20.0),
         padding: const EdgeInsets.all(4),
-        child: Form(
-          onChanged: () {
-            setState(() {});
-          },
+        child: FormBuilder(
+          key: _formKey,
           child: Flex(
             direction: Axis.horizontal,
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Flexible(
-                child: TextFormField(
-                  controller: commentContentController,
+                child: FormBuilderTextField(
+                  name: "content",
                   decoration: InputDecoration(
                     labelText: 'Add new comment',
                   ),
-                  onFieldSubmitted: commentContentController.text.isNotEmpty
-                      ? (title) => _addComment()
-                      : null,
+                  onSubmitted: (_) => _addComment(),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(),
+                  ]),
                 ),
               ),
               // PopupMenuButton<TodoCommentInputAttachmentType>(
@@ -93,9 +99,7 @@ class _TodoCommentInputState extends State<TodoCommentInput> {
               // ),
               IconButton(
                 icon: const Icon(Icons.send),
-                onPressed: commentContentController.text.isNotEmpty
-                    ? _addComment
-                    : null,
+                onPressed: () => _addComment(),
               ),
             ],
           ),
