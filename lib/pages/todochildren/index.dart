@@ -107,7 +107,7 @@ class _TodoSubTaskListState extends State<_TodoSubTaskList> {
                 TodoInputBar(
                   parentTodo: widget.todo.id,
                   initialProject: widget.todo.project,
-                  allowProjectSelection: false,
+                  additionalFields: false,
                   initialPipeline: widget.todo.pipeline,
                   onBackButton: () {
                     setState(() {

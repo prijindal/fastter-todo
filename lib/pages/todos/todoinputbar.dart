@@ -23,12 +23,12 @@ class TodoModifyBar extends StatelessWidget {
     super.key,
     required this.onBackButton,
     required this.todo,
-    this.allowProjectSelection = false,
+    this.additionalFields = true,
   });
 
   final void Function() onBackButton;
   final TodoData todo;
-  final bool allowProjectSelection;
+  final bool additionalFields;
 
   @override
   Widget build(BuildContext context) => _TodoInputBar(
@@ -40,7 +40,6 @@ class TodoModifyBar extends StatelessWidget {
         initialTags: todo.tags,
         labelText: "Edit task: ${todo.title}",
         initialDueDate: todo.dueDate,
-        allowProjectSelection: allowProjectSelection,
         parentTodo: todo.parent,
         leadingButtons: [],
         trailingButtons: [
@@ -48,6 +47,7 @@ class TodoModifyBar extends StatelessWidget {
             todo: todo,
           ),
         ],
+        additionalFields: additionalFields,
         onSave: ({
           required String title,
           String? project,
@@ -81,25 +81,25 @@ class TodoInputBar extends StatelessWidget {
     required this.onBackButton,
     this.initialProject,
     this.initialPipeline,
-    this.allowProjectSelection = false,
     this.parentTodo,
+    this.additionalFields = true,
   });
 
   final void Function() onBackButton;
+  final bool additionalFields;
   final String? initialProject; // this will be a project id
   final String? initialPipeline; // this will be a pipeline id
   final String?
       parentTodo; // This will be the parent id which is added to the todo
-  final bool allowProjectSelection;
 
   @override
   Widget build(BuildContext context) => _TodoInputBar(
         onBackButton: onBackButton,
         initialProject: initialProject,
         initialPipeline: initialPipeline,
-        allowProjectSelection: allowProjectSelection,
         parentTodo: parentTodo,
         labelText: "Add a task",
+        additionalFields: additionalFields,
         onSave: ({
           required String title,
           String? project,
@@ -135,17 +135,18 @@ class _TodoInputBar extends StatefulWidget {
     this.trailingButtons = const [],
     this.initialProject,
     this.initialPipeline,
-    this.allowProjectSelection = false,
     this.parentTodo,
     required this.onSave,
     this.initialTitle = "",
     this.initialDueDate,
     this.initialPriority,
     this.initialTags,
+    this.additionalFields = true,
   });
 
   final void Function() onBackButton;
   final String labelText;
+  final bool additionalFields;
   final List<Widget> leadingButtons;
   final List<Widget> trailingButtons;
   final String? initialProject; // this will be a project id
@@ -156,7 +157,6 @@ class _TodoInputBar extends StatefulWidget {
   final List<String>? initialTags;
   final String?
       parentTodo; // This will be the parent id which is added to the todo
-  final bool allowProjectSelection;
   final Future<void> Function({
     required String title,
     String? project,
@@ -284,6 +284,35 @@ class _TodoInputBarState extends State<_TodoInputBar>
     }
   }
 
+  Widget _buildTitleInputSuffix() {
+    if (widget.additionalFields == false) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              _formKey.currentState!.fields['title']?.didChange(null);
+              _unFocusKeyboard();
+            },
+          ),
+          IconButton(
+            key: const Key("TodoInputBarSendButton"),
+            icon: const Icon(Icons.send),
+            onPressed: _onSave,
+          ),
+        ],
+      );
+    }
+    return IconButton(
+      icon: const Icon(Icons.close),
+      onPressed: () {
+        _formKey.currentState!.fields['title']?.didChange(null);
+        _unFocusKeyboard();
+      },
+    );
+  }
+
   Widget _buildInput() => FormBuilderTextField(
         name: "title",
         key: Key("TodoInputBarTitleForm"),
@@ -298,15 +327,7 @@ class _TodoInputBarState extends State<_TodoInputBar>
         decoration: InputDecoration(
           labelText: widget.labelText,
           contentPadding: const EdgeInsets.only(left: 10, bottom: 10),
-          suffix: IconButton(
-            icon: const Icon(
-              Icons.close,
-            ),
-            onPressed: () {
-              _formKey.currentState!.fields['title']?.didChange(null);
-              _unFocusKeyboard();
-            },
-          ),
+          suffix: _buildTitleInputSuffix(),
         ),
         onSubmitted: (_) {
           _onSave();
@@ -451,6 +472,15 @@ class _TodoInputBarState extends State<_TodoInputBar>
 
   @override
   Widget build(BuildContext context) {
+    if (widget.additionalFields == false) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
+        child: FormBuilder(
+          key: _formKey,
+          child: _buildInput(),
+        ),
+      );
+    }
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
       child: FormBuilder(

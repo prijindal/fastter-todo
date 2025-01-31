@@ -40,7 +40,6 @@ class TodoScreen extends StatelessWidget {
         padding: MediaQuery.of(context).viewInsets,
         child: TodoModifyBar(
           todo: todo,
-          allowProjectSelection: true,
           onBackButton: () {
             AutoRouter.of(context).maybePop();
           },
@@ -426,7 +425,7 @@ class _ExpansionTodoChildrenState extends State<_ExpansionTodoChildren> {
               TodoInputBar(
                 parentTodo: widget.todo.id,
                 initialProject: widget.todo.project,
-                allowProjectSelection: false,
+                additionalFields: false,
                 initialPipeline: widget.todo.pipeline,
                 onBackButton: () {
                   setState(() {
