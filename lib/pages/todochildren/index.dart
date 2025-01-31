@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../models/core.dart';
 import '../../models/local_db_state.dart';
@@ -17,11 +17,13 @@ class TodoChildrenScreen extends StatelessWidget {
   final String todoId;
 
   @override
-  Widget build(BuildContext context) => Consumer<LocalDbState>(
-        builder: (context, localDbState, _) => _TodoChildrenScreen(
-          todo: localDbState.todos.firstWhere((f) => f.id == todoId),
-        ),
-      );
+  Widget build(BuildContext context) {
+    final todo = watchPropertyValue(
+        (LocalDbState state) => state.todos.firstWhere((f) => f.id == todoId));
+    return _TodoChildrenScreen(
+      todo: todo,
+    );
+  }
 }
 
 class _TodoChildrenScreen extends StatelessWidget {
@@ -61,10 +63,8 @@ class _TodoSubTaskListState extends State<_TodoSubTaskList> {
 
   @override
   Widget build(BuildContext context) {
-    final children = Provider.of<LocalDbState>(context)
-        .todos
-        .where((a) => a.parent == widget.todo.id)
-        .toList();
+    final children = watchPropertyValue((LocalDbState state) =>
+        state.todos.where((a) => a.parent == widget.todo.id).toList());
     return ListView(
       shrinkWrap: true,
       children: [
