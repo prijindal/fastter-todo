@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
@@ -38,6 +36,7 @@ class _TodosGrid extends WatchingWidget {
     required this.filters,
   });
   final ScrollController _scrollController = ScrollController();
+  final PageController _pageController = PageController();
 
   final List<TodoData> todos;
   final TodosFilters filters;
@@ -58,26 +57,44 @@ class _TodosGrid extends WatchingWidget {
     if (pipelines.isEmpty) {
       return Center(child: Text("Add some entries"));
     }
-    return Scrollbar(
-      controller: _scrollController,
-      child: ListView.builder(
-        controller: _scrollController,
-        shrinkWrap: true,
-        scrollDirection: Axis.horizontal,
-        itemCount: pipelines.length,
-        itemBuilder: (context, statusIndex) {
-          final status = pipelines[statusIndex];
-          final filteredTodos =
-              todos.where((todo) => todo.pipeline == status).toList();
+    final mediaQuery = MediaQuery.sizeOf(context);
+    if (mediaQuery.width < 600) {
+      return Scrollbar(
+        controller: _pageController,
+        child: PageView.builder(
+          controller: _pageController,
+          scrollDirection: Axis.horizontal,
+          itemCount: pipelines.length,
+          itemBuilder: (context, statusIndex) {
+            final status = pipelines[statusIndex];
+            final filteredTodos =
+                todos.where((todo) => todo.pipeline == status).toList();
 
-          final mediaQuery = MediaQuery.sizeOf(context);
-          return SizedBox(
-            width: min(mediaQuery.width, 600),
-            child: _buildList(filteredTodos, status, isSelected),
-          );
-        },
-      ),
-    );
+            return _buildList(filteredTodos, status, isSelected);
+          },
+        ),
+      );
+    } else {
+      return Scrollbar(
+        controller: _scrollController,
+        child: ListView.builder(
+          controller: _scrollController,
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemCount: pipelines.length,
+          itemBuilder: (context, statusIndex) {
+            final status = pipelines[statusIndex];
+            final filteredTodos =
+                todos.where((todo) => todo.pipeline == status).toList();
+
+            return SizedBox(
+              width: 600,
+              child: _buildList(filteredTodos, status, isSelected),
+            );
+          },
+        ),
+      );
+    }
   }
 
   Widget _buildPipelineChip(List<TodoData> filteredTodos, String pipeline) {
