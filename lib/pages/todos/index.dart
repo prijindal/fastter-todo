@@ -2,7 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../../helpers/todos_filters.dart';
-import 'home_app_bar.dart';
+import 'app_bars/home_app_bar.dart';
 import 'todo_list_scaffold.dart';
 
 const mediaBreakpoint = 700;

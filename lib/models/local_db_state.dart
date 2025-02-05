@@ -213,8 +213,22 @@ class LocalDbState extends ChangeNotifier {
   }
 
   List<String> getTodoTag(String id) {
-    final todo = todos.firstWhere((element) => element.id == id);
-    return todo.tags;
+    final todo = todos.where((element) => element.id == id).firstOrNull;
+    return todo?.tags ?? [];
+  }
+
+  String formTextFromTodos(List<String> ids) {
+    final todos = this.todos.where((todo) => ids.contains(todo.id));
+    return todos.map((a) {
+      var t = "";
+      if (a.completed) {
+        t += "[x]";
+      } else {
+        t += "[ ]";
+      }
+      t += " ${a.title}";
+      return t;
+    }).join('\n');
   }
 
   List<ReminderData> getTodoReminders(String id, [bool onlyPending = false]) {
