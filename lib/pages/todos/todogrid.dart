@@ -98,34 +98,40 @@ class _TodosGrid extends WatchingWidget {
   }
 
   Widget _buildPipelineChip(List<TodoData> filteredTodos, String pipeline) {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 8.0,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        Chip(
-          label: Text(pipeline),
-        ),
-        Text(filteredTodos.length.toString()),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 8.0,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Chip(
+            label: Text(pipeline),
+          ),
+          Text(filteredTodos.length.toString()),
+        ],
+      ),
     );
   }
 
   Widget _buildList(
       List<TodoData> filteredTodos, String pipeline, bool isSelected) {
-    return ListView(
-      shrinkWrap: false,
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         _buildPipelineChip(filteredTodos, pipeline),
-        TodosListView(
-          dismissible: false,
-          todos: filteredTodos,
-          shrinkWrap: true,
-          todoItemTapBehaviour: isSelected
-              ? TodoItemTapBehaviour.toggleSelection
-              : TodoItemTapBehaviour.openTodoBottomSheet,
-          todoItemLongPressBehaviour: TodoItemTapBehaviour.toggleSelection,
-          showChildren: true,
+        Flexible(
+          child: TodosListView(
+            dismissible: false,
+            todos: filteredTodos,
+            shrinkWrap: false,
+            todoItemTapBehaviour: isSelected
+                ? TodoItemTapBehaviour.toggleSelection
+                : TodoItemTapBehaviour.openTodoBottomSheet,
+            todoItemLongPressBehaviour: TodoItemTapBehaviour.toggleSelection,
+            showChildren: true,
+          ),
         ),
       ],
     );
