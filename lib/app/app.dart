@@ -81,7 +81,6 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
       });
       localDbState.addListener(() {
         final projects = localDbState.projects;
-        print(projects);
         final filters = [
           ...projects.map((project) => TodosFilters(projectFilter: project.id)),
           TodosFilters(projectFilter: "inbox")
