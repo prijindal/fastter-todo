@@ -1,4 +1,6 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:fastter_todo/db/db_crud_operations.dart';
+import 'package:fastter_todo/helpers/dbio.dart';
 import 'package:fastter_todo/models/db_manager.dart';
 import 'package:fastter_todo/models/local_db_state.dart';
 import 'package:fastter_todo/models/local_state.dart';
@@ -29,16 +31,19 @@ void main() {
       });
       when(() => mockStackRouter.currentUrl).thenReturn('/todos');
       // Load app widget.
-      GetIt.I.registerSingleton<DbSelector>(DbSelector.localOnly());
+      GetIt.I.registerSingletonAsync<DbSelector>(() => DbSelector.localOnly());
       GetIt.I.registerSingleton<SettingsStorageNotifier>(
           SettingsStorageNotifier());
       GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier());
-      GetIt.I.registerSingleton<LocalDbState>(
-        LocalDbState(),
-      );
-      GetIt.I.registerSingleton<AppRouter>(
-        AppRouter(),
-      );
+      GetIt.I.registerSingletonAsync<LocalDbState>(() async => LocalDbState(),
+          dependsOn: [DbSelector]);
+      GetIt.I.registerSingletonAsync<AppRouter>(() async => AppRouter(),
+          dependsOn: [DbSelector]);
+      GetIt.I.registerSingletonAsync<DbCrudOperations>(
+          () async => DbCrudOperations(),
+          dependsOn: [DbSelector]);
+      GetIt.I.registerSingletonAsync<DatabaseIO>(() async => DatabaseIO(),
+          dependsOn: [DbSelector]);
       await GetIt.I.allReady();
       await tester.pumpWidget(
         MaterialApp(

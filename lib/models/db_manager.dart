@@ -46,7 +46,7 @@ class DbSelector {
     this.remoteDbSettings,
   });
 
-  factory DbSelector.localOnly() {
+  static Future<DbSelector> localOnly() async {
     return DbSelector(
       database: SharedDatabase.local(),
       dbType: DbSelectorType.local,
