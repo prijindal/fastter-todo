@@ -8,12 +8,11 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/core.dart';
-import '../models/db_manager.dart';
 import 'constants.dart';
 import 'logger.dart';
 
 class DatabaseIO {
-  final SharedDatabase _database = GetIt.I<DbSelector>().database;
+  final SharedDatabase _database = GetIt.I<SharedDatabase>();
 
   SharedDatabase get database => _database;
 

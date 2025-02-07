@@ -35,7 +35,6 @@ dependencies:
   download: ^1.0.0
   drift: ^2.23.0
   drift_flutter: ^0.2.4
-  drift_hrana: ^1.0.2
   file_picker: ^8.1.7
   flex_color_picker: ^3.7.0
   flutter:

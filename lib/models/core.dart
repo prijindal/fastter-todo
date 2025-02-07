@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:drift_hrana/drift_hrana.dart';
 import 'package:uuid/uuid.dart';
 
 import '../helpers/constants.dart';
@@ -90,24 +89,6 @@ class SharedDatabase extends _$SharedDatabase {
             driftWorker: Uri.parse('drift_worker.dart.js'),
           ),
         ));
-
-  SharedDatabase.hrana({required String? jwtToken, required String url})
-      : super(HranaDatabase(
-          Uri.parse(url),
-          jwtToken: jwtToken,
-        ));
-
-  // SharedDatabase.libsql({
-  //   required String? jwtToken,
-  //   required String url,
-  //   required String path,
-  // }) : super(DriftLibsqlDatabase(
-  //         path,
-  //         syncUrl: url,
-  //         authToken: jwtToken,
-  //         readYourWrites: true,
-  //         syncIntervalSeconds: 3,
-  //       ));
 
   @override
   int get schemaVersion => 1;

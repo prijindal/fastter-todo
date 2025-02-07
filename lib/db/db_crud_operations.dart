@@ -2,7 +2,7 @@ import 'package:drift/drift.dart' as drift;
 import 'package:watch_it/watch_it.dart';
 
 import '../helpers/logger.dart';
-import '../models/db_manager.dart';
+import '../models/core.dart';
 
 enum TableName {
   project,
@@ -12,7 +12,7 @@ enum TableName {
 }
 
 class DbCrudOperations {
-  final _database = GetIt.I<DbSelector>().database;
+  final _database = GetIt.I<SharedDatabase>();
   late final project = _TableCrudOperation(_database.managers.project);
   late final todo = _TableCrudOperation(_database.managers.todo);
   late final comment = _TableCrudOperation(_database.managers.comment);
@@ -97,9 +97,5 @@ class _TableCrudOperation<
 
   Future<List<$Dataclass>> get() async {
     return await manager.get();
-  }
-
-  Stream<List<$Dataclass>> watch() {
-    return manager.watch();
   }
 }

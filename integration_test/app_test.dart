@@ -1,7 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fastter_todo/db/db_crud_operations.dart';
 import 'package:fastter_todo/helpers/dbio.dart';
-import 'package:fastter_todo/models/db_manager.dart';
+import 'package:fastter_todo/models/core.dart';
 import 'package:fastter_todo/models/local_db_state.dart';
 import 'package:fastter_todo/models/local_state.dart';
 import 'package:fastter_todo/models/settings.dart';
@@ -31,19 +31,19 @@ void main() {
       });
       when(() => mockStackRouter.currentUrl).thenReturn('/todos');
       // Load app widget.
-      GetIt.I.registerSingletonAsync<DbSelector>(() => DbSelector.localOnly());
+      GetIt.I.registerSingleton<SharedDatabase>(SharedDatabase.local());
       GetIt.I.registerSingleton<SettingsStorageNotifier>(
           SettingsStorageNotifier());
       GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier());
       GetIt.I.registerSingletonAsync<LocalDbState>(() async => LocalDbState(),
-          dependsOn: [DbSelector]);
+          dependsOn: [SharedDatabase]);
       GetIt.I.registerSingletonAsync<AppRouter>(() async => AppRouter(),
-          dependsOn: [DbSelector]);
+          dependsOn: [SharedDatabase]);
       GetIt.I.registerSingletonAsync<DbCrudOperations>(
           () async => DbCrudOperations(),
-          dependsOn: [DbSelector]);
+          dependsOn: [SharedDatabase]);
       GetIt.I.registerSingletonAsync<DatabaseIO>(() async => DatabaseIO(),
-          dependsOn: [DbSelector]);
+          dependsOn: [SharedDatabase]);
       await GetIt.I.allReady();
       await tester.pumpWidget(
         MaterialApp(

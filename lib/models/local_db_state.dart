@@ -1,28 +1,18 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../helpers/logger.dart';
 import 'core.dart';
-import 'db_manager.dart';
 import 'local_notifications_manager.dart';
 
 class LocalDbState extends ChangeNotifier {
-  DbSelector get dbManager => GetIt.I<DbSelector>();
-  SharedDatabase get db => dbManager.database;
-  RemoteDbSettings? get remoteDbSettings => dbManager.remoteDbSettings;
-
+  SharedDatabase get db => GetIt.I<SharedDatabase>();
   final LocalNotificationsManager localNotificationsManager =
       LocalNotificationsManager();
 
   List<StreamSubscription<List<dynamic>>> _subscriptions = [];
-
-  Timer? timer;
 
   final Map<String, List<drift.DataClass>> _localState = {};
 
@@ -58,7 +48,6 @@ class LocalDbState extends ChangeNotifier {
   LocalDbState() {
     // Local state is first initialized with local storage, this makes sure that when we first do init, we have some data on ui
     // This is only really useful when our sqlite db is a remote one
-    initFromLocalTempDb();
     initFromDb();
   }
 
@@ -67,7 +56,6 @@ class LocalDbState extends ChangeNotifier {
     for (var subscription in _subscriptions) {
       subscription.cancel();
     }
-    timer?.cancel();
     super.dispose();
   }
 
@@ -93,42 +81,6 @@ class LocalDbState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<StreamSubscription<List<int>>?> _initStreamForTable(
-      String table, Future<void> Function(String) onChange,
-      [int attemptsLeft = 5]) async {
-    if (attemptsLeft == 0) {
-      AppLogger.instance.w("Retried limit exceeded, cancelling");
-      return null;
-    }
-    final uri = Uri.parse(remoteDbSettings!.url);
-    final httpUri = Uri(
-      scheme: "https",
-      host: uri.host,
-      path: "/beta/listen",
-      queryParameters: {
-        "table": table,
-      },
-    );
-    AppLogger.instance.i("Starting to listen on stream for $table");
-    http.Request request = http.Request("GET", httpUri);
-    request.headers["Authorization"] = "Bearer ${remoteDbSettings!.token}";
-    try {
-      final response = await request.send();
-      StreamSubscription<List<int>> subscription =
-          response.stream.listen((event) {
-        final stringifed = String.fromCharCodes(event).trim();
-        if (stringifed == ":keep-alive") {
-          return;
-        }
-        onChange(stringifed);
-      });
-      return subscription;
-    } catch (e) {
-      AppLogger.instance.e("Error listening to stream for $table, $e");
-      return _initStreamForTable(table, onChange, attemptsLeft - 1);
-    }
-  }
-
   Future<void> onChange<T extends drift.DataClass>(
     drift.RootTableManager<dynamic, dynamic, dynamic, dynamic, dynamic, dynamic,
             dynamic, dynamic, dynamic, T, dynamic>
@@ -139,7 +91,6 @@ class LocalDbState extends ChangeNotifier {
     _localState[table] = values.toList();
     _initialized[table] = true;
     notifyListeners();
-    setLocalTempDb(table, values);
   }
 
   Future<StreamSubscription<List<dynamic>>?>
@@ -150,15 +101,9 @@ class LocalDbState extends ChangeNotifier {
     String table,
   ) async {
     await onChange(manager, table);
-    if (remoteDbSettings == null) {
-      return manager.watch().listen((_) async {
-        await onChange(manager, table);
-      });
-    } else {
-      return await _initStreamForTable(table, (_) async {
-        await onChange(manager, table);
-      });
-    }
+    return manager.watch().listen((_) async {
+      await onChange(manager, table);
+    });
   }
 
   Future<void> initFromDb() async {
@@ -242,50 +187,7 @@ class LocalDbState extends ChangeNotifier {
     return reminders.where((element) => element.todo == id).toList();
   }
 
-  Future<void> _readFromLocalDb<T extends drift.DataClass>(
-      String table, T Function(Map<String, dynamic>) fromJson) async {
-    final entriesStr =
-        await SharedPreferencesAsync().getString("LocalTempDb$table");
-    if (entriesStr != null) {
-      final entries = (jsonDecode(entriesStr) as List<dynamic>)
-          .map<T>((a) => fromJson(a as Map<String, dynamic>))
-          .toList();
-      if (_localState[table] == null) {
-        _localState[table] = entries;
-        AppLogger.instance.d("Found local shared preferences for $table:");
-        notifyListeners();
-      }
-    }
-  }
-
-  Future<void> _clearFromLocalDb(String table) async {
-    await SharedPreferencesAsync().remove("LocalTempDb$table");
-  }
-
-  void initFromLocalTempDb() async {
-    if (remoteDbSettings == null) return;
-    await Future.wait([
-      _readFromLocalDb<TodoData>("todo", TodoData.fromJson),
-      _readFromLocalDb<ProjectData>("project", ProjectData.fromJson),
-      _readFromLocalDb<CommentData>("comment", CommentData.fromJson),
-      _readFromLocalDb<ReminderData>("reminder", ReminderData.fromJson),
-    ]);
-    await syncReminders();
-  }
-
-  Future<void> setLocalTempDb(String table, List<drift.DataClass> items) async {
-    if (remoteDbSettings == null) return;
-    await SharedPreferencesAsync().setString(
-        "LocalTempDb$table", jsonEncode(items.map((a) => a.toJson()).toList()));
-  }
-
   Future<void> clear() async {
-    await Future.wait([
-      _clearFromLocalDb("todo"),
-      _clearFromLocalDb("project"),
-      _clearFromLocalDb("comment"),
-      _clearFromLocalDb("reminder"),
-    ]);
     _localState["todo"] = [];
     _localState["project"] = [];
     _localState["comment"] = [];
