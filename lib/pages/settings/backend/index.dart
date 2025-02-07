@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:restart_app/restart_app.dart';
 
 import '../../../db/db_crud_operations.dart';
-import '../../../models/db_manager.dart';
 import '../../../models/local_db_state.dart';
 
 @RoutePage()
@@ -18,11 +17,6 @@ class BackendSettingsScreen extends StatelessWidget {
         title: const Text("Settings -> Backend"),
       ),
       body: ListView(children: [
-        const ListTile(
-          title: Text("Database Backend"),
-          dense: true,
-        ),
-        const BackendImplementationTile(),
         ListTile(
           title: Text("Reset Database"),
           onTap: () async {
@@ -43,97 +37,6 @@ class BackendSettingsScreen extends StatelessWidget {
           },
         ),
       ]),
-    );
-  }
-}
-
-class BackendImplementationTile extends StatelessWidget {
-  const BackendImplementationTile({super.key});
-
-  Future<RemoteDbSettings?> _showRemoteSettingsDialog(
-      BuildContext context) async {
-    final urlController = TextEditingController();
-    final jwtTokenController = TextEditingController();
-    final remoteDbSettings = await showDialog<RemoteDbSettings?>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Input connection information'),
-        content: Column(
-          children: [
-            TextField(
-              controller: urlController,
-              decoration: InputDecoration(hintText: "Enter your url here"),
-            ),
-            TextField(
-              controller: jwtTokenController,
-              decoration: InputDecoration(hintText: "Enter your token here"),
-            ),
-          ],
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop<RemoteDbSettings?>(null);
-            },
-          ),
-          TextButton(
-            child: const Text('Submit'),
-            onPressed: () {
-              Navigator.of(context).pop<RemoteDbSettings>(
-                RemoteDbSettings(
-                  url: urlController.text,
-                  token: jwtTokenController.text.isEmpty
-                      ? null
-                      : jwtTokenController.text,
-                ),
-              );
-              // Handle the submit action
-            },
-          ),
-        ],
-      ),
-    );
-    return remoteDbSettings;
-  }
-
-  Widget _buildTitle(BuildContext context) {
-    final dbType = GetIt.I<DbSelector>().dbType;
-    return DropdownButton<DbSelectorType>(
-      value: dbType,
-      items: DbSelectorType.values
-          .map(
-            (e) => DropdownMenuItem<DbSelectorType>(
-              value: e,
-              child: Text(e.name),
-            ),
-          )
-          .toList(),
-      onChanged: (newValue) async {
-        if (newValue == DbSelectorType.remote) {
-          final settings = await _showRemoteSettingsDialog(context);
-          if (settings == null) {
-            return;
-          } else {
-            await DbSelector.setRemote(settings);
-          }
-        } else {
-          await DbSelector.setLocal();
-        }
-        await DbSelector.initDb();
-        await Restart.restartApp(
-          notificationTitle: 'Restarting App',
-          notificationBody: 'Please tap here to open the app again.',
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      subtitle: Text("Select backend implementation"),
-      title: _buildTitle(context),
     );
   }
 }

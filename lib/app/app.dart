@@ -8,7 +8,7 @@ import '../helpers/dbio.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
 import '../helpers/todos_filters.dart';
-import '../models/db_manager.dart';
+import '../models/core.dart';
 import '../models/local_db_state.dart';
 import '../models/local_state.dart';
 import '../models/settings.dart';
@@ -16,20 +16,21 @@ import '../pages/loading/index.dart';
 import '../router/app_router.dart';
 
 void registerAllServices() {
-  GetIt.I.registerSingletonAsync<DbSelector>(() => DbSelector.initDb());
+  GetIt.I.registerSingleton<SharedDatabase>(SharedDatabase.local());
   GetIt.I.registerSingleton<SettingsStorageNotifier>(SettingsStorageNotifier());
   GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier(
     todosView: isDesktop ? TodosView.grid : TodosView.list,
   ));
-  GetIt.I.registerSingletonAsync<LocalDbState>(() async => LocalDbState(),
-      dependsOn: [DbSelector]);
-  GetIt.I.registerSingletonAsync<AppRouter>(() async => AppRouter(),
-      dependsOn: [DbSelector]);
-  GetIt.I.registerSingletonAsync<DbCrudOperations>(
-      () async => DbCrudOperations(),
-      dependsOn: [DbSelector]);
-  GetIt.I.registerSingletonAsync<DatabaseIO>(() async => DatabaseIO(),
-      dependsOn: [DbSelector]);
+  GetIt.I.registerSingleton<LocalDbState>(
+    LocalDbState(),
+  );
+  GetIt.I.registerSingleton<AppRouter>(AppRouter());
+  GetIt.I.registerSingleton<DbCrudOperations>(
+    DbCrudOperations(),
+  );
+  GetIt.I.registerSingleton<DatabaseIO>(
+    DatabaseIO(),
+  );
 }
 
 class MyApp extends StatelessWidget {
