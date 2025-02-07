@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../helpers/breakpoints.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
 import '../models/db_manager.dart';
@@ -13,7 +14,9 @@ import '../router/app_router.dart';
 void registerAllServices() {
   GetIt.I.registerSingletonAsync<DbManager>(() => DbManager.autoInit());
   GetIt.I.registerSingleton<SettingsStorageNotifier>(SettingsStorageNotifier());
-  GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier());
+  GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier(
+    todosView: isDesktop ? TodosView.grid : TodosView.list,
+  ));
   GetIt.I.registerSingletonAsync<LocalDbState>(() async => LocalDbState(),
       dependsOn: [DbManager]);
   GetIt.I.registerSingletonAsync<AppRouter>(() async => AppRouter(),
