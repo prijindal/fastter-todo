@@ -149,7 +149,8 @@ class _TodoItem extends StatelessWidget {
     if (todo.dueDate == null &&
         reminders == 0 &&
         comments == 0 &&
-        childTodos == 0) {
+        childTodos == 0 &&
+        todo.tags.isEmpty) {
       return false;
     }
     return true;
@@ -169,7 +170,7 @@ class _TodoItem extends StatelessWidget {
               .update([todo.id], (o) => o(completed: drift.Value(newValue)));
         },
       ),
-      isThreeLine: elements.isNotEmpty,
+      isThreeLine: isThreeLines,
       title: Text(
         todo.title,
       ),
