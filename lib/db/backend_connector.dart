@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'backend_sync.dart';
@@ -8,12 +10,24 @@ Uri formWsUrl(String url) {
 }
 
 class BackendConnector {
-  final WebSocketChannel channel;
+  final WebSocketChannel _channel;
+  StreamSubscription<dynamic>? _subscription;
+  bool get isConnected => _subscription != null;
 
-  BackendConnector({required this.channel});
+  BackendConnector({required WebSocketChannel channel}) : _channel = channel {
+    initConnection();
+  }
 
   static Future<BackendConnector> init(BackendSyncConfiguration config) async {
     final channel = WebSocketChannel.connect(formWsUrl(config.url));
     return BackendConnector(channel: channel);
+  }
+
+  Future<void> initConnection() async {
+    await _channel.ready;
+    _channel.sink.add("Hello from client");
+    _subscription = _channel.stream.listen((message) {
+      print("Received: $message");
+    });
   }
 }

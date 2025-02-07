@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:fastter_todo/db/backend_sync.dart';
 import 'package:fastter_todo/db/db_crud_operations.dart';
 import 'package:fastter_todo/helpers/dbio.dart';
 import 'package:fastter_todo/models/core.dart';
@@ -35,15 +36,17 @@ void main() {
       GetIt.I.registerSingleton<SettingsStorageNotifier>(
           SettingsStorageNotifier());
       GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier());
-      GetIt.I.registerSingletonAsync<LocalDbState>(() async => LocalDbState(),
-          dependsOn: [SharedDatabase]);
-      GetIt.I.registerSingletonAsync<AppRouter>(() async => AppRouter(),
-          dependsOn: [SharedDatabase]);
-      GetIt.I.registerSingletonAsync<DbCrudOperations>(
-          () async => DbCrudOperations(),
-          dependsOn: [SharedDatabase]);
-      GetIt.I.registerSingletonAsync<DatabaseIO>(() async => DatabaseIO(),
-          dependsOn: [SharedDatabase]);
+      GetIt.I.registerSingleton<LocalDbState>(
+        LocalDbState(),
+      );
+      GetIt.I.registerSingleton<AppRouter>(AppRouter());
+      GetIt.I.registerSingleton<BackendSync>(BackendSync(null));
+      GetIt.I.registerSingleton<DbCrudOperations>(
+        DbCrudOperations(),
+      );
+      GetIt.I.registerSingleton<DatabaseIO>(
+        DatabaseIO(),
+      );
       await GetIt.I.allReady();
       await tester.pumpWidget(
         MaterialApp(
