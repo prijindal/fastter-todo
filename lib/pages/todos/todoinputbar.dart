@@ -7,9 +7,9 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../db/db_crud_operations.dart';
 import '../../helpers/logger.dart';
 import '../../models/core.dart';
-import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import '../todo/index.dart';
 import 'pipeline_dialog.dart';
@@ -53,21 +53,17 @@ class TodoModifyBar extends StatelessWidget {
           int? priority,
           List<String>? tags,
         }) async {
-          await GetIt.I<DbManager>()
-              .database
-              .managers
-              .todo
-              .filter((a) => a.id.equals(todo.id))
-              .update(
-                (o) => o(
-                  title: drift.Value(title),
-                  project: drift.Value(project ?? todo.project),
-                  dueDate: drift.Value(dueDate ?? todo.dueDate),
-                  pipeline: drift.Value(pipeline ?? todo.pipeline),
-                  priority: drift.Value(priority ?? todo.priority),
-                  tags: drift.Value(tags ?? todo.tags),
-                ),
-              );
+          await GetIt.I<DbCrudOperations>().todo.update(
+            [todo.id],
+            (o) => o(
+              title: drift.Value(title),
+              project: drift.Value(project ?? todo.project),
+              dueDate: drift.Value(dueDate ?? todo.dueDate),
+              pipeline: drift.Value(pipeline ?? todo.pipeline),
+              priority: drift.Value(priority ?? todo.priority),
+              tags: drift.Value(tags ?? todo.tags),
+            ),
+          );
         },
       );
 }
@@ -105,7 +101,7 @@ class TodoInputBar extends StatelessWidget {
           int priority = 1,
           List<String> tags = const [],
         }) async {
-          await GetIt.I<DbManager>().database.managers.todo.create(
+          await GetIt.I<DbCrudOperations>().todo.create(
                 (o) => o(
                   title: title,
                   project: drift.Value(project),

@@ -119,15 +119,6 @@ class DbManager {
     }
   }
 
-  // This will drop all the tables in the database and recreate it
-  Future<void> resetDatabase() async {
-    await database.customStatement("DROP TABLE reminder;");
-    await database.customStatement("DROP TABLE comment;");
-    await database.customStatement("DROP TABLE todo;");
-    await database.customStatement("DROP TABLE project;");
-    await database.customStatement("PRAGMA user_version = 0;");
-  }
-
   Future<void> setLocal() async {
     await SharedPreferencesAsync().setString(dbImplementationKey, 'local');
   }
@@ -141,26 +132,5 @@ class DbManager {
       dbRemoteSettings,
       settings.toJson(),
     );
-  }
-
-  Future<void> deleteParentTodosByParentIds(List<String> parentIds) async {
-    final childTodos = await database.managers.todo
-        .filter((f) => f.parent.isIn(parentIds))
-        .get();
-    for (var childTodo in childTodos) {
-      AppLogger.instance.i("Deleting Child todo: ${childTodo.id}");
-      await deleteTodosByIds([childTodo.id]);
-    }
-  }
-
-  // These are helper methods for db deletion/updation etc
-  Future<void> deleteTodosByIds(List<String> ids) async {
-    AppLogger.instance.i("Deleting todos: ${ids.join(",")}");
-    await Future.wait([
-      database.managers.comment.filter((f) => f.todo.isIn(ids)).delete(),
-      database.managers.reminder.filter((f) => f.todo.isIn(ids)).delete(),
-      database.managers.todo.filter((f) => f.id.isIn(ids)).delete(),
-      deleteParentTodosByParentIds(ids),
-    ]);
   }
 }

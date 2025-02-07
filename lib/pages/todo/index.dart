@@ -7,9 +7,9 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../../db/db_crud_operations.dart';
 import '../../helpers/breakpoints.dart';
 import '../../models/core.dart';
-import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import '../todocomments/todo_comment_item.dart';
 import '../todoreminders/index.dart';
@@ -110,7 +110,7 @@ class TodosScreenScaffold extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             onPressed: () async {
-              await GetIt.I<DbManager>().deleteTodosByIds([todo.id]);
+              await GetIt.I<DbCrudOperations>().deleteTodosByIds([todo.id]);
               // ignore: use_build_context_synchronously
               await AutoRouter.of(context).maybePop();
             },
@@ -152,22 +152,18 @@ class _TodoEditBodyState extends State<TodoEditBody> {
   void _save() async {
     if (_formKey.currentState?.saveAndValidate() == true) {
       final todo = _formKey.currentState!.value;
-      await GetIt.I<DbManager>()
-          .database
-          .managers
-          .todo
-          .filter((a) => a.id.equals(widget.todo.id))
-          .update(
-            (o) => o(
-              title: drift.Value(todo["title"] as String),
-              project: drift.Value(todo["project"] as String?),
-              priority: drift.Value(todo["priority"] as int),
-              dueDate: drift.Value(todo["dueDate"] as DateTime?),
-              tags: drift.Value(todo["tags"] as List<String>),
-              pipeline: drift.Value(todo["pipeline"] as String),
-              completed: drift.Value(todo["completed"] as bool),
-            ),
-          );
+      await GetIt.I<DbCrudOperations>().todo.update(
+        [widget.todo.id],
+        (o) => o(
+          title: drift.Value(todo["title"] as String),
+          project: drift.Value(todo["project"] as String?),
+          priority: drift.Value(todo["priority"] as int),
+          dueDate: drift.Value(todo["dueDate"] as DateTime?),
+          tags: drift.Value(todo["tags"] as List<String>),
+          pipeline: drift.Value(todo["pipeline"] as String),
+          completed: drift.Value(todo["completed"] as bool),
+        ),
+      );
       widget.onSave?.call();
     }
   }

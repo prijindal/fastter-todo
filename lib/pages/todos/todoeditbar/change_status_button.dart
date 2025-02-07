@@ -2,8 +2,8 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../db/db_crud_operations.dart';
 import '../../../models/core.dart';
-import '../../../models/db_manager.dart';
 import '../../../models/local_db_state.dart';
 import '../pipeline_dialog.dart';
 
@@ -38,12 +38,9 @@ class ChangePipelineButton extends StatelessWidget {
     final pipeline =
         await showPipelineDialog(context, getAllPipelines(context));
     if (pipeline != null && context.mounted) {
-      await GetIt.I<DbManager>()
-          .database
-          .managers
-          .todo
-          .filter((f) => f.id.isIn(selectedTodos.map((a) => a.id)))
-          .update((o) => o(pipeline: drift.Value(pipeline)));
+      await GetIt.I<DbCrudOperations>().todo.update(
+          selectedTodos.map((a) => a.id),
+          (o) => o(pipeline: drift.Value(pipeline)));
     }
   }
 }

@@ -4,8 +4,8 @@ import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../../db/db_crud_operations.dart';
 import '../../models/core.dart';
-import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import 'form.dart';
 
@@ -42,18 +42,13 @@ class _EditProjectScreen extends StatelessWidget {
     Color? color,
     List<String>? pipelines,
   }) async {
-    await GetIt.I<DbManager>()
-        .database
-        .managers
-        .project
-        .filter((f) => f.id.equals(project.id))
-        .update(
-          (o) => o(
-            color: drift.Value(color?.hex ?? project.color),
-            title: drift.Value(title ?? project.title),
-            pipelines: drift.Value(pipelines ?? project.pipelines),
-          ),
-        );
+    await GetIt.I<DbCrudOperations>().project.update(
+        [project.id],
+        (o) => o(
+              color: drift.Value(color?.hex ?? project.color),
+              title: drift.Value(title ?? project.title),
+              pipelines: drift.Value(pipelines ?? project.pipelines),
+            ));
     // ignore: use_build_context_synchronously
     Navigator.of(context).pop();
   }

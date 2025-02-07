@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:quick_actions/quick_actions.dart';
 
+import '../db/db_crud_operations.dart';
 import '../helpers/breakpoints.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
@@ -22,6 +23,9 @@ void registerAllServices() {
   GetIt.I.registerSingletonAsync<LocalDbState>(() async => LocalDbState(),
       dependsOn: [DbManager]);
   GetIt.I.registerSingletonAsync<AppRouter>(() async => AppRouter(),
+      dependsOn: [DbManager]);
+  GetIt.I.registerSingletonAsync<DbCrudOperations>(
+      () async => DbCrudOperations(),
       dependsOn: [DbManager]);
 }
 

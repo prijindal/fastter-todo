@@ -6,8 +6,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../db/db_crud_operations.dart';
 import '../../models/core.dart';
-import '../../models/db_manager.dart';
 
 class TodoCommentInput extends StatefulWidget {
   const TodoCommentInput({
@@ -31,7 +31,7 @@ class _TodoCommentInputState extends State<TodoCommentInput> {
       final comment = _formKey.currentState!.value;
       final content =
           Uint8List.fromList((comment["content"] as String).codeUnits);
-      await GetIt.I<DbManager>().database.managers.comment.create(
+      await GetIt.I<DbCrudOperations>().comment.create(
             (f) => f(
               type: TodoCommentType.text,
               content: content,

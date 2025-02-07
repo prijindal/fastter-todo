@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:restart_app/restart_app.dart';
 
+import '../../../db/db_crud_operations.dart';
 import '../../../models/db_manager.dart';
 import '../../../models/local_db_state.dart';
 
@@ -26,7 +27,7 @@ class BackendSettingsScreen extends StatelessWidget {
           title: Text("Reset Database"),
           onTap: () async {
             try {
-              await GetIt.I<DbManager>().resetDatabase();
+              await GetIt.I<DbCrudOperations>().resetDatabase();
               // ignore: use_build_context_synchronously
               await GetIt.I<LocalDbState>().clear();
               await Restart.restartApp(

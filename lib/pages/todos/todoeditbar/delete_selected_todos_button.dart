@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../../models/db_manager.dart';
+import '../../../db/db_crud_operations.dart';
 import '../../../models/local_state.dart';
 import '../confirmation_dialog.dart';
 
@@ -15,7 +15,7 @@ class DeleteSelectedTodosButton extends StatelessWidget {
       builder: (context) => ConfirmationDialog(),
     );
     if (shouldDelete != null && shouldDelete && context.mounted) {
-      await GetIt.I<DbManager>()
+      await GetIt.I<DbCrudOperations>()
           .deleteTodosByIds(localStateNotifier.selectedTodoIds);
       localStateNotifier.clearSelectedTodoIds();
     }

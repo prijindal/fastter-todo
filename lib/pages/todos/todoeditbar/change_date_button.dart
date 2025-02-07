@@ -2,8 +2,8 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../db/db_crud_operations.dart';
 import '../../../models/core.dart';
-import '../../../models/db_manager.dart';
 import '../todo_select_date.dart';
 
 class ChangeDateButton extends StatelessWidget {
@@ -19,13 +19,9 @@ class ChangeDateButton extends StatelessWidget {
       final selectedDate =
           await todoSelectDate(context, selectedTodos.first.dueDate);
       if (selectedDate != null && context.mounted) {
-        await (GetIt.I<DbManager>().database.todo.update()
-              ..where((tbl) => tbl.id.isIn(selectedTodos.map((a) => a.id))))
-            .write(
-          TodoCompanion(
-            dueDate: drift.Value(selectedDate),
-          ),
-        );
+        await GetIt.I<DbCrudOperations>().todo.update(
+            selectedTodos.map((a) => a.id),
+            (o) => o(dueDate: drift.Value(selectedDate)));
       }
     }
   }

@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../../db/db_crud_operations.dart';
 import '../../models/core.dart';
-import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import 'todo_comment_input.dart';
 import 'todo_comment_item.dart';
@@ -173,12 +173,7 @@ class TodoCommentsAppBar extends StatelessWidget
       ),
     );
     if (shouldDelete == true && context.mounted) {
-      await GetIt.I<DbManager>()
-          .database
-          .managers
-          .comment
-          .filter((f) => f.id.isIn(selectedComments))
-          .delete();
+      await GetIt.I<DbCrudOperations>().comment.delete(selectedComments);
     }
   }
 

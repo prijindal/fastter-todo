@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../db/db_crud_operations.dart';
 import '../../helpers/date_fomatters.dart';
 import '../../models/core.dart';
-import '../../models/db_manager.dart';
 
 class TodoCommentItem extends StatelessWidget {
   const TodoCommentItem({
@@ -27,12 +27,7 @@ class TodoCommentItem extends StatelessWidget {
   Widget build(BuildContext context) => _TodoCommentItem(
         todoComment: todoComment,
         deleteComment: () async {
-          await GetIt.I<DbManager>()
-              .database
-              .managers
-              .comment
-              .filter((f) => f.id.equals(todoComment.id))
-              .delete();
+          await GetIt.I<DbCrudOperations>().comment.delete([todoComment.id]);
         },
         onLongPress: onLongPress,
         onTap: onTap,

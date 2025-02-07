@@ -2,8 +2,8 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../../../db/db_crud_operations.dart';
 import '../../../models/core.dart';
-import '../../../models/db_manager.dart';
 import '../../../models/local_db_state.dart';
 import '../../../models/local_state.dart';
 import '../tagselector.dart';
@@ -97,16 +97,13 @@ class TodoEditBarCollapsed extends WatchingWidget {
         TagSelector(
           expanded: false,
           selectedTags: selectedTodos.first.tags,
-          onSelected: (selectedTags) async => await GetIt.I<DbManager>()
-              .database
-              .managers
-              .todo
-              .filter((f) => f.id.equals(selectedTodos.first.id))
-              .update(
-                (o) => o(
-                  tags: drift.Value(selectedTags),
-                ),
-              ),
+          onSelected: (selectedTags) async =>
+              await GetIt.I<DbCrudOperations>().todo.update(
+            [selectedTodos.first.id],
+            (o) => o(
+              tags: drift.Value(selectedTags),
+            ),
+          ),
         ),
         ChangePriorityButton(
           selectedTodos: selectedTodos,
@@ -137,16 +134,13 @@ class TodoEditBarCollapsed extends WatchingWidget {
       TagSelector(
         expanded: false,
         selectedTags: selectedTags,
-        onSelected: (selectedTags) async => await GetIt.I<DbManager>()
-            .database
-            .managers
-            .todo
-            .filter((f) => f.id.isIn(selectedTodos.map((a) => a.id)))
-            .update(
-              (o) => o(
-                tags: drift.Value(selectedTags),
-              ),
-            ),
+        onSelected: (selectedTags) async =>
+            await GetIt.I<DbCrudOperations>().todo.update(
+                  selectedTodos.map((a) => a.id),
+                  (o) => o(
+                    tags: drift.Value(selectedTags),
+                  ),
+                ),
       ),
       ChangePriorityButton(
         selectedTodos: selectedTodos,

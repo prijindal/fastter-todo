@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../../db/db_crud_operations.dart';
 import '../../models/core.dart';
-import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import '../todos/todo_select_date.dart';
 
@@ -22,7 +22,7 @@ Future<void> newReminder(BuildContext context, String todoId) async {
       final newTime =
           DateTime(date.year, date.month, date.day, time.hour, time.minute);
       // ignore: use_build_context_synchronously
-      await GetIt.I<DbManager>().database.managers.reminder.create((o) => o(
+      await GetIt.I<DbCrudOperations>().reminder.create((o) => o(
             time: newTime.toUtc(),
             title: "New Reminder",
             todo: todoId,
@@ -99,12 +99,7 @@ class _TodoRemindersScreenState extends State<_TodoRemindersScreen> {
       ),
     );
     if (shouldDelete == true && context.mounted) {
-      await GetIt.I<DbManager>()
-          .database
-          .managers
-          .reminder
-          .filter((f) => f.id.isIn(_selectedReminders))
-          .delete();
+      await GetIt.I<DbCrudOperations>().reminder.delete(_selectedReminders);
       // ignore: use_build_context_synchronously
       await GetIt.I<LocalDbState>().refresh();
     }

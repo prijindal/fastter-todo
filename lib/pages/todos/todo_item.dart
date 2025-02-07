@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../../db/db_crud_operations.dart';
 import '../../helpers/date_fomatters.dart';
 import '../../models/core.dart';
-import '../../models/db_manager.dart';
 import '../../models/local_db_state.dart';
 import '../../models/local_state.dart';
 import '../todo/index.dart';
@@ -59,6 +59,13 @@ class TodoItem extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
+    final reminders = watchPropertyValue(
+        (LocalDbState state) => state.getTodoReminders(todo.id, true).length);
+    final comments = watchPropertyValue((LocalDbState state) =>
+        state.comments.where((f) => f.todo == todo.id).length);
+    final childTodos = watchPropertyValue((LocalDbState state) => state.todos
+        .where((a) => a.parent == todo.id && a.completed == false)
+        .length);
     if (tapBehaviour == TodoItemTapBehaviour.toggleSelection ||
         longPressBehaviour == TodoItemTapBehaviour.toggleSelection) {
       final selected = watchPropertyValue((LocalStateNotifier localState) =>
@@ -71,6 +78,9 @@ class TodoItem extends WatchingWidget {
         elements: elements,
         onTap: action(tapBehaviour, context, todo),
         onLongPress: action(longPressBehaviour, context, todo),
+        comments: comments,
+        reminders: reminders,
+        childTodos: childTodos,
       );
     }
     return _TodoItem(
@@ -81,6 +91,9 @@ class TodoItem extends WatchingWidget {
       elements: elements,
       onTap: action(tapBehaviour, context, todo),
       onLongPress: action(longPressBehaviour, context, todo),
+      comments: comments,
+      reminders: reminders,
+      childTodos: childTodos,
     );
   }
 }
@@ -94,6 +107,9 @@ class _TodoItem extends StatelessWidget {
     this.onTap,
     this.onLongPress,
     required this.elements,
+    required this.comments,
+    required this.childTodos,
+    required this.reminders,
   });
 
   final TodoData todo;
@@ -103,16 +119,16 @@ class _TodoItem extends StatelessWidget {
   final List<TodoItemElements> elements;
   final void Function()? onTap;
   final void Function()? onLongPress;
+  final int comments;
+  final int reminders;
+  final int childTodos;
 
   void _selectDate(BuildContext context) {
     todoSelectDate(context, todo.dueDate).then((dueDate) async {
       if (dueDate != null && context.mounted) {
-        await GetIt.I<DbManager>()
-            .database
-            .managers
+        await GetIt.I<DbCrudOperations>()
             .todo
-            .filter((tbl) => tbl.id.equals(todo.id))
-            .update((o) => o(dueDate: drift.Value(dueDate)));
+            .update([todo.id], (o) => o(dueDate: drift.Value(dueDate)));
       }
     });
   }
@@ -123,7 +139,20 @@ class _TodoItem extends StatelessWidget {
       );
 
   void _deleteTodo(BuildContext context) async {
-    await GetIt.I<DbManager>().deleteTodosByIds([todo.id]);
+    await GetIt.I<DbCrudOperations>().deleteTodosByIds([todo.id]);
+  }
+
+  bool get isThreeLines {
+    if (elements.isEmpty) {
+      return false;
+    }
+    if (todo.dueDate == null &&
+        reminders == 0 &&
+        comments == 0 &&
+        childTodos == 0) {
+      return false;
+    }
+    return true;
   }
 
   Widget _buildListTile(BuildContext context) {
@@ -135,12 +164,9 @@ class _TodoItem extends StatelessWidget {
       leading: TodoItemToggle(
         todo: todo,
         toggleCompleted: (bool newValue) async {
-          await GetIt.I<DbManager>()
-              .database
-              .managers
+          await GetIt.I<DbCrudOperations>()
               .todo
-              .filter((tbl) => tbl.id.equals(todo.id))
-              .update((o) => o(completed: drift.Value(newValue)));
+              .update([todo.id], (o) => o(completed: drift.Value(newValue)));
         },
       ),
       isThreeLine: elements.isNotEmpty,
@@ -163,6 +189,9 @@ class _TodoItem extends StatelessWidget {
                   showReminders: elements.contains(TodoItemElements.reminders),
                   showComments: elements.contains(TodoItemElements.comments),
                   showChildren: elements.contains(TodoItemElements.children),
+                  comments: comments,
+                  reminders: reminders,
+                  childTodos: childTodos,
                 ),
                 if (elements.contains(TodoItemElements.tags))
                   _TodoItemThirdRow(
@@ -262,6 +291,9 @@ class _TodoItemSecondRow extends WatchingWidget {
     required this.showReminders,
     required this.showComments,
     required this.showChildren,
+    required this.comments,
+    required this.childTodos,
+    required this.reminders,
   });
 
   final TodoData todo;
@@ -269,9 +301,12 @@ class _TodoItemSecondRow extends WatchingWidget {
   final bool showReminders;
   final bool showComments;
   final bool showChildren;
+  final int comments;
+  final int reminders;
+  final int childTodos;
 
-  Widget _buildSecondRow(
-      BuildContext context, int comments, int reminders, int childTodos) {
+  @override
+  Widget build(BuildContext context) {
     var children = <Widget>[];
     final iconSize =
         (ListTileTheme.of(context).subtitleTextStyle?.fontSize ?? 12) + 2;
@@ -342,23 +377,6 @@ class _TodoItemSecondRow extends WatchingWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: children,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final reminders = watchPropertyValue(
-        (LocalDbState state) => state.getTodoReminders(todo.id, true).length);
-    final comments = watchPropertyValue((LocalDbState state) =>
-        state.comments.where((f) => f.todo == todo.id).length);
-    final childTodos = watchPropertyValue((LocalDbState state) => state.todos
-        .where((a) => a.parent == todo.id && a.completed == false)
-        .length);
-    return _buildSecondRow(
-      context,
-      comments,
-      reminders,
-      childTodos,
     );
   }
 }

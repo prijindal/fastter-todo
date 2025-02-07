@@ -52,7 +52,7 @@ class _TodosGrid extends WatchingWidget {
     if (filters.projectFilter != null && filters.projectFilter != "inbox") {
       return GetIt.I<LocalDbState>().getProjectPipelines(filters.projectFilter);
     }
-    return todos.map((todo) => todo.pipeline).toSet().toList();
+    return todos.map((todo) => todo.pipeline).toSet().toList()..sort();
   }
 
   @override

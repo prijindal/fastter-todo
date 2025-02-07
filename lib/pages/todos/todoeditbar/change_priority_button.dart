@@ -2,8 +2,8 @@ import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../../db/db_crud_operations.dart';
 import '../../../models/core.dart';
-import '../../../models/db_manager.dart';
 import '../priority_dialog.dart';
 
 class ChangePriorityButton extends StatelessWidget {
@@ -33,12 +33,9 @@ class ChangePriorityButton extends StatelessWidget {
   void _selectPriority(BuildContext context) async {
     final priority = await showPriorityDialog(context);
     if (priority != null && context.mounted) {
-      await GetIt.I<DbManager>()
-          .database
-          .managers
-          .todo
-          .filter((f) => f.id.isIn(selectedTodos.map((a) => a.id)))
-          .update((o) => o(priority: drift.Value(priority)));
+      await GetIt.I<DbCrudOperations>().todo.update(
+          selectedTodos.map((a) => a.id),
+          (o) => o(priority: drift.Value(priority)));
     }
   }
 }
