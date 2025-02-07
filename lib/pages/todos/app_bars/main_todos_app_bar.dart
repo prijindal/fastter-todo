@@ -7,14 +7,10 @@ class MainTodosAppBar extends StatelessWidget {
 
   final TodosFilters filters;
 
-  Widget _buildTitle(BuildContext context) {
-    return Text(filters.createTitle(context));
-  }
-
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: _buildTitle(context),
+      title: Text(filters.createTitle),
       actions: filters.actions
           .map(
             (action) => IconButton(

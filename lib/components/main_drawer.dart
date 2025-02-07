@@ -67,7 +67,7 @@ class TodosNavigationListTile extends WatchingWidget {
       icon: icon,
       selectedIcon: selectedIcon,
       route: queryString.isEmpty ? "/todos" : "/todos?$queryString",
-      label: filters.createTitle(context),
+      label: filters.createTitle,
       trailing: "$completed/$total",
     );
   }

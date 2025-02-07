@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:quick_actions/quick_actions.dart';
 
 import '../helpers/breakpoints.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
+import '../helpers/todos_filters.dart';
 import '../models/db_manager.dart';
 import '../models/local_db_state.dart';
 import '../models/local_state.dart';
@@ -48,14 +50,53 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyMaterialApp extends StatelessWidget {
+class MyMaterialApp extends StatefulWidget {
   const MyMaterialApp({
     super.key,
   });
 
+  @override
+  State<MyMaterialApp> createState() => _MyMaterialAppState();
+}
+
+class _MyMaterialAppState extends State<MyMaterialApp> {
   SettingsStorageNotifier get settingsStorage =>
       GetIt.I<SettingsStorageNotifier>();
+
   DbManager get dbManager => GetIt.I<DbManager>();
+  LocalDbState get localDbState => GetIt.I<LocalDbState>();
+  final QuickActions quickActions = const QuickActions();
+
+  @override
+  void initState() {
+    _initQuickActions();
+    super.initState();
+  }
+
+  void _initQuickActions() {
+    if (isMobile) {
+      quickActions.initialize((shortcutType) {
+        AppRouter appRouter = GetIt.I<AppRouter>();
+        appRouter.navigateNamed(shortcutType);
+      });
+      localDbState.addListener(() {
+        final projects = localDbState.projects;
+        print(projects);
+        final filters = [
+          ...projects.map((project) => TodosFilters(projectFilter: project.id)),
+          TodosFilters(projectFilter: "inbox")
+        ];
+        quickActions.setShortcutItems(
+          filters
+              .map((filter) => ShortcutItem(
+                    type: "/todos/?${filter.queryString}",
+                    localizedTitle: filter.createTitle,
+                  ))
+              .toList(),
+        );
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

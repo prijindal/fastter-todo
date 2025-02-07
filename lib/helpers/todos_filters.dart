@@ -100,7 +100,7 @@ class TodosFilters {
     return todos.toList();
   }
 
-  String createTitle(BuildContext context) {
+  String get createTitle {
     if (projectFilter == null && tagFilter == null && daysAhead == null) {
       return "All Todos";
     }
