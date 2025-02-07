@@ -3,6 +3,8 @@ import 'package:watch_it/watch_it.dart';
 
 import '../helpers/logger.dart';
 import '../models/core.dart';
+import 'backend_connector.dart';
+import 'backend_sync.dart';
 
 enum TableName {
   project,
@@ -13,10 +15,17 @@ enum TableName {
 
 class DbCrudOperations {
   final _database = GetIt.I<SharedDatabase>();
+  final _backendSync = GetIt.I<BackendSync>();
   late final project = _TableCrudOperation(_database.managers.project);
   late final todo = _TableCrudOperation(_database.managers.todo);
   late final comment = _TableCrudOperation(_database.managers.comment);
   late final reminder = _TableCrudOperation(_database.managers.reminder);
+
+  DbCrudOperations() {
+    if (_backendSync.backendSyncConfiguration != null) {
+      BackendConnector.init(_backendSync.backendSyncConfiguration!);
+    }
+  }
 
   // This will drop all the tables in the database and recreate it
   Future<void> resetDatabase() async {

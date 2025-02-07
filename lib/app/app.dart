@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:quick_actions/quick_actions.dart';
 
+import '../db/backend_sync.dart';
 import '../db/db_crud_operations.dart';
 import '../helpers/breakpoints.dart';
 import '../helpers/dbio.dart';
@@ -25,8 +26,10 @@ void registerAllServices() {
     LocalDbState(),
   );
   GetIt.I.registerSingleton<AppRouter>(AppRouter());
-  GetIt.I.registerSingleton<DbCrudOperations>(
-    DbCrudOperations(),
+  GetIt.I.registerSingletonAsync<BackendSync>(() => BackendSync.init());
+  GetIt.I.registerSingletonAsync<DbCrudOperations>(
+    () async => DbCrudOperations(),
+    dependsOn: [BackendSync],
   );
   GetIt.I.registerSingleton<DatabaseIO>(
     DatabaseIO(),
