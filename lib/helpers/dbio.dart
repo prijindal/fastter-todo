@@ -4,15 +4,16 @@ import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/isolate.dart';
+import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/core.dart';
+import '../models/db_manager.dart';
 import 'constants.dart';
 import 'logger.dart';
 
 class DatabaseIO {
-  final SharedDatabase _database;
-  DatabaseIO(this._database);
+  final SharedDatabase _database = GetIt.I<DbSelector>().database;
 
   SharedDatabase get database => _database;
 

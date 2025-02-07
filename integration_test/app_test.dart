@@ -29,7 +29,7 @@ void main() {
       });
       when(() => mockStackRouter.currentUrl).thenReturn('/todos');
       // Load app widget.
-      GetIt.I.registerSingleton<DbManager>(DbManager.localOnly());
+      GetIt.I.registerSingleton<DbSelector>(DbSelector.localOnly());
       GetIt.I.registerSingleton<SettingsStorageNotifier>(
           SettingsStorageNotifier());
       GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier());

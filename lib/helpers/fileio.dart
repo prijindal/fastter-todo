@@ -10,11 +10,11 @@ import 'package:get_it/get_it.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-import '../models/db_manager.dart';
 import 'constants.dart';
+import 'dbio.dart';
 
 void downloadContent(BuildContext context) async {
-  final encoded = await GetIt.I<DbManager>().io.extractDbJson();
+  final encoded = await GetIt.I<DatabaseIO>().extractDbJson();
   if (Platform.isAndroid || Platform.isIOS) {
     final params = SaveFileDialogParams(
       data: Uint8List.fromList(encoded.codeUnits),
@@ -61,7 +61,7 @@ void uploadContent(BuildContext context) async {
     }
     if (jsonEncoded != null && context.mounted) {
       try {
-        await GetIt.I<DbManager>().io.jsonToDb(jsonEncoded);
+        await GetIt.I<DatabaseIO>().jsonToDb(jsonEncoded);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

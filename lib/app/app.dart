@@ -4,6 +4,7 @@ import 'package:quick_actions/quick_actions.dart';
 
 import '../db/db_crud_operations.dart';
 import '../helpers/breakpoints.dart';
+import '../helpers/dbio.dart';
 import '../helpers/logger.dart';
 import '../helpers/theme.dart';
 import '../helpers/todos_filters.dart';
@@ -15,18 +16,20 @@ import '../pages/loading/index.dart';
 import '../router/app_router.dart';
 
 void registerAllServices() {
-  GetIt.I.registerSingletonAsync<DbManager>(() => DbManager.autoInit());
+  GetIt.I.registerSingletonAsync<DbSelector>(() => DbSelector.initDb());
   GetIt.I.registerSingleton<SettingsStorageNotifier>(SettingsStorageNotifier());
   GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier(
     todosView: isDesktop ? TodosView.grid : TodosView.list,
   ));
   GetIt.I.registerSingletonAsync<LocalDbState>(() async => LocalDbState(),
-      dependsOn: [DbManager]);
+      dependsOn: [DbSelector]);
   GetIt.I.registerSingletonAsync<AppRouter>(() async => AppRouter(),
-      dependsOn: [DbManager]);
+      dependsOn: [DbSelector]);
   GetIt.I.registerSingletonAsync<DbCrudOperations>(
       () async => DbCrudOperations(),
-      dependsOn: [DbManager]);
+      dependsOn: [DbSelector]);
+  GetIt.I.registerSingletonAsync<DatabaseIO>(() async => DatabaseIO(),
+      dependsOn: [DbSelector]);
 }
 
 class MyApp extends StatelessWidget {
@@ -67,7 +70,6 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
   SettingsStorageNotifier get settingsStorage =>
       GetIt.I<SettingsStorageNotifier>();
 
-  DbManager get dbManager => GetIt.I<DbManager>();
   LocalDbState get localDbState => GetIt.I<LocalDbState>();
   final QuickActions quickActions = const QuickActions();
 

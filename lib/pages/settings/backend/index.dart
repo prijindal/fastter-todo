@@ -86,7 +86,6 @@ class BackendImplementationTile extends StatelessWidget {
                   token: jwtTokenController.text.isEmpty
                       ? null
                       : jwtTokenController.text,
-                  implementationType: RemoteDbImplementationType.hrana,
                 ),
               );
               // Handle the submit action
@@ -99,8 +98,7 @@ class BackendImplementationTile extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context) {
-    final dbSelector = GetIt.I<DbManager>();
-    final dbType = dbSelector.dbType;
+    final dbType = GetIt.I<DbSelector>().dbType;
     return DropdownButton<DbSelectorType>(
       value: dbType,
       items: DbSelectorType.values
@@ -117,12 +115,12 @@ class BackendImplementationTile extends StatelessWidget {
           if (settings == null) {
             return;
           } else {
-            await dbSelector.setRemote(settings);
+            await DbSelector.setRemote(settings);
           }
         } else {
-          await dbSelector.setLocal();
+          await DbSelector.setLocal();
         }
-        await dbSelector.initDb();
+        await DbSelector.initDb();
         await Restart.restartApp(
           notificationTitle: 'Restarting App',
           notificationBody: 'Please tap here to open the app again.',

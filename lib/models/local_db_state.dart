@@ -13,7 +13,7 @@ import 'db_manager.dart';
 import 'local_notifications_manager.dart';
 
 class LocalDbState extends ChangeNotifier {
-  DbManager get dbManager => GetIt.I<DbManager>();
+  DbSelector get dbManager => GetIt.I<DbSelector>();
   SharedDatabase get db => dbManager.database;
   RemoteDbSettings? get remoteDbSettings => dbManager.remoteDbSettings;
 

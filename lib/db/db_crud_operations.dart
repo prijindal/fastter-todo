@@ -12,7 +12,7 @@ enum TableName {
 }
 
 class DbCrudOperations {
-  final _database = GetIt.I<DbManager>().database;
+  final _database = GetIt.I<DbSelector>().database;
   late final project = _TableCrudOperation(_database.managers.project);
   late final todo = _TableCrudOperation(_database.managers.todo);
   late final comment = _TableCrudOperation(_database.managers.comment);
