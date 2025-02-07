@@ -41,18 +41,9 @@ class TodoModifyBar extends StatelessWidget {
         labelText: "Edit task: ${todo.title}",
         initialDueDate: todo.dueDate,
         parentTodo: todo.parent,
-        leadingButtons: [],
-        trailingButtons: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () async {
-              await Navigator.of(context).maybePop();
-              // ignore: use_build_context_synchronously
-              TodoScreen.openPage(context, todo);
-            },
-            tooltip: 'Edit Todo',
-          ),
-        ],
+        onEdit: () async {
+          await TodoScreen.openPage(context, todo);
+        },
         additionalFields: additionalFields,
         onSave: ({
           required String title,
@@ -133,8 +124,6 @@ class _TodoInputBar extends StatefulWidget {
   const _TodoInputBar({
     required this.onBackButton,
     required this.labelText,
-    this.leadingButtons = const [],
-    this.trailingButtons = const [],
     this.initialProject,
     this.initialPipeline,
     this.parentTodo,
@@ -144,13 +133,13 @@ class _TodoInputBar extends StatefulWidget {
     this.initialPriority,
     this.initialTags,
     this.additionalFields = true,
+    this.onEdit,
   });
 
   final void Function() onBackButton;
   final String labelText;
   final bool additionalFields;
-  final List<Widget> leadingButtons;
-  final List<Widget> trailingButtons;
+  final Future<void> Function()? onEdit;
   final String? initialProject; // this will be a project id
   final String? initialPipeline; // this will be a pipeline id
   final String initialTitle;
@@ -399,7 +388,6 @@ class _TodoInputBarState extends State<_TodoInputBar>
         direction: Axis.horizontal,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          ...widget.leadingButtons,
           FormBuilderField<DateTime?>(
             name: "dueDate",
             initialValue: widget.initialDueDate,
@@ -458,7 +446,18 @@ class _TodoInputBarState extends State<_TodoInputBar>
               });
             },
           ),
-          ...widget.trailingButtons,
+          if (widget.onEdit != null)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () async {
+                setState(() {
+                  _isPreventClose = true;
+                });
+                await widget.onEdit!();
+                widget.onBackButton();
+              },
+              tooltip: 'Edit Todo',
+            ),
           Flexible(
             child: Container(),
           ),

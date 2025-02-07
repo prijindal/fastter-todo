@@ -41,7 +41,9 @@ class TodoScreen extends StatelessWidget {
         child: TodoModifyBar(
           todo: todo,
           onBackButton: () {
-            AutoRouter.of(context).maybePop();
+            if (context.mounted) {
+              AutoRouter.of(context).maybePop();
+            }
           },
         ),
       ),
@@ -51,7 +53,7 @@ class TodoScreen extends StatelessWidget {
   static Future<void> openPage(BuildContext context, TodoData todo) async {
     if (isDesktop) {
       final mediaQuery = MediaQuery.sizeOf(context);
-      showDialog<void>(
+      await showDialog<void>(
         context: context,
         builder: (context) {
           return Dialog(
