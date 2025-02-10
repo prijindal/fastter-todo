@@ -49,16 +49,17 @@ class BackendSync extends ChangeNotifier {
     }
   }
 
-  static Future<bool> checkConnection(BackendSyncConfiguration config) async {
-    final uri = Uri.parse(config.url);
+  static Future<void> checkConnection(BackendSyncConfiguration config) async {
+    final uri = Uri.parse(config.url).replace(path: "/auth/appkey");
     AppLogger.instance.i("Checking connection to ${uri.host}");
     final health = await http
         .get(uri, headers: {"Authorization": "Bearer ${config.jwtToken}"});
     if (health.statusCode != 200) {
-      return false;
+      throw Error();
     }
     final response = jsonDecode(health.body);
-    return response["status"] as bool;
+    final id = response["id"] as String?;
+    AppLogger.instance.i("Connection to ${uri.host} is successful. ID: $id");
   }
 
   Future<void> setRemote(BackendSyncConfiguration config) async {
