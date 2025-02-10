@@ -26,3 +26,26 @@ class StringListConverter extends TypeConverter<List<String>, String>
     return toSql(value);
   }
 }
+
+class JsonConverter extends TypeConverter<Map<String, dynamic>, String>
+    implements JsonTypeConverter<Map<String, dynamic>, String> {
+  const JsonConverter();
+
+  @override
+  Map<String, dynamic> fromSql(String fromDb) {
+    return (jsonDecode(fromDb) as Map<String, dynamic>);
+  }
+
+  @override
+  String toSql(Map<String, dynamic> value) {
+    return jsonEncode(value);
+  }
+
+  @override
+  Map<String, dynamic> fromJson(String json) => fromSql(json);
+
+  @override
+  String toJson(Map<String, dynamic> value) {
+    return toSql(value);
+  }
+}
