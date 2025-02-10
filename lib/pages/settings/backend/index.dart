@@ -1,7 +1,7 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../../../db/backend_sync.dart';
 import '../../../db/db_crud_operations.dart';
@@ -48,7 +48,7 @@ class BackendSettingsScreen extends StatelessWidget {
   }
 }
 
-class BackendImplementationTile extends StatelessWidget {
+class BackendImplementationTile extends WatchingWidget {
   const BackendImplementationTile({super.key});
 
   Future<BackendSyncConfiguration?> _showRemoteSettingsDialog(
@@ -115,7 +115,7 @@ class BackendImplementationTile extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     final backendSyncConfiguration =
-        GetIt.I<BackendSync>().backendSyncConfiguration;
+        watchPropertyValue((BackendSync s) => s.backendSyncConfiguration);
     return CheckboxListTile(
       value: backendSyncConfiguration != null,
       title: Text("Backend Sync"),
