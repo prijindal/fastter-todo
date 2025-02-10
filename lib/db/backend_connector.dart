@@ -2,9 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:socket_io_client/socket_io_client.dart' as io;
-import 'package:uuid/uuid.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../helpers/logger.dart';
+import '../models/core.dart';
 import 'backend/entity_types.dart';
 import 'backend_sync.dart';
 
@@ -17,6 +18,8 @@ class BackendConnector {
   final io.Socket _socket;
   StreamSubscription<dynamic>? _subscription;
   bool get isConnected => _subscription != null;
+  SharedDatabase get _database => GetIt.I<SharedDatabase>();
+  Timer? _timer;
 
   BackendConnector({required io.Socket socket}) : _socket = socket {
     initConnection();
@@ -47,13 +50,45 @@ class BackendConnector {
     return completer.future;
   }
 
+  Future<void> _sendQueueData() async {
+    final queue = await _database.managers.entityActionsQueue.get();
+    if (queue.isEmpty) return;
+    final List<EntityActionBase> actions = queue.map<EntityActionBase>((a) {
+      if (a.action == "CREATE") {
+        return EntityActionCreate(
+            entityName: a.name,
+            payload: a.payload,
+            id: a.ids[0],
+            timestamp: a.timestamp);
+      } else if (a.action == "UPDATE") {
+        return EntityActionUpdate(
+            entityName: a.name,
+            payload: a.payload,
+            ids: a.ids,
+            timestamp: a.timestamp);
+      } else if (a.action == "DELETE") {
+        return EntityActionDelete(
+            entityName: a.name,
+            payload: a.payload,
+            ids: a.ids,
+            timestamp: a.timestamp);
+      }
+      throw Error();
+    }).toList();
+    final data = await _emitActions(actions);
+    AppLogger.instance.i(data.map((a) => a.toJson()).toList());
+    await _database.managers.entityActionsQueue
+        .filter((f) => f.requestId.isIn(queue.map((a) => a.requestId).toList()))
+        .delete();
+  }
+
   Future<void> _onConnect() async {
     AppLogger.instance.i("connected received from server");
-    final data = await _emitActions([
-      EntityActionCreate(entityName: "todos", payload: {}, id: Uuid().v4())
-    ]);
-    AppLogger.instance.i(data);
-    AppLogger.instance.i("Test action sent");
+    _timer = Timer.periodic(Duration(seconds: 1), (_) => _sendQueueData());
+  }
+
+  void _onDisconnect() {
+    _timer?.cancel();
   }
 
   Future<void> initConnection() async {
@@ -61,9 +96,9 @@ class BackendConnector {
     try {
       _socket.connect();
       _socket.on("connected", (d) => _onConnect());
+      _socket.on("server_actions", (d) => AppLogger.instance.d(d));
       _socket.onConnect((data) => AppLogger.instance.i("Connected to server"));
-      _socket.onDisconnect(
-          (data) => AppLogger.instance.i("Disconnected from server"));
+      _socket.onDisconnect((data) => _onDisconnect());
       _socket.onConnectError(
           (data) => AppLogger.instance.i("Error in connection"));
       _socket.onError((data) => AppLogger.instance.i("Error occurred"));

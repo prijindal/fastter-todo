@@ -10,8 +10,8 @@ class DateParams {
       );
 
   Map<String, dynamic> toJson() => {
-        'gte': gte?.toIso8601String(),
-        'lte': lte?.toIso8601String(),
+        'gte': gte?.toUtc().toIso8601String(),
+        'lte': lte?.toUtc().toIso8601String(),
       };
 }
 
@@ -168,8 +168,13 @@ class EntityHistoryResponse {
 abstract class EntityActionBase {
   String entityName;
   Map<String, dynamic> payload;
+  DateTime timestamp;
 
-  EntityActionBase({required this.entityName, required this.payload});
+  EntityActionBase({
+    required this.entityName,
+    required this.payload,
+    required this.timestamp,
+  });
 
   factory EntityActionBase.fromJson(Map<String, dynamic> json) {
     switch (json['action']) {
@@ -195,6 +200,7 @@ class EntityActionCreate extends EntityActionBase {
     required super.entityName,
     required super.payload,
     required this.id,
+    required super.timestamp,
   });
 
   factory EntityActionCreate.fromJson(Map<String, dynamic> json) =>
@@ -202,6 +208,9 @@ class EntityActionCreate extends EntityActionBase {
         entityName: json['entity_name'] as String,
         payload: (json['payload'] as Map<String, dynamic>?) ?? {},
         id: json['id'] as String,
+        timestamp: json['timestamp'] != null
+            ? DateTime.parse(json['timestamp'] as String)
+            : DateTime.now(),
       );
 
   @override
@@ -210,6 +219,7 @@ class EntityActionCreate extends EntityActionBase {
         'payload': payload,
         'id': id,
         'action': action,
+        'timestamp': timestamp.toUtc().toIso8601String(),
       };
 }
 
@@ -221,6 +231,7 @@ class EntityActionUpdate extends EntityActionBase {
     required super.entityName,
     required super.payload,
     required this.ids,
+    required super.timestamp,
   });
 
   factory EntityActionUpdate.fromJson(Map<String, dynamic> json) =>
@@ -228,6 +239,9 @@ class EntityActionUpdate extends EntityActionBase {
         entityName: json['entity_name'] as String,
         payload: (json['payload'] as Map<String, dynamic>?) ?? {},
         ids: (json['ids'] as List<dynamic>).map((e) => e.toString()).toList(),
+        timestamp: json['timestamp'] != null
+            ? DateTime.parse(json['timestamp'] as String)
+            : DateTime.now(),
       );
 
   @override
@@ -236,6 +250,7 @@ class EntityActionUpdate extends EntityActionBase {
         'payload': payload,
         'ids': ids,
         'action': action,
+        'timestamp': timestamp.toUtc().toIso8601String(),
       };
 }
 
@@ -247,6 +262,7 @@ class EntityActionDelete extends EntityActionBase {
     required super.entityName,
     required super.payload,
     required this.ids,
+    required super.timestamp,
   });
 
   factory EntityActionDelete.fromJson(Map<String, dynamic> json) =>
@@ -254,6 +270,9 @@ class EntityActionDelete extends EntityActionBase {
         entityName: json['entity_name'] as String,
         payload: (json['payload'] as Map<String, dynamic>?) ?? {},
         ids: (json['ids'] as List<dynamic>).map((e) => e.toString()).toList(),
+        timestamp: json['timestamp'] != null
+            ? DateTime.parse(json['timestamp'] as String)
+            : DateTime.now(),
       );
 
   @override
@@ -262,6 +281,7 @@ class EntityActionDelete extends EntityActionBase {
         'payload': payload,
         'ids': ids,
         'action': action,
+        'timestamp': timestamp.toUtc().toIso8601String(),
       };
 }
 

@@ -73,9 +73,23 @@ class Reminder extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+class EntityActionsQueue extends Table {
+  late final requestId = text().clientDefault(() => _uuid.v4())();
+  late final ids = text()
+      .map(const StringListConverter())
+      .clientDefault(() => jsonEncode([]))();
+  late final name = text()();
+  late final action = text()(); // CREATE, UPDATE, DELETE
+  late final payload = text().map(const JsonConverter())();
+  late final timestamp = dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {requestId};
+}
+
 // this annotation tells drift to prepare a database class that uses both of the
 // tables we just defined. We'll see how to use that database class in a moment.
-@DriftDatabase(tables: [Todo, Project, Comment, Reminder])
+@DriftDatabase(tables: [Todo, Project, Comment, Reminder, EntityActionsQueue])
 class SharedDatabase extends _$SharedDatabase {
   // Keeping a custom constructor is useful for unit tests which may want to
   // open an in-memory database only.

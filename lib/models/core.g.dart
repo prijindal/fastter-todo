@@ -1402,6 +1402,367 @@ class ReminderCompanion extends UpdateCompanion<ReminderData> {
   }
 }
 
+class $EntityActionsQueueTable extends EntityActionsQueue
+    with TableInfo<$EntityActionsQueueTable, EntityActionsQueueData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EntityActionsQueueTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _requestIdMeta =
+      const VerificationMeta('requestId');
+  @override
+  late final GeneratedColumn<String> requestId = GeneratedColumn<String>(
+      'request_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      clientDefault: () => _uuid.v4());
+  static const VerificationMeta _idsMeta = const VerificationMeta('ids');
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String> ids =
+      GeneratedColumn<String>('ids', aliasedName, false,
+              type: DriftSqlType.string,
+              requiredDuringInsert: false,
+              clientDefault: () => jsonEncode([]))
+          .withConverter<List<String>>($EntityActionsQueueTable.$converterids);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _actionMeta = const VerificationMeta('action');
+  @override
+  late final GeneratedColumn<String> action = GeneratedColumn<String>(
+      'action', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _payloadMeta =
+      const VerificationMeta('payload');
+  @override
+  late final GeneratedColumnWithTypeConverter<Map<String, dynamic>, String>
+      payload = GeneratedColumn<String>('payload', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<Map<String, dynamic>>(
+              $EntityActionsQueueTable.$converterpayload);
+  static const VerificationMeta _timestampMeta =
+      const VerificationMeta('timestamp');
+  @override
+  late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
+      'timestamp', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [requestId, ids, name, action, payload, timestamp];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'entity_actions_queue';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<EntityActionsQueueData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('request_id')) {
+      context.handle(_requestIdMeta,
+          requestId.isAcceptableOrUnknown(data['request_id']!, _requestIdMeta));
+    }
+    context.handle(_idsMeta, const VerificationResult.success());
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('action')) {
+      context.handle(_actionMeta,
+          action.isAcceptableOrUnknown(data['action']!, _actionMeta));
+    } else if (isInserting) {
+      context.missing(_actionMeta);
+    }
+    context.handle(_payloadMeta, const VerificationResult.success());
+    if (data.containsKey('timestamp')) {
+      context.handle(_timestampMeta,
+          timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));
+    } else if (isInserting) {
+      context.missing(_timestampMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {requestId};
+  @override
+  EntityActionsQueueData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EntityActionsQueueData(
+      requestId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}request_id'])!,
+      ids: $EntityActionsQueueTable.$converterids.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}ids'])!),
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      action: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}action'])!,
+      payload: $EntityActionsQueueTable.$converterpayload.fromSql(
+          attachedDatabase.typeMapping
+              .read(DriftSqlType.string, data['${effectivePrefix}payload'])!),
+      timestamp: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}timestamp'])!,
+    );
+  }
+
+  @override
+  $EntityActionsQueueTable createAlias(String alias) {
+    return $EntityActionsQueueTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<List<String>, String, String> $converterids =
+      const StringListConverter();
+  static JsonTypeConverter2<Map<String, dynamic>, String, String>
+      $converterpayload = const JsonConverter();
+}
+
+class EntityActionsQueueData extends DataClass
+    implements Insertable<EntityActionsQueueData> {
+  final String requestId;
+  final List<String> ids;
+  final String name;
+  final String action;
+  final Map<String, dynamic> payload;
+  final DateTime timestamp;
+  const EntityActionsQueueData(
+      {required this.requestId,
+      required this.ids,
+      required this.name,
+      required this.action,
+      required this.payload,
+      required this.timestamp});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['request_id'] = Variable<String>(requestId);
+    {
+      map['ids'] =
+          Variable<String>($EntityActionsQueueTable.$converterids.toSql(ids));
+    }
+    map['name'] = Variable<String>(name);
+    map['action'] = Variable<String>(action);
+    {
+      map['payload'] = Variable<String>(
+          $EntityActionsQueueTable.$converterpayload.toSql(payload));
+    }
+    map['timestamp'] = Variable<DateTime>(timestamp);
+    return map;
+  }
+
+  EntityActionsQueueCompanion toCompanion(bool nullToAbsent) {
+    return EntityActionsQueueCompanion(
+      requestId: Value(requestId),
+      ids: Value(ids),
+      name: Value(name),
+      action: Value(action),
+      payload: Value(payload),
+      timestamp: Value(timestamp),
+    );
+  }
+
+  factory EntityActionsQueueData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EntityActionsQueueData(
+      requestId: serializer.fromJson<String>(json['requestId']),
+      ids: $EntityActionsQueueTable.$converterids
+          .fromJson(serializer.fromJson<String>(json['ids'])),
+      name: serializer.fromJson<String>(json['name']),
+      action: serializer.fromJson<String>(json['action']),
+      payload: $EntityActionsQueueTable.$converterpayload
+          .fromJson(serializer.fromJson<String>(json['payload'])),
+      timestamp: serializer.fromJson<DateTime>(json['timestamp']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'requestId': serializer.toJson<String>(requestId),
+      'ids': serializer
+          .toJson<String>($EntityActionsQueueTable.$converterids.toJson(ids)),
+      'name': serializer.toJson<String>(name),
+      'action': serializer.toJson<String>(action),
+      'payload': serializer.toJson<String>(
+          $EntityActionsQueueTable.$converterpayload.toJson(payload)),
+      'timestamp': serializer.toJson<DateTime>(timestamp),
+    };
+  }
+
+  EntityActionsQueueData copyWith(
+          {String? requestId,
+          List<String>? ids,
+          String? name,
+          String? action,
+          Map<String, dynamic>? payload,
+          DateTime? timestamp}) =>
+      EntityActionsQueueData(
+        requestId: requestId ?? this.requestId,
+        ids: ids ?? this.ids,
+        name: name ?? this.name,
+        action: action ?? this.action,
+        payload: payload ?? this.payload,
+        timestamp: timestamp ?? this.timestamp,
+      );
+  EntityActionsQueueData copyWithCompanion(EntityActionsQueueCompanion data) {
+    return EntityActionsQueueData(
+      requestId: data.requestId.present ? data.requestId.value : this.requestId,
+      ids: data.ids.present ? data.ids.value : this.ids,
+      name: data.name.present ? data.name.value : this.name,
+      action: data.action.present ? data.action.value : this.action,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EntityActionsQueueData(')
+          ..write('requestId: $requestId, ')
+          ..write('ids: $ids, ')
+          ..write('name: $name, ')
+          ..write('action: $action, ')
+          ..write('payload: $payload, ')
+          ..write('timestamp: $timestamp')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(requestId, ids, name, action, payload, timestamp);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EntityActionsQueueData &&
+          other.requestId == this.requestId &&
+          other.ids == this.ids &&
+          other.name == this.name &&
+          other.action == this.action &&
+          other.payload == this.payload &&
+          other.timestamp == this.timestamp);
+}
+
+class EntityActionsQueueCompanion
+    extends UpdateCompanion<EntityActionsQueueData> {
+  final Value<String> requestId;
+  final Value<List<String>> ids;
+  final Value<String> name;
+  final Value<String> action;
+  final Value<Map<String, dynamic>> payload;
+  final Value<DateTime> timestamp;
+  final Value<int> rowid;
+  const EntityActionsQueueCompanion({
+    this.requestId = const Value.absent(),
+    this.ids = const Value.absent(),
+    this.name = const Value.absent(),
+    this.action = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.timestamp = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  EntityActionsQueueCompanion.insert({
+    this.requestId = const Value.absent(),
+    this.ids = const Value.absent(),
+    required String name,
+    required String action,
+    required Map<String, dynamic> payload,
+    required DateTime timestamp,
+    this.rowid = const Value.absent(),
+  })  : name = Value(name),
+        action = Value(action),
+        payload = Value(payload),
+        timestamp = Value(timestamp);
+  static Insertable<EntityActionsQueueData> custom({
+    Expression<String>? requestId,
+    Expression<String>? ids,
+    Expression<String>? name,
+    Expression<String>? action,
+    Expression<String>? payload,
+    Expression<DateTime>? timestamp,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (requestId != null) 'request_id': requestId,
+      if (ids != null) 'ids': ids,
+      if (name != null) 'name': name,
+      if (action != null) 'action': action,
+      if (payload != null) 'payload': payload,
+      if (timestamp != null) 'timestamp': timestamp,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  EntityActionsQueueCompanion copyWith(
+      {Value<String>? requestId,
+      Value<List<String>>? ids,
+      Value<String>? name,
+      Value<String>? action,
+      Value<Map<String, dynamic>>? payload,
+      Value<DateTime>? timestamp,
+      Value<int>? rowid}) {
+    return EntityActionsQueueCompanion(
+      requestId: requestId ?? this.requestId,
+      ids: ids ?? this.ids,
+      name: name ?? this.name,
+      action: action ?? this.action,
+      payload: payload ?? this.payload,
+      timestamp: timestamp ?? this.timestamp,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (requestId.present) {
+      map['request_id'] = Variable<String>(requestId.value);
+    }
+    if (ids.present) {
+      map['ids'] = Variable<String>(
+          $EntityActionsQueueTable.$converterids.toSql(ids.value));
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (action.present) {
+      map['action'] = Variable<String>(action.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(
+          $EntityActionsQueueTable.$converterpayload.toSql(payload.value));
+    }
+    if (timestamp.present) {
+      map['timestamp'] = Variable<DateTime>(timestamp.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EntityActionsQueueCompanion(')
+          ..write('requestId: $requestId, ')
+          ..write('ids: $ids, ')
+          ..write('name: $name, ')
+          ..write('action: $action, ')
+          ..write('payload: $payload, ')
+          ..write('timestamp: $timestamp, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$SharedDatabase extends GeneratedDatabase {
   _$SharedDatabase(QueryExecutor e) : super(e);
   $SharedDatabaseManager get managers => $SharedDatabaseManager(this);
@@ -1409,12 +1770,14 @@ abstract class _$SharedDatabase extends GeneratedDatabase {
   late final $ProjectTable project = $ProjectTable(this);
   late final $CommentTable comment = $CommentTable(this);
   late final $ReminderTable reminder = $ReminderTable(this);
+  late final $EntityActionsQueueTable entityActionsQueue =
+      $EntityActionsQueueTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [todo, project, comment, reminder];
+      [todo, project, comment, reminder, entityActionsQueue];
 }
 
 typedef $$TodoTableCreateCompanionBuilder = TodoCompanion Function({
@@ -2150,6 +2513,203 @@ typedef $$ReminderTableProcessedTableManager = ProcessedTableManager<
     ),
     ReminderData,
     PrefetchHooks Function()>;
+typedef $$EntityActionsQueueTableCreateCompanionBuilder
+    = EntityActionsQueueCompanion Function({
+  Value<String> requestId,
+  Value<List<String>> ids,
+  required String name,
+  required String action,
+  required Map<String, dynamic> payload,
+  required DateTime timestamp,
+  Value<int> rowid,
+});
+typedef $$EntityActionsQueueTableUpdateCompanionBuilder
+    = EntityActionsQueueCompanion Function({
+  Value<String> requestId,
+  Value<List<String>> ids,
+  Value<String> name,
+  Value<String> action,
+  Value<Map<String, dynamic>> payload,
+  Value<DateTime> timestamp,
+  Value<int> rowid,
+});
+
+class $$EntityActionsQueueTableFilterComposer
+    extends Composer<_$SharedDatabase, $EntityActionsQueueTable> {
+  $$EntityActionsQueueTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get requestId => $composableBuilder(
+      column: $table.requestId, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<List<String>, List<String>, String> get ids =>
+      $composableBuilder(
+          column: $table.ids,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get action => $composableBuilder(
+      column: $table.action, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Map<String, dynamic>, Map<String, dynamic>,
+          String>
+      get payload => $composableBuilder(
+          column: $table.payload,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnFilters(column));
+}
+
+class $$EntityActionsQueueTableOrderingComposer
+    extends Composer<_$SharedDatabase, $EntityActionsQueueTable> {
+  $$EntityActionsQueueTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get requestId => $composableBuilder(
+      column: $table.requestId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get ids => $composableBuilder(
+      column: $table.ids, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get action => $composableBuilder(
+      column: $table.action, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+      column: $table.payload, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnOrderings(column));
+}
+
+class $$EntityActionsQueueTableAnnotationComposer
+    extends Composer<_$SharedDatabase, $EntityActionsQueueTable> {
+  $$EntityActionsQueueTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get requestId =>
+      $composableBuilder(column: $table.requestId, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<String>, String> get ids =>
+      $composableBuilder(column: $table.ids, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get action =>
+      $composableBuilder(column: $table.action, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Map<String, dynamic>, String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => column);
+}
+
+class $$EntityActionsQueueTableTableManager extends RootTableManager<
+    _$SharedDatabase,
+    $EntityActionsQueueTable,
+    EntityActionsQueueData,
+    $$EntityActionsQueueTableFilterComposer,
+    $$EntityActionsQueueTableOrderingComposer,
+    $$EntityActionsQueueTableAnnotationComposer,
+    $$EntityActionsQueueTableCreateCompanionBuilder,
+    $$EntityActionsQueueTableUpdateCompanionBuilder,
+    (
+      EntityActionsQueueData,
+      BaseReferences<_$SharedDatabase, $EntityActionsQueueTable,
+          EntityActionsQueueData>
+    ),
+    EntityActionsQueueData,
+    PrefetchHooks Function()> {
+  $$EntityActionsQueueTableTableManager(
+      _$SharedDatabase db, $EntityActionsQueueTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EntityActionsQueueTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EntityActionsQueueTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EntityActionsQueueTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> requestId = const Value.absent(),
+            Value<List<String>> ids = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> action = const Value.absent(),
+            Value<Map<String, dynamic>> payload = const Value.absent(),
+            Value<DateTime> timestamp = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              EntityActionsQueueCompanion(
+            requestId: requestId,
+            ids: ids,
+            name: name,
+            action: action,
+            payload: payload,
+            timestamp: timestamp,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<String> requestId = const Value.absent(),
+            Value<List<String>> ids = const Value.absent(),
+            required String name,
+            required String action,
+            required Map<String, dynamic> payload,
+            required DateTime timestamp,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              EntityActionsQueueCompanion.insert(
+            requestId: requestId,
+            ids: ids,
+            name: name,
+            action: action,
+            payload: payload,
+            timestamp: timestamp,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$EntityActionsQueueTableProcessedTableManager = ProcessedTableManager<
+    _$SharedDatabase,
+    $EntityActionsQueueTable,
+    EntityActionsQueueData,
+    $$EntityActionsQueueTableFilterComposer,
+    $$EntityActionsQueueTableOrderingComposer,
+    $$EntityActionsQueueTableAnnotationComposer,
+    $$EntityActionsQueueTableCreateCompanionBuilder,
+    $$EntityActionsQueueTableUpdateCompanionBuilder,
+    (
+      EntityActionsQueueData,
+      BaseReferences<_$SharedDatabase, $EntityActionsQueueTable,
+          EntityActionsQueueData>
+    ),
+    EntityActionsQueueData,
+    PrefetchHooks Function()>;
 
 class $SharedDatabaseManager {
   final _$SharedDatabase _db;
@@ -2161,4 +2721,6 @@ class $SharedDatabaseManager {
       $$CommentTableTableManager(_db, _db.comment);
   $$ReminderTableTableManager get reminder =>
       $$ReminderTableTableManager(_db, _db.reminder);
+  $$EntityActionsQueueTableTableManager get entityActionsQueue =>
+      $$EntityActionsQueueTableTableManager(_db, _db.entityActionsQueue);
 }

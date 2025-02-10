@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart' as drift;
 import 'package:watch_it/watch_it.dart';
 
@@ -16,10 +18,26 @@ enum TableName {
 class DbCrudOperations {
   final _database = GetIt.I<SharedDatabase>();
   final _backendSync = GetIt.I<BackendSync>();
-  late final project = _TableCrudOperation(_database.managers.project);
-  late final todo = _TableCrudOperation(_database.managers.todo);
-  late final comment = _TableCrudOperation(_database.managers.comment);
-  late final reminder = _TableCrudOperation(_database.managers.reminder);
+  late final project = _TableCrudOperation(
+    _database.project.entityName,
+    _database.managers.project,
+    _database.managers.entityActionsQueue,
+  );
+  late final todo = _TableCrudOperation(
+    _database.todo.entityName,
+    _database.managers.todo,
+    _database.managers.entityActionsQueue,
+  );
+  late final comment = _TableCrudOperation(
+    _database.comment.entityName,
+    _database.managers.comment,
+    _database.managers.entityActionsQueue,
+  );
+  late final reminder = _TableCrudOperation(
+    _database.reminder.entityName,
+    _database.managers.reminder,
+    _database.managers.entityActionsQueue,
+  );
 
   DbCrudOperations() {
     if (_backendSync.backendSyncConfiguration != null) {
@@ -82,26 +100,89 @@ class _TableCrudOperation<
       $Dataclass,
       $CreatePrefetchHooksCallback> manager;
 
-  _TableCrudOperation(this.manager);
+  final $$EntityActionsQueueTableTableManager queueTableManager;
+  final String entityName;
+
+  _TableCrudOperation(
+    this.entityName,
+    this.manager,
+    this.queueTableManager,
+  );
 
   drift.Expression<bool> _idsFilter($FilterComposer f, Iterable<String> ids) {
     return (f as dynamic).id.isIn(ids) as drift.Expression<bool>;
   }
 
-  Future<int> create(
+  Future<void> _createInQueue($Dataclass created) async {
+    await this.queueTableManager.create(
+          (o) => o(
+            ids: drift.Value([(created as dynamic).id as String]),
+            name: entityName,
+            action: "CREATE",
+            payload: created.toJson(),
+            timestamp: DateTime.now(),
+          ),
+        );
+  }
+
+  Future<void> _updateInQueue(
+      List<$Dataclass> previous, List<String> ids) async {
+    final afterUpdate = await manager.filter((f) => _idsFilter(f, ids)).get();
+    for (var element in afterUpdate) {
+      final elementJson = element.toJson();
+      final previousJson = previous
+          .firstWhere((prev) => (prev as dynamic).id == (element as dynamic).id)
+          .toJson();
+      final updateJson = <String, dynamic>{};
+      for (var key in elementJson.keys) {
+        if (elementJson[key] != previousJson[key]) {
+          updateJson[key] = elementJson[key];
+        }
+      }
+      await this.queueTableManager.create(
+            (o) => o(
+              ids: drift.Value(ids),
+              name: entityName,
+              action: "UPDATE",
+              payload: updateJson,
+              timestamp: DateTime.now(),
+            ),
+          );
+    }
+  }
+
+  Future<void> _deleteInQueue(List<String> ids) async {
+    await this.queueTableManager.create(
+          (o) => o(
+            ids: drift.Value(ids.toList()),
+            name: entityName,
+            action: "DELETE",
+            payload: {},
+            timestamp: DateTime.now(),
+          ),
+        );
+  }
+
+  Future<$Dataclass> create(
       drift.Insertable<$Dataclass> Function($CreateCompanionCallback) f) async {
-    return await manager.create(f);
+    final created = await manager.createReturning(f);
+    unawaited(_createInQueue(created));
+    return created;
   }
 
   Future<int> update(
     Iterable<String> ids,
     drift.Insertable<$Dataclass> Function($UpdateCompanionCallback) f,
   ) async {
-    return await manager.filter((f) => _idsFilter(f, ids)).update(f);
+    final previous = await manager.filter((f) => _idsFilter(f, ids)).get();
+    final updated = await manager.filter((f) => _idsFilter(f, ids)).update(f);
+    unawaited(_updateInQueue(previous, ids.toList()));
+    return updated;
   }
 
   Future<void> delete(Iterable<String> ids) async {
     await manager.filter((f) => _idsFilter(f, ids)).delete();
+    unawaited(_deleteInQueue(ids.toList()));
   }
 
   Future<List<$Dataclass>> get() async {
