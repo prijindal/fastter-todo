@@ -7,14 +7,14 @@ import 'package:drift/isolate.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../db/db_crud_operations.dart';
 import '../models/core.dart';
 import 'constants.dart';
 import 'logger.dart';
 
 class DatabaseIO {
-  final SharedDatabase _database = GetIt.I<SharedDatabase>();
-
-  SharedDatabase get database => _database;
+  final SharedDatabase database = GetIt.I<SharedDatabase>();
+  final DbCrudOperations dbCrudOperations = GetIt.I<DbCrudOperations>();
 
   Future<String> extractDbJson() async {
     final entries = await database.computeWithDatabase<List<List<DataClass>>>(
@@ -41,45 +41,22 @@ class DatabaseIO {
     return encoded;
   }
 
-  Future<void> _jsonToDbTable(
-      List<dynamic> entries,
-      TableInfo<Table, dynamic> manager,
-      Insertable Function(Map<String, dynamic>) toElement) async {
-    database.batch((batch) {
-      batch.insertAll(
-        manager,
-        entries.map(
-          (a) => toElement(a as Map<String, dynamic>),
-        ),
-        mode: InsertMode.insertOrIgnore,
-      );
-    });
-  }
-
   Future<void> jsonToDb(String jsonEncoded) async {
     final decoded = jsonDecode(jsonEncoded);
     await Future.wait(
       [
-        _jsonToDbTable(
+        dbCrudOperations.todo.insert(
           decoded["todo"] as List<dynamic>,
-          database.todo,
-          TodoData.fromJson,
         ),
-        _jsonToDbTable(
+        dbCrudOperations.project.insert(
           decoded["project"] as List<dynamic>,
-          database.project,
-          ProjectData.fromJson,
         ),
-        _jsonToDbTable(
+        dbCrudOperations.comment.insert(
           decoded["comment"] as List<dynamic>,
-          database.comment,
-          CommentData.fromJson,
         ),
-        _jsonToDbTable(
+        dbCrudOperations.reminder.insert(
           decoded["reminder"] as List<dynamic>,
-          database.reminder,
-          ReminderData.fromJson,
-        )
+        ),
       ],
     );
     AppLogger.instance.d("Loaded data into database");

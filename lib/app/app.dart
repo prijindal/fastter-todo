@@ -32,8 +32,9 @@ void registerAllServices() {
     () async => DbCrudOperations(),
     dependsOn: [BackendSyncConfigurationService],
   );
-  GetIt.I.registerSingleton<DatabaseIO>(
-    DatabaseIO(),
+  GetIt.I.registerSingletonAsync<DatabaseIO>(
+    () async => DatabaseIO(),
+    dependsOn: [DbCrudOperations],
   );
 }
 
