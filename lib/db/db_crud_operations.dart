@@ -6,7 +6,7 @@ import 'package:watch_it/watch_it.dart';
 import '../helpers/logger.dart';
 import '../models/core.dart';
 import 'backend_connector.dart';
-import 'backend_sync.dart';
+import 'backend_sync_configuration.dart';
 
 enum TableName {
   project,
@@ -17,25 +17,33 @@ enum TableName {
 
 class DbCrudOperations {
   final _database = GetIt.I<SharedDatabase>();
-  final _backendSync = GetIt.I<BackendSync>();
-  late final project = _TableCrudOperation(
+  final _backendSync = GetIt.I<BackendSyncConfigurationService>();
+  late final project = TableCrudOperation(
     _database.project.entityName,
     _database.managers.project,
+    _database.project,
+    (json) => ProjectData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
-  late final todo = _TableCrudOperation(
+  late final todo = TableCrudOperation(
     _database.todo.entityName,
     _database.managers.todo,
+    _database.todo,
+    (json) => TodoData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
-  late final comment = _TableCrudOperation(
+  late final comment = TableCrudOperation(
     _database.comment.entityName,
     _database.managers.comment,
+    _database.comment,
+    (json) => CommentData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
-  late final reminder = _TableCrudOperation(
+  late final reminder = TableCrudOperation(
     _database.reminder.entityName,
     _database.managers.reminder,
+    _database.reminder,
+    (json) => ReminderData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
 
@@ -78,7 +86,7 @@ class DbCrudOperations {
   }
 }
 
-class _TableCrudOperation<
+class TableCrudOperation<
     $Database extends drift.GeneratedDatabase,
     $Table extends drift.Table,
     $Dataclass extends drift.DataClass,
@@ -103,11 +111,15 @@ class _TableCrudOperation<
       $CreatePrefetchHooksCallback> manager;
 
   final $$EntityActionsQueueTableTableManager queueTableManager;
+  final drift.TableInfo<$Table, dynamic> table;
+  drift.Insertable<$Dataclass> Function(Map<String, dynamic>) insertable;
   final String entityName;
 
-  _TableCrudOperation(
+  TableCrudOperation(
     this.entityName,
     this.manager,
+    this.table,
+    this.insertable,
     this.queueTableManager,
   );
 
@@ -155,7 +167,7 @@ class _TableCrudOperation<
 
   Future<void> _deleteInQueue(List<String> ids) async {
     for (var id in ids) {
-      final created = await this.queueTableManager.create(
+      await this.queueTableManager.create(
             (o) => o(
               id: id,
               name: entityName,
@@ -164,7 +176,6 @@ class _TableCrudOperation<
               timestamp: DateTime.now(),
             ),
           );
-      print(created);
     }
   }
 
