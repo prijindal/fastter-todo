@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'constants.dart';
 import 'dbio.dart';
+import 'logger.dart';
 
 void downloadContent(BuildContext context) async {
   final encoded = await GetIt.I<DatabaseIO>().extractDbJson();
@@ -69,7 +70,8 @@ void uploadContent(BuildContext context) async {
             ),
           );
         }
-      } catch (e) {
+      } catch (e, stack) {
+        AppLogger.instance.e(e, error: e, stackTrace: stack);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

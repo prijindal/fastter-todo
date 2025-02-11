@@ -97,6 +97,8 @@ class TableCrudOperation<
     $UpdateCompanionCallback extends Function,
     $DataclassWithReferences,
     $CreatePrefetchHooksCallback extends Function> {
+  final database = GetIt.I<SharedDatabase>();
+
   final drift.RootTableManager<
       $Database,
       $Table,
@@ -184,6 +186,24 @@ class TableCrudOperation<
     final created = await manager.createReturning(f);
     unawaited(_createInQueue(created));
     return created;
+  }
+
+  Future<void> insert(List<dynamic> entries) async {
+    await database.batch((batch) {
+      batch.insertAll(
+        table,
+        entries.map((a) => insertable(a as Map<String, dynamic>)),
+        mode: drift.InsertMode.insertOrIgnore,
+      );
+    });
+    final insertedEntries = await manager
+        .filter((f) =>
+            (f as dynamic).id.isIn(entries.map((e) => e["id"] as String))
+                as drift.Expression<bool>)
+        .get();
+    for (var entry in insertedEntries) {
+      await _createInQueue(entry);
+    }
   }
 
   Future<int> update(
