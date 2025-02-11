@@ -37,41 +37,69 @@ class BackendConnector {
     return BackendConnector(socket: socket);
   }
 
-  Future<List<EntityActionResponse>> _emitActions(
-      List<EntityActionBase> actions) {
-    var completer = Completer<List<EntityActionResponse>>();
-    _socket.emitWithAck(
-        "actions", jsonEncode(actions.map((e) => e.toJson()).toList()),
-        ack: (List<dynamic> data) {
-      completer.complete(data
-          .map((a) => EntityActionResponse.fromJson(a as Map<String, dynamic>))
-          .toList());
+  Future<R> _emitWithResponse<T, R>(
+      String event, T request, R Function(dynamic data) fromJson) {
+    var completer = Completer<R>();
+    _socket.emitWithAck(event, jsonEncode(request), ack: (data) {
+      completer.complete(fromJson(data));
     });
     return completer.future;
   }
 
+  Future<List<EntityActionResponse>> _emitActions(
+      List<EntityActionBase> actions) {
+    return _emitWithResponse<List<EntityActionBase>,
+            List<EntityActionResponse>>(
+        "actions",
+        actions,
+        (dynamic data) => (data as List<dynamic>)
+            .map(
+                (a) => EntityActionResponse.fromJson(a as Map<String, dynamic>))
+            .toList());
+  }
+
+  Future<List<EntityHistoryResponse>> _emitHistory(
+      List<EntityHistoryRequest> history) {
+    return _emitWithResponse<List<EntityHistoryRequest>,
+            List<EntityHistoryResponse>>(
+        "search_history",
+        history,
+        (dynamic data) => (data as List<dynamic>)
+            .map((a) =>
+                EntityHistoryResponse.fromJson(a as Map<String, dynamic>))
+            .toList());
+  }
+
   Future<void> _sendQueueData() async {
-    final queue = await _database.managers.entityActionsQueue.get();
+    final queue = await _database.managers.entityActionsQueue
+        .orderBy((o) => o.timestamp.asc())
+        .get();
     if (queue.isEmpty) return;
+    AppLogger.instance.i("Sending actions to server ${queue.length}");
     final List<EntityActionBase> actions = queue.map<EntityActionBase>((a) {
       if (a.action == "CREATE") {
         return EntityActionCreate(
-            entityName: a.name,
-            payload: a.payload,
-            id: a.ids[0],
-            timestamp: a.timestamp);
+          entityName: a.name,
+          payload: a.payload,
+          entityId: a.id,
+          requestId: a.requestId,
+          timestamp: a.timestamp,
+        );
       } else if (a.action == "UPDATE") {
         return EntityActionUpdate(
-            entityName: a.name,
-            payload: a.payload,
-            ids: a.ids,
-            timestamp: a.timestamp);
+          entityName: a.name,
+          payload: a.payload,
+          entityId: a.id,
+          requestId: a.requestId,
+          timestamp: a.timestamp,
+        );
       } else if (a.action == "DELETE") {
         return EntityActionDelete(
-            entityName: a.name,
-            payload: a.payload,
-            ids: a.ids,
-            timestamp: a.timestamp);
+          entityName: a.name,
+          entityId: a.id,
+          requestId: a.requestId,
+          timestamp: a.timestamp,
+        );
       }
       throw Error();
     }).toList();
@@ -82,9 +110,52 @@ class BackendConnector {
         .delete();
   }
 
+  Future<void> _fetchHistory() async {
+    AppLogger.instance.i("Fetching history");
+    final history = await _emitHistory([
+      EntityHistoryRequest(
+        entityName: "todo",
+        params: EntityHistoryParams(),
+        order: {
+          "timestamp": "asc",
+        },
+      ),
+      EntityHistoryRequest(
+        entityName: "project",
+        params: EntityHistoryParams(),
+        order: {
+          "timestamp": "asc",
+        },
+      ),
+      EntityHistoryRequest(
+        entityName: "comment",
+        params: EntityHistoryParams(),
+        order: {
+          "timestamp": "asc",
+        },
+      ),
+      EntityHistoryRequest(
+        entityName: "reminder",
+        params: EntityHistoryParams(),
+        order: {
+          "timestamp": "asc",
+        },
+      ),
+    ]);
+    for (var histor in history) {
+      for (var row in histor.data) {
+        print(row.toJson());
+      }
+    }
+  }
+
   Future<void> _onConnect() async {
     AppLogger.instance.i("connected received from server");
+    await _sendQueueData();
     _timer = Timer.periodic(Duration(seconds: 1), (_) => _sendQueueData());
+    await _fetchHistory();
+    // After running _sendQueueData once, create a timer to run it perioidically
+    // TODO: Fetch data from server, using list operation
   }
 
   void _onDisconnect() {

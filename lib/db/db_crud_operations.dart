@@ -67,12 +67,14 @@ class DbCrudOperations {
   // These are helper methods for db deletion/updation etc
   Future<void> deleteTodosByIds(List<String> ids) async {
     AppLogger.instance.i("Deleting todos: ${ids.join(",")}");
-    await Future.wait([
-      _database.managers.comment.filter((f) => f.todo.isIn(ids)).delete(),
-      _database.managers.reminder.filter((f) => f.todo.isIn(ids)).delete(),
-      _database.managers.todo.filter((f) => f.id.isIn(ids)).delete(),
-      deleteParentTodosByParentIds(ids),
-    ]);
+    final comments =
+        await _database.managers.comment.filter((f) => f.todo.isIn(ids)).get();
+    final reminders =
+        await _database.managers.reminder.filter((f) => f.todo.isIn(ids)).get();
+    await comment.delete(comments.map((e) => e.id));
+    await reminder.delete(reminders.map((e) => e.id));
+    await todo.delete(ids);
+    await deleteParentTodosByParentIds(ids);
   }
 }
 
@@ -116,7 +118,7 @@ class _TableCrudOperation<
   Future<void> _createInQueue($Dataclass created) async {
     await this.queueTableManager.create(
           (o) => o(
-            ids: drift.Value([(created as dynamic).id as String]),
+            id: (created as dynamic).id as String,
             name: entityName,
             action: "CREATE",
             payload: created.toJson(),
@@ -141,7 +143,7 @@ class _TableCrudOperation<
       }
       await this.queueTableManager.create(
             (o) => o(
-              ids: drift.Value(ids),
+              id: (element as dynamic).id as String,
               name: entityName,
               action: "UPDATE",
               payload: updateJson,
@@ -152,15 +154,18 @@ class _TableCrudOperation<
   }
 
   Future<void> _deleteInQueue(List<String> ids) async {
-    await this.queueTableManager.create(
-          (o) => o(
-            ids: drift.Value(ids.toList()),
-            name: entityName,
-            action: "DELETE",
-            payload: {},
-            timestamp: DateTime.now(),
-          ),
-        );
+    for (var id in ids) {
+      final created = await this.queueTableManager.create(
+            (o) => o(
+              id: id,
+              name: entityName,
+              action: "DELETE",
+              payload: {},
+              timestamp: DateTime.now(),
+            ),
+          );
+      print(created);
+    }
   }
 
   Future<$Dataclass> create(

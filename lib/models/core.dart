@@ -75,9 +75,7 @@ class Reminder extends Table {
 
 class EntityActionsQueue extends Table {
   late final requestId = text().clientDefault(() => _uuid.v4())();
-  late final ids = text()
-      .map(const StringListConverter())
-      .clientDefault(() => jsonEncode([]))();
+  late final id = text()(); // entityId
   late final name = text()();
   late final action = text()(); // CREATE, UPDATE, DELETE
   late final payload = text().map(const JsonConverter())();

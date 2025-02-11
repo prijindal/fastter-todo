@@ -1416,14 +1416,11 @@ class $EntityActionsQueueTable extends EntityActionsQueue
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       clientDefault: () => _uuid.v4());
-  static const VerificationMeta _idsMeta = const VerificationMeta('ids');
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumnWithTypeConverter<List<String>, String> ids =
-      GeneratedColumn<String>('ids', aliasedName, false,
-              type: DriftSqlType.string,
-              requiredDuringInsert: false,
-              clientDefault: () => jsonEncode([]))
-          .withConverter<List<String>>($EntityActionsQueueTable.$converterids);
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -1450,7 +1447,7 @@ class $EntityActionsQueueTable extends EntityActionsQueue
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [requestId, ids, name, action, payload, timestamp];
+      [requestId, id, name, action, payload, timestamp];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1466,7 +1463,11 @@ class $EntityActionsQueueTable extends EntityActionsQueue
       context.handle(_requestIdMeta,
           requestId.isAcceptableOrUnknown(data['request_id']!, _requestIdMeta));
     }
-    context.handle(_idsMeta, const VerificationResult.success());
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
@@ -1497,9 +1498,8 @@ class $EntityActionsQueueTable extends EntityActionsQueue
     return EntityActionsQueueData(
       requestId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}request_id'])!,
-      ids: $EntityActionsQueueTable.$converterids.fromSql(attachedDatabase
-          .typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}ids'])!),
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       action: attachedDatabase.typeMapping
@@ -1517,8 +1517,6 @@ class $EntityActionsQueueTable extends EntityActionsQueue
     return $EntityActionsQueueTable(attachedDatabase, alias);
   }
 
-  static JsonTypeConverter2<List<String>, String, String> $converterids =
-      const StringListConverter();
   static JsonTypeConverter2<Map<String, dynamic>, String, String>
       $converterpayload = const JsonConverter();
 }
@@ -1526,14 +1524,14 @@ class $EntityActionsQueueTable extends EntityActionsQueue
 class EntityActionsQueueData extends DataClass
     implements Insertable<EntityActionsQueueData> {
   final String requestId;
-  final List<String> ids;
+  final String id;
   final String name;
   final String action;
   final Map<String, dynamic> payload;
   final DateTime timestamp;
   const EntityActionsQueueData(
       {required this.requestId,
-      required this.ids,
+      required this.id,
       required this.name,
       required this.action,
       required this.payload,
@@ -1542,10 +1540,7 @@ class EntityActionsQueueData extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['request_id'] = Variable<String>(requestId);
-    {
-      map['ids'] =
-          Variable<String>($EntityActionsQueueTable.$converterids.toSql(ids));
-    }
+    map['id'] = Variable<String>(id);
     map['name'] = Variable<String>(name);
     map['action'] = Variable<String>(action);
     {
@@ -1559,7 +1554,7 @@ class EntityActionsQueueData extends DataClass
   EntityActionsQueueCompanion toCompanion(bool nullToAbsent) {
     return EntityActionsQueueCompanion(
       requestId: Value(requestId),
-      ids: Value(ids),
+      id: Value(id),
       name: Value(name),
       action: Value(action),
       payload: Value(payload),
@@ -1572,8 +1567,7 @@ class EntityActionsQueueData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return EntityActionsQueueData(
       requestId: serializer.fromJson<String>(json['requestId']),
-      ids: $EntityActionsQueueTable.$converterids
-          .fromJson(serializer.fromJson<String>(json['ids'])),
+      id: serializer.fromJson<String>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       action: serializer.fromJson<String>(json['action']),
       payload: $EntityActionsQueueTable.$converterpayload
@@ -1586,8 +1580,7 @@ class EntityActionsQueueData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'requestId': serializer.toJson<String>(requestId),
-      'ids': serializer
-          .toJson<String>($EntityActionsQueueTable.$converterids.toJson(ids)),
+      'id': serializer.toJson<String>(id),
       'name': serializer.toJson<String>(name),
       'action': serializer.toJson<String>(action),
       'payload': serializer.toJson<String>(
@@ -1598,14 +1591,14 @@ class EntityActionsQueueData extends DataClass
 
   EntityActionsQueueData copyWith(
           {String? requestId,
-          List<String>? ids,
+          String? id,
           String? name,
           String? action,
           Map<String, dynamic>? payload,
           DateTime? timestamp}) =>
       EntityActionsQueueData(
         requestId: requestId ?? this.requestId,
-        ids: ids ?? this.ids,
+        id: id ?? this.id,
         name: name ?? this.name,
         action: action ?? this.action,
         payload: payload ?? this.payload,
@@ -1614,7 +1607,7 @@ class EntityActionsQueueData extends DataClass
   EntityActionsQueueData copyWithCompanion(EntityActionsQueueCompanion data) {
     return EntityActionsQueueData(
       requestId: data.requestId.present ? data.requestId.value : this.requestId,
-      ids: data.ids.present ? data.ids.value : this.ids,
+      id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       action: data.action.present ? data.action.value : this.action,
       payload: data.payload.present ? data.payload.value : this.payload,
@@ -1626,7 +1619,7 @@ class EntityActionsQueueData extends DataClass
   String toString() {
     return (StringBuffer('EntityActionsQueueData(')
           ..write('requestId: $requestId, ')
-          ..write('ids: $ids, ')
+          ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('action: $action, ')
           ..write('payload: $payload, ')
@@ -1637,13 +1630,13 @@ class EntityActionsQueueData extends DataClass
 
   @override
   int get hashCode =>
-      Object.hash(requestId, ids, name, action, payload, timestamp);
+      Object.hash(requestId, id, name, action, payload, timestamp);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is EntityActionsQueueData &&
           other.requestId == this.requestId &&
-          other.ids == this.ids &&
+          other.id == this.id &&
           other.name == this.name &&
           other.action == this.action &&
           other.payload == this.payload &&
@@ -1653,7 +1646,7 @@ class EntityActionsQueueData extends DataClass
 class EntityActionsQueueCompanion
     extends UpdateCompanion<EntityActionsQueueData> {
   final Value<String> requestId;
-  final Value<List<String>> ids;
+  final Value<String> id;
   final Value<String> name;
   final Value<String> action;
   final Value<Map<String, dynamic>> payload;
@@ -1661,7 +1654,7 @@ class EntityActionsQueueCompanion
   final Value<int> rowid;
   const EntityActionsQueueCompanion({
     this.requestId = const Value.absent(),
-    this.ids = const Value.absent(),
+    this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.action = const Value.absent(),
     this.payload = const Value.absent(),
@@ -1670,19 +1663,20 @@ class EntityActionsQueueCompanion
   });
   EntityActionsQueueCompanion.insert({
     this.requestId = const Value.absent(),
-    this.ids = const Value.absent(),
+    required String id,
     required String name,
     required String action,
     required Map<String, dynamic> payload,
     required DateTime timestamp,
     this.rowid = const Value.absent(),
-  })  : name = Value(name),
+  })  : id = Value(id),
+        name = Value(name),
         action = Value(action),
         payload = Value(payload),
         timestamp = Value(timestamp);
   static Insertable<EntityActionsQueueData> custom({
     Expression<String>? requestId,
-    Expression<String>? ids,
+    Expression<String>? id,
     Expression<String>? name,
     Expression<String>? action,
     Expression<String>? payload,
@@ -1691,7 +1685,7 @@ class EntityActionsQueueCompanion
   }) {
     return RawValuesInsertable({
       if (requestId != null) 'request_id': requestId,
-      if (ids != null) 'ids': ids,
+      if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (action != null) 'action': action,
       if (payload != null) 'payload': payload,
@@ -1702,7 +1696,7 @@ class EntityActionsQueueCompanion
 
   EntityActionsQueueCompanion copyWith(
       {Value<String>? requestId,
-      Value<List<String>>? ids,
+      Value<String>? id,
       Value<String>? name,
       Value<String>? action,
       Value<Map<String, dynamic>>? payload,
@@ -1710,7 +1704,7 @@ class EntityActionsQueueCompanion
       Value<int>? rowid}) {
     return EntityActionsQueueCompanion(
       requestId: requestId ?? this.requestId,
-      ids: ids ?? this.ids,
+      id: id ?? this.id,
       name: name ?? this.name,
       action: action ?? this.action,
       payload: payload ?? this.payload,
@@ -1725,9 +1719,8 @@ class EntityActionsQueueCompanion
     if (requestId.present) {
       map['request_id'] = Variable<String>(requestId.value);
     }
-    if (ids.present) {
-      map['ids'] = Variable<String>(
-          $EntityActionsQueueTable.$converterids.toSql(ids.value));
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -1752,7 +1745,7 @@ class EntityActionsQueueCompanion
   String toString() {
     return (StringBuffer('EntityActionsQueueCompanion(')
           ..write('requestId: $requestId, ')
-          ..write('ids: $ids, ')
+          ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('action: $action, ')
           ..write('payload: $payload, ')
@@ -2516,7 +2509,7 @@ typedef $$ReminderTableProcessedTableManager = ProcessedTableManager<
 typedef $$EntityActionsQueueTableCreateCompanionBuilder
     = EntityActionsQueueCompanion Function({
   Value<String> requestId,
-  Value<List<String>> ids,
+  required String id,
   required String name,
   required String action,
   required Map<String, dynamic> payload,
@@ -2526,7 +2519,7 @@ typedef $$EntityActionsQueueTableCreateCompanionBuilder
 typedef $$EntityActionsQueueTableUpdateCompanionBuilder
     = EntityActionsQueueCompanion Function({
   Value<String> requestId,
-  Value<List<String>> ids,
+  Value<String> id,
   Value<String> name,
   Value<String> action,
   Value<Map<String, dynamic>> payload,
@@ -2546,10 +2539,8 @@ class $$EntityActionsQueueTableFilterComposer
   ColumnFilters<String> get requestId => $composableBuilder(
       column: $table.requestId, builder: (column) => ColumnFilters(column));
 
-  ColumnWithTypeConverterFilters<List<String>, List<String>, String> get ids =>
-      $composableBuilder(
-          column: $table.ids,
-          builder: (column) => ColumnWithTypeConverterFilters(column));
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnFilters(column));
@@ -2579,8 +2570,8 @@ class $$EntityActionsQueueTableOrderingComposer
   ColumnOrderings<String> get requestId => $composableBuilder(
       column: $table.requestId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get ids => $composableBuilder(
-      column: $table.ids, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get name => $composableBuilder(
       column: $table.name, builder: (column) => ColumnOrderings(column));
@@ -2607,8 +2598,8 @@ class $$EntityActionsQueueTableAnnotationComposer
   GeneratedColumn<String> get requestId =>
       $composableBuilder(column: $table.requestId, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<List<String>, String> get ids =>
-      $composableBuilder(column: $table.ids, builder: (column) => column);
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
@@ -2653,7 +2644,7 @@ class $$EntityActionsQueueTableTableManager extends RootTableManager<
                   $db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> requestId = const Value.absent(),
-            Value<List<String>> ids = const Value.absent(),
+            Value<String> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<String> action = const Value.absent(),
             Value<Map<String, dynamic>> payload = const Value.absent(),
@@ -2662,7 +2653,7 @@ class $$EntityActionsQueueTableTableManager extends RootTableManager<
           }) =>
               EntityActionsQueueCompanion(
             requestId: requestId,
-            ids: ids,
+            id: id,
             name: name,
             action: action,
             payload: payload,
@@ -2671,7 +2662,7 @@ class $$EntityActionsQueueTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             Value<String> requestId = const Value.absent(),
-            Value<List<String>> ids = const Value.absent(),
+            required String id,
             required String name,
             required String action,
             required Map<String, dynamic> payload,
@@ -2680,7 +2671,7 @@ class $$EntityActionsQueueTableTableManager extends RootTableManager<
           }) =>
               EntityActionsQueueCompanion.insert(
             requestId: requestId,
-            ids: ids,
+            id: id,
             name: name,
             action: action,
             payload: payload,
