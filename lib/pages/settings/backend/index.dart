@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watch_it/watch_it.dart';
 
-import '../../../db/backend_sync.dart';
+import '../../../db/backend_sync_configuration.dart';
 import '../../../db/db_crud_operations.dart';
 import '../../../helpers/logger.dart';
 import '../../../models/local_db_state.dart';
@@ -102,10 +102,10 @@ class BackendImplementationTile extends WatchingWidget {
       if (settings == null) {
         return;
       } else {
-        await GetIt.I<BackendSync>().setRemote(settings);
+        await GetIt.I<BackendSyncConfigurationService>().setRemote(settings);
       }
     } else {
-      await GetIt.I<BackendSync>().clearRemote();
+      await GetIt.I<BackendSyncConfigurationService>().clearRemote();
     }
     await Restart.restartApp(
       notificationTitle: 'Restarting App',
@@ -114,8 +114,8 @@ class BackendImplementationTile extends WatchingWidget {
   }
 
   Widget _buildTitle(BuildContext context) {
-    final backendSyncConfiguration =
-        watchPropertyValue((BackendSync s) => s.backendSyncConfiguration);
+    final backendSyncConfiguration = watchPropertyValue(
+        (BackendSyncConfigurationService s) => s.backendSyncConfiguration);
     return CheckboxListTile(
       value: backendSyncConfiguration != null,
       title: Text("Backend Sync"),

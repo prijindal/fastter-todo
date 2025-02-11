@@ -29,23 +29,23 @@ class BackendSyncConfiguration {
   }
 }
 
-class BackendSync extends ChangeNotifier {
+class BackendSyncConfigurationService extends ChangeNotifier {
   BackendSyncConfiguration? _backendSyncConfiguration;
 
-  BackendSync(this._backendSyncConfiguration);
+  BackendSyncConfigurationService(this._backendSyncConfiguration);
 
   BackendSyncConfiguration? get backendSyncConfiguration =>
       _backendSyncConfiguration;
 
-  static Future<BackendSync> init() async {
+  static Future<BackendSyncConfigurationService> init() async {
     final backendSyncSettings =
         await SharedPreferencesAsync().getString(backendSyncSettingsKey);
     if (backendSyncSettings == null) {
-      return BackendSync(null);
+      return BackendSyncConfigurationService(null);
     } else {
       final config = BackendSyncConfiguration.fromJson(
           jsonDecode(backendSyncSettings) as Map<String, dynamic>);
-      return BackendSync(config);
+      return BackendSyncConfigurationService(config);
     }
   }
 
