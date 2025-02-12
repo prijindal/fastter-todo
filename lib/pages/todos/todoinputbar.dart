@@ -205,7 +205,7 @@ class _TodoInputBarState extends State<_TodoInputBar>
         priority: todo["priority"] as int? ?? 1,
         tags: todo["tags"] as List<String>? ?? [],
       );
-      _formKey.currentState!.reset();
+      _formKey.currentState?.reset();
       if (mounted) {
         await _unFocusKeyboard(
           checkTitle: false,

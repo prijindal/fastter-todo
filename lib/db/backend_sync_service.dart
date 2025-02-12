@@ -46,7 +46,7 @@ class BackendSyncService {
     await _sendQueueData();
     _timer =
         Timer.periodic(Duration(milliseconds: 100), (_) => _sendQueueData());
-    await _fetchHistoryWrapper();
+    await fetchHistoryWrapper();
     // After running _sendQueueData once, create a timer to run it perioidically
     // Fetch data from server, using list operation
   }
@@ -145,7 +145,7 @@ class BackendSyncService {
     return hostId;
   }
 
-  Future<void> _fetchHistoryWrapper() async {
+  Future<void> fetchHistoryWrapper() async {
     final hostId = await getHostId();
     final lastUpdatedAt =
         await SharedPreferencesAsync().getInt("lastUpdatedAt");
@@ -155,13 +155,6 @@ class BackendSyncService {
           : DateTime.fromMillisecondsSinceEpoch(lastUpdatedAt),
       hostId: hostId,
     );
-    await SharedPreferencesAsync()
-        .setInt("lastUpdatedAt", DateTime.now().millisecondsSinceEpoch);
-  }
-
-  Future<void> consumeServerHistory(
-      Iterable<EntityHistoryResponse> history) async {
-    await _consumeHistory(history);
     await SharedPreferencesAsync()
         .setInt("lastUpdatedAt", DateTime.now().millisecondsSinceEpoch);
   }
