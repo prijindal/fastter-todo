@@ -25,45 +25,30 @@ class SettingsStorageNotifier with ChangeNotifier {
   ColorSeed _baseColor;
   ThemeMode _themeMode;
 
-  final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
-
   SettingsStorageNotifier({
     ThemeMode themeMode = ThemeMode.system,
     ColorSeed baseColor = ColorSeed.baseColor,
   })  : _baseColor = baseColor,
-        _themeMode = themeMode {
-    init();
+        _themeMode = themeMode;
+
+  static Future<SettingsStorageNotifier> initialize() async {
+    final theme = await _readSetting(appThemeMode);
+    final color = await _readSetting(appColorSeed);
+    return SettingsStorageNotifier(
+      themeMode: theme == null
+          ? ThemeMode.system
+          : ThemeMode.values.asNameMap()[theme] ?? ThemeMode.system,
+      baseColor: color == null
+          ? ColorSeed.baseColor
+          : ColorSeed.values.asNameMap()[color] ?? ColorSeed.baseColor,
+    );
   }
 
-  Future<String?> _readSetting(String key) async {
+  static Future<String?> _readSetting(String key) async {
     AppLogger.instance.d("Reading $key from shared_preferences");
-    final preference = await asyncPrefs.getString(key);
+    final preference = await SharedPreferencesAsync().getString(key);
     AppLogger.instance.d("Read $key as $preference from shared_preferences");
     return preference;
-  }
-
-  Future<void> _readThemeFromStorage() async {
-    final preference = await _readSetting(appThemeMode);
-    _themeMode = preference == null
-        ? ThemeMode.system
-        : ThemeMode.values.asNameMap()[preference] ?? ThemeMode.system;
-  }
-
-  Future<void> _readColorFromStorage() async {
-    final preference = await _readSetting(appColorSeed);
-    _baseColor = preference == null
-        ? ColorSeed.baseColor
-        : ColorSeed.values.asNameMap()[preference] ?? ColorSeed.baseColor;
-  }
-
-  void init() async {
-    await Future.wait(
-      [
-        _readThemeFromStorage(),
-        _readColorFromStorage(),
-      ],
-    );
-    notifyListeners();
   }
 
   ThemeMode getTheme() => _themeMode;
@@ -72,7 +57,7 @@ class SettingsStorageNotifier with ChangeNotifier {
 
   Future<void> _setSetting(String key, String newSetting) async {
     AppLogger.instance.d("Writting newSetting as $key to shared_preferences");
-    await asyncPrefs.setString(
+    await SharedPreferencesAsync().setString(
       key,
       newSetting,
     );

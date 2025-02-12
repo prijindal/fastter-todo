@@ -18,7 +18,8 @@ import '../router/app_router.dart';
 
 void registerAllServices() {
   GetIt.I.registerSingleton<SharedDatabase>(SharedDatabase.local());
-  GetIt.I.registerSingleton<SettingsStorageNotifier>(SettingsStorageNotifier());
+  GetIt.I.registerSingletonAsync<SettingsStorageNotifier>(
+      () => SettingsStorageNotifier.initialize());
   GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier(
     todosView: isDesktop ? TodosView.grid : TodosView.list,
   ));
