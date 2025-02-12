@@ -5,19 +5,13 @@ import 'package:get_it/get_it.dart';
 import '../models/core.dart';
 import '../models/local_db_state.dart';
 import '../models/local_state.dart';
+import '../pages/todos/app_bars/app_bar_with_actions.dart';
 
 class AppBarActions {
-  final void Function(BuildContext context) onPressed;
-  final Widget icon;
-
-  const AppBarActions({
-    required this.icon,
-    required this.onPressed,
-  });
-
-  factory AppBarActions.toggleView() {
-    return AppBarActions(
+  static AppBarAction toggleView() {
+    return AppBarAction(
       icon: Icon(Icons.list),
+      title: "Toggle View",
       onPressed: (context) {
         final localStateNotifier = GetIt.I<LocalStateNotifier>();
         localStateNotifier.setTodosView(
@@ -29,32 +23,36 @@ class AppBarActions {
     );
   }
 
-  factory AppBarActions.settings() {
-    return AppBarActions(
+  static AppBarAction settings() {
+    return AppBarAction(
       icon: Icon(Icons.settings),
+      title: "Settings",
       onPressed: (context) => AutoRouter.of(context).pushNamed("/settings"),
     );
   }
 
-  factory AppBarActions.editProject(String projectId) {
-    return AppBarActions(
+  static AppBarAction editProject(String projectId) {
+    return AppBarAction(
       icon: Icon(Icons.edit),
+      title: "Edit Project",
       onPressed: (context) =>
           AutoRouter.of(context).pushNamed("/project/$projectId"),
     );
   }
 
-  factory AppBarActions.search() {
-    return AppBarActions(
+  static AppBarAction search() {
+    return AppBarAction(
       icon: Icon(Icons.search),
+      title: "Search",
       onPressed: (context) => AutoRouter.of(context).pushNamed("/search"),
     );
   }
 
-  factory AppBarActions.forceRefresh() {
-    return AppBarActions(
+  static AppBarAction forceRefresh() {
+    return AppBarAction(
       // TODO: Display refreshing status
       icon: Icon(Icons.refresh),
+      title: "Refresh",
       onPressed: (context) => GetIt.I<LocalDbState>().refresh(),
     );
   }
@@ -144,12 +142,12 @@ class TodosFilters {
     return parts.join("&");
   }
 
-  List<AppBarActions> get actions {
-    final actions = <AppBarActions>[];
+  List<AppBarAction> get actions {
+    final actions = <AppBarAction>[];
+    actions.add(AppBarActions.search());
     if (projectFilter != null && projectFilter != "inbox") {
       actions.add(AppBarActions.editProject(projectFilter!));
     }
-    actions.add(AppBarActions.search());
     actions.add(AppBarActions.toggleView());
     actions.add(AppBarActions.forceRefresh());
     actions.add(AppBarActions.settings());

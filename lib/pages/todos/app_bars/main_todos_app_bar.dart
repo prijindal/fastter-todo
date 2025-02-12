@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../helpers/todos_filters.dart';
+import 'app_bar_with_actions.dart';
 
 class MainTodosAppBar extends StatelessWidget {
   const MainTodosAppBar({super.key, required this.filters});
@@ -9,16 +10,13 @@ class MainTodosAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(filters.createTitle),
-      actions: filters.actions
-          .map(
-            (action) => IconButton(
-              onPressed: () => action.onPressed(context),
-              icon: action.icon,
-            ),
-          )
-          .toList(),
+    final actions = filters.actions;
+    final primaryAction = actions.first;
+    final secondaryActions = actions.sublist(1);
+    return AppBarWithActions(
+      title: filters.createTitle,
+      primaryAction: primaryAction,
+      secondaryActions: secondaryActions,
     );
   }
 }
