@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
 import '../helpers/logger.dart';
@@ -25,7 +26,8 @@ class BackendConnector {
     final socket = io.io(
         config.url,
         io.OptionBuilder()
-            .setTransports(['websocket']) // for Flutter or Dart VM
+            .setTransports(
+                kIsWeb ? ['polling'] : ['websocket']) // for Flutter or Dart VM
             .disableAutoConnect() // disable auto-connection
             .setExtraHeaders(
                 {'Authorization': 'Bearer ${config.jwtToken}'}) // optional
