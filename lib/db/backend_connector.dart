@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
 import '../helpers/logger.dart';
+import 'backend/entity_types.dart';
 import 'backend_sync_configuration.dart';
 import 'backend_sync_service.dart';
 
@@ -49,7 +50,14 @@ class BackendConnector {
     try {
       _socket.connect();
       _socket.on("connected", (d) => _onConnect());
-      _socket.on("server_actions", (d) => AppLogger.instance.d(d));
+      _socket.on(
+        "server_actions",
+        (d) => backendSyncService?.consumeServerHistory(
+          (d as List<dynamic>).map(
+            (a) => EntityHistoryResponse.fromJson(a as Map<String, dynamic>),
+          ),
+        ),
+      );
       _socket.onConnect((data) => AppLogger.instance.i("Connected to server"));
       _socket.onDisconnect((data) => _onDisconnect());
       _socket.onConnectError(

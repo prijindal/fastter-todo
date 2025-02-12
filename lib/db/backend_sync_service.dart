@@ -19,6 +19,8 @@ class BackendSyncService {
   DbCrudOperations get dbCrudOperations => GetIt.I<DbCrudOperations>();
   Timer? _timer;
 
+  bool _performingActions = false;
+
   late final managers = [
     dbCrudOperations.todo,
     dbCrudOperations.project,
@@ -42,7 +44,8 @@ class BackendSyncService {
 
   Future<void> init() async {
     await _sendQueueData();
-    _timer = Timer.periodic(Duration(seconds: 1), (_) => _sendQueueData());
+    _timer =
+        Timer.periodic(Duration(milliseconds: 100), (_) => _sendQueueData());
     await _fetchHistoryWrapper();
     // After running _sendQueueData once, create a timer to run it perioidically
     // Fetch data from server, using list operation
@@ -86,6 +89,8 @@ class BackendSyncService {
   }
 
   Future<void> _sendQueueData() async {
+    if (_performingActions) return;
+    _performingActions = true;
     final queue = await _database.managers.entityActionsQueue
         .orderBy((o) => o.timestamp.asc())
         .get();
@@ -127,6 +132,7 @@ class BackendSyncService {
     await _database.managers.entityActionsQueue
         .filter((f) => f.requestId.isIn(queue.map((a) => a.requestId).toList()))
         .delete();
+    _performingActions = false;
   }
 
   Future<String> getHostId() async {
@@ -153,30 +159,14 @@ class BackendSyncService {
         .setInt("lastUpdatedAt", DateTime.now().millisecondsSinceEpoch);
   }
 
-  Future<void> _fetchHistory({
-    DateTime? lastUpdatedAt,
-    required String hostId,
-  }) async {
-    AppLogger.instance.i("Fetching history");
-    EntityHistoryParams params = EntityHistoryParams(
-      hostId: HostParams(ne: hostId),
-    );
-    if (lastUpdatedAt != null) {
-      params = EntityHistoryParams(
-        createdAt: DateParams(gte: lastUpdatedAt),
-        hostId: HostParams(ne: hostId),
-      );
-    }
-    final historyRequest = entities.map(
-      (entityName) => EntityHistoryRequest(
-        entityName: entityName,
-        params: params,
-        order: {
-          "timestamp": "asc",
-        },
-      ),
-    );
-    final history = await _emitHistory(historyRequest.toList());
+  Future<void> consumeServerHistory(
+      Iterable<EntityHistoryResponse> history) async {
+    await _consumeHistory(history);
+    await SharedPreferencesAsync()
+        .setInt("lastUpdatedAt", DateTime.now().millisecondsSinceEpoch);
+  }
+
+  Future<void> _consumeHistory(Iterable<EntityHistoryResponse> history) async {
     for (var histor in history) {
       final manager = getManager(histor.entityName);
       AppLogger.instance
@@ -214,5 +204,32 @@ class BackendSyncService {
         }
       }
     }
+  }
+
+  Future<void> _fetchHistory({
+    DateTime? lastUpdatedAt,
+    required String hostId,
+  }) async {
+    AppLogger.instance.i("Fetching history");
+    EntityHistoryParams params = EntityHistoryParams(
+      hostId: HostParams(ne: hostId),
+    );
+    if (lastUpdatedAt != null) {
+      params = EntityHistoryParams(
+        createdAt: DateParams(gte: lastUpdatedAt),
+        hostId: HostParams(ne: hostId),
+      );
+    }
+    final historyRequest = entities.map(
+      (entityName) => EntityHistoryRequest(
+        entityName: entityName,
+        params: params,
+        order: {
+          "timestamp": "asc",
+        },
+      ),
+    );
+    final history = await _emitHistory(historyRequest.toList());
+    await _consumeHistory(history);
   }
 }
