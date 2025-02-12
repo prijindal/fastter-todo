@@ -44,8 +44,7 @@ class BackendSyncService {
 
   Future<void> init() async {
     await _sendQueueData();
-    _timer =
-        Timer.periodic(Duration(milliseconds: 100), (_) => _sendQueueData());
+    _timer = Timer.periodic(Duration(seconds: 1), (_) => _sendQueueData());
     await fetchHistoryWrapper();
     // After running _sendQueueData once, create a timer to run it perioidically
     // Fetch data from server, using list operation
