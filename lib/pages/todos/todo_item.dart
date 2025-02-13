@@ -133,10 +133,8 @@ class _TodoItem extends StatelessWidget {
     });
   }
 
-  Future<bool?> _confirmDelete(BuildContext context) => showDialog<bool>(
-        context: context,
-        builder: (context) => ConfirmationDialog(),
-      );
+  Future<bool?> _confirmDelete(BuildContext context) =>
+      showConfirmationDialog(context);
 
   void _deleteTodo(BuildContext context) async {
     await GetIt.I<DbCrudOperations>().deleteTodosByIds([todo.id]);

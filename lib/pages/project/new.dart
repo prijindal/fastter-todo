@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../db/db_crud_operations.dart';
+import '../../helpers/todos_filters.dart';
 import '../../models/core.dart';
 import 'form.dart';
 
@@ -23,7 +24,7 @@ class NewProjectScreen extends StatelessWidget {
     if (title == null || color == null) {
       return;
     }
-    await GetIt.I<DbCrudOperations>().project.create(
+    final project = await GetIt.I<DbCrudOperations>().project.create(
           (o) => o(
             color: color.hex,
             title: title,
@@ -31,7 +32,8 @@ class NewProjectScreen extends StatelessWidget {
           ),
         );
     // ignore: use_build_context_synchronously
-    Navigator.of(context).pop();
+    AutoRouter.of(context).navigateNamed(
+        "/todos/?${TodosFilters(projectFilter: project.id).queryString}");
   }
 
   @override

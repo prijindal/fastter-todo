@@ -10,10 +10,7 @@ class DeleteSelectedTodosButton extends StatelessWidget {
 
   void _onDelete(BuildContext context) async {
     final localStateNotifier = GetIt.I<LocalStateNotifier>();
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) => ConfirmationDialog(),
-    );
+    final shouldDelete = await showConfirmationDialog(context);
     if (shouldDelete != null && shouldDelete && context.mounted) {
       await GetIt.I<DbCrudOperations>()
           .deleteTodosByIds(localStateNotifier.selectedTodoIds);

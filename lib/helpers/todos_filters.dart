@@ -6,6 +6,7 @@ import '../models/core.dart';
 import '../models/local_db_state.dart';
 import '../models/local_state.dart';
 import '../pages/todos/app_bars/app_bar_with_actions.dart';
+import '../pages/todos/projectdeletiondialog.dart';
 
 class AppBarActions {
   static AppBarAction toggleView() {
@@ -37,6 +38,25 @@ class AppBarActions {
       title: "Edit Project",
       onPressed: (context) =>
           AutoRouter.of(context).pushNamed("/project/$projectId"),
+    );
+  }
+
+  static AppBarAction deleteProject(String projectId) {
+    return AppBarAction(
+      icon: Icon(Icons.delete),
+      title: "Delete Project",
+      onPressed: (context) async {
+        final deleted = await showProjectDeletionDialog(
+          context,
+          GetIt.I<LocalDbState>()
+              .projects
+              .singleWhere((f) => f.id == projectId),
+        );
+        if (deleted) {
+          // ignore: use_build_context_synchronously
+          AutoRouter.of(context).navigateNamed("/todos");
+        }
+      },
     );
   }
 
@@ -147,6 +167,7 @@ class TodosFilters {
     actions.add(AppBarActions.search());
     if (projectFilter != null && projectFilter != "inbox") {
       actions.add(AppBarActions.editProject(projectFilter!));
+      actions.add(AppBarActions.deleteProject(projectFilter!));
     }
     actions.add(AppBarActions.toggleView());
     actions.add(AppBarActions.forceRefresh());

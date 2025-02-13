@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 class ConfirmationDialog extends StatelessWidget {
   const ConfirmationDialog({
     super.key,
-    this.title = "Are you sure?",
-    this.content = "Are you sure you want to continue?",
-    this.cancelText = "No",
-    this.confirmText = "Yes",
-  });
+    String? title,
+    String? content,
+    String? cancelText,
+    String? confirmText,
+  })  : title = title ?? "Are you sure?",
+        content = content ?? "Are you sure you want to continue?",
+        cancelText = cancelText ?? "No",
+        confirmText = confirmText ?? "Yes";
 
   final String title;
   final String content;
@@ -36,3 +39,20 @@ class ConfirmationDialog extends StatelessWidget {
     );
   }
 }
+
+Future<bool?> showConfirmationDialog(
+  BuildContext context, {
+  String? title,
+  String? content,
+  String? cancelText,
+  String? confirmText,
+}) =>
+    showDialog<bool>(
+      context: context,
+      builder: (context) => ConfirmationDialog(
+        title: title,
+        content: content,
+        cancelText: cancelText,
+        confirmText: confirmText,
+      ),
+    );
