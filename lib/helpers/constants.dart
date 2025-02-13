@@ -1,5 +1,6 @@
 const appThemeMode = "APP_THEME_MODE";
 const appColorSeed = "APP_COLOR_SEED";
+const appDefaultRoute = "APP_DEFAULT_ROUTE";
 
 const backupEncryptionStatus = "BACKUP_ENCYRYPTION_STATUS";
 const backupEncryptionKey = "BACKUP_ENCYRYPTION_KEY";

@@ -118,7 +118,7 @@ class TodosFilters {
     return todos.toList();
   }
 
-  String get createTitle {
+  String createTitle(List<ProjectData> projects) {
     if (projectFilter == null && tagFilter == null && daysAhead == null) {
       return "All Todos";
     }
@@ -136,10 +136,8 @@ class TodosFilters {
         return "Inbox";
       } else {
         // ignore: use_build_context_synchronously
-        final project = GetIt.I<LocalDbState>()
-            .projects
-            .where((f) => f.id == projectFilter)
-            .firstOrNull;
+        final project =
+            projects.where((f) => f.id == projectFilter).firstOrNull;
         if (project != null) {
           return project.title;
         }

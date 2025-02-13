@@ -58,6 +58,7 @@ class TodosNavigationListTile extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
+    final projects = watchPropertyValue((LocalDbState state) => state.projects);
     final filtered = watchPropertyValue(
         (LocalDbState state) => filters.filtered(state.todos));
     final completed = filtered.where((a) => a.completed).length;
@@ -67,7 +68,7 @@ class TodosNavigationListTile extends WatchingWidget {
       icon: icon,
       selectedIcon: selectedIcon,
       route: queryString.isEmpty ? "/todos" : "/todos?$queryString",
-      label: filters.createTitle,
+      label: filters.createTitle(projects),
       trailing: "$completed/$total",
     );
   }

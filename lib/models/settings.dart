@@ -24,16 +24,20 @@ enum ColorSeed {
 class SettingsStorageNotifier with ChangeNotifier {
   ColorSeed _baseColor;
   ThemeMode _themeMode;
+  String _defaultRoute;
 
   SettingsStorageNotifier({
     ThemeMode themeMode = ThemeMode.system,
     ColorSeed baseColor = ColorSeed.baseColor,
+    String defaultRoute = "",
   })  : _baseColor = baseColor,
-        _themeMode = themeMode;
+        _themeMode = themeMode,
+        _defaultRoute = defaultRoute;
 
   static Future<SettingsStorageNotifier> initialize() async {
     final theme = await _readSetting(appThemeMode);
     final color = await _readSetting(appColorSeed);
+    final defaultRoute = await _readSetting(appDefaultRoute);
     return SettingsStorageNotifier(
       themeMode: theme == null
           ? ThemeMode.system
@@ -41,6 +45,7 @@ class SettingsStorageNotifier with ChangeNotifier {
       baseColor: color == null
           ? ColorSeed.baseColor
           : ColorSeed.values.asNameMap()[color] ?? ColorSeed.baseColor,
+      defaultRoute: defaultRoute ?? "",
     );
   }
 
@@ -54,6 +59,8 @@ class SettingsStorageNotifier with ChangeNotifier {
   ThemeMode getTheme() => _themeMode;
 
   ColorSeed getBaseColor() => _baseColor;
+
+  String getDefaultRoute() => _defaultRoute;
 
   Future<void> _setSetting(String key, String newSetting) async {
     AppLogger.instance.d("Writting newSetting as $key to shared_preferences");
@@ -73,5 +80,10 @@ class SettingsStorageNotifier with ChangeNotifier {
   Future<void> setColor(ColorSeed color) async {
     _baseColor = color;
     await _setSetting(appColorSeed, color.name);
+  }
+
+  Future<void> setDefaultRoute(String defaultRoute) async {
+    _defaultRoute = defaultRoute;
+    await _setSetting(appDefaultRoute, defaultRoute);
   }
 }

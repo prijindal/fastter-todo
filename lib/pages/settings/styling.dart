@@ -2,6 +2,8 @@ import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../../helpers/todos_filters.dart';
+import '../../models/local_db_state.dart';
 import '../../models/settings.dart';
 
 @RoutePage()
@@ -21,6 +23,7 @@ class StylingSettingsScreen extends StatelessWidget {
         ),
         const ThemeSelectorTile(),
         const ColorSeedSelectorTile(),
+        const DefaultRouteSelectorTile(),
       ]),
     );
   }
@@ -98,6 +101,48 @@ class ColorSeedSelectorTile extends WatchingWidget {
         onChanged: (newValue) async {
           await GetIt.I<SettingsStorageNotifier>()
               .setColor(newValue ?? ColorSeed.baseColor);
+        },
+      ),
+    );
+  }
+}
+
+class DefaultRouteSelectorTile extends WatchingWidget {
+  const DefaultRouteSelectorTile({super.key});
+
+  List<TodosFilters> _getAllFilters() {
+    final staticFilters = [
+      TodosFilters(),
+      TodosFilters(projectFilter: "inbox"),
+      TodosFilters(daysAhead: 1),
+      TodosFilters(daysAhead: 7),
+    ];
+    final projects = GetIt.I<LocalDbState>()
+        .projects
+        .map((project) => TodosFilters(projectFilter: project.id));
+    return [...staticFilters, ...projects];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final projects = watchPropertyValue((LocalDbState state) => state.projects);
+    return ListTile(
+      subtitle: Text("Select Default route"),
+      title: DropdownButton<TodosFilters>(
+        value: watchPropertyValue((SettingsStorageNotifier s) =>
+            _getAllFilters()
+                .singleWhere((a) => a.queryString == s.getDefaultRoute())),
+        items: _getAllFilters()
+            .map(
+              (e) => DropdownMenuItem<TodosFilters>(
+                value: e,
+                child: Text(e.createTitle(projects)),
+              ),
+            )
+            .toList(),
+        onChanged: (newValue) async {
+          await GetIt.I<SettingsStorageNotifier>()
+              .setDefaultRoute(newValue?.queryString ?? "");
         },
       ),
     );

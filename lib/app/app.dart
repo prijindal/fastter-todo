@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:quick_actions/quick_actions.dart';
+import 'package:watch_it/watch_it.dart';
 
 import '../db/backend_sync_configuration.dart';
 import '../db/db_crud_operations.dart';
@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyMaterialApp extends StatefulWidget {
+class MyMaterialApp extends WatchingStatefulWidget {
   const MyMaterialApp({
     super.key,
   });
@@ -74,9 +74,6 @@ class MyMaterialApp extends StatefulWidget {
 }
 
 class _MyMaterialAppState extends State<MyMaterialApp> {
-  SettingsStorageNotifier get settingsStorage =>
-      GetIt.I<SettingsStorageNotifier>();
-
   LocalDbState get localDbState => GetIt.I<LocalDbState>();
   final QuickActions quickActions = const QuickActions();
 
@@ -84,6 +81,8 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
   void initState() {
     _initQuickActions();
     super.initState();
+    final defaultRoute = GetIt.I<SettingsStorageNotifier>().getDefaultRoute();
+    GetIt.I<AppRouter>().replaceNamed("/todos/?$defaultRoute");
   }
 
   void _initQuickActions() {
@@ -102,7 +101,7 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
           filters
               .map((filter) => ShortcutItem(
                     type: "/todos/?${filter.queryString}",
-                    localizedTitle: filter.createTitle,
+                    localizedTitle: filter.createTitle(localDbState.projects),
                   ))
               .toList(),
         );
@@ -113,11 +112,19 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
   @override
   Widget build(BuildContext context) {
     AppLogger.instance.d("Building MyApp");
+    final baseColor = watchPropertyValue(
+      (SettingsStorageNotifier settingsStorageNotifier) =>
+          settingsStorageNotifier.getBaseColor(),
+    );
+    final theme = watchPropertyValue(
+      (SettingsStorageNotifier settingsStorageNotifier) =>
+          settingsStorageNotifier.getTheme(),
+    );
     return MaterialApp.router(
       routerConfig: GetIt.I<AppRouter>().config(),
-      theme: lightTheme(settingsStorage.getBaseColor().color),
-      darkTheme: darkTheme(settingsStorage.getBaseColor().color),
-      themeMode: settingsStorage.getTheme(),
+      theme: lightTheme(baseColor.color),
+      darkTheme: darkTheme(baseColor.color),
+      themeMode: theme,
     );
   }
 }
