@@ -174,7 +174,6 @@ class EntityHistoryRequest {
 
 class EntityHistory {
   final String userId;
-  final String projectId;
   final String entityName;
   final String id;
   final String entityId;
@@ -185,7 +184,6 @@ class EntityHistory {
 
   EntityHistory({
     required this.userId,
-    required this.projectId,
     required this.entityName,
     required this.id,
     required this.entityId,
@@ -198,7 +196,6 @@ class EntityHistory {
   factory EntityHistory.fromJson(Map<String, dynamic> json) {
     return EntityHistory(
       userId: json['user_id'] as String,
-      projectId: json['project_id'] as String,
       entityName: json['entity_name'] as String,
       id: json['id'] as String,
       entityId: json['entity_id'] as String,
@@ -213,7 +210,6 @@ class EntityHistory {
 
   Map<String, dynamic> toJson() => {
         'user_id': userId,
-        'project_id': projectId,
         'entity_name': entityName,
         'id': id,
         'entity_id': entityId,
