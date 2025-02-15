@@ -312,7 +312,7 @@ class _TodoItemSecondRow extends WatchingWidget {
     if (todo.dueDate != null && showDueDate) {
       children.add(
         Container(
-          margin: const EdgeInsets.only(left: 4),
+          margin: const EdgeInsets.only(right: 4),
           child: Text(
             dueDateFormatter(
               todo.dueDate,
@@ -324,7 +324,7 @@ class _TodoItemSecondRow extends WatchingWidget {
     if (reminders > 0 && showReminders) {
       children.add(
         Container(
-          margin: const EdgeInsets.only(left: 4),
+          margin: const EdgeInsets.only(right: 4),
           child: Row(
             children: <Widget>[
               Icon(
@@ -340,7 +340,7 @@ class _TodoItemSecondRow extends WatchingWidget {
     if (comments > 0 && showComments) {
       children.add(
         Container(
-          margin: const EdgeInsets.only(left: 4),
+          margin: const EdgeInsets.only(right: 4),
           child: Row(
             children: <Widget>[
               Icon(
@@ -356,7 +356,7 @@ class _TodoItemSecondRow extends WatchingWidget {
     if (childTodos > 0 && showChildren) {
       children.add(
         Container(
-          margin: const EdgeInsets.only(left: 4),
+          margin: const EdgeInsets.only(right: 4),
           child: Row(
             children: <Widget>[
               Icon(
