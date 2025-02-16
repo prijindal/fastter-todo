@@ -64,7 +64,6 @@ class Comment extends Table {
 
 class Reminder extends Table {
   late final id = text().clientDefault(() => _uuid.v4())();
-  late final title = text()();
   late final time = dateTime()();
   late final completed = boolean().clientDefault(() => false)();
   late final todo = text()();

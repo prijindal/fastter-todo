@@ -63,7 +63,7 @@ class LocalDbState extends ChangeNotifier {
     if (reminders.isNotEmpty) {
       final status = await localNotificationsManager.register();
       if (status) {
-        await localNotificationsManager.syncReminders(reminders);
+        await localNotificationsManager.syncReminders(reminders, todos);
       }
     }
   }

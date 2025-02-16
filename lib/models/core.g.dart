@@ -1110,11 +1110,6 @@ class $ReminderTable extends Reminder
       type: DriftSqlType.string,
       requiredDuringInsert: false,
       clientDefault: () => _uuid.v4());
-  static const VerificationMeta _titleMeta = const VerificationMeta('title');
-  @override
-  late final GeneratedColumn<String> title = GeneratedColumn<String>(
-      'title', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _timeMeta = const VerificationMeta('time');
   @override
   late final GeneratedColumn<DateTime> time = GeneratedColumn<DateTime>(
@@ -1136,7 +1131,7 @@ class $ReminderTable extends Reminder
       'todo', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [id, title, time, completed, todo];
+  List<GeneratedColumn> get $columns => [id, time, completed, todo];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1149,12 +1144,6 @@ class $ReminderTable extends Reminder
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('title')) {
-      context.handle(
-          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
-    } else if (isInserting) {
-      context.missing(_titleMeta);
     }
     if (data.containsKey('time')) {
       context.handle(
@@ -1183,8 +1172,6 @@ class $ReminderTable extends Reminder
     return ReminderData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      title: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       time: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}time'])!,
       completed: attachedDatabase.typeMapping
@@ -1202,13 +1189,11 @@ class $ReminderTable extends Reminder
 
 class ReminderData extends DataClass implements Insertable<ReminderData> {
   final String id;
-  final String title;
   final DateTime time;
   final bool completed;
   final String todo;
   const ReminderData(
       {required this.id,
-      required this.title,
       required this.time,
       required this.completed,
       required this.todo});
@@ -1216,7 +1201,6 @@ class ReminderData extends DataClass implements Insertable<ReminderData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['title'] = Variable<String>(title);
     map['time'] = Variable<DateTime>(time);
     map['completed'] = Variable<bool>(completed);
     map['todo'] = Variable<String>(todo);
@@ -1226,7 +1210,6 @@ class ReminderData extends DataClass implements Insertable<ReminderData> {
   ReminderCompanion toCompanion(bool nullToAbsent) {
     return ReminderCompanion(
       id: Value(id),
-      title: Value(title),
       time: Value(time),
       completed: Value(completed),
       todo: Value(todo),
@@ -1238,7 +1221,6 @@ class ReminderData extends DataClass implements Insertable<ReminderData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ReminderData(
       id: serializer.fromJson<String>(json['id']),
-      title: serializer.fromJson<String>(json['title']),
       time: serializer.fromJson<DateTime>(json['time']),
       completed: serializer.fromJson<bool>(json['completed']),
       todo: serializer.fromJson<String>(json['todo']),
@@ -1249,7 +1231,6 @@ class ReminderData extends DataClass implements Insertable<ReminderData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'title': serializer.toJson<String>(title),
       'time': serializer.toJson<DateTime>(time),
       'completed': serializer.toJson<bool>(completed),
       'todo': serializer.toJson<String>(todo),
@@ -1257,14 +1238,9 @@ class ReminderData extends DataClass implements Insertable<ReminderData> {
   }
 
   ReminderData copyWith(
-          {String? id,
-          String? title,
-          DateTime? time,
-          bool? completed,
-          String? todo}) =>
+          {String? id, DateTime? time, bool? completed, String? todo}) =>
       ReminderData(
         id: id ?? this.id,
-        title: title ?? this.title,
         time: time ?? this.time,
         completed: completed ?? this.completed,
         todo: todo ?? this.todo,
@@ -1272,7 +1248,6 @@ class ReminderData extends DataClass implements Insertable<ReminderData> {
   ReminderData copyWithCompanion(ReminderCompanion data) {
     return ReminderData(
       id: data.id.present ? data.id.value : this.id,
-      title: data.title.present ? data.title.value : this.title,
       time: data.time.present ? data.time.value : this.time,
       completed: data.completed.present ? data.completed.value : this.completed,
       todo: data.todo.present ? data.todo.value : this.todo,
@@ -1283,7 +1258,6 @@ class ReminderData extends DataClass implements Insertable<ReminderData> {
   String toString() {
     return (StringBuffer('ReminderData(')
           ..write('id: $id, ')
-          ..write('title: $title, ')
           ..write('time: $time, ')
           ..write('completed: $completed, ')
           ..write('todo: $todo')
@@ -1292,13 +1266,12 @@ class ReminderData extends DataClass implements Insertable<ReminderData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, time, completed, todo);
+  int get hashCode => Object.hash(id, time, completed, todo);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is ReminderData &&
           other.id == this.id &&
-          other.title == this.title &&
           other.time == this.time &&
           other.completed == this.completed &&
           other.todo == this.todo);
@@ -1306,14 +1279,12 @@ class ReminderData extends DataClass implements Insertable<ReminderData> {
 
 class ReminderCompanion extends UpdateCompanion<ReminderData> {
   final Value<String> id;
-  final Value<String> title;
   final Value<DateTime> time;
   final Value<bool> completed;
   final Value<String> todo;
   final Value<int> rowid;
   const ReminderCompanion({
     this.id = const Value.absent(),
-    this.title = const Value.absent(),
     this.time = const Value.absent(),
     this.completed = const Value.absent(),
     this.todo = const Value.absent(),
@@ -1321,17 +1292,14 @@ class ReminderCompanion extends UpdateCompanion<ReminderData> {
   });
   ReminderCompanion.insert({
     this.id = const Value.absent(),
-    required String title,
     required DateTime time,
     this.completed = const Value.absent(),
     required String todo,
     this.rowid = const Value.absent(),
-  })  : title = Value(title),
-        time = Value(time),
+  })  : time = Value(time),
         todo = Value(todo);
   static Insertable<ReminderData> custom({
     Expression<String>? id,
-    Expression<String>? title,
     Expression<DateTime>? time,
     Expression<bool>? completed,
     Expression<String>? todo,
@@ -1339,7 +1307,6 @@ class ReminderCompanion extends UpdateCompanion<ReminderData> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (title != null) 'title': title,
       if (time != null) 'time': time,
       if (completed != null) 'completed': completed,
       if (todo != null) 'todo': todo,
@@ -1349,14 +1316,12 @@ class ReminderCompanion extends UpdateCompanion<ReminderData> {
 
   ReminderCompanion copyWith(
       {Value<String>? id,
-      Value<String>? title,
       Value<DateTime>? time,
       Value<bool>? completed,
       Value<String>? todo,
       Value<int>? rowid}) {
     return ReminderCompanion(
       id: id ?? this.id,
-      title: title ?? this.title,
       time: time ?? this.time,
       completed: completed ?? this.completed,
       todo: todo ?? this.todo,
@@ -1369,9 +1334,6 @@ class ReminderCompanion extends UpdateCompanion<ReminderData> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<String>(id.value);
-    }
-    if (title.present) {
-      map['title'] = Variable<String>(title.value);
     }
     if (time.present) {
       map['time'] = Variable<DateTime>(time.value);
@@ -1392,7 +1354,6 @@ class ReminderCompanion extends UpdateCompanion<ReminderData> {
   String toString() {
     return (StringBuffer('ReminderCompanion(')
           ..write('id: $id, ')
-          ..write('title: $title, ')
           ..write('time: $time, ')
           ..write('completed: $completed, ')
           ..write('todo: $todo, ')
@@ -2337,7 +2298,6 @@ typedef $$CommentTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$ReminderTableCreateCompanionBuilder = ReminderCompanion Function({
   Value<String> id,
-  required String title,
   required DateTime time,
   Value<bool> completed,
   required String todo,
@@ -2345,7 +2305,6 @@ typedef $$ReminderTableCreateCompanionBuilder = ReminderCompanion Function({
 });
 typedef $$ReminderTableUpdateCompanionBuilder = ReminderCompanion Function({
   Value<String> id,
-  Value<String> title,
   Value<DateTime> time,
   Value<bool> completed,
   Value<String> todo,
@@ -2363,9 +2322,6 @@ class $$ReminderTableFilterComposer
   });
   ColumnFilters<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get time => $composableBuilder(
       column: $table.time, builder: (column) => ColumnFilters(column));
@@ -2389,9 +2345,6 @@ class $$ReminderTableOrderingComposer
   ColumnOrderings<String> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnOrderings(column));
-
   ColumnOrderings<DateTime> get time => $composableBuilder(
       column: $table.time, builder: (column) => ColumnOrderings(column));
 
@@ -2413,9 +2366,6 @@ class $$ReminderTableAnnotationComposer
   });
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get title =>
-      $composableBuilder(column: $table.title, builder: (column) => column);
 
   GeneratedColumn<DateTime> get time =>
       $composableBuilder(column: $table.time, builder: (column) => column);
@@ -2454,7 +2404,6 @@ class $$ReminderTableTableManager extends RootTableManager<
               $$ReminderTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            Value<String> title = const Value.absent(),
             Value<DateTime> time = const Value.absent(),
             Value<bool> completed = const Value.absent(),
             Value<String> todo = const Value.absent(),
@@ -2462,7 +2411,6 @@ class $$ReminderTableTableManager extends RootTableManager<
           }) =>
               ReminderCompanion(
             id: id,
-            title: title,
             time: time,
             completed: completed,
             todo: todo,
@@ -2470,7 +2418,6 @@ class $$ReminderTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            required String title,
             required DateTime time,
             Value<bool> completed = const Value.absent(),
             required String todo,
@@ -2478,7 +2425,6 @@ class $$ReminderTableTableManager extends RootTableManager<
           }) =>
               ReminderCompanion.insert(
             id: id,
-            title: title,
             time: time,
             completed: completed,
             todo: todo,

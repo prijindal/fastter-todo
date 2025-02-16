@@ -24,7 +24,6 @@ Future<void> newReminder(BuildContext context, String todoId) async {
       // ignore: use_build_context_synchronously
       await GetIt.I<DbCrudOperations>().reminder.create(ReminderCompanion(
             time: drift.Value(newTime.toUtc()),
-            title: drift.Value("New Reminder"),
             todo: drift.Value(todoId),
             completed: drift.Value(false),
           ));
@@ -216,8 +215,7 @@ class TodoReminderTile extends StatelessWidget {
     return ListTile(
       dense: dense,
       enabled: reminder.time.compareTo(DateTime.now()) > 0,
-      title: Text(reminder.title),
-      subtitle: Text(_formattedTime(reminder)),
+      title: Text(_formattedTime(reminder)),
       onLongPress: onLongPress,
       onTap: onTap,
       selected: selected,

@@ -10,11 +10,13 @@ import 'package:timezone/timezone.dart' as tz;
 import '../helpers/logger.dart';
 import '../router/app_router.dart';
 import 'core.dart';
+import 'local_db_state.dart';
 
 class LocalNotificationsManager {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   bool initialized = false;
+  LocalDbState get state => GetIt.I<LocalDbState>();
 
   LocalNotificationsManager() {
     tz.initializeTimeZones();
@@ -48,7 +50,9 @@ class LocalNotificationsManager {
           "Received notification: ${details.id}, payload: ${details.payload}");
       if (details.payload != null) {
         AppRouter appRouter = GetIt.I<AppRouter>();
-        appRouter.navigateNamed(details.payload!);
+        final reminderId = details.payload!;
+        final reminder = state.reminders.singleWhere((a) => a.id == reminderId);
+        appRouter.navigateNamed("/todo/${reminder.todo}");
       }
     });
     flutterLocalNotificationsPlugin
@@ -59,7 +63,9 @@ class LocalNotificationsManager {
           notification.notificationResponse != null &&
           notification.notificationResponse!.payload != null) {
         AppRouter appRouter = GetIt.I<AppRouter>();
-        appRouter.navigateNamed(notification.notificationResponse!.payload!);
+        final reminderId = notification.notificationResponse!.payload!;
+        final reminder = state.reminders.singleWhere((a) => a.id == reminderId);
+        appRouter.navigateNamed("/todo/${reminder.todo}");
       }
     });
   }
@@ -123,11 +129,11 @@ class LocalNotificationsManager {
   Future<void> cancelNotification(int id) =>
       flutterLocalNotificationsPlugin.cancel(id);
 
-  Future<void> _zonedSchedule(ReminderData reminder) =>
+  Future<void> _zonedSchedule(ReminderData reminder, TodoData todo) =>
       flutterLocalNotificationsPlugin.zonedSchedule(
         reminder.id.hashCode,
-        reminder.title,
-        reminder.title,
+        todo.title,
+        todo.pipeline,
         tz.TZDateTime.from(reminder.time, tz.local),
         NotificationDetails(
           android: AndroidNotificationDetails(
@@ -139,13 +145,16 @@ class LocalNotificationsManager {
             priority: Priority.high,
           ),
         ),
-        payload: "/todo/${reminder.todo}",
+        payload: reminder.id,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
 
-  Future<void> syncReminders(List<ReminderData> reminders) async {
+  Future<void> syncReminders(
+    List<ReminderData> reminders,
+    List<TodoData> todos,
+  ) async {
     if (!isSupported) return;
     if (!initialized) return;
     final pendingNotifications = await pendingNotificationRequests();
@@ -163,9 +172,12 @@ class LocalNotificationsManager {
         if (pendingNotifications
             .where((a) => a.id == reminder.id.hashCode)
             .isEmpty) {
-          await _zonedSchedule(reminder);
-          AppLogger.instance
-              .i("Scheduled new notification at ${reminder.time}");
+          final todo = todos.where((a) => a.id == reminder.todo).singleOrNull;
+          if (todo != null) {
+            await _zonedSchedule(reminder, todo);
+            AppLogger.instance
+                .i("Scheduled new notification at ${reminder.time}");
+          }
         }
       }
     }
