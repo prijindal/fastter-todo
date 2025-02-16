@@ -100,7 +100,7 @@ class TodoEditBarCollapsed extends WatchingWidget {
           onSelected: (selectedTags) async =>
               await GetIt.I<DbCrudOperations>().todo.update(
             [selectedTodos.first.id],
-            (o) => o(
+            TodoCompanion(
               tags: drift.Value(selectedTags),
             ),
           ),
@@ -137,7 +137,7 @@ class TodoEditBarCollapsed extends WatchingWidget {
         onSelected: (selectedTags) async =>
             await GetIt.I<DbCrudOperations>().todo.update(
                   selectedTodos.map((a) => a.id),
-                  (o) => o(
+                  TodoCompanion(
                     tags: drift.Value(selectedTags),
                   ),
                 ),

@@ -55,7 +55,7 @@ class TodoModifyBar extends StatelessWidget {
         }) async {
           await GetIt.I<DbCrudOperations>().todo.update(
             [todo.id],
-            (o) => o(
+            TodoCompanion(
               title: drift.Value(title),
               project: drift.Value(project ?? todo.project),
               dueDate: drift.Value(dueDate ?? todo.dueDate),
@@ -102,8 +102,8 @@ class TodoInputBar extends StatelessWidget {
           List<String> tags = const [],
         }) async {
           await GetIt.I<DbCrudOperations>().todo.create(
-                (o) => o(
-                  title: title,
+                TodoCompanion(
+                  title: drift.Value(title),
                   project: drift.Value(project),
                   dueDate: drift.Value(dueDate),
                   parent: drift.Value(parentTodo),

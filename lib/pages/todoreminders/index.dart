@@ -22,10 +22,10 @@ Future<void> newReminder(BuildContext context, String todoId) async {
       final newTime =
           DateTime(date.year, date.month, date.day, time.hour, time.minute);
       // ignore: use_build_context_synchronously
-      await GetIt.I<DbCrudOperations>().reminder.create((o) => o(
-            time: newTime.toUtc(),
-            title: "New Reminder",
-            todo: todoId,
+      await GetIt.I<DbCrudOperations>().reminder.create(ReminderCompanion(
+            time: drift.Value(newTime.toUtc()),
+            title: drift.Value("New Reminder"),
+            todo: drift.Value(todoId),
             completed: drift.Value(false),
           ));
       // ignore: use_build_context_synchronously

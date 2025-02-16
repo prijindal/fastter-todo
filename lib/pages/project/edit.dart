@@ -44,11 +44,11 @@ class _EditProjectScreen extends StatelessWidget {
   }) async {
     await GetIt.I<DbCrudOperations>().project.update(
         [project.id],
-        (o) => o(
-              color: drift.Value(color?.hex ?? project.color),
-              title: drift.Value(title ?? project.title),
-              pipelines: drift.Value(pipelines ?? project.pipelines),
-            ));
+        ProjectCompanion(
+          color: drift.Value(color?.hex ?? project.color),
+          title: drift.Value(title ?? project.title),
+          pipelines: drift.Value(pipelines ?? project.pipelines),
+        ));
     // ignore: use_build_context_synchronously
     Navigator.of(context).pop();
   }

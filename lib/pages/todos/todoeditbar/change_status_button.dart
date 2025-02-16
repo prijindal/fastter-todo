@@ -40,7 +40,7 @@ class ChangePipelineButton extends StatelessWidget {
     if (pipeline != null && context.mounted) {
       await GetIt.I<DbCrudOperations>().todo.update(
           selectedTodos.map((a) => a.id),
-          (o) => o(pipeline: drift.Value(pipeline)));
+          TodoCompanion(pipeline: drift.Value(pipeline)));
     }
   }
 }

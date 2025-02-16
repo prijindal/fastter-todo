@@ -154,7 +154,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
       final todo = _formKey.currentState!.value;
       await GetIt.I<DbCrudOperations>().todo.update(
         [widget.todo.id],
-        (o) => o(
+        TodoCompanion(
           title: drift.Value(todo["title"] as String),
           project: drift.Value(todo["project"] as String?),
           priority: drift.Value(todo["priority"] as int),

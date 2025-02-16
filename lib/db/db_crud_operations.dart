@@ -19,29 +19,21 @@ class DbCrudOperations {
   final _database = GetIt.I<SharedDatabase>();
   final _backendSync = GetIt.I<BackendSyncConfigurationService>();
   late final project = TableCrudOperation(
-    _database.project.entityName,
-    _database.managers.project,
     _database.project,
     (json) => ProjectData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
   late final todo = TableCrudOperation(
-    _database.todo.entityName,
-    _database.managers.todo,
     _database.todo,
     (json) => TodoData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
   late final comment = TableCrudOperation(
-    _database.comment.entityName,
-    _database.managers.comment,
     _database.comment,
     (json) => CommentData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
   late final reminder = TableCrudOperation(
-    _database.reminder.entityName,
-    _database.managers.reminder,
     _database.reminder,
     (json) => ReminderData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
@@ -86,54 +78,29 @@ class DbCrudOperations {
   }
 }
 
-class TableCrudOperation<
-    $Database extends drift.GeneratedDatabase,
-    $Table extends drift.Table,
-    $Dataclass extends drift.DataClass,
-    $FilterComposer extends drift.Composer<$Database, $Table>,
-    $OrderingComposer extends drift.Composer<$Database, $Table>,
-    $ComputedFieldComposer extends drift.Composer<$Database, $Table>,
-    $CreateCompanionCallback extends Function,
-    $UpdateCompanionCallback extends Function,
-    $DataclassWithReferences,
-    $CreatePrefetchHooksCallback extends Function> {
+class TableCrudOperation<$Table extends drift.Table,
+    $Dataclass extends drift.DataClass> {
   final database = GetIt.I<SharedDatabase>();
 
-  final drift.RootTableManager<
-      $Database,
-      $Table,
-      $Dataclass,
-      $FilterComposer,
-      $OrderingComposer,
-      $ComputedFieldComposer,
-      $CreateCompanionCallback,
-      $UpdateCompanionCallback,
-      $DataclassWithReferences,
-      $Dataclass,
-      $CreatePrefetchHooksCallback> manager;
-
   final $$EntityActionsQueueTableTableManager queueTableManager;
-  final drift.TableInfo<$Table, dynamic> table;
+  final drift.TableInfo<$Table, $Dataclass> table;
   drift.Insertable<$Dataclass> Function(Map<String, dynamic>) insertable;
-  final String entityName;
 
   TableCrudOperation(
-    this.entityName,
-    this.manager,
     this.table,
     this.insertable,
     this.queueTableManager,
   );
 
-  drift.Expression<bool> _idsFilter($FilterComposer f, Iterable<String> ids) {
-    return (f as dynamic).id.isIn(ids) as drift.Expression<bool>;
+  drift.Expression<bool> _idsFilter(Iterable<String> ids) {
+    return (table as dynamic).id.isIn(ids) as drift.Expression<bool>;
   }
 
   Future<void> _createInQueue($Dataclass created) async {
     await this.queueTableManager.create(
           (o) => o(
             id: (created as dynamic).id as String,
-            name: entityName,
+            name: table.entityName,
             action: "CREATE",
             payload: created.toJson(),
             timestamp: DateTime.now(),
@@ -143,7 +110,8 @@ class TableCrudOperation<
 
   Future<void> _updateInQueue(
       List<$Dataclass> previous, List<String> ids) async {
-    final afterUpdate = await manager.filter((f) => _idsFilter(f, ids)).get();
+    final afterUpdate =
+        await (table.select()..where((f) => _idsFilter(ids))).get();
     for (var element in afterUpdate) {
       final elementJson = element.toJson();
       final previousJson = previous
@@ -158,7 +126,7 @@ class TableCrudOperation<
       await this.queueTableManager.create(
             (o) => o(
               id: (element as dynamic).id as String,
-              name: entityName,
+              name: table.entityName,
               action: "UPDATE",
               payload: updateJson,
               timestamp: DateTime.now(),
@@ -172,7 +140,7 @@ class TableCrudOperation<
       await this.queueTableManager.create(
             (o) => o(
               id: id,
-              name: entityName,
+              name: table.entityName,
               action: "DELETE",
               payload: {},
               timestamp: DateTime.now(),
@@ -181,9 +149,8 @@ class TableCrudOperation<
     }
   }
 
-  Future<$Dataclass> create(
-      drift.Insertable<$Dataclass> Function($CreateCompanionCallback) f) async {
-    final created = await manager.createReturning(f);
+  Future<$Dataclass> create(drift.Insertable<$Dataclass> f) async {
+    final created = await (table.insertReturning(f));
     unawaited(_createInQueue(created));
     return created;
   }
@@ -196,10 +163,10 @@ class TableCrudOperation<
         mode: drift.InsertMode.insertOrIgnore,
       );
     });
-    final insertedEntries = await manager
-        .filter((f) =>
-            (f as dynamic).id.isIn(entries.map((e) => e["id"] as String))
-                as drift.Expression<bool>)
+    final insertedEntries = await (table.select()
+          ..where((f) =>
+              (f as dynamic).id.isIn(entries.map((e) => e["id"] as String))
+                  as drift.Expression<bool>))
         .get();
     for (var entry in insertedEntries) {
       await _createInQueue(entry);
@@ -208,20 +175,29 @@ class TableCrudOperation<
 
   Future<int> update(
     Iterable<String> ids,
-    drift.Insertable<$Dataclass> Function($UpdateCompanionCallback) f,
+    drift.Insertable<$Dataclass> f,
   ) async {
-    final previous = await manager.filter((f) => _idsFilter(f, ids)).get();
-    final updated = await manager.filter((f) => _idsFilter(f, ids)).update(f);
+    final previous =
+        await (table.select()..where((f) => _idsFilter(ids))).get();
+    final updated =
+        await (table.update()..where((f) => _idsFilter(ids))).write(f);
     unawaited(_updateInQueue(previous, ids.toList()));
     return updated;
   }
 
   Future<void> delete(Iterable<String> ids) async {
-    await manager.filter((f) => _idsFilter(f, ids)).delete();
+    await (table.delete()..where((f) => _idsFilter(ids))).go();
     unawaited(_deleteInQueue(ids.toList()));
   }
 
   Future<List<$Dataclass>> get() async {
-    return await manager.get();
+    return await table.select().get();
+  }
+
+  Future<$Dataclass?> getById(String id) async {
+    return await (table.select()
+          ..where(
+              (f) => (f as dynamic).id.equals(id) as drift.Expression<bool>))
+        .getSingleOrNull();
   }
 }

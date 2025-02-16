@@ -29,12 +29,12 @@ class BackendSyncService {
   ];
 
   Iterable<String> get entities {
-    return managers.map((a) => a.entityName);
+    return managers.map((a) => a.table.entityName);
   }
 
-  TableCrudOperation<dynamic, dynamic, dynamic, dynamic, dynamic, dynamic,
-      dynamic, dynamic, dynamic, dynamic> getManager(String entityName) {
-    final operation = managers.singleWhere((a) => a.entityName == entityName);
+  TableCrudOperation<dynamic, dynamic> getManager(String entityName) {
+    final operation =
+        managers.singleWhere((a) => a.table.entityName == entityName);
     return operation;
   }
 
@@ -177,10 +177,8 @@ class BackendSyncService {
                 onConflict: drift.DoNothing(),
               );
         } else if (row.action == "UPDATE") {
-          final existingEntry = await manager.manager
-              .filter((f) => (f.id as dynamic).equals(row.entityId)
-                  as drift.Expression<bool>)
-              .getSingle() as drift.DataClass?;
+          final existingEntry =
+              (await manager.getById(row.entityId)) as drift.DataClass?;
           if (existingEntry != null) {
             final existing = existingEntry.toJson();
             existing.addAll(row.payload);

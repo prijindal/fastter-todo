@@ -35,7 +35,7 @@ class ChangePriorityButton extends StatelessWidget {
     if (priority != null && context.mounted) {
       await GetIt.I<DbCrudOperations>().todo.update(
           selectedTodos.map((a) => a.id),
-          (o) => o(priority: drift.Value(priority)));
+          TodoCompanion(priority: drift.Value(priority)));
     }
   }
 }

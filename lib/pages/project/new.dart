@@ -25,9 +25,9 @@ class NewProjectScreen extends StatelessWidget {
       return;
     }
     final project = await GetIt.I<DbCrudOperations>().project.create(
-          (o) => o(
-            color: color.hex,
-            title: title,
+          ProjectCompanion(
+            color: drift.Value(color.hex),
+            title: drift.Value(title),
             pipelines: drift.Value(pipelines ?? [defaultPipeline]),
           ),
         );

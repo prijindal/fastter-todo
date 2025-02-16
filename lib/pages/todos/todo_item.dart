@@ -128,7 +128,7 @@ class _TodoItem extends StatelessWidget {
       if (dueDate != null && context.mounted) {
         await GetIt.I<DbCrudOperations>()
             .todo
-            .update([todo.id], (o) => o(dueDate: drift.Value(dueDate)));
+            .update([todo.id], TodoCompanion(dueDate: drift.Value(dueDate)));
       }
     });
   }
@@ -163,9 +163,8 @@ class _TodoItem extends StatelessWidget {
       leading: TodoItemToggle(
         todo: todo,
         toggleCompleted: (bool newValue) async {
-          await GetIt.I<DbCrudOperations>()
-              .todo
-              .update([todo.id], (o) => o(completed: drift.Value(newValue)));
+          await GetIt.I<DbCrudOperations>().todo.update(
+              [todo.id], TodoCompanion(completed: drift.Value(newValue)));
         },
       ),
       isThreeLine: isThreeLines,

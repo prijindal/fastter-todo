@@ -245,18 +245,18 @@ packages:
     dependency: "direct main"
     description:
       name: drift
-      sha256: ab4d0e7aa1793829b1dd8e72d71bbf0b53bf4ff84b184045d1ab71b0832e632e
+      sha256: "97d5832657d49f26e7a8e07de397ddc63790b039372878d5117af816d0fdb5cb"
       url: "https://pub.dev"
     source: hosted
-    version: "2.25.0"
+    version: "2.25.1"
   drift_dev:
     dependency: "direct dev"
     description:
       name: drift_dev
-      sha256: "6c559daf45dd9588eb88d8de7038b9826d404c2163850c6ebad008ba0ec1b9f7"
+      sha256: f1db88482dbb016b9bbddddf746d5d0a6938b156ff20e07320052981f97388cc
       url: "https://pub.dev"
     source: hosted
-    version: "2.25.1"
+    version: "2.25.2"
   drift_flutter:
     dependency: "direct main"
     description:
@@ -293,10 +293,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: "3d57312a53746ed4eb8c843dc50372454bbda37dd0c01a4d40fedc83e2ce4921"
+      sha256: "6f6bfa8797f296965bdc3e1f702574ab49a540c19b9237b401e7c2b25dfe594c"
       url: "https://pub.dev"
     source: hosted
-    version: "8.3.5"
+    version: "9.0.0"
   fixnum:
     dependency: transitive
     description:

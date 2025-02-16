@@ -19,7 +19,7 @@ class ChangeProjectButton extends WatchingWidget {
       ProjectData? project, BuildContext context) async {
     await GetIt.I<DbCrudOperations>().todo.update(
         selectedTodos.map((a) => a.id),
-        (o) => o(project: drift.Value(project?.id)));
+        TodoCompanion(project: drift.Value(project?.id)));
   }
 
   @override

@@ -21,7 +21,7 @@ class ChangeDateButton extends StatelessWidget {
       if (selectedDate != null && context.mounted) {
         await GetIt.I<DbCrudOperations>().todo.update(
             selectedTodos.map((a) => a.id),
-            (o) => o(dueDate: drift.Value(selectedDate)));
+            TodoCompanion(dueDate: drift.Value(selectedDate)));
       }
     }
   }

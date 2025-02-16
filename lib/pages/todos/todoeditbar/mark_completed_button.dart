@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../db/db_crud_operations.dart';
+import '../../../models/core.dart';
 import '../../../models/local_state.dart';
 
 class MarkCompletedButton extends StatelessWidget {
@@ -12,7 +13,7 @@ class MarkCompletedButton extends StatelessWidget {
     final localStateNotifier = GetIt.I<LocalStateNotifier>();
     await GetIt.I<DbCrudOperations>().todo.update(
         localStateNotifier.selectedTodoIds,
-        (o) => o(completed: drift.Value(true)));
+        TodoCompanion(completed: drift.Value(true)));
   }
 
   @override

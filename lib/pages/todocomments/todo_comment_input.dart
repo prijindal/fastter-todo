@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -32,10 +33,10 @@ class _TodoCommentInputState extends State<TodoCommentInput> {
       final content =
           Uint8List.fromList((comment["content"] as String).codeUnits);
       await GetIt.I<DbCrudOperations>().comment.create(
-            (f) => f(
-              type: TodoCommentType.text,
-              content: content,
-              todo: widget.todo.id,
+            CommentCompanion(
+              type: drift.Value(TodoCommentType.text),
+              content: drift.Value(content),
+              todo: drift.Value(widget.todo.id),
             ),
           );
       _formKey.currentState!.reset();
