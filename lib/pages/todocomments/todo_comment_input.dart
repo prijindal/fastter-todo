@@ -37,6 +37,7 @@ class _TodoCommentInputState extends State<TodoCommentInput> {
               type: drift.Value(TodoCommentType.text),
               content: drift.Value(content),
               todo: drift.Value(widget.todo.id),
+              creationTime: drift.Value(DateTime.now()),
             ),
           );
       _formKey.currentState!.reset();
