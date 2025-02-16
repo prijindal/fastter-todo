@@ -59,17 +59,21 @@ class BackendImplementationTile extends WatchingWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Input connection information'),
-        content: Column(
-          children: [
-            TextField(
-              controller: urlController,
-              decoration: InputDecoration(hintText: "Enter your url here"),
-            ),
-            TextField(
-              controller: jwtTokenController,
-              decoration: InputDecoration(hintText: "Enter your token here"),
-            ),
-          ],
+        content: AutofillGroup(
+          child: Column(
+            children: [
+              TextField(
+                controller: urlController,
+                autofillHints: [AutofillHints.url],
+                decoration: InputDecoration(hintText: "Enter your url here"),
+              ),
+              TextField(
+                controller: jwtTokenController,
+                autofillHints: [AutofillHints.password],
+                decoration: InputDecoration(hintText: "Enter your token here"),
+              ),
+            ],
+          ),
         ),
         actions: <Widget>[
           TextButton(
