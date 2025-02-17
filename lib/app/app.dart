@@ -13,20 +13,19 @@ import '../models/core.dart';
 import '../models/local_db_state.dart';
 import '../models/local_state.dart';
 import '../models/settings.dart';
-import '../pages/loading/index.dart';
 import '../router/app_router.dart';
 
 void registerAllServices() {
-  GetIt.I.registerSingleton<SharedDatabase>(SharedDatabase.local());
+  GetIt.I.registerLazySingleton<SharedDatabase>(() => SharedDatabase.local());
   GetIt.I.registerSingletonAsync<SettingsStorageNotifier>(
       () => SettingsStorageNotifier.initialize());
-  GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier(
-    todosView: isDesktop ? TodosView.grid : TodosView.list,
-  ));
-  GetIt.I.registerSingleton<LocalDbState>(
-    LocalDbState(),
+  GetIt.I.registerLazySingleton<LocalStateNotifier>(() => LocalStateNotifier(
+        todosView: isDesktop ? TodosView.grid : TodosView.list,
+      ));
+  GetIt.I.registerLazySingleton<LocalDbState>(
+    () => LocalDbState(),
   );
-  GetIt.I.registerSingleton<AppRouter>(AppRouter());
+  GetIt.I.registerLazySingleton<AppRouter>(() => AppRouter());
   GetIt.I.registerSingletonAsync<BackendSyncConfigurationService>(
       () => BackendSyncConfigurationService.init());
   GetIt.I.registerSingletonAsync<DbCrudOperations>(
@@ -43,25 +42,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: GetIt.I.allReady(),
-      builder: (_, ready) => ready.hasData == false
-          ? Material(
-              child: Directionality(
-              textDirection: TextDirection.ltr,
-              child: Localizations(
-                locale: const Locale('en', 'US'),
-                delegates: const <LocalizationsDelegate<dynamic>>[
-                  DefaultWidgetsLocalizations.delegate,
-                  DefaultMaterialLocalizations.delegate,
-                ],
-                child: LoadingScreen(),
-              ),
-            ))
-          : MyMaterialApp(),
-    );
-  }
+  Widget build(BuildContext context) => const MyMaterialApp();
 }
 
 class MyMaterialApp extends WatchingStatefulWidget {
