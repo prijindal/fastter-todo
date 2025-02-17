@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:watch_it/watch_it.dart';
@@ -81,8 +82,10 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
   void initState() {
     _initQuickActions();
     super.initState();
-    final defaultRoute = GetIt.I<SettingsStorageNotifier>().getDefaultRoute();
-    GetIt.I<AppRouter>().replaceNamed("/todos/?$defaultRoute");
+    if (!kIsWeb) {
+      final defaultRoute = GetIt.I<SettingsStorageNotifier>().getDefaultRoute();
+      GetIt.I<AppRouter>().replaceNamed("/todos/?$defaultRoute");
+    }
   }
 
   void _initQuickActions() {

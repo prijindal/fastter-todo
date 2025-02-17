@@ -48,7 +48,7 @@ class LocalDbState extends ChangeNotifier {
   LocalDbState() {
     // Local state is first initialized with local storage, this makes sure that when we first do init, we have some data on ui
     // This is only really useful when our sqlite db is a remote one
-    initFromDb();
+    initFromDb().then<void>((_) => syncReminders());
   }
 
   @override
