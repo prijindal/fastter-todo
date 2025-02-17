@@ -23,7 +23,8 @@ String dueDateFormatter(DateTime? dateUtc) {
 }
 
 String dateFromNowFormatter(DateTime dateUtc) {
-  final date = DateTime(dateUtc.year, dateUtc.month, dateUtc.day);
+  final date = DateTime(dateUtc.year, dateUtc.month, dateUtc.day, dateUtc.hour,
+      dateUtc.minute, dateUtc.second, dateUtc.millisecond, dateUtc.microsecond);
   final nowTime = DateTime.now();
   final now = DateTime(nowTime.year, nowTime.month, nowTime.day);
   final diff = date.difference(now);
