@@ -113,7 +113,6 @@ class _TodoCommentItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(todoComment.creationTime);
     if (!dismissible) {
       return _buildListTile(context);
     }
