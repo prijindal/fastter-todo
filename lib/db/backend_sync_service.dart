@@ -148,14 +148,18 @@ class BackendSyncService {
     return hostId;
   }
 
-  Future<void> fetchHistoryWrapper() async {
-    final hostId = await getHostId();
+  Future<DateTime?> getLastUpdatedAt() async {
     final lastUpdatedAt =
         await SharedPreferencesAsync().getInt("lastUpdatedAt");
+    return lastUpdatedAt == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(lastUpdatedAt);
+  }
+
+  Future<void> fetchHistoryWrapper() async {
+    final hostId = await getHostId();
     await _fetchHistory(
-      lastUpdatedAt: lastUpdatedAt == null
-          ? null
-          : DateTime.fromMillisecondsSinceEpoch(lastUpdatedAt),
+      lastUpdatedAt: await getLastUpdatedAt(),
       hostId: hostId,
     );
     await SharedPreferencesAsync()
@@ -167,36 +171,38 @@ class BackendSyncService {
       final manager = getManager(histor.entityName);
       AppLogger.instance
           .i("Fetched ${histor.data.length} entries for ${histor.entityName}");
-      for (var row in histor.data) {
-        if (row.action == "CREATE") {
-          final payload = manager.insertable(row.payload);
-          await _database
-              .into(manager.table as drift.TableInfo<drift.Table, dynamic>)
-              .insert(
-                payload,
-                onConflict: drift.DoNothing(),
-              );
-        } else if (row.action == "UPDATE") {
-          final existingEntry =
-              (await manager.getById(row.entityId)) as drift.DataClass?;
-          if (existingEntry != null) {
-            final existing = existingEntry.toJson();
-            existing.addAll(row.payload);
-            final payload = manager.insertable(existing);
-            (_database.update(
-              manager.table as drift.TableInfo<drift.Table, dynamic>,
-            )..where((u) => (u as dynamic).id.equals(row.entityId)
-                    as drift.Expression<bool>))
-                .write(payload);
+      _database.transaction<void>(() async {
+        for (var row in histor.data) {
+          if (row.action == "CREATE") {
+            final payload = manager.insertable(row.payload);
+            await _database
+                .into(manager.table as drift.TableInfo<drift.Table, dynamic>)
+                .insert(
+                  payload,
+                  onConflict: drift.DoNothing(),
+                );
+          } else if (row.action == "UPDATE") {
+            final existingEntry =
+                (await manager.getById(row.entityId)) as drift.DataClass?;
+            if (existingEntry != null) {
+              final existing = existingEntry.toJson();
+              existing.addAll(row.payload);
+              final payload = manager.insertable(existing);
+              (_database.update(
+                manager.table as drift.TableInfo<drift.Table, dynamic>,
+              )..where((u) => (u as dynamic).id.equals(row.entityId)
+                      as drift.Expression<bool>))
+                  .write(payload);
+            }
+          } else if (row.action == "DELETE") {
+            await (_database.delete(
+                    manager.table as drift.TableInfo<drift.Table, dynamic>)
+                  ..where((u) => (u as dynamic).id.equals(row.entityId)
+                      as drift.Expression<bool>))
+                .go();
           }
-        } else if (row.action == "DELETE") {
-          await (_database.delete(
-                  manager.table as drift.TableInfo<drift.Table, dynamic>)
-                ..where((u) => (u as dynamic).id.equals(row.entityId)
-                    as drift.Expression<bool>))
-              .go();
         }
-      }
+      });
     }
   }
 

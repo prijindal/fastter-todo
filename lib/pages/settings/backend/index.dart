@@ -24,6 +24,10 @@ class BackendSettingsScreen extends StatelessWidget {
           dense: true,
         ),
         const BackendImplementationTile(),
+        const ListTile(
+          title: Text("Local Database"),
+          dense: true,
+        ),
         ListTile(
           title: Text("Reset Database"),
           onTap: () async {
@@ -139,9 +143,28 @@ class BackendImplementationTile extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      subtitle: Text("Select backend implementation"),
-      title: _buildTitle(context),
+    final backendConnector = GetIt.I<DbCrudOperations>().backendConnector;
+    return Column(
+      children: [
+        ListTile(
+          subtitle: Text("Select backend implementation"),
+          title: _buildTitle(context),
+        ),
+        if (backendConnector != null)
+          ListTile(
+            title: Text("Backend connected"),
+            subtitle: Text(backendConnector.socket.connected.toString()),
+          ),
+        FutureBuilder(
+          future: backendConnector?.backendSyncService?.getLastUpdatedAt(),
+          builder: (context, snapshot) => ListTile(
+            title: Text("Last Updated At"),
+            subtitle: Text(
+              snapshot.data?.toString() ?? "Not Updated yet",
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

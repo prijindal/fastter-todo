@@ -17,7 +17,11 @@ enum TableName {
 
 class DbCrudOperations {
   final _database = GetIt.I<SharedDatabase>();
-  final _backendSync = GetIt.I<BackendSyncConfigurationService>();
+  final _backendSyncConfig = GetIt.I<BackendSyncConfigurationService>();
+  BackendConnector? _backendConneector;
+
+  BackendConnector? get backendConnector => _backendConneector;
+
   late final project = TableCrudOperation(
     _database.project,
     (json) => ProjectData.fromJson(json).toCompanion(true),
@@ -40,8 +44,11 @@ class DbCrudOperations {
   );
 
   DbCrudOperations() {
-    if (_backendSync.backendSyncConfiguration != null) {
-      BackendConnector.init(_backendSync.backendSyncConfiguration!);
+    if (_backendSyncConfig.backendSyncConfiguration != null) {
+      BackendConnector.init(_backendSyncConfig.backendSyncConfiguration!)
+          .then((value) {
+        _backendConneector = value;
+      });
     }
   }
 

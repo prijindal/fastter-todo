@@ -7,9 +7,14 @@ import '../helpers/logger.dart';
 import 'backend_sync_configuration.dart';
 import 'backend_sync_service.dart';
 
-Uri formWsUrl(String url) {
+Uri formWsUrl(String url, [bool isWs = true]) {
+  final parsed = Uri.parse(url);
+  String scheme = parsed.scheme;
+  if (isWs) {
+    scheme = parsed.scheme == "https" ? "wss" : "ws";
+  }
   // Transform a url in string format, to a Uri object and replace the schema from https to wss, or http to ws
-  return Uri.parse(url).replace(scheme: url.startsWith("https") ? "wss" : "ws");
+  return parsed.replace(scheme: scheme, path: "");
 }
 
 class BackendConnector {
@@ -18,13 +23,17 @@ class BackendConnector {
   bool get isConnected => _subscription != null;
   BackendSyncService? backendSyncService;
 
+  io.Socket get socket => _socket;
+
   BackendConnector({required io.Socket socket}) : _socket = socket {
     initConnection();
   }
 
   static Future<BackendConnector> init(BackendSyncConfiguration config) async {
+    final uri = formWsUrl(config.url, !kIsWeb);
+    AppLogger.instance.i("Initiating socket connection to $uri");
     final socket = io.io(
-        config.url,
+        uri.toString(),
         io.OptionBuilder()
             .setTransports(
                 kIsWeb ? ['polling'] : ['websocket']) // for Flutter or Dart VM
@@ -41,6 +50,7 @@ class BackendConnector {
   }
 
   void _onDisconnect() {
+    AppLogger.instance.i("Disconnecting from socket");
     backendSyncService?.disconnect();
   }
 
@@ -48,6 +58,7 @@ class BackendConnector {
     AppLogger.instance.i("Initializing web socket connection");
     try {
       _socket.connect();
+      _socket.on("discnnecte", (d) => _onDisconnect());
       _socket.on("connected", (d) => _onConnect());
       _socket.on(
         "server_actions",

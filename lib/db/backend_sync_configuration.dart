@@ -50,7 +50,8 @@ class BackendSyncConfigurationService extends ChangeNotifier {
   }
 
   static Future<void> checkConnection(BackendSyncConfiguration config) async {
-    final uri = Uri.parse(config.url).replace(path: "/api/application/auth/verify");
+    final url = "${config.url}/api/auth/verify";
+    final uri = Uri.parse(url);
     AppLogger.instance.i("Checking connection to ${uri.host}");
     final health = await http
         .get(uri, headers: {"Authorization": "Bearer ${config.jwtToken}"});
