@@ -71,7 +71,6 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
   late final GeneratedColumn<String> parent = GeneratedColumn<String>(
       'parent', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _tagsMeta = const VerificationMeta('tags');
   @override
   late final GeneratedColumnWithTypeConverter<List<String>, String> tags =
       GeneratedColumn<String>('tags', aliasedName, false,
@@ -141,7 +140,6 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
       context.handle(_parentMeta,
           parent.isAcceptableOrUnknown(data['parent']!, _parentMeta));
     }
-    context.handle(_tagsMeta, const VerificationResult.success());
     return context;
   }
 
@@ -533,8 +531,6 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
   late final GeneratedColumn<String> color = GeneratedColumn<String>(
       'color', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _pipelinesMeta =
-      const VerificationMeta('pipelines');
   @override
   late final GeneratedColumnWithTypeConverter<List<String>, String> pipelines =
       GeneratedColumn<String>('pipelines', aliasedName, false,
@@ -569,7 +565,6 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
     } else if (isInserting) {
       context.missing(_colorMeta);
     }
-    context.handle(_pipelinesMeta, const VerificationResult.success());
     return context;
   }
 
@@ -803,7 +798,6 @@ class $CommentTable extends Comment with TableInfo<$CommentTable, CommentData> {
   late final GeneratedColumn<Uint8List> content = GeneratedColumn<Uint8List>(
       'content', aliasedName, false,
       type: DriftSqlType.blob, requiredDuringInsert: true);
-  static const VerificationMeta _typeMeta = const VerificationMeta('type');
   @override
   late final GeneratedColumnWithTypeConverter<TodoCommentType, String> type =
       GeneratedColumn<String>('type', aliasedName, false,
@@ -843,7 +837,6 @@ class $CommentTable extends Comment with TableInfo<$CommentTable, CommentData> {
     } else if (isInserting) {
       context.missing(_contentMeta);
     }
-    context.handle(_typeMeta, const VerificationResult.success());
     if (data.containsKey('todo')) {
       context.handle(
           _todoMeta, todo.isAcceptableOrUnknown(data['todo']!, _todoMeta));
@@ -1392,8 +1385,6 @@ class $EntityActionsQueueTable extends EntityActionsQueue
   late final GeneratedColumn<String> action = GeneratedColumn<String>(
       'action', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _payloadMeta =
-      const VerificationMeta('payload');
   @override
   late final GeneratedColumnWithTypeConverter<Map<String, dynamic>, String>
       payload = GeneratedColumn<String>('payload', aliasedName, false,
@@ -1441,7 +1432,6 @@ class $EntityActionsQueueTable extends EntityActionsQueue
     } else if (isInserting) {
       context.missing(_actionMeta);
     }
-    context.handle(_payloadMeta, const VerificationResult.success());
     if (data.containsKey('timestamp')) {
       context.handle(_timestampMeta,
           timestamp.isAcceptableOrUnknown(data['timestamp']!, _timestampMeta));

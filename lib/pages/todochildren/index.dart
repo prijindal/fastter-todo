@@ -8,7 +8,7 @@ import '../todos/todo_item.dart';
 import '../todos/todoinputbar.dart';
 
 @RoutePage()
-class TodoChildrenScreen extends StatelessWidget {
+class TodoChildrenScreen extends WatchingWidget {
   const TodoChildrenScreen({
     super.key,
     @PathParam() required this.todoId,
@@ -45,7 +45,7 @@ class _TodoChildrenScreen extends StatelessWidget {
   }
 }
 
-class _TodoSubTaskList extends StatefulWidget {
+class _TodoSubTaskList extends WatchingStatefulWidget {
   const _TodoSubTaskList({
     required this.todo,
     required this.allowAddition,
