@@ -52,7 +52,7 @@ class LocalNotificationsManager {
         AppRouter appRouter = GetIt.I<AppRouter>();
         final reminderId = details.payload!;
         final reminder = state.reminders.singleWhere((a) => a.id == reminderId);
-        appRouter.navigateNamed("/todo/${reminder.todo}");
+        appRouter.navigatePath("/todo/${reminder.todo}");
       }
     });
     flutterLocalNotificationsPlugin
@@ -65,7 +65,7 @@ class LocalNotificationsManager {
         AppRouter appRouter = GetIt.I<AppRouter>();
         final reminderId = notification.notificationResponse!.payload!;
         final reminder = state.reminders.singleWhere((a) => a.id == reminderId);
-        appRouter.navigateNamed("/todo/${reminder.todo}");
+        appRouter.navigatePath("/todo/${reminder.todo}");
       }
     });
   }
@@ -146,8 +146,6 @@ class LocalNotificationsManager {
           ),
         ),
         payload: reminder.id,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
 

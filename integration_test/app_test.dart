@@ -27,7 +27,7 @@ void main() {
   group('end-to-end test', () {
     testWidgets('Create a todo and verify that it got created', (tester) async {
       final mockStackRouter = MockStackRouter();
-      when(() => mockStackRouter.pushNamed(any())).thenAnswer((_) async {
+      when(() => mockStackRouter.pushPath(any())).thenAnswer((_) async {
         return null;
       });
       when(() => mockStackRouter.currentUrl).thenReturn('/todos');

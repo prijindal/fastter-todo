@@ -69,7 +69,7 @@ class TodoScreen extends StatelessWidget {
         },
       );
     } else {
-      await AutoRouter.of(context).pushNamed("/todo/${todo.id}");
+      await AutoRouter.of(context).pushPath("/todo/${todo.id}");
     }
   }
 
@@ -331,7 +331,7 @@ class _ExpansionTodoComment extends WatchingWidget {
     return ExpansionTile(
       leading: IconButton(
         onPressed: () =>
-            AutoRouter.of(context).pushNamed("/todocomments/${todo.id}"),
+            AutoRouter.of(context).pushPath("/todocomments/${todo.id}"),
         icon: const Icon(Icons.list),
       ),
       initiallyExpanded: true,
@@ -362,7 +362,7 @@ class _ExpansionTodoReminder extends WatchingWidget {
         children: [
           IconButton(
             onPressed: () =>
-                AutoRouter.of(context).pushNamed("/todoreminders/${todo.id}"),
+                AutoRouter.of(context).pushPath("/todoreminders/${todo.id}"),
             icon: const Icon(Icons.list),
           ),
           IconButton(
@@ -408,7 +408,7 @@ class _ExpansionTodoChildrenState extends State<_ExpansionTodoChildren> {
         children: [
           IconButton(
             onPressed: () => AutoRouter.of(context)
-                .pushNamed("/todochildren/${widget.todo.id}"),
+                .pushPath("/todochildren/${widget.todo.id}"),
             icon: const Icon(Icons.list),
           ),
           IconButton(

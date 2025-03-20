@@ -17,34 +17,33 @@ class SettingsScreen extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.style),
           title: const Text("Styling"),
-          onTap: () => AutoRouter.of(context).pushNamed("/settings/styling"),
+          onTap: () => AutoRouter.of(context).pushPath("/settings/styling"),
         ),
         ListTile(
           leading: const Icon(Icons.code),
           title: const Text("Backend"),
-          onTap: () => AutoRouter.of(context).pushNamed("/settings/backend"),
+          onTap: () => AutoRouter.of(context).pushPath("/settings/backend"),
         ),
         ListTile(
           leading: const Icon(Icons.backup),
           title: const Text("Backup"),
-          onTap: () => AutoRouter.of(context).pushNamed("/settings/backup"),
+          onTap: () => AutoRouter.of(context).pushPath("/settings/backup"),
         ),
         ListTile(
           leading: const Icon(Icons.security_update),
           title: const Text("Permissions"),
-          onTap: () =>
-              AutoRouter.of(context).pushNamed("/settings/permissions"),
+          onTap: () => AutoRouter.of(context).pushPath("/settings/permissions"),
         ),
         ListTile(
           leading: const Icon(Icons.notifications),
           title: const Text("Scheduled notifications"),
           onTap: () =>
-              AutoRouter.of(context).pushNamed("/settings/notifications"),
+              AutoRouter.of(context).pushPath("/settings/notifications"),
         ),
         ListTile(
           leading: const Icon(Icons.help),
           title: const Text("Help"),
-          onTap: () => AutoRouter.of(context).pushNamed("/settings/help"),
+          onTap: () => AutoRouter.of(context).pushPath("/settings/help"),
         ),
         // TODO: Add settings for group by
         // TODO: Add settings for date format

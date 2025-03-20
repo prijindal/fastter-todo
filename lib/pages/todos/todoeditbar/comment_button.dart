@@ -13,7 +13,7 @@ class CommentButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.comment),
       onPressed: () {
-        AutoRouter.of(context).pushNamed("/todocomments/${todo.id}");
+        AutoRouter.of(context).pushPath("/todocomments/${todo.id}");
       },
       tooltip: 'Comments',
     );

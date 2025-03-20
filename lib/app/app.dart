@@ -84,7 +84,7 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
     super.initState();
     if (!kIsWeb) {
       final defaultRoute = GetIt.I<SettingsStorageNotifier>().getDefaultRoute();
-      GetIt.I<AppRouter>().replaceNamed("/todos/?$defaultRoute");
+      GetIt.I<AppRouter>().replacePath("/todos/?$defaultRoute");
     }
   }
 
@@ -92,7 +92,7 @@ class _MyMaterialAppState extends State<MyMaterialApp> {
     if (isMobile) {
       quickActions.initialize((shortcutType) {
         AppRouter appRouter = GetIt.I<AppRouter>();
-        appRouter.navigateNamed(shortcutType);
+        appRouter.navigatePath(shortcutType);
       });
       localDbState.addListener(() {
         final projects = localDbState.projects;

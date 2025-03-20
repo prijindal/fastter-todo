@@ -28,7 +28,7 @@ class AppBarActions {
     return AppBarAction(
       icon: Icon(Icons.settings),
       title: "Settings",
-      onPressed: (context) => AutoRouter.of(context).pushNamed("/settings"),
+      onPressed: (context) => AutoRouter.of(context).pushPath("/settings"),
     );
   }
 
@@ -37,7 +37,7 @@ class AppBarActions {
       icon: Icon(Icons.edit),
       title: "Edit Project",
       onPressed: (context) =>
-          AutoRouter.of(context).pushNamed("/project/$projectId"),
+          AutoRouter.of(context).pushPath("/project/$projectId"),
     );
   }
 
@@ -54,7 +54,7 @@ class AppBarActions {
         );
         if (deleted) {
           // ignore: use_build_context_synchronously
-          AutoRouter.of(context).navigateNamed("/todos");
+          AutoRouter.of(context).navigatePath("/todos");
         }
       },
     );
@@ -64,7 +64,7 @@ class AppBarActions {
     return AppBarAction(
       icon: Icon(Icons.search),
       title: "Search",
-      onPressed: (context) => AutoRouter.of(context).pushNamed("/search"),
+      onPressed: (context) => AutoRouter.of(context).pushPath("/search"),
     );
   }
 

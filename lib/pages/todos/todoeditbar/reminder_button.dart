@@ -13,7 +13,7 @@ class ReminderButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.alarm),
       onPressed: () {
-        AutoRouter.of(context).pushNamed("/todoreminders/${todo.id}");
+        AutoRouter.of(context).pushPath("/todoreminders/${todo.id}");
       },
       tooltip: 'Reminders',
     );

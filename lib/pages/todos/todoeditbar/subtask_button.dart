@@ -13,7 +13,7 @@ class SubtaskButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.format_strikethrough),
       onPressed: () {
-        AutoRouter.of(context).pushNamed("/todochildren/${todo.id}");
+        AutoRouter.of(context).pushPath("/todochildren/${todo.id}");
       },
       tooltip: 'Sub Tasks',
     );

@@ -30,7 +30,7 @@ class ProjectsScreen extends WatchingWidget {
         return ProjectListTile(
           project: project,
           onTap: () =>
-              AutoRouter.of(context).pushNamed("/project/${project.id}"),
+              AutoRouter.of(context).pushPath("/project/${project.id}"),
         );
       },
     );
@@ -47,7 +47,7 @@ class ProjectsScreen extends WatchingWidget {
       body: _buildBody(context, projects),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          AutoRouter.of(context).pushNamed("/newproject");
+          AutoRouter.of(context).pushPath("/newproject");
         },
         tooltip: 'New Journal',
         key: Key("New Journal"),

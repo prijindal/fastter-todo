@@ -45,7 +45,7 @@ class _SearchScreenState extends State<SearchScreen>
       getter: (project) => project.title.toString().toLowerCase(),
       itemBuilder: (item) => ProjectListTile(
         project: item.choice,
-        onTap: () => AutoRouter.of(context).pushNamed(
+        onTap: () => AutoRouter.of(context).pushPath(
           "/todos?projectFilter=${item.choice.id}",
         ),
       ),

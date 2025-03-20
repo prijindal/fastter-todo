@@ -34,7 +34,7 @@ class NavigationListTile extends StatelessWidget {
       onTap: route == null
           ? null
           : () async {
-              await appRouter.navigateNamed(route!);
+              await appRouter.navigatePath(route!);
               if (context.mounted && Scaffold.of(context).isDrawerOpen) {
                 Scaffold.of(context).closeDrawer();
               }

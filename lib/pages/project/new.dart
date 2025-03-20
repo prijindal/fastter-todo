@@ -32,7 +32,7 @@ class NewProjectScreen extends StatelessWidget {
           ),
         );
     // ignore: use_build_context_synchronously
-    AutoRouter.of(context).navigateNamed(
+    AutoRouter.of(context).navigatePath(
         "/todos/?${TodosFilters(projectFilter: project.id).queryString}");
   }
 
