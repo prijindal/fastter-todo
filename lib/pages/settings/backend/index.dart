@@ -1,5 +1,6 @@
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:watch_it/watch_it.dart';
 
@@ -7,6 +8,7 @@ import '../../../db/backend_sync_configuration.dart';
 import '../../../db/db_crud_operations.dart';
 import '../../../helpers/logger.dart';
 import '../../../models/local_db_state.dart';
+import 'newbackend.dart';
 
 @RoutePage()
 class BackendSettingsScreen extends StatelessWidget {
@@ -55,52 +57,11 @@ class BackendSettingsScreen extends StatelessWidget {
 class BackendImplementationTile extends WatchingWidget {
   const BackendImplementationTile({super.key});
 
-  Future<BackendSyncConfiguration?> _showRemoteSettingsDialog(
+  Future<BackendLoginConfiguraion?> _showRemoteSettingsDialog(
       BuildContext context) async {
-    final urlController = TextEditingController();
-    final jwtTokenController = TextEditingController();
-    final remoteDbSettings = await showDialog<BackendSyncConfiguration?>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Input connection information'),
-        content: AutofillGroup(
-          child: Column(
-            children: [
-              TextField(
-                controller: urlController,
-                autofillHints: [AutofillHints.url],
-                decoration: InputDecoration(hintText: "Enter your url here"),
-              ),
-              TextField(
-                controller: jwtTokenController,
-                autofillHints: [AutofillHints.password],
-                decoration: InputDecoration(hintText: "Enter your token here"),
-              ),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop<BackendSyncConfiguration?>(null);
-            },
-          ),
-          TextButton(
-            child: const Text('Submit'),
-            onPressed: () {
-              Navigator.of(context).pop<BackendSyncConfiguration>(
-                BackendSyncConfiguration(
-                  url: urlController.text,
-                  jwtToken: jwtTokenController.text,
-                ),
-              );
-              // Handle the submit action
-            },
-          ),
-        ],
-      ),
-    );
+    final remoteDbSettings = Navigator.of(context).push(
+        MaterialPageRoute<BackendLoginConfiguraion?>(
+            builder: (context) => NewBackendConfig()));
     return remoteDbSettings;
   }
 
@@ -110,7 +71,13 @@ class BackendImplementationTile extends WatchingWidget {
       if (settings == null) {
         return;
       } else {
-        await GetIt.I<BackendSyncConfigurationService>().setRemote(settings);
+        await GetIt.I<BackendSyncConfigurationService>().setRemote(
+          url: settings.url,
+          email: settings.email,
+          password: settings.password,
+          tls: settings.tls,
+          allowInsecure: settings.allowInsecure,
+        );
       }
     } else {
       await GetIt.I<BackendSyncConfigurationService>().clearRemote();
@@ -153,17 +120,27 @@ class BackendImplementationTile extends WatchingWidget {
         if (backendConnector != null)
           ListTile(
             title: Text("Backend connected"),
-            subtitle: Text(backendConnector.socket.connected.toString()),
+            subtitle: Text(backendConnector.isConnected.toString()),
           ),
-        FutureBuilder(
-          future: backendConnector?.backendSyncService?.getLastUpdatedAt(),
-          builder: (context, snapshot) => ListTile(
-            title: Text("Last Updated At"),
-            subtitle: Text(
-              snapshot.data?.toString() ?? "Not Updated yet",
+        if (backendConnector != null)
+          ListTile(
+            title: Text("Backend url"),
+            subtitle: Text(backendConnector.server.url),
+            onTap: () {
+              Clipboard.setData(
+                  ClipboardData(text: backendConnector.server.url));
+            },
+          ),
+        if (backendConnector != null)
+          FutureBuilder(
+            future: backendConnector.backendSyncService?.getLastUpdatedAt(),
+            builder: (context, snapshot) => ListTile(
+              title: Text("Last Updated At"),
+              subtitle: Text(
+                snapshot.data?.toString() ?? "Not Updated yet",
+              ),
             ),
           ),
-        ),
       ],
     );
   }

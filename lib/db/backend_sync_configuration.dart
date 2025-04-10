@@ -1,30 +1,42 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../grpc_client/api_from_server.dart';
 import '../helpers/logger.dart';
+import '../schemaless_proto/types/login.pb.dart';
 
 final backendSyncSettingsKey = "backendSyncSettings";
 
 class BackendSyncConfiguration {
   String url;
   String jwtToken;
+  bool tls = false;
+  bool allowInsecure = false;
 
-  BackendSyncConfiguration({required this.url, required this.jwtToken});
+  BackendSyncConfiguration({
+    required this.url,
+    required this.jwtToken,
+    this.tls = false,
+    this.allowInsecure = false,
+  });
 
   static BackendSyncConfiguration fromJson(Map<String, dynamic> json) {
     return BackendSyncConfiguration(
       url: json["url"] as String,
       jwtToken: json["jwtToken"] as String,
+      tls: json["tls"] as bool,
+      allowInsecure: json["allowInsecure"] as bool,
     );
   }
 
-  Map<String, String> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       "url": url,
       "jwtToken": jwtToken,
+      "tls": tls,
+      "allowInsecure": allowInsecure,
     };
   }
 }
@@ -49,27 +61,50 @@ class BackendSyncConfigurationService extends ChangeNotifier {
     }
   }
 
-  static Future<void> checkConnection(BackendSyncConfiguration config) async {
-    final url = "${config.url}/api/auth/verify";
-    final uri = Uri.parse(url);
-    AppLogger.instance.i("Checking connection to ${uri.host}");
-    final health = await http
-        .get(uri, headers: {"Authorization": "Bearer ${config.jwtToken}"});
-    if (health.statusCode != 200) {
-      throw Error();
-    }
-    final response = jsonDecode(health.body);
-    final id = response["id"] as String?;
-    AppLogger.instance.i("Connection to ${uri.host} is successful. ID: $id");
+  static Future<String> checkConnection({
+    required String url,
+    required bool tls,
+    required bool allowInsecure,
+    required String email,
+    required String password,
+  }) async {
+    final loginApi = getLoginApiFromUrl(
+      url,
+      tls: tls,
+      allowInsecure: allowInsecure,
+    );
+    final res = await loginApi.loginUser(LoginRequest(
+      email: email,
+      password: password,
+    ));
+    AppLogger.instance.i("Connection to $url is successful. ID: ${res.iD}");
+    return res.token;
   }
 
-  Future<void> setRemote(BackendSyncConfiguration config) async {
-    await checkConnection(config);
-    _backendSyncConfiguration = config;
+  Future<void> setRemote({
+    required String url,
+    required bool tls,
+    required bool allowInsecure,
+    required String email,
+    required String password,
+  }) async {
+    final token = await checkConnection(
+      url: url,
+      tls: tls,
+      allowInsecure: allowInsecure,
+      email: email,
+      password: password,
+    );
+    _backendSyncConfiguration = BackendSyncConfiguration(
+      url: url,
+      jwtToken: token,
+      tls: tls,
+      allowInsecure: allowInsecure,
+    );
     // TODO: Check if remote is valid by doing a health check
     await SharedPreferencesAsync().setString(
       backendSyncSettingsKey,
-      jsonEncode(config.toJson()),
+      jsonEncode(_backendSyncConfiguration!.toJson()),
     );
     notifyListeners();
   }

@@ -3,17 +3,20 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' as drift;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:uuid/uuid.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../grpc_client/api_from_server.dart';
 import '../helpers/logger.dart';
 import '../models/core.dart';
-import 'backend/entity_types.dart';
+import '../schemaless_proto/google/protobuf/timestamp.pb.dart';
+import '../schemaless_proto/types/entity.pb.dart';
 import 'db_crud_operations.dart';
 
 class BackendSyncService {
-  final io.Socket _socket;
+  final ApiFromServerInfo _server;
+  StreamSubscription<EntityHistory>? _subscription;
+  bool get isConnected => _subscription != null;
 
   SharedDatabase get _database => GetIt.I<SharedDatabase>();
   DbCrudOperations get dbCrudOperations => GetIt.I<DbCrudOperations>();
@@ -38,7 +41,7 @@ class BackendSyncService {
     return operation;
   }
 
-  BackendSyncService({required io.Socket socket}) : _socket = socket {
+  BackendSyncService({required ApiFromServerInfo server}) : _server = server {
     init();
   }
 
@@ -46,46 +49,12 @@ class BackendSyncService {
     await _sendQueueData();
     _timer =
         Timer.periodic(Duration(milliseconds: 100), (_) => _sendQueueData());
-    await fetchHistoryWrapper();
     // After running _sendQueueData once, create a timer to run it perioidically
-    // Fetch data from server, using list operation
-  }
-
-  Future<R> _emitWithResponse<T, R>(
-      String event, T request, R Function(dynamic data) fromJson) {
-    var completer = Completer<R>();
-    _socket.emitWithAck(event, jsonEncode(request), ack: (dynamic data) {
-      completer.complete(fromJson(data));
-    });
-    return completer.future;
   }
 
   void disconnect() {
     _timer?.cancel();
-  }
-
-  Future<List<EntityActionResponse>> _emitActions(
-      List<EntityActionBase> actions) {
-    return _emitWithResponse<List<EntityActionBase>,
-            List<EntityActionResponse>>(
-        "actions",
-        actions,
-        (dynamic data) => (data as List<dynamic>)
-            .map(
-                (a) => EntityActionResponse.fromJson(a as Map<String, dynamic>))
-            .toList());
-  }
-
-  Future<List<EntityHistoryResponse>> _emitHistory(
-      List<EntityHistoryRequest> history) {
-    return _emitWithResponse<List<EntityHistoryRequest>,
-            List<EntityHistoryResponse>>(
-        "search_history",
-        history,
-        (dynamic data) => (data as List<dynamic>)
-            .map((a) =>
-                EntityHistoryResponse.fromJson(a as Map<String, dynamic>))
-            .toList());
+    _subscription?.cancel();
   }
 
   Future<void> _sendQueueData() async {
@@ -100,38 +69,46 @@ class BackendSyncService {
     }
     AppLogger.instance.i("Sending actions to server ${queue.length}");
     final hostId = await getHostId();
-    final List<EntityActionBase> actions = queue.map<EntityActionBase>((a) {
+    final List<EntityActionRequest> actions =
+        queue.map<EntityActionRequest>((a) {
       if (a.action == "CREATE") {
-        return EntityActionCreate(
+        return EntityActionRequest(
+          hostID: hostId,
+          actionId: Uuid().v4(),
           entityName: a.name,
-          payload: a.payload,
+          action: EntityAction.CREATE,
+          createdAt: Timestamp.fromDateTime(a.timestamp),
           entityId: a.id,
-          hostId: hostId,
-          requestId: a.requestId,
-          timestamp: a.timestamp,
+          payload: jsonEncode(a.payload).codeUnits,
+          requestID: a.requestId,
         );
       } else if (a.action == "UPDATE") {
-        return EntityActionUpdate(
+        return EntityActionRequest(
+          hostID: hostId,
+          actionId: Uuid().v4(),
           entityName: a.name,
-          payload: a.payload,
+          action: EntityAction.UPDATE,
+          createdAt: Timestamp.fromDateTime(a.timestamp),
           entityId: a.id,
-          requestId: a.requestId,
-          hostId: hostId,
-          timestamp: a.timestamp,
+          payload: jsonEncode(a.payload).codeUnits,
+          requestID: a.requestId,
         );
       } else if (a.action == "DELETE") {
-        return EntityActionDelete(
+        return EntityActionRequest(
+          hostID: hostId,
+          actionId: Uuid().v4(),
           entityName: a.name,
+          action: EntityAction.DELETE,
+          createdAt: Timestamp.fromDateTime(a.timestamp),
           entityId: a.id,
-          requestId: a.requestId,
-          hostId: hostId,
-          timestamp: a.timestamp,
+          requestID: a.requestId,
         );
       }
       throw Error();
     }).toList();
-    final data = await _emitActions(actions);
-    AppLogger.instance.i(data.map((a) => a.toJson()).toList());
+    for (var action in actions) {
+      await _server.entityClient.entityAction(action);
+    }
     await _database.managers.entityActionsQueue
         .filter((f) => f.requestId.isIn(queue.map((a) => a.requestId).toList()))
         .delete();
@@ -156,80 +133,72 @@ class BackendSyncService {
         : DateTime.fromMillisecondsSinceEpoch(lastUpdatedAt);
   }
 
-  Future<void> fetchHistoryWrapper() async {
+  Future<void> listenOnEntityHistory() async {
     final hostId = await getHostId();
-    await _fetchHistory(
-      lastUpdatedAt: await getLastUpdatedAt(),
-      hostId: hostId,
-    );
-    await SharedPreferencesAsync()
-        .setInt("lastUpdatedAt", DateTime.now().millisecondsSinceEpoch);
-  }
-
-  Future<void> _consumeHistory(Iterable<EntityHistoryResponse> history) async {
-    for (var histor in history) {
-      final manager = getManager(histor.entityName);
-      AppLogger.instance
-          .i("Fetched ${histor.data.length} entries for ${histor.entityName}");
-      _database.transaction<void>(() async {
-        for (var row in histor.data) {
-          if (row.action == "CREATE") {
-            final payload = manager.insertable(row.payload);
-            await _database
-                .into(manager.table as drift.TableInfo<drift.Table, dynamic>)
-                .insert(
-                  payload,
-                  onConflict: drift.DoNothing(),
-                );
-          } else if (row.action == "UPDATE") {
-            final existingEntry =
-                (await manager.getById(row.entityId)) as drift.DataClass?;
-            if (existingEntry != null) {
-              final existing = existingEntry.toJson();
-              existing.addAll(row.payload);
-              final payload = manager.insertable(existing);
-              (_database.update(
-                manager.table as drift.TableInfo<drift.Table, dynamic>,
-              )..where((u) => (u as dynamic).id.equals(row.entityId)
-                      as drift.Expression<bool>))
-                  .write(payload);
-            }
-          } else if (row.action == "DELETE") {
-            await (_database.delete(
-                    manager.table as drift.TableInfo<drift.Table, dynamic>)
-                  ..where((u) => (u as dynamic).id.equals(row.entityId)
-                      as drift.Expression<bool>))
-                .go();
-          }
-        }
-      });
-    }
-  }
-
-  Future<void> _fetchHistory({
-    DateTime? lastUpdatedAt,
-    required String hostId,
-  }) async {
-    AppLogger.instance.i("Fetching history");
-    EntityHistoryParams params = EntityHistoryParams(
-      hostId: HostParams(ne: hostId),
-    );
-    if (lastUpdatedAt != null) {
-      params = EntityHistoryParams(
-        createdAt: DateParams(gte: lastUpdatedAt),
-        hostId: HostParams(ne: hostId),
-      );
-    }
-    final historyRequest = entities.map(
-      (entityName) => EntityHistoryRequest(
-        entityName: entityName,
-        params: params,
-        order: {
-          "timestamp": "asc",
-        },
+    final lastUpdatedAt = await getLastUpdatedAt();
+    final stream = _server.entityClient.searchEntityHistory(
+      SearchEntityHistoryRequest(
+        params: EntityHistoryRequestParams(
+          createdAt: EntityHistoryRequestDateParam(
+            gte: lastUpdatedAt == null
+                ? null
+                : Timestamp.fromDateTime(lastUpdatedAt),
+          ),
+          hostID: EntityHistoryRequestHostIDParam(
+            neq: hostId,
+          ),
+        ),
+        order: [
+          EntityHistoryRequestOrder(
+            field_1: EntityHistoryOrderField.CreatedAt,
+            value: EntityHistoryOrderValue.DESC,
+          )
+        ],
       ),
     );
-    final history = await _emitHistory(historyRequest.toList());
-    await _consumeHistory(history);
+    _subscription = stream.listen((d) => _consumeHistory(d));
+    AppLogger.instance.i("Started listening on stream");
+  }
+
+  Future<void> _consumeHistory(EntityHistory history) async {
+    final manager = getManager(history.entityName);
+    AppLogger.instance
+        .i("Fetched ${history.entityID} entry for ${history.entityName}");
+    if (history.action == EntityAction.CREATE) {
+      final payload = manager.insertable(
+        jsonDecode(String.fromCharCodes(history.payload))
+            as Map<String, dynamic>,
+      );
+      await _database
+          .into(manager.table as drift.TableInfo<drift.Table, dynamic>)
+          .insert(
+            payload,
+            onConflict: drift.DoNothing(),
+          );
+    } else if (history.action == EntityAction.UPDATE) {
+      final existingEntry =
+          (await manager.getById(history.entityID)) as drift.DataClass?;
+      if (existingEntry != null) {
+        final existing = existingEntry.toJson();
+        existing.addAll(
+          jsonDecode(String.fromCharCodes(history.payload))
+              as Map<String, dynamic>,
+        );
+        final payload = manager.insertable(existing);
+        (_database.update(
+          manager.table as drift.TableInfo<drift.Table, dynamic>,
+        )..where((u) => (u as dynamic).id.equals(history.entityID)
+                as drift.Expression<bool>))
+            .write(payload);
+      }
+    } else if (history.action == EntityAction.DELETE) {
+      await (_database
+              .delete(manager.table as drift.TableInfo<drift.Table, dynamic>)
+            ..where((u) => (u as dynamic).id.equals(history.entityID)
+                as drift.Expression<bool>))
+          .go();
+    }
+    await SharedPreferencesAsync().setInt(
+        "lastUpdatedAt", history.createdAt.toDateTime().millisecondsSinceEpoch);
   }
 }
