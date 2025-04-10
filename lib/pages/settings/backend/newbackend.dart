@@ -26,6 +26,8 @@ class BackendLoginConfiguraion {
 class NewBackendConfig extends StatelessWidget {
   final _formKey = GlobalKey<FormBuilderState>();
 
+  NewBackendConfig({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
