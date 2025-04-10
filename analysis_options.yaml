@@ -40,3 +40,4 @@ analyzer:
   exclude:
     - lib/models/core.g.dart
     - lib/router/app_router.gr.dart
+    - lib/schemaless_proto/*
