@@ -57,10 +57,10 @@ class BackendSettingsScreen extends StatelessWidget {
 class BackendImplementationTile extends WatchingWidget {
   const BackendImplementationTile({super.key});
 
-  Future<BackendLoginConfiguraion?> _showRemoteSettingsDialog(
+  Future<BackendTokenConfiguraion?> _showRemoteSettingsDialog(
       BuildContext context) async {
     final remoteDbSettings = Navigator.of(context).push(
-        MaterialPageRoute<BackendLoginConfiguraion?>(
+        MaterialPageRoute<BackendTokenConfiguraion?>(
             builder: (context) => NewBackendConfig()));
     return remoteDbSettings;
   }
@@ -73,8 +73,7 @@ class BackendImplementationTile extends WatchingWidget {
       } else {
         await GetIt.I<BackendSyncConfigurationService>().setRemote(
           url: settings.url,
-          email: settings.email,
-          password: settings.password,
+          token: settings.jwtToken,
           tls: settings.tls,
           allowInsecure: settings.allowInsecure,
         );

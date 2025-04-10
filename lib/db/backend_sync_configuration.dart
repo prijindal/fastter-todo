@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../grpc_client/api_from_server.dart';
 import '../helpers/logger.dart';
+import '../schemaless_proto/google/protobuf/empty.pb.dart';
 import '../schemaless_proto/types/login.pb.dart';
 
 final backendSyncSettingsKey = "backendSyncSettings";
@@ -61,7 +62,7 @@ class BackendSyncConfigurationService extends ChangeNotifier {
     }
   }
 
-  static Future<String> checkConnection({
+  static Future<String> register({
     required String url,
     required bool tls,
     required bool allowInsecure,
@@ -73,11 +74,46 @@ class BackendSyncConfigurationService extends ChangeNotifier {
       tls: tls,
       allowInsecure: allowInsecure,
     );
-    final res = await loginApi.loginUser(LoginRequest(
+    await loginApi.registerUser(LoginRequest(
       email: email,
       password: password,
     ));
-    AppLogger.instance.i("Connection to $url is successful. ID: ${res.iD}");
+    return login(
+      url: url,
+      tls: tls,
+      allowInsecure: allowInsecure,
+      email: email,
+      password: password,
+    );
+  }
+
+  static Future<String> login({
+    required String url,
+    required bool tls,
+    required bool allowInsecure,
+    required String email,
+    required String password,
+  }) async {
+    final loginApi = getLoginApiFromUrl(
+      url,
+      tls: tls,
+      allowInsecure: allowInsecure,
+    );
+    final loginResponse = await loginApi.loginUser(LoginRequest(
+      email: email,
+      password: password,
+    ));
+    AppLogger.instance
+        .i("Connection to $url is successful. ID: ${loginResponse.iD}");
+    final api = ApiFromServerInfo(
+      url: url,
+      jwtToken: loginResponse.token,
+      tls: tls,
+      allowInsecure: allowInsecure,
+    );
+    final res = await api.authClient.generateKey(Empty());
+    AppLogger.instance
+        .i("Generating token on $url is successful. ID: ${loginResponse.iD}");
     return res.token;
   }
 
@@ -85,16 +121,8 @@ class BackendSyncConfigurationService extends ChangeNotifier {
     required String url,
     required bool tls,
     required bool allowInsecure,
-    required String email,
-    required String password,
+    required String token,
   }) async {
-    final token = await checkConnection(
-      url: url,
-      tls: tls,
-      allowInsecure: allowInsecure,
-      email: email,
-      password: password,
-    );
     _backendSyncConfiguration = BackendSyncConfiguration(
       url: url,
       jwtToken: token,
