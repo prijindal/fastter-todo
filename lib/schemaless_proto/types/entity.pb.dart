@@ -23,11 +23,11 @@ export 'entity.pbenum.dart';
 /// ListEntityTypesResponse
 class ListEntityTypesResponse extends $pb.GeneratedMessage {
   factory ListEntityTypesResponse({
-    $core.String? entityType,
+    $core.Iterable<$core.String>? entityType,
   }) {
     final $result = create();
     if (entityType != null) {
-      $result.entityType = entityType;
+      $result.entityType.addAll(entityType);
     }
     return $result;
   }
@@ -36,7 +36,7 @@ class ListEntityTypesResponse extends $pb.GeneratedMessage {
   factory ListEntityTypesResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ListEntityTypesResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'types'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'EntityType', protoName: 'EntityType')
+    ..pPS(1, _omitFieldNames ? '' : 'EntityType', protoName: 'EntityType')
     ..hasRequiredFields = false
   ;
 
@@ -62,13 +62,7 @@ class ListEntityTypesResponse extends $pb.GeneratedMessage {
   static ListEntityTypesResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get entityType => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set entityType($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasEntityType() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearEntityType() => $_clearField(1);
+  $pb.PbList<$core.String> get entityType => $_getList(0);
 }
 
 class EntityHistoryRequestOrder extends $pb.GeneratedMessage {

@@ -71,13 +71,13 @@ final $typed_data.Uint8List entityActionResponseStatusDescriptor = $convert.base
 const ListEntityTypesResponse$json = {
   '1': 'ListEntityTypesResponse',
   '2': [
-    {'1': 'EntityType', '3': 1, '4': 1, '5': 9, '10': 'EntityType'},
+    {'1': 'EntityType', '3': 1, '4': 3, '5': 9, '10': 'EntityType'},
   ],
 };
 
 /// Descriptor for `ListEntityTypesResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List listEntityTypesResponseDescriptor = $convert.base64Decode(
-    'ChdMaXN0RW50aXR5VHlwZXNSZXNwb25zZRIeCgpFbnRpdHlUeXBlGAEgASgJUgpFbnRpdHlUeX'
+    'ChdMaXN0RW50aXR5VHlwZXNSZXNwb25zZRIeCgpFbnRpdHlUeXBlGAEgAygJUgpFbnRpdHlUeX'
     'Bl');
 
 @$core.Deprecated('Use entityHistoryRequestOrderDescriptor instead')
