@@ -136,7 +136,7 @@ class BackendSyncService {
   Future<void> listenOnEntityHistory() async {
     final hostId = await getHostId();
     final lastUpdatedAt = await getLastUpdatedAt();
-    final stream = _server.entityClient.searchEntityHistory(
+    final stream = _server.entityClient.streamEntityHistory(
       SearchEntityHistoryRequest(
         params: EntityHistoryRequestParams(
           createdAt: EntityHistoryRequestDateParam(
