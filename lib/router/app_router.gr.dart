@@ -32,7 +32,7 @@ import 'package:flutter/material.dart' as _i18;
 /// [_i1.BackendSettingsScreen]
 class BackendSettingsRoute extends _i17.PageRouteInfo<void> {
   const BackendSettingsRoute({List<_i17.PageRouteInfo>? children})
-    : super(BackendSettingsRoute.name, initialChildren: children);
+      : super(BackendSettingsRoute.name, initialChildren: children);
 
   static const String name = 'BackendSettingsRoute';
 
@@ -48,7 +48,7 @@ class BackendSettingsRoute extends _i17.PageRouteInfo<void> {
 /// [_i2.BackupSettingsScreen]
 class BackupSettingsRoute extends _i17.PageRouteInfo<void> {
   const BackupSettingsRoute({List<_i17.PageRouteInfo>? children})
-    : super(BackupSettingsRoute.name, initialChildren: children);
+      : super(BackupSettingsRoute.name, initialChildren: children);
 
   static const String name = 'BackupSettingsRoute';
 
@@ -68,11 +68,11 @@ class EditProjectRoute extends _i17.PageRouteInfo<EditProjectRouteArgs> {
     required String projectId,
     List<_i17.PageRouteInfo>? children,
   }) : super(
-         EditProjectRoute.name,
-         args: EditProjectRouteArgs(key: key, projectId: projectId),
-         rawPathParams: {'projectId': projectId},
-         initialChildren: children,
-       );
+          EditProjectRoute.name,
+          args: EditProjectRouteArgs(key: key, projectId: projectId),
+          rawPathParams: {'projectId': projectId},
+          initialChildren: children,
+        );
 
   static const String name = 'EditProjectRoute';
 
@@ -81,10 +81,8 @@ class EditProjectRoute extends _i17.PageRouteInfo<EditProjectRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<EditProjectRouteArgs>(
-        orElse:
-            () => EditProjectRouteArgs(
-              projectId: pathParams.getString('projectId'),
-            ),
+        orElse: () =>
+            EditProjectRouteArgs(projectId: pathParams.getString('projectId')),
       );
       return _i3.EditProjectScreen(key: args.key, projectId: args.projectId);
     },
@@ -102,13 +100,23 @@ class EditProjectRouteArgs {
   String toString() {
     return 'EditProjectRouteArgs{key: $key, projectId: $projectId}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! EditProjectRouteArgs) return false;
+    return key == other.key && projectId == other.projectId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ projectId.hashCode;
 }
 
 /// generated route for
 /// [_i4.HelpSettingsScreen]
 class HelpSettingsRoute extends _i17.PageRouteInfo<void> {
   const HelpSettingsRoute({List<_i17.PageRouteInfo>? children})
-    : super(HelpSettingsRoute.name, initialChildren: children);
+      : super(HelpSettingsRoute.name, initialChildren: children);
 
   static const String name = 'HelpSettingsRoute';
 
@@ -124,7 +132,7 @@ class HelpSettingsRoute extends _i17.PageRouteInfo<void> {
 /// [_i5.NewProjectScreen]
 class NewProjectRoute extends _i17.PageRouteInfo<void> {
   const NewProjectRoute({List<_i17.PageRouteInfo>? children})
-    : super(NewProjectRoute.name, initialChildren: children);
+      : super(NewProjectRoute.name, initialChildren: children);
 
   static const String name = 'NewProjectRoute';
 
@@ -140,7 +148,7 @@ class NewProjectRoute extends _i17.PageRouteInfo<void> {
 /// [_i6.NotificationsSettingsScreen]
 class NotificationsSettingsRoute extends _i17.PageRouteInfo<void> {
   const NotificationsSettingsRoute({List<_i17.PageRouteInfo>? children})
-    : super(NotificationsSettingsRoute.name, initialChildren: children);
+      : super(NotificationsSettingsRoute.name, initialChildren: children);
 
   static const String name = 'NotificationsSettingsRoute';
 
@@ -156,7 +164,7 @@ class NotificationsSettingsRoute extends _i17.PageRouteInfo<void> {
 /// [_i7.PermissionsSettingsScreen]
 class PermissionsSettingsRoute extends _i17.PageRouteInfo<void> {
   const PermissionsSettingsRoute({List<_i17.PageRouteInfo>? children})
-    : super(PermissionsSettingsRoute.name, initialChildren: children);
+      : super(PermissionsSettingsRoute.name, initialChildren: children);
 
   static const String name = 'PermissionsSettingsRoute';
 
@@ -172,7 +180,7 @@ class PermissionsSettingsRoute extends _i17.PageRouteInfo<void> {
 /// [_i8.ProjectsScreen]
 class ProjectsRoute extends _i17.PageRouteInfo<void> {
   const ProjectsRoute({List<_i17.PageRouteInfo>? children})
-    : super(ProjectsRoute.name, initialChildren: children);
+      : super(ProjectsRoute.name, initialChildren: children);
 
   static const String name = 'ProjectsRoute';
 
@@ -188,7 +196,7 @@ class ProjectsRoute extends _i17.PageRouteInfo<void> {
 /// [_i9.SearchScreen]
 class SearchRoute extends _i17.PageRouteInfo<void> {
   const SearchRoute({List<_i17.PageRouteInfo>? children})
-    : super(SearchRoute.name, initialChildren: children);
+      : super(SearchRoute.name, initialChildren: children);
 
   static const String name = 'SearchRoute';
 
@@ -204,7 +212,7 @@ class SearchRoute extends _i17.PageRouteInfo<void> {
 /// [_i10.SettingsScreen]
 class SettingsRoute extends _i17.PageRouteInfo<void> {
   const SettingsRoute({List<_i17.PageRouteInfo>? children})
-    : super(SettingsRoute.name, initialChildren: children);
+      : super(SettingsRoute.name, initialChildren: children);
 
   static const String name = 'SettingsRoute';
 
@@ -220,7 +228,7 @@ class SettingsRoute extends _i17.PageRouteInfo<void> {
 /// [_i11.StylingSettingsScreen]
 class StylingSettingsRoute extends _i17.PageRouteInfo<void> {
   const StylingSettingsRoute({List<_i17.PageRouteInfo>? children})
-    : super(StylingSettingsRoute.name, initialChildren: children);
+      : super(StylingSettingsRoute.name, initialChildren: children);
 
   static const String name = 'StylingSettingsRoute';
 
@@ -240,11 +248,11 @@ class TodoChildrenRoute extends _i17.PageRouteInfo<TodoChildrenRouteArgs> {
     required String todoId,
     List<_i17.PageRouteInfo>? children,
   }) : super(
-         TodoChildrenRoute.name,
-         args: TodoChildrenRouteArgs(key: key, todoId: todoId),
-         rawPathParams: {'todoId': todoId},
-         initialChildren: children,
-       );
+          TodoChildrenRoute.name,
+          args: TodoChildrenRouteArgs(key: key, todoId: todoId),
+          rawPathParams: {'todoId': todoId},
+          initialChildren: children,
+        );
 
   static const String name = 'TodoChildrenRoute';
 
@@ -253,8 +261,8 @@ class TodoChildrenRoute extends _i17.PageRouteInfo<TodoChildrenRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<TodoChildrenRouteArgs>(
-        orElse:
-            () => TodoChildrenRouteArgs(todoId: pathParams.getString('todoId')),
+        orElse: () =>
+            TodoChildrenRouteArgs(todoId: pathParams.getString('todoId')),
       );
       return _i12.TodoChildrenScreen(key: args.key, todoId: args.todoId);
     },
@@ -272,6 +280,16 @@ class TodoChildrenRouteArgs {
   String toString() {
     return 'TodoChildrenRouteArgs{key: $key, todoId: $todoId}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! TodoChildrenRouteArgs) return false;
+    return key == other.key && todoId == other.todoId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ todoId.hashCode;
 }
 
 /// generated route for
@@ -282,11 +300,11 @@ class TodoCommentsRoute extends _i17.PageRouteInfo<TodoCommentsRouteArgs> {
     required String todoId,
     List<_i17.PageRouteInfo>? children,
   }) : super(
-         TodoCommentsRoute.name,
-         args: TodoCommentsRouteArgs(key: key, todoId: todoId),
-         rawPathParams: {'todoId': todoId},
-         initialChildren: children,
-       );
+          TodoCommentsRoute.name,
+          args: TodoCommentsRouteArgs(key: key, todoId: todoId),
+          rawPathParams: {'todoId': todoId},
+          initialChildren: children,
+        );
 
   static const String name = 'TodoCommentsRoute';
 
@@ -295,8 +313,8 @@ class TodoCommentsRoute extends _i17.PageRouteInfo<TodoCommentsRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<TodoCommentsRouteArgs>(
-        orElse:
-            () => TodoCommentsRouteArgs(todoId: pathParams.getString('todoId')),
+        orElse: () =>
+            TodoCommentsRouteArgs(todoId: pathParams.getString('todoId')),
       );
       return _i13.TodoCommentsScreen(key: args.key, todoId: args.todoId);
     },
@@ -314,6 +332,16 @@ class TodoCommentsRouteArgs {
   String toString() {
     return 'TodoCommentsRouteArgs{key: $key, todoId: $todoId}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! TodoCommentsRouteArgs) return false;
+    return key == other.key && todoId == other.todoId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ todoId.hashCode;
 }
 
 /// generated route for
@@ -324,11 +352,11 @@ class TodoRemindersRoute extends _i17.PageRouteInfo<TodoRemindersRouteArgs> {
     required String todoId,
     List<_i17.PageRouteInfo>? children,
   }) : super(
-         TodoRemindersRoute.name,
-         args: TodoRemindersRouteArgs(key: key, todoId: todoId),
-         rawPathParams: {'todoId': todoId},
-         initialChildren: children,
-       );
+          TodoRemindersRoute.name,
+          args: TodoRemindersRouteArgs(key: key, todoId: todoId),
+          rawPathParams: {'todoId': todoId},
+          initialChildren: children,
+        );
 
   static const String name = 'TodoRemindersRoute';
 
@@ -337,9 +365,8 @@ class TodoRemindersRoute extends _i17.PageRouteInfo<TodoRemindersRouteArgs> {
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<TodoRemindersRouteArgs>(
-        orElse:
-            () =>
-                TodoRemindersRouteArgs(todoId: pathParams.getString('todoId')),
+        orElse: () =>
+            TodoRemindersRouteArgs(todoId: pathParams.getString('todoId')),
       );
       return _i14.TodoRemindersScreen(key: args.key, todoId: args.todoId);
     },
@@ -357,6 +384,16 @@ class TodoRemindersRouteArgs {
   String toString() {
     return 'TodoRemindersRouteArgs{key: $key, todoId: $todoId}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! TodoRemindersRouteArgs) return false;
+    return key == other.key && todoId == other.todoId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ todoId.hashCode;
 }
 
 /// generated route for
@@ -367,11 +404,11 @@ class TodoRoute extends _i17.PageRouteInfo<TodoRouteArgs> {
     required String todoId,
     List<_i17.PageRouteInfo>? children,
   }) : super(
-         TodoRoute.name,
-         args: TodoRouteArgs(key: key, todoId: todoId),
-         rawPathParams: {'todoId': todoId},
-         initialChildren: children,
-       );
+          TodoRoute.name,
+          args: TodoRouteArgs(key: key, todoId: todoId),
+          rawPathParams: {'todoId': todoId},
+          initialChildren: children,
+        );
 
   static const String name = 'TodoRoute';
 
@@ -398,6 +435,16 @@ class TodoRouteArgs {
   String toString() {
     return 'TodoRouteArgs{key: $key, todoId: $todoId}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! TodoRouteArgs) return false;
+    return key == other.key && todoId == other.todoId;
+  }
+
+  @override
+  int get hashCode => key.hashCode ^ todoId.hashCode;
 }
 
 /// generated route for
@@ -410,20 +457,20 @@ class TodosRoute extends _i17.PageRouteInfo<TodosRouteArgs> {
     int? daysAhead,
     List<_i17.PageRouteInfo>? children,
   }) : super(
-         TodosRoute.name,
-         args: TodosRouteArgs(
-           key: key,
-           projectFilter: projectFilter,
-           tagFilter: tagFilter,
-           daysAhead: daysAhead,
-         ),
-         rawQueryParams: {
-           'projectFilter': projectFilter,
-           'tagFilter': tagFilter,
-           'daysAhead': daysAhead,
-         },
-         initialChildren: children,
-       );
+          TodosRoute.name,
+          args: TodosRouteArgs(
+            key: key,
+            projectFilter: projectFilter,
+            tagFilter: tagFilter,
+            daysAhead: daysAhead,
+          ),
+          rawQueryParams: {
+            'projectFilter': projectFilter,
+            'tagFilter': tagFilter,
+            'daysAhead': daysAhead,
+          },
+          initialChildren: children,
+        );
 
   static const String name = 'TodosRoute';
 
@@ -432,12 +479,11 @@ class TodosRoute extends _i17.PageRouteInfo<TodosRouteArgs> {
     builder: (data) {
       final queryParams = data.queryParams;
       final args = data.argsAs<TodosRouteArgs>(
-        orElse:
-            () => TodosRouteArgs(
-              projectFilter: queryParams.optString('projectFilter'),
-              tagFilter: queryParams.optString('tagFilter'),
-              daysAhead: queryParams.optInt('daysAhead'),
-            ),
+        orElse: () => TodosRouteArgs(
+          projectFilter: queryParams.optString('projectFilter'),
+          tagFilter: queryParams.optString('tagFilter'),
+          daysAhead: queryParams.optInt('daysAhead'),
+        ),
       );
       return _i16.TodosScreen(
         key: args.key,
@@ -469,4 +515,21 @@ class TodosRouteArgs {
   String toString() {
     return 'TodosRouteArgs{key: $key, projectFilter: $projectFilter, tagFilter: $tagFilter, daysAhead: $daysAhead}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! TodosRouteArgs) return false;
+    return key == other.key &&
+        projectFilter == other.projectFilter &&
+        tagFilter == other.tagFilter &&
+        daysAhead == other.daysAhead;
+  }
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      projectFilter.hashCode ^
+      tagFilter.hashCode ^
+      daysAhead.hashCode;
 }
