@@ -30,7 +30,7 @@ class TodoItemToggle extends StatelessWidget {
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
                 color: (todo.completed == true)
-                    ? Theme.of(context).indicatorColor
+                    ? Theme.of(context).tabBarTheme.indicatorColor
                     : Colors.transparent,
                 border: Border.all(
                   color: priorityColors[todo.priority - 1],

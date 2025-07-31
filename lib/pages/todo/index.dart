@@ -168,7 +168,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
     }
   }
 
-  void _markEdited(dynamic) {
+  void _markEdited(dynamic d) {
     setState(() {
       _isEdited = true;
     });

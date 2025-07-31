@@ -14,7 +14,11 @@ class ShareSelectedTodosButton extends StatelessWidget {
       final localStateNotifier = GetIt.I<LocalStateNotifier>();
       final text = GetIt.I<LocalDbState>()
           .formTextFromTodos(localStateNotifier.selectedTodoIds);
-      final result = await Share.share(text);
+      final result = await SharePlus.instance.share(
+        ShareParams(
+          text: text,
+        ),
+      );
       if (result.status == ShareResultStatus.success) {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context)

@@ -141,7 +141,11 @@ class TodoCommentsAppBar extends StatelessWidget
   }
 
   void _shareSelectedComment() {
-    Share.share(_commentsToString());
+    SharePlus.instance.share(
+      ShareParams(
+        text: _commentsToString(),
+      ),
+    );
   }
 
   Future<void> _copySelectedComment(BuildContext context) async {
