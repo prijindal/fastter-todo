@@ -1,6 +1,6 @@
 // This is a generated file - do not edit.
 //
-// Generated from google/protobuf/empty.proto.
+// Generated from types/v1/health.proto.
 
 // @dart = 3.3
 

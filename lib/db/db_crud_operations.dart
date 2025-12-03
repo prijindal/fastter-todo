@@ -104,7 +104,7 @@ class TableCrudOperation<$Table extends drift.Table,
   }
 
   Future<void> _createInQueue($Dataclass created) async {
-    await this.queueTableManager.create(
+    await queueTableManager.create(
           (o) => o(
             id: (created as dynamic).id as String,
             name: table.entityName,
@@ -130,7 +130,7 @@ class TableCrudOperation<$Table extends drift.Table,
           updateJson[key] = elementJson[key];
         }
       }
-      await this.queueTableManager.create(
+      await queueTableManager.create(
             (o) => o(
               id: (element as dynamic).id as String,
               name: table.entityName,
@@ -144,7 +144,7 @@ class TableCrudOperation<$Table extends drift.Table,
 
   Future<void> _deleteInQueue(List<String> ids) async {
     for (var id in ids) {
-      await this.queueTableManager.create(
+      await queueTableManager.create(
             (o) => o(
               id: id,
               name: table.entityName,

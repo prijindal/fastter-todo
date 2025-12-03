@@ -34,52 +34,15 @@ class NewBackendConfig extends StatelessWidget {
       if (_formKey.currentState?.saveAndValidate() == true) {
         final config = _formKey.currentState!.value;
 
-        final token = await BackendSyncConfigurationService.login(
+        final backendConfig = await BackendSyncConfigurationService.login(
           url: config["url"] as String,
-          email: config["email"] as String,
-          password: config["password"] as String,
+          clientId: config["client_id"] as String,
           tls: config["tls"] as bool,
           allowInsecure: config["allowInsecure"] as bool,
         );
         // ignore: use_build_context_synchronously
-        Navigator.of(context).pop<BackendTokenConfiguraion>(
-          BackendTokenConfiguraion(
-            url: config["url"] as String,
-            jwtToken: token,
-            tls: config["tls"] as bool,
-            allowInsecure: config["allowInsecure"] as bool,
-          ),
-        );
-      } // Handle the submit action
-    } catch (e) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Error: $e"),
-      ));
-      AppLogger.instance.e(e.toString(), error: e);
-    }
-  }
-
-  Future<void> _register(BuildContext context) async {
-    try {
-      if (_formKey.currentState?.saveAndValidate() == true) {
-        final config = _formKey.currentState!.value;
-
-        final token = await BackendSyncConfigurationService.register(
-          url: config["url"] as String,
-          email: config["email"] as String,
-          password: config["password"] as String,
-          tls: config["tls"] as bool,
-          allowInsecure: config["allowInsecure"] as bool,
-        );
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop<BackendTokenConfiguraion>(
-          BackendTokenConfiguraion(
-            url: config["url"] as String,
-            jwtToken: token,
-            tls: config["tls"] as bool,
-            allowInsecure: config["allowInsecure"] as bool,
-          ),
+        Navigator.of(context).pop<BackendSyncConfiguration>(
+          backendConfig,
         );
       } // Handle the submit action
     } catch (e) {
@@ -123,22 +86,12 @@ class NewBackendConfig extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   FormBuilderTextField(
-                    name: "email",
-                    keyboardType: TextInputType.emailAddress,
-                    autofillHints: [AutofillHints.email],
-                    decoration: InputDecoration(labelText: 'Email'),
+                    name: "client_id",
+                    autofocus: false,
+                    decoration: InputDecoration(labelText: 'Client ID'),
                     validator: FormBuilderValidators.compose([
                       FormBuilderValidators.required(),
-                      FormBuilderValidators.email(),
                     ]),
-                  ),
-                  SizedBox(height: 10),
-                  FormBuilderTextField(
-                    name: "password",
-                    obscureText: true,
-                    autofillHints: [AutofillHints.password],
-                    decoration: InputDecoration(labelText: 'Password'),
-                    validator: FormBuilderValidators.required(),
                   ),
                   SizedBox(height: 10),
                   FormBuilderCheckbox(
@@ -162,11 +115,6 @@ class NewBackendConfig extends StatelessWidget {
                   ElevatedButton(
                     child: const Text('Login'),
                     onPressed: () => _login(context),
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    child: const Text('Register'),
-                    onPressed: () => _register(context),
                   ),
                 ],
               ),

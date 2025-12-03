@@ -9,13 +9,13 @@ import 'package:watch_it/watch_it.dart';
 import '../grpc_client/api_from_server.dart';
 import '../helpers/logger.dart';
 import '../models/core.dart';
+import '../schemaless_proto/application_services/v1/entity.pb.dart';
 import '../schemaless_proto/google/protobuf/timestamp.pb.dart';
-import '../schemaless_proto/types/entity.pb.dart';
 import 'db_crud_operations.dart';
 
 class BackendSyncService {
   final ApiFromServerInfo _server;
-  StreamSubscription<EntityHistory>? _subscription;
+  StreamSubscription<StreamEntityHistoryResponse>? _subscription;
   bool get isConnected => _subscription != null;
 
   SharedDatabase get _database => GetIt.I<SharedDatabase>();
@@ -73,35 +73,35 @@ class BackendSyncService {
         queue.map<EntityActionRequest>((a) {
       if (a.action == "CREATE") {
         return EntityActionRequest(
-          hostID: hostId,
+          hostId: hostId,
           actionId: Uuid().v4(),
           entityName: a.name,
-          action: EntityAction.CREATE,
+          action: EntityAction.ENTITY_ACTION_CREATE,
           createdAt: Timestamp.fromDateTime(a.timestamp),
           entityId: a.id,
           payload: jsonEncode(a.payload).codeUnits,
-          requestID: a.requestId,
+          requestId: a.requestId,
         );
       } else if (a.action == "UPDATE") {
         return EntityActionRequest(
-          hostID: hostId,
+          hostId: hostId,
           actionId: Uuid().v4(),
           entityName: a.name,
-          action: EntityAction.UPDATE,
+          action: EntityAction.ENTITY_ACTION_UPDATE,
           createdAt: Timestamp.fromDateTime(a.timestamp),
           entityId: a.id,
           payload: jsonEncode(a.payload).codeUnits,
-          requestID: a.requestId,
+          requestId: a.requestId,
         );
       } else if (a.action == "DELETE") {
         return EntityActionRequest(
-          hostID: hostId,
+          hostId: hostId,
           actionId: Uuid().v4(),
           entityName: a.name,
-          action: EntityAction.DELETE,
+          action: EntityAction.ENTITY_ACTION_DELETE,
           createdAt: Timestamp.fromDateTime(a.timestamp),
           entityId: a.id,
-          requestID: a.requestId,
+          requestId: a.requestId,
         );
       }
       throw Error();
@@ -137,21 +137,21 @@ class BackendSyncService {
     final hostId = await getHostId();
     final lastUpdatedAt = await getLastUpdatedAt();
     final stream = _server.entityClient.streamEntityHistory(
-      SearchEntityHistoryRequest(
+      StreamEntityHistoryRequest(
         params: EntityHistoryRequestParams(
           createdAt: EntityHistoryRequestDateParam(
             gte: lastUpdatedAt == null
                 ? null
                 : Timestamp.fromDateTime(lastUpdatedAt),
           ),
-          hostID: EntityHistoryRequestHostIDParam(
+          hostId: EntityHistoryRequestHostIDParam(
             neq: hostId,
           ),
         ),
         order: [
           EntityHistoryRequestOrder(
-            field_1: EntityHistoryOrderField.CreatedAt,
-            value: EntityHistoryOrderValue.DESC,
+            field_1: EntityHistoryOrderField.ENTITY_HISTORY_ORDER_FIELD_CREATED_AT,
+            value: EntityHistoryOrderValue.ENTITY_HISTORY_ORDER_VALUE_DESC,
           )
         ],
       ),
@@ -160,11 +160,12 @@ class BackendSyncService {
     AppLogger.instance.i("Started listening on stream");
   }
 
-  Future<void> _consumeHistory(EntityHistory history) async {
+  Future<void> _consumeHistory(StreamEntityHistoryResponse resp) async {
+    final history = resp.history;
     final manager = getManager(history.entityName);
     AppLogger.instance
-        .i("Fetched ${history.entityID} entry for ${history.entityName}");
-    if (history.action == EntityAction.CREATE) {
+        .i("Fetched ${history.entityId} entry for ${history.entityName}");
+    if (history.action == EntityAction.ENTITY_ACTION_CREATE) {
       final payload = manager.insertable(
         jsonDecode(String.fromCharCodes(history.payload))
             as Map<String, dynamic>,
@@ -175,9 +176,9 @@ class BackendSyncService {
             payload,
             onConflict: drift.DoNothing(),
           );
-    } else if (history.action == EntityAction.UPDATE) {
+    } else if (history.action == EntityAction.ENTITY_ACTION_UPDATE) {
       final existingEntry =
-          (await manager.getById(history.entityID)) as drift.DataClass?;
+          (await manager.getById(history.entityId)) as drift.DataClass?;
       if (existingEntry != null) {
         final existing = existingEntry.toJson();
         existing.addAll(
@@ -187,14 +188,14 @@ class BackendSyncService {
         final payload = manager.insertable(existing);
         (_database.update(
           manager.table as drift.TableInfo<drift.Table, dynamic>,
-        )..where((u) => (u as dynamic).id.equals(history.entityID)
+        )..where((u) => (u as dynamic).id.equals(history.entityId)
                 as drift.Expression<bool>))
             .write(payload);
       }
-    } else if (history.action == EntityAction.DELETE) {
+    } else if (history.action == EntityAction.ENTITY_ACTION_DELETE) {
       await (_database
               .delete(manager.table as drift.TableInfo<drift.Table, dynamic>)
-            ..where((u) => (u as dynamic).id.equals(history.entityID)
+            ..where((u) => (u as dynamic).id.equals(history.entityId)
                 as drift.Expression<bool>))
           .go();
     }
