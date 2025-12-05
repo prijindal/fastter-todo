@@ -144,7 +144,7 @@ const EntityHistoryRequestParam$json = {
   '2': [
     {'1': 'field', '3': 1, '4': 1, '5': 9, '10': 'field'},
     {
-      '1': 'stringParams',
+      '1': 'string_params',
       '3': 2,
       '4': 1,
       '5': 11,
@@ -153,7 +153,7 @@ const EntityHistoryRequestParam$json = {
       '10': 'stringParams'
     },
     {
-      '1': 'dataParams',
+      '1': 'data_params',
       '3': 3,
       '4': 1,
       '5': 11,
@@ -169,11 +169,11 @@ const EntityHistoryRequestParam$json = {
 
 /// Descriptor for `EntityHistoryRequestParam`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List entityHistoryRequestParamDescriptor = $convert.base64Decode(
-    'ChlFbnRpdHlIaXN0b3J5UmVxdWVzdFBhcmFtEhQKBWZpZWxkGAEgASgJUgVmaWVsZBJeCgxzdH'
-    'JpbmdQYXJhbXMYAiABKAsyOC5hcHBsaWNhdGlvbl9zZXJ2aWNlcy52MS5FbnRpdHlIaXN0b3J5'
-    'UmVxdWVzdFN0cmluZ1BhcmFtSABSDHN0cmluZ1BhcmFtcxJYCgpkYXRhUGFyYW1zGAMgASgLMj'
-    'YuYXBwbGljYXRpb25fc2VydmljZXMudjEuRW50aXR5SGlzdG9yeVJlcXVlc3REYXRlUGFyYW1I'
-    'AFIKZGF0YVBhcmFtc0IICgZwYXJhbXM=');
+    'ChlFbnRpdHlIaXN0b3J5UmVxdWVzdFBhcmFtEhQKBWZpZWxkGAEgASgJUgVmaWVsZBJfCg1zdH'
+    'JpbmdfcGFyYW1zGAIgASgLMjguYXBwbGljYXRpb25fc2VydmljZXMudjEuRW50aXR5SGlzdG9y'
+    'eVJlcXVlc3RTdHJpbmdQYXJhbUgAUgxzdHJpbmdQYXJhbXMSWQoLZGF0YV9wYXJhbXMYAyABKA'
+    'syNi5hcHBsaWNhdGlvbl9zZXJ2aWNlcy52MS5FbnRpdHlIaXN0b3J5UmVxdWVzdERhdGVQYXJh'
+    'bUgAUgpkYXRhUGFyYW1zQggKBnBhcmFtcw==');
 
 @$core.Deprecated('Use streamEntityHistoryRequestDescriptor instead')
 const StreamEntityHistoryRequest$json = {

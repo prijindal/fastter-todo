@@ -373,10 +373,8 @@ class EntityHistoryRequestParam extends $pb.GeneratedMessage {
     ..aOS(1, _omitFieldNames ? '' : 'field')
     ..aOM<EntityHistoryRequestStringParam>(
         2, _omitFieldNames ? '' : 'stringParams',
-        protoName: 'stringParams',
         subBuilder: EntityHistoryRequestStringParam.create)
     ..aOM<EntityHistoryRequestDateParam>(3, _omitFieldNames ? '' : 'dataParams',
-        protoName: 'dataParams',
         subBuilder: EntityHistoryRequestDateParam.create)
     ..hasRequiredFields = false;
 
