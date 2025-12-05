@@ -124,11 +124,11 @@ class _TodoItem extends StatelessWidget {
   final int childTodos;
 
   void _selectDate(BuildContext context) {
-    todoSelectDate(context, todo.dueDate).then((dueDate) async {
+    todoSelectDate(context, todo.due_date).then((dueDate) async {
       if (dueDate != null && context.mounted) {
         await GetIt.I<DbCrudOperations>()
             .todo
-            .update([todo.id], TodoCompanion(dueDate: drift.Value(dueDate)));
+            .update([todo.id], TodoCompanion(due_date: drift.Value(dueDate)));
       }
     });
   }
@@ -144,7 +144,7 @@ class _TodoItem extends StatelessWidget {
     if (elements.isEmpty) {
       return false;
     }
-    if (todo.dueDate == null &&
+    if (todo.due_date == null &&
         reminders == 0 &&
         comments == 0 &&
         childTodos == 0 &&
@@ -308,13 +308,13 @@ class _TodoItemSecondRow extends WatchingWidget {
     var children = <Widget>[];
     final iconSize =
         (ListTileTheme.of(context).subtitleTextStyle?.fontSize ?? 12) + 2;
-    if (todo.dueDate != null && showDueDate) {
+    if (todo.due_date != null && showDueDate) {
       children.add(
         Container(
           margin: const EdgeInsets.only(right: 4),
           child: Text(
             dueDateFormatter(
-              todo.dueDate,
+              todo.due_date,
             ),
           ),
         ),

@@ -17,8 +17,8 @@ class TodosSortingAlgorithm {
   factory TodosSortingAlgorithm.dueDate() => TodosSortingAlgorithm(
         title: "By Due Date",
         compare: (a, b) {
-          final aDueDate = a.dueDate;
-          final bDueDate = b.dueDate;
+          final aDueDate = a.due_date;
+          final bDueDate = b.due_date;
           if (bDueDate == null && aDueDate == null) {
             return 0;
           }
@@ -35,7 +35,7 @@ class TodosSortingAlgorithm {
   factory TodosSortingAlgorithm.creationTime() => TodosSortingAlgorithm(
         title: "By Creation Time",
         compare: (a, b) {
-          return b.creationTime.compareTo(a.creationTime);
+          return b.created_at.compareTo(a.created_at);
         },
       );
 

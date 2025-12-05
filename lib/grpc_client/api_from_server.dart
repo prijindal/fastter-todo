@@ -37,6 +37,7 @@ Future<TokenResponse> fetchAccessToken(BackendSyncConfiguration info) async {
       },
     );
     final body = jsonDecode(json.body);
+    print(body);
     final expiresIn = body["expires_in"] as int;
     final expiresAt = DateTime.now().add(Duration(seconds: expiresIn));
     final accessToken = body["access_token"] as String;

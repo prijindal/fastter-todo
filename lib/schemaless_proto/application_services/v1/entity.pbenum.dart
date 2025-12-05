@@ -14,33 +14,6 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-/// SearchEntityHistoryRequest
-class EntityHistoryOrderField extends $pb.ProtobufEnum {
-  static const EntityHistoryOrderField ENTITY_HISTORY_ORDER_FIELD_UNSPECIFIED =
-      EntityHistoryOrderField._(
-          0, _omitEnumNames ? '' : 'ENTITY_HISTORY_ORDER_FIELD_UNSPECIFIED');
-  static const EntityHistoryOrderField ENTITY_HISTORY_ORDER_FIELD_CREATED_AT =
-      EntityHistoryOrderField._(
-          1, _omitEnumNames ? '' : 'ENTITY_HISTORY_ORDER_FIELD_CREATED_AT');
-  static const EntityHistoryOrderField ENTITY_HISTORY_ORDER_FIELD_UPDATED_AT =
-      EntityHistoryOrderField._(
-          2, _omitEnumNames ? '' : 'ENTITY_HISTORY_ORDER_FIELD_UPDATED_AT');
-
-  static const $core.List<EntityHistoryOrderField> values =
-      <EntityHistoryOrderField>[
-    ENTITY_HISTORY_ORDER_FIELD_UNSPECIFIED,
-    ENTITY_HISTORY_ORDER_FIELD_CREATED_AT,
-    ENTITY_HISTORY_ORDER_FIELD_UPDATED_AT,
-  ];
-
-  static final $core.List<EntityHistoryOrderField?> _byValue =
-      $pb.ProtobufEnum.$_initByValueList(values, 2);
-  static EntityHistoryOrderField? valueOf($core.int value) =>
-      value < 0 || value >= _byValue.length ? null : _byValue[value];
-
-  const EntityHistoryOrderField._(super.value, super.name);
-}
-
 class EntityHistoryOrderValue extends $pb.ProtobufEnum {
   static const EntityHistoryOrderValue ENTITY_HISTORY_ORDER_VALUE_UNSPECIFIED =
       EntityHistoryOrderValue._(

@@ -73,33 +73,27 @@ class BackendSyncService {
         queue.map<EntityActionRequest>((a) {
       if (a.action == "CREATE") {
         return EntityActionRequest(
-          hostId: hostId,
-          actionId: Uuid().v4(),
           entityName: a.name,
           action: EntityAction.ENTITY_ACTION_CREATE,
-          createdAt: Timestamp.fromDateTime(a.timestamp),
+          timestamp: Timestamp.fromDateTime(a.timestamp),
           entityId: a.id,
           payload: jsonEncode(a.payload).codeUnits,
           requestId: a.requestId,
         );
       } else if (a.action == "UPDATE") {
         return EntityActionRequest(
-          hostId: hostId,
-          actionId: Uuid().v4(),
           entityName: a.name,
           action: EntityAction.ENTITY_ACTION_UPDATE,
-          createdAt: Timestamp.fromDateTime(a.timestamp),
+          timestamp: Timestamp.fromDateTime(a.timestamp),
           entityId: a.id,
           payload: jsonEncode(a.payload).codeUnits,
           requestId: a.requestId,
         );
       } else if (a.action == "DELETE") {
         return EntityActionRequest(
-          hostId: hostId,
-          actionId: Uuid().v4(),
           entityName: a.name,
           action: EntityAction.ENTITY_ACTION_DELETE,
-          createdAt: Timestamp.fromDateTime(a.timestamp),
+          timestamp: Timestamp.fromDateTime(a.timestamp),
           entityId: a.id,
           requestId: a.requestId,
         );
@@ -107,6 +101,7 @@ class BackendSyncService {
       throw Error();
     }).toList();
     for (var action in actions) {
+      print(action);
       await _server.entityClient.entityAction(action);
     }
     await _database.managers.entityActionsQueue
@@ -138,19 +133,19 @@ class BackendSyncService {
     final lastUpdatedAt = await getLastUpdatedAt();
     final stream = _server.entityClient.streamEntityHistory(
       StreamEntityHistoryRequest(
-        params: EntityHistoryRequestParams(
-          createdAt: EntityHistoryRequestDateParam(
+        entityName: "todo",
+        params: [EntityHistoryRequestParam(
+          field_1: "created_at",
+          dataParams: EntityHistoryRequestDateParam(
             gte: lastUpdatedAt == null
                 ? null
                 : Timestamp.fromDateTime(lastUpdatedAt),
           ),
-          hostId: EntityHistoryRequestHostIDParam(
-            neq: hostId,
-          ),
         ),
+        ],
         order: [
           EntityHistoryRequestOrder(
-            field_1: EntityHistoryOrderField.ENTITY_HISTORY_ORDER_FIELD_CREATED_AT,
+            field_1: "updated_at",
             value: EntityHistoryOrderValue.ENTITY_HISTORY_ORDER_VALUE_DESC,
           )
         ],
@@ -161,14 +156,37 @@ class BackendSyncService {
   }
 
   Future<void> _consumeHistory(StreamEntityHistoryResponse resp) async {
-    final history = resp.history;
-    final manager = getManager(history.entityName);
+    final entity = resp.entity;
+    final manager = getManager(entity.entityName);
     AppLogger.instance
-        .i("Fetched ${history.entityId} entry for ${history.entityName}");
-    if (history.action == EntityAction.ENTITY_ACTION_CREATE) {
+        .i("Fetched ${entity.id} entry for ${entity.entityName}");
+        
+      final existingEntry =
+          (await manager.getById(entity.id)) as drift.DataClass?;
+      if(entity.deletedAt.hasRequiredFields()) {
+
+      await (_database
+              .delete(manager.table as drift.TableInfo<drift.Table, dynamic>)
+            ..where((u) => (u as dynamic).id.equals(entity.id)
+                as drift.Expression<bool>))
+          .go();
+      }
+      else if (existingEntry != null) {
+        final existing = existingEntry.toJson();
+        existing.addAll(
+          jsonDecode(String.fromCharCodes(entity.payload))
+              as Map<String, dynamic>,
+        );
+        final payload = manager.insertable(existing);
+        (_database.update(
+          manager.table as drift.TableInfo<drift.Table, dynamic>,
+        )..where((u) => (u as dynamic).id.equals(entity.id)
+                as drift.Expression<bool>))
+            .write(payload);
+      } else {
       final payload = manager.insertable(
-        jsonDecode(String.fromCharCodes(history.payload))
-            as Map<String, dynamic>,
+        jsonDecode(String.fromCharCodes(entity.payload))
+              as Map<String, dynamic>,
       );
       await _database
           .into(manager.table as drift.TableInfo<drift.Table, dynamic>)
@@ -176,30 +194,9 @@ class BackendSyncService {
             payload,
             onConflict: drift.DoNothing(),
           );
-    } else if (history.action == EntityAction.ENTITY_ACTION_UPDATE) {
-      final existingEntry =
-          (await manager.getById(history.entityId)) as drift.DataClass?;
-      if (existingEntry != null) {
-        final existing = existingEntry.toJson();
-        existing.addAll(
-          jsonDecode(String.fromCharCodes(history.payload))
-              as Map<String, dynamic>,
-        );
-        final payload = manager.insertable(existing);
-        (_database.update(
-          manager.table as drift.TableInfo<drift.Table, dynamic>,
-        )..where((u) => (u as dynamic).id.equals(history.entityId)
-                as drift.Expression<bool>))
-            .write(payload);
       }
-    } else if (history.action == EntityAction.ENTITY_ACTION_DELETE) {
-      await (_database
-              .delete(manager.table as drift.TableInfo<drift.Table, dynamic>)
-            ..where((u) => (u as dynamic).id.equals(history.entityId)
-                as drift.Expression<bool>))
-          .go();
-    }
+
     await SharedPreferencesAsync().setInt(
-        "lastUpdatedAt", history.createdAt.toDateTime().millisecondsSinceEpoch);
+        "lastUpdatedAt", entity.createdAt.toDateTime().millisecondsSinceEpoch);
   }
 }

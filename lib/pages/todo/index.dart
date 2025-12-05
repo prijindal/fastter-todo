@@ -158,7 +158,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
           title: drift.Value(todo["title"] as String),
           project: drift.Value(todo["project"] as String?),
           priority: drift.Value(todo["priority"] as int),
-          dueDate: drift.Value(todo["dueDate"] as DateTime?),
+          due_date: drift.Value(todo["dueDate"] as DateTime?),
           tags: drift.Value(todo["tags"] as List<String>),
           pipeline: drift.Value(todo["pipeline"] as String),
           completed: drift.Value(todo["completed"] as bool),
@@ -234,7 +234,7 @@ class _TodoEditBodyState extends State<TodoEditBody> {
               FormBuilderDateTimePicker(
                 name: "dueDate",
                 inputType: InputType.date,
-                initialValue: widget.todo.dueDate,
+                initialValue: widget.todo.due_date,
                 onChanged: _markEdited,
                 decoration: InputDecoration(
                   labelText: 'Due Date',

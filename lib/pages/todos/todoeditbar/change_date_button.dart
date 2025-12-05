@@ -17,11 +17,11 @@ class ChangeDateButton extends StatelessWidget {
   Future<void> _showDatePicker(BuildContext context) async {
     if (selectedTodos.isNotEmpty && context.mounted) {
       final selectedDate =
-          await todoSelectDate(context, selectedTodos.first.dueDate);
+          await todoSelectDate(context, selectedTodos.first.due_date);
       if (selectedDate != null && context.mounted) {
         await GetIt.I<DbCrudOperations>().todo.update(
             selectedTodos.map((a) => a.id),
-            TodoCompanion(dueDate: drift.Value(selectedDate)));
+            TodoCompanion(due_date: drift.Value(selectedDate)));
       }
     }
   }

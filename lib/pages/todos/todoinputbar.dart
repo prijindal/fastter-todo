@@ -39,7 +39,7 @@ class TodoModifyBar extends StatelessWidget {
         initialPriority: todo.priority,
         initialTags: todo.tags,
         labelText: "Edit task: ${todo.title}",
-        initialDueDate: todo.dueDate,
+        initialDueDate: todo.due_date,
         parentTodo: todo.parent,
         onEdit: () async {
           await TodoScreen.openPage(context, todo);
@@ -58,7 +58,7 @@ class TodoModifyBar extends StatelessWidget {
             TodoCompanion(
               title: drift.Value(title),
               project: drift.Value(project ?? todo.project),
-              dueDate: drift.Value(dueDate ?? todo.dueDate),
+              due_date: drift.Value(dueDate ?? todo.due_date),
               pipeline: drift.Value(pipeline ?? todo.pipeline),
               priority: drift.Value(priority ?? todo.priority),
               tags: drift.Value(tags ?? todo.tags),
@@ -105,7 +105,7 @@ class TodoInputBar extends StatelessWidget {
                 TodoCompanion(
                   title: drift.Value(title),
                   project: drift.Value(project),
-                  dueDate: drift.Value(dueDate),
+                  due_date: drift.Value(dueDate),
                   parent: drift.Value(parentTodo),
                   pipeline: drift.Value(pipeline),
                   priority: drift.Value(priority),

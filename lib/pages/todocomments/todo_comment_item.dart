@@ -107,7 +107,7 @@ class _TodoCommentItem extends StatelessWidget {
       onTap: onTap,
       selected: selected,
       title: _buildContent(context),
-      subtitle: Text(dateFromNowFormatter(todoComment.creationTime)),
+      subtitle: Text(dateFromNowFormatter(todoComment.created_at)),
     );
   }
 

@@ -107,8 +107,8 @@ class TodosFilters {
       todos = todos
           .where(
             (t) =>
-                t.dueDate != null &&
-                t.dueDate!.compareTo(
+                t.due_date != null &&
+                t.due_date!.compareTo(
                       DateTime.now().add(Duration(days: daysAhead!)),
                     ) <=
                     0,

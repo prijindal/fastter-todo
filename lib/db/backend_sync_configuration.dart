@@ -110,6 +110,7 @@ class BackendSyncConfigurationService extends ChangeNotifier {
       client,
       port: 4000,
       urlLancher: urlLauncher,
+      scopes: ["offline_access"]
     );
 
     var c = await authenticator.authorize();

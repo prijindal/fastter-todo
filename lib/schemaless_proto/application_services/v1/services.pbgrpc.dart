@@ -137,13 +137,6 @@ class EntityServiceClient extends $grpc.Client {
 
   EntityServiceClient(super.channel, {super.options, super.interceptors});
 
-  $grpc.ResponseFuture<$2.ListEntityTypesResponse> listEntityTypes(
-    $2.ListEntityTypesRequest request, {
-    $grpc.CallOptions? options,
-  }) {
-    return $createUnaryCall(_$listEntityTypes, request, options: options);
-  }
-
   $grpc.ResponseStream<$2.StreamEntityHistoryResponse> streamEntityHistory(
     $2.StreamEntityHistoryRequest request, {
     $grpc.CallOptions? options,
@@ -170,11 +163,6 @@ class EntityServiceClient extends $grpc.Client {
 
   // method descriptors
 
-  static final _$listEntityTypes =
-      $grpc.ClientMethod<$2.ListEntityTypesRequest, $2.ListEntityTypesResponse>(
-          '/application_services.v1.EntityService/ListEntityTypes',
-          ($2.ListEntityTypesRequest value) => value.writeToBuffer(),
-          $2.ListEntityTypesResponse.fromBuffer);
   static final _$streamEntityHistory = $grpc.ClientMethod<
           $2.StreamEntityHistoryRequest, $2.StreamEntityHistoryResponse>(
       '/application_services.v1.EntityService/StreamEntityHistory',
@@ -197,15 +185,6 @@ abstract class EntityServiceBase extends $grpc.Service {
   $core.String get $name => 'application_services.v1.EntityService';
 
   EntityServiceBase() {
-    $addMethod($grpc.ServiceMethod<$2.ListEntityTypesRequest,
-            $2.ListEntityTypesResponse>(
-        'ListEntityTypes',
-        listEntityTypes_Pre,
-        false,
-        false,
-        ($core.List<$core.int> value) =>
-            $2.ListEntityTypesRequest.fromBuffer(value),
-        ($2.ListEntityTypesResponse value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$2.StreamEntityHistoryRequest,
             $2.StreamEntityHistoryResponse>(
         'StreamEntityHistory',
@@ -234,15 +213,6 @@ abstract class EntityServiceBase extends $grpc.Service {
                 $2.EntityActionRequest.fromBuffer(value),
             ($2.EntityActionResponse value) => value.writeToBuffer()));
   }
-
-  $async.Future<$2.ListEntityTypesResponse> listEntityTypes_Pre(
-      $grpc.ServiceCall $call,
-      $async.Future<$2.ListEntityTypesRequest> $request) async {
-    return listEntityTypes($call, await $request);
-  }
-
-  $async.Future<$2.ListEntityTypesResponse> listEntityTypes(
-      $grpc.ServiceCall call, $2.ListEntityTypesRequest request);
 
   $async.Stream<$2.StreamEntityHistoryResponse> streamEntityHistory_Pre(
       $grpc.ServiceCall $call,

@@ -46,17 +46,17 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("completed" IN (0, 1))'),
       clientDefault: () => false);
-  static const VerificationMeta _dueDateMeta =
-      const VerificationMeta('dueDate');
+  static const VerificationMeta _due_dateMeta =
+      const VerificationMeta('due_date');
   @override
-  late final GeneratedColumn<DateTime> dueDate = GeneratedColumn<DateTime>(
+  late final GeneratedColumn<DateTime> due_date = GeneratedColumn<DateTime>(
       'due_date', aliasedName, true,
       type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  static const VerificationMeta _creationTimeMeta =
-      const VerificationMeta('creationTime');
+  static const VerificationMeta _created_atMeta =
+      const VerificationMeta('created_at');
   @override
-  late final GeneratedColumn<DateTime> creationTime = GeneratedColumn<DateTime>(
-      'creation_time', aliasedName, false,
+  late final GeneratedColumn<DateTime> created_at = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
       type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
       clientDefault: () => DateTime.now());
@@ -85,8 +85,8 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
         priority,
         pipeline,
         completed,
-        dueDate,
-        creationTime,
+        due_date,
+        created_at,
         project,
         parent,
         tags
@@ -123,14 +123,14 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
           completed.isAcceptableOrUnknown(data['completed']!, _completedMeta));
     }
     if (data.containsKey('due_date')) {
-      context.handle(_dueDateMeta,
-          dueDate.isAcceptableOrUnknown(data['due_date']!, _dueDateMeta));
+      context.handle(_due_dateMeta,
+          due_date.isAcceptableOrUnknown(data['due_date']!, _due_dateMeta));
     }
-    if (data.containsKey('creation_time')) {
+    if (data.containsKey('created_at')) {
       context.handle(
-          _creationTimeMeta,
-          creationTime.isAcceptableOrUnknown(
-              data['creation_time']!, _creationTimeMeta));
+          _created_atMeta,
+          created_at.isAcceptableOrUnknown(
+              data['created_at']!, _created_atMeta));
     }
     if (data.containsKey('project')) {
       context.handle(_projectMeta,
@@ -159,10 +159,10 @@ class $TodoTable extends Todo with TableInfo<$TodoTable, TodoData> {
           .read(DriftSqlType.string, data['${effectivePrefix}pipeline'])!,
       completed: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}completed'])!,
-      dueDate: attachedDatabase.typeMapping
+      due_date: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}due_date']),
-      creationTime: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}creation_time'])!,
+      created_at: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       project: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}project']),
       parent: attachedDatabase.typeMapping
@@ -187,8 +187,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
   final int priority;
   final String pipeline;
   final bool completed;
-  final DateTime? dueDate;
-  final DateTime creationTime;
+  final DateTime? due_date;
+  final DateTime created_at;
   final String? project;
   final String? parent;
   final List<String> tags;
@@ -198,8 +198,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       required this.priority,
       required this.pipeline,
       required this.completed,
-      this.dueDate,
-      required this.creationTime,
+      this.due_date,
+      required this.created_at,
       this.project,
       this.parent,
       required this.tags});
@@ -211,10 +211,10 @@ class TodoData extends DataClass implements Insertable<TodoData> {
     map['priority'] = Variable<int>(priority);
     map['pipeline'] = Variable<String>(pipeline);
     map['completed'] = Variable<bool>(completed);
-    if (!nullToAbsent || dueDate != null) {
-      map['due_date'] = Variable<DateTime>(dueDate);
+    if (!nullToAbsent || due_date != null) {
+      map['due_date'] = Variable<DateTime>(due_date);
     }
-    map['creation_time'] = Variable<DateTime>(creationTime);
+    map['created_at'] = Variable<DateTime>(created_at);
     if (!nullToAbsent || project != null) {
       map['project'] = Variable<String>(project);
     }
@@ -234,10 +234,10 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       priority: Value(priority),
       pipeline: Value(pipeline),
       completed: Value(completed),
-      dueDate: dueDate == null && nullToAbsent
+      due_date: due_date == null && nullToAbsent
           ? const Value.absent()
-          : Value(dueDate),
-      creationTime: Value(creationTime),
+          : Value(due_date),
+      created_at: Value(created_at),
       project: project == null && nullToAbsent
           ? const Value.absent()
           : Value(project),
@@ -256,8 +256,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       priority: serializer.fromJson<int>(json['priority']),
       pipeline: serializer.fromJson<String>(json['pipeline']),
       completed: serializer.fromJson<bool>(json['completed']),
-      dueDate: serializer.fromJson<DateTime?>(json['dueDate']),
-      creationTime: serializer.fromJson<DateTime>(json['creationTime']),
+      due_date: serializer.fromJson<DateTime?>(json['due_date']),
+      created_at: serializer.fromJson<DateTime>(json['created_at']),
       project: serializer.fromJson<String?>(json['project']),
       parent: serializer.fromJson<String?>(json['parent']),
       tags: $TodoTable.$convertertags
@@ -273,8 +273,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       'priority': serializer.toJson<int>(priority),
       'pipeline': serializer.toJson<String>(pipeline),
       'completed': serializer.toJson<bool>(completed),
-      'dueDate': serializer.toJson<DateTime?>(dueDate),
-      'creationTime': serializer.toJson<DateTime>(creationTime),
+      'due_date': serializer.toJson<DateTime?>(due_date),
+      'created_at': serializer.toJson<DateTime>(created_at),
       'project': serializer.toJson<String?>(project),
       'parent': serializer.toJson<String?>(parent),
       'tags': serializer.toJson<String>($TodoTable.$convertertags.toJson(tags)),
@@ -287,8 +287,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
           int? priority,
           String? pipeline,
           bool? completed,
-          Value<DateTime?> dueDate = const Value.absent(),
-          DateTime? creationTime,
+          Value<DateTime?> due_date = const Value.absent(),
+          DateTime? created_at,
           Value<String?> project = const Value.absent(),
           Value<String?> parent = const Value.absent(),
           List<String>? tags}) =>
@@ -298,8 +298,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
         priority: priority ?? this.priority,
         pipeline: pipeline ?? this.pipeline,
         completed: completed ?? this.completed,
-        dueDate: dueDate.present ? dueDate.value : this.dueDate,
-        creationTime: creationTime ?? this.creationTime,
+        due_date: due_date.present ? due_date.value : this.due_date,
+        created_at: created_at ?? this.created_at,
         project: project.present ? project.value : this.project,
         parent: parent.present ? parent.value : this.parent,
         tags: tags ?? this.tags,
@@ -311,10 +311,9 @@ class TodoData extends DataClass implements Insertable<TodoData> {
       priority: data.priority.present ? data.priority.value : this.priority,
       pipeline: data.pipeline.present ? data.pipeline.value : this.pipeline,
       completed: data.completed.present ? data.completed.value : this.completed,
-      dueDate: data.dueDate.present ? data.dueDate.value : this.dueDate,
-      creationTime: data.creationTime.present
-          ? data.creationTime.value
-          : this.creationTime,
+      due_date: data.due_date.present ? data.due_date.value : this.due_date,
+      created_at:
+          data.created_at.present ? data.created_at.value : this.created_at,
       project: data.project.present ? data.project.value : this.project,
       parent: data.parent.present ? data.parent.value : this.parent,
       tags: data.tags.present ? data.tags.value : this.tags,
@@ -329,8 +328,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
           ..write('priority: $priority, ')
           ..write('pipeline: $pipeline, ')
           ..write('completed: $completed, ')
-          ..write('dueDate: $dueDate, ')
-          ..write('creationTime: $creationTime, ')
+          ..write('due_date: $due_date, ')
+          ..write('created_at: $created_at, ')
           ..write('project: $project, ')
           ..write('parent: $parent, ')
           ..write('tags: $tags')
@@ -340,7 +339,7 @@ class TodoData extends DataClass implements Insertable<TodoData> {
 
   @override
   int get hashCode => Object.hash(id, title, priority, pipeline, completed,
-      dueDate, creationTime, project, parent, tags);
+      due_date, created_at, project, parent, tags);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -350,8 +349,8 @@ class TodoData extends DataClass implements Insertable<TodoData> {
           other.priority == this.priority &&
           other.pipeline == this.pipeline &&
           other.completed == this.completed &&
-          other.dueDate == this.dueDate &&
-          other.creationTime == this.creationTime &&
+          other.due_date == this.due_date &&
+          other.created_at == this.created_at &&
           other.project == this.project &&
           other.parent == this.parent &&
           other.tags == this.tags);
@@ -363,8 +362,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
   final Value<int> priority;
   final Value<String> pipeline;
   final Value<bool> completed;
-  final Value<DateTime?> dueDate;
-  final Value<DateTime> creationTime;
+  final Value<DateTime?> due_date;
+  final Value<DateTime> created_at;
   final Value<String?> project;
   final Value<String?> parent;
   final Value<List<String>> tags;
@@ -375,8 +374,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
     this.priority = const Value.absent(),
     this.pipeline = const Value.absent(),
     this.completed = const Value.absent(),
-    this.dueDate = const Value.absent(),
-    this.creationTime = const Value.absent(),
+    this.due_date = const Value.absent(),
+    this.created_at = const Value.absent(),
     this.project = const Value.absent(),
     this.parent = const Value.absent(),
     this.tags = const Value.absent(),
@@ -388,8 +387,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
     this.priority = const Value.absent(),
     this.pipeline = const Value.absent(),
     this.completed = const Value.absent(),
-    this.dueDate = const Value.absent(),
-    this.creationTime = const Value.absent(),
+    this.due_date = const Value.absent(),
+    this.created_at = const Value.absent(),
     this.project = const Value.absent(),
     this.parent = const Value.absent(),
     this.tags = const Value.absent(),
@@ -401,8 +400,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
     Expression<int>? priority,
     Expression<String>? pipeline,
     Expression<bool>? completed,
-    Expression<DateTime>? dueDate,
-    Expression<DateTime>? creationTime,
+    Expression<DateTime>? due_date,
+    Expression<DateTime>? created_at,
     Expression<String>? project,
     Expression<String>? parent,
     Expression<String>? tags,
@@ -414,8 +413,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
       if (priority != null) 'priority': priority,
       if (pipeline != null) 'pipeline': pipeline,
       if (completed != null) 'completed': completed,
-      if (dueDate != null) 'due_date': dueDate,
-      if (creationTime != null) 'creation_time': creationTime,
+      if (due_date != null) 'due_date': due_date,
+      if (created_at != null) 'created_at': created_at,
       if (project != null) 'project': project,
       if (parent != null) 'parent': parent,
       if (tags != null) 'tags': tags,
@@ -429,8 +428,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
       Value<int>? priority,
       Value<String>? pipeline,
       Value<bool>? completed,
-      Value<DateTime?>? dueDate,
-      Value<DateTime>? creationTime,
+      Value<DateTime?>? due_date,
+      Value<DateTime>? created_at,
       Value<String?>? project,
       Value<String?>? parent,
       Value<List<String>>? tags,
@@ -441,8 +440,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
       priority: priority ?? this.priority,
       pipeline: pipeline ?? this.pipeline,
       completed: completed ?? this.completed,
-      dueDate: dueDate ?? this.dueDate,
-      creationTime: creationTime ?? this.creationTime,
+      due_date: due_date ?? this.due_date,
+      created_at: created_at ?? this.created_at,
       project: project ?? this.project,
       parent: parent ?? this.parent,
       tags: tags ?? this.tags,
@@ -468,11 +467,11 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
     if (completed.present) {
       map['completed'] = Variable<bool>(completed.value);
     }
-    if (dueDate.present) {
-      map['due_date'] = Variable<DateTime>(dueDate.value);
+    if (due_date.present) {
+      map['due_date'] = Variable<DateTime>(due_date.value);
     }
-    if (creationTime.present) {
-      map['creation_time'] = Variable<DateTime>(creationTime.value);
+    if (created_at.present) {
+      map['created_at'] = Variable<DateTime>(created_at.value);
     }
     if (project.present) {
       map['project'] = Variable<String>(project.value);
@@ -498,8 +497,8 @@ class TodoCompanion extends UpdateCompanion<TodoData> {
           ..write('priority: $priority, ')
           ..write('pipeline: $pipeline, ')
           ..write('completed: $completed, ')
-          ..write('dueDate: $dueDate, ')
-          ..write('creationTime: $creationTime, ')
+          ..write('due_date: $due_date, ')
+          ..write('created_at: $created_at, ')
           ..write('project: $project, ')
           ..write('parent: $parent, ')
           ..write('tags: $tags, ')
@@ -808,16 +807,16 @@ class $CommentTable extends Comment with TableInfo<$CommentTable, CommentData> {
   late final GeneratedColumn<String> todo = GeneratedColumn<String>(
       'todo', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _creationTimeMeta =
-      const VerificationMeta('creationTime');
+  static const VerificationMeta _created_atMeta =
+      const VerificationMeta('created_at');
   @override
-  late final GeneratedColumn<DateTime> creationTime = GeneratedColumn<DateTime>(
-      'creation_time', aliasedName, false,
+  late final GeneratedColumn<DateTime> created_at = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
       type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
       clientDefault: () => DateTime.now());
   @override
-  List<GeneratedColumn> get $columns => [id, content, type, todo, creationTime];
+  List<GeneratedColumn> get $columns => [id, content, type, todo, created_at];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -843,11 +842,11 @@ class $CommentTable extends Comment with TableInfo<$CommentTable, CommentData> {
     } else if (isInserting) {
       context.missing(_todoMeta);
     }
-    if (data.containsKey('creation_time')) {
+    if (data.containsKey('created_at')) {
       context.handle(
-          _creationTimeMeta,
-          creationTime.isAcceptableOrUnknown(
-              data['creation_time']!, _creationTimeMeta));
+          _created_atMeta,
+          created_at.isAcceptableOrUnknown(
+              data['created_at']!, _created_atMeta));
     }
     return context;
   }
@@ -866,8 +865,8 @@ class $CommentTable extends Comment with TableInfo<$CommentTable, CommentData> {
           .read(DriftSqlType.string, data['${effectivePrefix}type'])!),
       todo: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}todo'])!,
-      creationTime: attachedDatabase.typeMapping.read(
-          DriftSqlType.dateTime, data['${effectivePrefix}creation_time'])!,
+      created_at: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
   }
 
@@ -885,13 +884,13 @@ class CommentData extends DataClass implements Insertable<CommentData> {
   final Uint8List content;
   final TodoCommentType type;
   final String todo;
-  final DateTime creationTime;
+  final DateTime created_at;
   const CommentData(
       {required this.id,
       required this.content,
       required this.type,
       required this.todo,
-      required this.creationTime});
+      required this.created_at});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -901,7 +900,7 @@ class CommentData extends DataClass implements Insertable<CommentData> {
       map['type'] = Variable<String>($CommentTable.$convertertype.toSql(type));
     }
     map['todo'] = Variable<String>(todo);
-    map['creation_time'] = Variable<DateTime>(creationTime);
+    map['created_at'] = Variable<DateTime>(created_at);
     return map;
   }
 
@@ -911,7 +910,7 @@ class CommentData extends DataClass implements Insertable<CommentData> {
       content: Value(content),
       type: Value(type),
       todo: Value(todo),
-      creationTime: Value(creationTime),
+      created_at: Value(created_at),
     );
   }
 
@@ -924,7 +923,7 @@ class CommentData extends DataClass implements Insertable<CommentData> {
       type: $CommentTable.$convertertype
           .fromJson(serializer.fromJson<String>(json['type'])),
       todo: serializer.fromJson<String>(json['todo']),
-      creationTime: serializer.fromJson<DateTime>(json['creationTime']),
+      created_at: serializer.fromJson<DateTime>(json['created_at']),
     );
   }
   @override
@@ -936,7 +935,7 @@ class CommentData extends DataClass implements Insertable<CommentData> {
       'type':
           serializer.toJson<String>($CommentTable.$convertertype.toJson(type)),
       'todo': serializer.toJson<String>(todo),
-      'creationTime': serializer.toJson<DateTime>(creationTime),
+      'created_at': serializer.toJson<DateTime>(created_at),
     };
   }
 
@@ -945,13 +944,13 @@ class CommentData extends DataClass implements Insertable<CommentData> {
           Uint8List? content,
           TodoCommentType? type,
           String? todo,
-          DateTime? creationTime}) =>
+          DateTime? created_at}) =>
       CommentData(
         id: id ?? this.id,
         content: content ?? this.content,
         type: type ?? this.type,
         todo: todo ?? this.todo,
-        creationTime: creationTime ?? this.creationTime,
+        created_at: created_at ?? this.created_at,
       );
   CommentData copyWithCompanion(CommentCompanion data) {
     return CommentData(
@@ -959,9 +958,8 @@ class CommentData extends DataClass implements Insertable<CommentData> {
       content: data.content.present ? data.content.value : this.content,
       type: data.type.present ? data.type.value : this.type,
       todo: data.todo.present ? data.todo.value : this.todo,
-      creationTime: data.creationTime.present
-          ? data.creationTime.value
-          : this.creationTime,
+      created_at:
+          data.created_at.present ? data.created_at.value : this.created_at,
     );
   }
 
@@ -972,14 +970,14 @@ class CommentData extends DataClass implements Insertable<CommentData> {
           ..write('content: $content, ')
           ..write('type: $type, ')
           ..write('todo: $todo, ')
-          ..write('creationTime: $creationTime')
+          ..write('created_at: $created_at')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-      id, $driftBlobEquality.hash(content), type, todo, creationTime);
+  int get hashCode =>
+      Object.hash(id, $driftBlobEquality.hash(content), type, todo, created_at);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -988,7 +986,7 @@ class CommentData extends DataClass implements Insertable<CommentData> {
           $driftBlobEquality.equals(other.content, this.content) &&
           other.type == this.type &&
           other.todo == this.todo &&
-          other.creationTime == this.creationTime);
+          other.created_at == this.created_at);
 }
 
 class CommentCompanion extends UpdateCompanion<CommentData> {
@@ -996,14 +994,14 @@ class CommentCompanion extends UpdateCompanion<CommentData> {
   final Value<Uint8List> content;
   final Value<TodoCommentType> type;
   final Value<String> todo;
-  final Value<DateTime> creationTime;
+  final Value<DateTime> created_at;
   final Value<int> rowid;
   const CommentCompanion({
     this.id = const Value.absent(),
     this.content = const Value.absent(),
     this.type = const Value.absent(),
     this.todo = const Value.absent(),
-    this.creationTime = const Value.absent(),
+    this.created_at = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CommentCompanion.insert({
@@ -1011,7 +1009,7 @@ class CommentCompanion extends UpdateCompanion<CommentData> {
     required Uint8List content,
     required TodoCommentType type,
     required String todo,
-    this.creationTime = const Value.absent(),
+    this.created_at = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : content = Value(content),
         type = Value(type),
@@ -1021,7 +1019,7 @@ class CommentCompanion extends UpdateCompanion<CommentData> {
     Expression<Uint8List>? content,
     Expression<String>? type,
     Expression<String>? todo,
-    Expression<DateTime>? creationTime,
+    Expression<DateTime>? created_at,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1029,7 +1027,7 @@ class CommentCompanion extends UpdateCompanion<CommentData> {
       if (content != null) 'content': content,
       if (type != null) 'type': type,
       if (todo != null) 'todo': todo,
-      if (creationTime != null) 'creation_time': creationTime,
+      if (created_at != null) 'created_at': created_at,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1039,14 +1037,14 @@ class CommentCompanion extends UpdateCompanion<CommentData> {
       Value<Uint8List>? content,
       Value<TodoCommentType>? type,
       Value<String>? todo,
-      Value<DateTime>? creationTime,
+      Value<DateTime>? created_at,
       Value<int>? rowid}) {
     return CommentCompanion(
       id: id ?? this.id,
       content: content ?? this.content,
       type: type ?? this.type,
       todo: todo ?? this.todo,
-      creationTime: creationTime ?? this.creationTime,
+      created_at: created_at ?? this.created_at,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1067,8 +1065,8 @@ class CommentCompanion extends UpdateCompanion<CommentData> {
     if (todo.present) {
       map['todo'] = Variable<String>(todo.value);
     }
-    if (creationTime.present) {
-      map['creation_time'] = Variable<DateTime>(creationTime.value);
+    if (created_at.present) {
+      map['created_at'] = Variable<DateTime>(created_at.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1083,7 +1081,7 @@ class CommentCompanion extends UpdateCompanion<CommentData> {
           ..write('content: $content, ')
           ..write('type: $type, ')
           ..write('todo: $todo, ')
-          ..write('creationTime: $creationTime, ')
+          ..write('created_at: $created_at, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1730,8 +1728,8 @@ typedef $$TodoTableCreateCompanionBuilder = TodoCompanion Function({
   Value<int> priority,
   Value<String> pipeline,
   Value<bool> completed,
-  Value<DateTime?> dueDate,
-  Value<DateTime> creationTime,
+  Value<DateTime?> due_date,
+  Value<DateTime> created_at,
   Value<String?> project,
   Value<String?> parent,
   Value<List<String>> tags,
@@ -1743,8 +1741,8 @@ typedef $$TodoTableUpdateCompanionBuilder = TodoCompanion Function({
   Value<int> priority,
   Value<String> pipeline,
   Value<bool> completed,
-  Value<DateTime?> dueDate,
-  Value<DateTime> creationTime,
+  Value<DateTime?> due_date,
+  Value<DateTime> created_at,
   Value<String?> project,
   Value<String?> parent,
   Value<List<String>> tags,
@@ -1774,11 +1772,11 @@ class $$TodoTableFilterComposer extends Composer<_$SharedDatabase, $TodoTable> {
   ColumnFilters<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get dueDate => $composableBuilder(
-      column: $table.dueDate, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get due_date => $composableBuilder(
+      column: $table.due_date, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get creationTime => $composableBuilder(
-      column: $table.creationTime, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get created_at => $composableBuilder(
+      column: $table.created_at, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get project => $composableBuilder(
       column: $table.project, builder: (column) => ColumnFilters(column));
@@ -1816,12 +1814,11 @@ class $$TodoTableOrderingComposer
   ColumnOrderings<bool> get completed => $composableBuilder(
       column: $table.completed, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get dueDate => $composableBuilder(
-      column: $table.dueDate, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get due_date => $composableBuilder(
+      column: $table.due_date, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get creationTime => $composableBuilder(
-      column: $table.creationTime,
-      builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get created_at => $composableBuilder(
+      column: $table.created_at, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get project => $composableBuilder(
       column: $table.project, builder: (column) => ColumnOrderings(column));
@@ -1857,11 +1854,11 @@ class $$TodoTableAnnotationComposer
   GeneratedColumn<bool> get completed =>
       $composableBuilder(column: $table.completed, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get dueDate =>
-      $composableBuilder(column: $table.dueDate, builder: (column) => column);
+  GeneratedColumn<DateTime> get due_date =>
+      $composableBuilder(column: $table.due_date, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get creationTime => $composableBuilder(
-      column: $table.creationTime, builder: (column) => column);
+  GeneratedColumn<DateTime> get created_at => $composableBuilder(
+      column: $table.created_at, builder: (column) => column);
 
   GeneratedColumn<String> get project =>
       $composableBuilder(column: $table.project, builder: (column) => column);
@@ -1901,8 +1898,8 @@ class $$TodoTableTableManager extends RootTableManager<
             Value<int> priority = const Value.absent(),
             Value<String> pipeline = const Value.absent(),
             Value<bool> completed = const Value.absent(),
-            Value<DateTime?> dueDate = const Value.absent(),
-            Value<DateTime> creationTime = const Value.absent(),
+            Value<DateTime?> due_date = const Value.absent(),
+            Value<DateTime> created_at = const Value.absent(),
             Value<String?> project = const Value.absent(),
             Value<String?> parent = const Value.absent(),
             Value<List<String>> tags = const Value.absent(),
@@ -1914,8 +1911,8 @@ class $$TodoTableTableManager extends RootTableManager<
             priority: priority,
             pipeline: pipeline,
             completed: completed,
-            dueDate: dueDate,
-            creationTime: creationTime,
+            due_date: due_date,
+            created_at: created_at,
             project: project,
             parent: parent,
             tags: tags,
@@ -1927,8 +1924,8 @@ class $$TodoTableTableManager extends RootTableManager<
             Value<int> priority = const Value.absent(),
             Value<String> pipeline = const Value.absent(),
             Value<bool> completed = const Value.absent(),
-            Value<DateTime?> dueDate = const Value.absent(),
-            Value<DateTime> creationTime = const Value.absent(),
+            Value<DateTime?> due_date = const Value.absent(),
+            Value<DateTime> created_at = const Value.absent(),
             Value<String?> project = const Value.absent(),
             Value<String?> parent = const Value.absent(),
             Value<List<String>> tags = const Value.absent(),
@@ -1940,8 +1937,8 @@ class $$TodoTableTableManager extends RootTableManager<
             priority: priority,
             pipeline: pipeline,
             completed: completed,
-            dueDate: dueDate,
-            creationTime: creationTime,
+            due_date: due_date,
+            created_at: created_at,
             project: project,
             parent: parent,
             tags: tags,
@@ -2123,7 +2120,7 @@ typedef $$CommentTableCreateCompanionBuilder = CommentCompanion Function({
   required Uint8List content,
   required TodoCommentType type,
   required String todo,
-  Value<DateTime> creationTime,
+  Value<DateTime> created_at,
   Value<int> rowid,
 });
 typedef $$CommentTableUpdateCompanionBuilder = CommentCompanion Function({
@@ -2131,7 +2128,7 @@ typedef $$CommentTableUpdateCompanionBuilder = CommentCompanion Function({
   Value<Uint8List> content,
   Value<TodoCommentType> type,
   Value<String> todo,
-  Value<DateTime> creationTime,
+  Value<DateTime> created_at,
   Value<int> rowid,
 });
 
@@ -2158,8 +2155,8 @@ class $$CommentTableFilterComposer
   ColumnFilters<String> get todo => $composableBuilder(
       column: $table.todo, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get creationTime => $composableBuilder(
-      column: $table.creationTime, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get created_at => $composableBuilder(
+      column: $table.created_at, builder: (column) => ColumnFilters(column));
 }
 
 class $$CommentTableOrderingComposer
@@ -2183,9 +2180,8 @@ class $$CommentTableOrderingComposer
   ColumnOrderings<String> get todo => $composableBuilder(
       column: $table.todo, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get creationTime => $composableBuilder(
-      column: $table.creationTime,
-      builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get created_at => $composableBuilder(
+      column: $table.created_at, builder: (column) => ColumnOrderings(column));
 }
 
 class $$CommentTableAnnotationComposer
@@ -2209,8 +2205,8 @@ class $$CommentTableAnnotationComposer
   GeneratedColumn<String> get todo =>
       $composableBuilder(column: $table.todo, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get creationTime => $composableBuilder(
-      column: $table.creationTime, builder: (column) => column);
+  GeneratedColumn<DateTime> get created_at => $composableBuilder(
+      column: $table.created_at, builder: (column) => column);
 }
 
 class $$CommentTableTableManager extends RootTableManager<
@@ -2240,7 +2236,7 @@ class $$CommentTableTableManager extends RootTableManager<
             Value<Uint8List> content = const Value.absent(),
             Value<TodoCommentType> type = const Value.absent(),
             Value<String> todo = const Value.absent(),
-            Value<DateTime> creationTime = const Value.absent(),
+            Value<DateTime> created_at = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               CommentCompanion(
@@ -2248,7 +2244,7 @@ class $$CommentTableTableManager extends RootTableManager<
             content: content,
             type: type,
             todo: todo,
-            creationTime: creationTime,
+            created_at: created_at,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -2256,7 +2252,7 @@ class $$CommentTableTableManager extends RootTableManager<
             required Uint8List content,
             required TodoCommentType type,
             required String todo,
-            Value<DateTime> creationTime = const Value.absent(),
+            Value<DateTime> created_at = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               CommentCompanion.insert(
@@ -2264,7 +2260,7 @@ class $$CommentTableTableManager extends RootTableManager<
             content: content,
             type: type,
             todo: todo,
-            creationTime: creationTime,
+            created_at: created_at,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

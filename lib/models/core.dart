@@ -33,8 +33,8 @@ class Todo extends Table {
   late final priority = integer().clientDefault(() => 1)();
   late final pipeline = text().clientDefault(() => defaultPipeline)();
   late final completed = boolean().clientDefault(() => false)();
-  late final dueDate = dateTime().nullable()();
-  late final creationTime = dateTime().clientDefault(() => DateTime.now())();
+  late final due_date = dateTime().nullable()();
+  late final created_at = dateTime().clientDefault(() => DateTime.now())();
   late final project = text().nullable()();
   late final parent = text().nullable()();
   late final tags = text()
@@ -56,7 +56,7 @@ class Comment extends Table {
   late final content = blob()();
   late final type = textEnum<TodoCommentType>()();
   late final todo = text()();
-  late final creationTime = dateTime().clientDefault(() => DateTime.now())();
+  late final created_at = dateTime().clientDefault(() => DateTime.now())();
 
   @override
   Set<Column> get primaryKey => {id};
