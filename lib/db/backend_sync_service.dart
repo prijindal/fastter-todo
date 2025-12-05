@@ -68,7 +68,6 @@ class BackendSyncService {
       return;
     }
     AppLogger.instance.i("Sending actions to server ${queue.length}");
-    final hostId = await getHostId();
     final List<EntityActionRequest> actions =
         queue.map<EntityActionRequest>((a) {
       if (a.action == "CREATE") {
@@ -101,7 +100,6 @@ class BackendSyncService {
       throw Error();
     }).toList();
     for (var action in actions) {
-      print(action);
       await _server.entityClient.entityAction(action);
     }
     await _database.managers.entityActionsQueue
@@ -129,7 +127,6 @@ class BackendSyncService {
   }
 
   Future<void> listenOnEntityHistory() async {
-    final hostId = await getHostId();
     final lastUpdatedAt = await getLastUpdatedAt();
     final stream = _server.entityClient.streamEntityHistory(
       StreamEntityHistoryRequest(
