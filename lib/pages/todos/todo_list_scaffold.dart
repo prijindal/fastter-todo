@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../components/adaptive_scaffold.dart';
 import '../../components/main_drawer.dart';
-import '../../helpers/breakpoints.dart';
 import '../../helpers/todos_filters.dart';
 import '../../models/local_state.dart';
 import 'todoeditbar/index.dart';
@@ -31,50 +28,6 @@ class TodoListScaffold extends WatchingStatefulWidget {
 
 class _TodoListScaffoldState extends State<TodoListScaffold> {
   bool _showInput = false;
-  final HotKey _hotKeyN = HotKey(
-    key: PhysicalKeyboardKey.keyN,
-    modifiers: [HotKeyModifier.control],
-    // Set hotkey scope (default is HotKeyScope.system)
-    scope: HotKeyScope.inapp, // Set as inapp-wide hotkey.
-  );
-  final HotKey _hotKeyEscape = HotKey(
-    key: PhysicalKeyboardKey.escape,
-    // Set hotkey scope (default is HotKeyScope.system)
-    scope: HotKeyScope.inapp, // Set as inapp-wide hotkey.
-  );
-
-  @override
-  initState() {
-    super.initState();
-    if (isDesktop) {
-      hotKeyManager.register(
-        _hotKeyN,
-        keyDownHandler: (hotKey) {
-          setState(() {
-            _showInput = true;
-          });
-        },
-      );
-      hotKeyManager.register(
-        _hotKeyEscape,
-        keyDownHandler: (hotKey) {
-          setState(() {
-            _showInput = false;
-          });
-        },
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    if (isDesktop) {
-      hotKeyManager.unregister(_hotKeyN);
-      hotKeyManager.unregister(_hotKeyEscape);
-    }
-  }
 
   Widget? _buildFab(bool isSelected) {
     if (isSelected || _showInput) {

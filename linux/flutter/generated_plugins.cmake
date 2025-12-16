@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  hotkey_manager_linux
   sqlite3_flutter_libs
   url_launcher_linux
 )

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
-import 'package:drift/isolate.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,7 +16,7 @@ class DatabaseIO {
   final DbCrudOperations dbCrudOperations = GetIt.I<DbCrudOperations>();
 
   Future<String> extractDbJson() async {
-    final entries = await database.computeWithDatabase<List<List<DataClass>>>(
+    final entries = await database.computeWithDatabase<List<List<DataClass>>, SharedDatabase>(
       computation: (database) async {
         final [todo, project, comment, reminder] = await Future.wait([
           database.managers.todo.get(),
