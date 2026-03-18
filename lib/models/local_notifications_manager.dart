@@ -44,17 +44,19 @@ class LocalNotificationsManager {
       macOS: initializationSettingsDarwin,
       linux: initializationSettingsLinux,
     );
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+    await flutterLocalNotificationsPlugin.initialize(
+        settings: initializationSettings,
         onDidReceiveNotificationResponse: (details) {
-      AppLogger.instance.d(
-          "Received notification: ${details.id}, payload: ${details.payload}");
-      if (details.payload != null) {
-        AppRouter appRouter = GetIt.I<AppRouter>();
-        final reminderId = details.payload!;
-        final reminder = state.reminders.singleWhere((a) => a.id == reminderId);
-        appRouter.navigatePath("/todo/${reminder.todo}");
-      }
-    });
+          AppLogger.instance.d(
+              "Received notification: ${details.id}, payload: ${details.payload}");
+          if (details.payload != null) {
+            AppRouter appRouter = GetIt.I<AppRouter>();
+            final reminderId = details.payload!;
+            final reminder =
+                state.reminders.singleWhere((a) => a.id == reminderId);
+            appRouter.navigatePath("/todo/${reminder.todo}");
+          }
+        });
     flutterLocalNotificationsPlugin
         .getNotificationAppLaunchDetails()
         .then((notification) {
@@ -127,15 +129,15 @@ class LocalNotificationsManager {
       flutterLocalNotificationsPlugin.pendingNotificationRequests();
 
   Future<void> cancelNotification(int id) =>
-      flutterLocalNotificationsPlugin.cancel(id);
+      flutterLocalNotificationsPlugin.cancel(id: id);
 
   Future<void> _zonedSchedule(ReminderData reminder, TodoData todo) =>
       flutterLocalNotificationsPlugin.zonedSchedule(
-        reminder.id.hashCode,
-        todo.title,
-        todo.pipeline,
-        tz.TZDateTime.from(reminder.time, tz.local),
-        NotificationDetails(
+        id: reminder.id.hashCode,
+        title: todo.title,
+        body: todo.pipeline,
+        scheduledDate: tz.TZDateTime.from(reminder.time, tz.local),
+        notificationDetails: NotificationDetails(
           android: AndroidNotificationDetails(
             "remnders",
             "Reminders",
