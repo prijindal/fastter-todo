@@ -30,6 +30,14 @@ android {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
+    val versionPropsFile = rootProject.file("version.properties")
+    val versionProps = Properties()
+
+    if(versionPropsFile.exists())
+        versionProps.load(FileInputStream(versionPropsFile))
+
+    val code = (versionProps["VERSION_CODE"] as? String ?: "1").toInt() + 1
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.prijindal.fastter_todo"
@@ -37,8 +45,8 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        versionCode = code
+        versionName = flutter.versionName + "-" + code.toString()
     }
 
     signingConfigs {

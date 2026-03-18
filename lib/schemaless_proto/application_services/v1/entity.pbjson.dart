@@ -60,15 +60,15 @@ final $typed_data.Uint8List listEntityTypesRequestDescriptor =
 const ListEntityTypesResponse$json = {
   '1': 'ListEntityTypesResponse',
   '2': [
-    {'1': 'entity_type', '3': 1, '4': 3, '5': 9, '8': {}, '10': 'entityType'},
+    {'1': 'entity_type', '3': 1, '4': 3, '5': 9, '10': 'entityType'},
   ],
 };
 
 /// Descriptor for `ListEntityTypesResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List listEntityTypesResponseDescriptor =
     $convert.base64Decode(
-        'ChdMaXN0RW50aXR5VHlwZXNSZXNwb25zZRIvCgtlbnRpdHlfdHlwZRgBIAMoCUIOukgLkgEIIg'
-        'ZyBBABGBRSCmVudGl0eVR5cGU=');
+        'ChdMaXN0RW50aXR5VHlwZXNSZXNwb25zZRIfCgtlbnRpdHlfdHlwZRgBIAMoCVIKZW50aXR5VH'
+        'lwZQ==');
 
 @$core.Deprecated('Use entityHistoryRequestOrderDescriptor instead')
 const EntityHistoryRequestOrder$json = {
@@ -273,7 +273,7 @@ final $typed_data.Uint8List streamEntityHistoryResponseDescriptor =
 const EntityActionRequest$json = {
   '1': 'EntityActionRequest',
   '2': [
-    {'1': 'entity_name', '3': 1, '4': 1, '5': 9, '8': {}, '10': 'entityName'},
+    {'1': 'entity_name', '3': 1, '4': 1, '5': 9, '10': 'entityName'},
     {
       '1': 'action',
       '3': 2,
@@ -298,11 +298,11 @@ const EntityActionRequest$json = {
 
 /// Descriptor for `EntityActionRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List entityActionRequestDescriptor = $convert.base64Decode(
-    'ChNFbnRpdHlBY3Rpb25SZXF1ZXN0EioKC2VudGl0eV9uYW1lGAEgASgJQgm6SAZyBBABGBRSCm'
-    'VudGl0eU5hbWUSPQoGYWN0aW9uGAIgASgOMiUuYXBwbGljYXRpb25fc2VydmljZXMudjEuRW50'
-    'aXR5QWN0aW9uUgZhY3Rpb24SOAoJdGltZXN0YW1wGAMgASgLMhouZ29vZ2xlLnByb3RvYnVmLl'
-    'RpbWVzdGFtcFIJdGltZXN0YW1wEhsKCWVudGl0eV9pZBgEIAEoCVIIZW50aXR5SWQSGAoHcGF5'
-    'bG9hZBgFIAEoDFIHcGF5bG9hZBIdCgpyZXF1ZXN0X2lkGAYgASgJUglyZXF1ZXN0SWQ=');
+    'ChNFbnRpdHlBY3Rpb25SZXF1ZXN0Eh8KC2VudGl0eV9uYW1lGAEgASgJUgplbnRpdHlOYW1lEj'
+    '0KBmFjdGlvbhgCIAEoDjIlLmFwcGxpY2F0aW9uX3NlcnZpY2VzLnYxLkVudGl0eUFjdGlvblIG'
+    'YWN0aW9uEjgKCXRpbWVzdGFtcBgDIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXBSCX'
+    'RpbWVzdGFtcBIbCgllbnRpdHlfaWQYBCABKAlSCGVudGl0eUlkEhgKB3BheWxvYWQYBSABKAxS'
+    'B3BheWxvYWQSHQoKcmVxdWVzdF9pZBgGIAEoCVIJcmVxdWVzdElk');
 
 @$core.Deprecated('Use entityActionResponseDescriptor instead')
 const EntityActionResponse$json = {

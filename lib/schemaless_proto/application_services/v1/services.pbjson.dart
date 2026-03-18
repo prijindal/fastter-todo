@@ -27,11 +27,10 @@ final $typed_data.Uint8List verifyUserRequestDescriptor =
 const VerifyUserResponse$json = {
   '1': 'VerifyUserResponse',
   '2': [
-    {'1': 'id', '3': 1, '4': 1, '5': 9, '8': {}, '10': 'id'},
+    {'1': 'id', '3': 1, '4': 1, '5': 9, '10': 'id'},
   ],
 };
 
 /// Descriptor for `VerifyUserResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List verifyUserResponseDescriptor =
-    $convert.base64Decode(
-        'ChJWZXJpZnlVc2VyUmVzcG9uc2USGQoCaWQYASABKAlCCbpIBnIEEAEYZFICaWQ=');
+    $convert.base64Decode('ChJWZXJpZnlVc2VyUmVzcG9uc2USDgoCaWQYASABKAlSAmlk');
