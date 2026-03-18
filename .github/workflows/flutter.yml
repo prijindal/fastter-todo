@@ -119,7 +119,9 @@ jobs:
       - run: flutter analyze
       # - run: flutter test --coverage
       - name: Run Integration Tests
-        run: flutter test integration_test -d linux -r github --coverage
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: flutter test integration_test -d linux -r github --coverage
       - uses: codecov/codecov-action@v5
         with:
           flags: linux
@@ -138,7 +140,7 @@ jobs:
           cache: true
           cache-key: 'flutter-${{ github.job }}-:os:-:channel:-:version:-:arch:-:hash:'
           cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: "zulu"
           java-version: "17"
@@ -211,7 +213,7 @@ jobs:
           name: windows
           path: build/windows/
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest@v4
         with:
           subject-path: |
             build/android/*
@@ -235,7 +237,7 @@ jobs:
           cache: true
           cache-key: 'flutter-${{ github.job }}-:os:-:channel:-:version:-:arch:-:hash:'
           cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:'
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: "zulu"
           java-version: "17"
@@ -438,7 +440,7 @@ jobs:
       - run: flutter pub get
       - run: flutter build windows --release
       - name: Compile .ISS to .EXE Installer
-        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.7
         with:
           path: windows.iss
           options: /O+
