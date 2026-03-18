@@ -143,7 +143,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: "zulu"
-          java-version: "17"
+          java-version: "21"
       
       - name: Cache
         uses: actions/cache@v5
@@ -240,7 +240,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: "zulu"
-          java-version: "17"
+          java-version: "21"
       
       - name: Cache
         uses: actions/cache@v5
@@ -270,7 +270,7 @@ jobs:
           path: |
             build/app/outputs/bundle/release/
             build/app/outputs/mapping/release/
-            build/app/intermediates/merged_native_libs/release/out/lib/
+            build/app/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/
 
   google-play-publish:
     needs: [test-android, android-appbundle]
@@ -290,7 +290,7 @@ jobs:
           packageName: com.prijindal.fastter_todo
           track: beta
           status: completed
-          # debugSymbols: build/app/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/
+          debugSymbols: build/app/intermediates/merged_native_libs/release/mergeReleaseNativeLibs/out/lib/
           mappingFile: build/app/outputs/mapping/release/mapping.txt
 
   web:
