@@ -128,27 +128,30 @@ class BackendSyncService {
 
   Future<void> listenOnEntityHistory() async {
     final lastUpdatedAt = await getLastUpdatedAt();
-    final stream = _server.entityClient.streamEntityHistory(
-      StreamEntityHistoryRequest(
-        entityName: "todo",
-        params: [EntityHistoryRequestParam(
-          field_1: "created_at",
-          dataParams: EntityHistoryRequestDateParam(
-            gte: lastUpdatedAt == null
-                ? null
-                : Timestamp.fromDateTime(lastUpdatedAt),
+    const entityNames = ["todo", "project", "comment", "reminder"];
+    for(final entityName in entityNames) {
+      final stream = _server.entityClient.streamEntityHistory(
+        StreamEntityHistoryRequest(
+          entityName: entityName,
+          params: [EntityHistoryRequestParam(
+            field_1: "created_at",
+            dataParams: EntityHistoryRequestDateParam(
+              gte: lastUpdatedAt == null
+                  ? null
+                  : Timestamp.fromDateTime(lastUpdatedAt),
+            ),
           ),
+          ],
+          order: [
+            EntityHistoryRequestOrder(
+              field_1: "updated_at",
+              value: EntityHistoryOrderValue.ENTITY_HISTORY_ORDER_VALUE_DESC,
+            )
+          ],
         ),
-        ],
-        order: [
-          EntityHistoryRequestOrder(
-            field_1: "updated_at",
-            value: EntityHistoryOrderValue.ENTITY_HISTORY_ORDER_VALUE_DESC,
-          )
-        ],
-      ),
-    );
-    _subscription = stream.listen((d) => _consumeHistory(d));
+      );
+      _subscription = stream.listen((d) => _consumeHistory(d));
+    }
     AppLogger.instance.i("Started listening on stream");
   }
 

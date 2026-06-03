@@ -52,7 +52,7 @@ void downloadContent(BuildContext context) async {
 }
 
 void uploadContent(BuildContext context) async {
-  FilePickerResult? result = await FilePicker.platform.pickFiles();
+  FilePickerResult? result = await FilePicker.pickFiles();
   if (result != null) {
     String? jsonEncoded;
     if (result.files.single.bytes != null) {
