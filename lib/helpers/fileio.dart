@@ -55,8 +55,9 @@ void uploadContent(BuildContext context) async {
   FilePickerResult? result = await FilePicker.pickFiles();
   if (result != null) {
     String? jsonEncoded;
-    if (result.files.single.bytes != null) {
-      jsonEncoded = utf8.decode(result.files.single.bytes!);
+    final bytes = await result.files.single.readAsBytes();
+    if (bytes.isNotEmpty) {
+      jsonEncoded = utf8.decode(bytes);
     } else if (result.files.single.path != null) {
       jsonEncoded = await File(result.files.single.path!).readAsString();
     }

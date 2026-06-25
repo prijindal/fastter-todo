@@ -71,9 +71,7 @@ class BackendImplementationTile extends WatchingWidget {
       if (settings == null) {
         return;
       } else {
-        await GetIt.I<BackendSyncConfigurationService>().setRemote(
-          settings
-        );
+        await GetIt.I<BackendSyncConfigurationService>().setRemote(settings);
       }
     } else {
       await GetIt.I<BackendSyncConfigurationService>().clearRemote();
@@ -106,7 +104,8 @@ class BackendImplementationTile extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backendConnector = GetIt.I<DbCrudOperations>().backendConnector;
+    final backendConnector =
+        GetIt.I<BackendSyncConfigurationService>().backendSyncConfiguration;
     return Column(
       children: [
         ListTile(
@@ -115,27 +114,11 @@ class BackendImplementationTile extends WatchingWidget {
         ),
         if (backendConnector != null)
           ListTile(
-            title: Text("Backend connected"),
-            subtitle: Text(backendConnector.isConnected.toString()),
-          ),
-        if (backendConnector != null)
-          ListTile(
             title: Text("Backend url"),
-            subtitle: Text(backendConnector.server.url),
+            subtitle: Text(backendConnector.syncUrl),
             onTap: () {
-              Clipboard.setData(
-                  ClipboardData(text: backendConnector.server.url));
+              Clipboard.setData(ClipboardData(text: backendConnector.syncUrl));
             },
-          ),
-        if (backendConnector != null)
-          FutureBuilder(
-            future: backendConnector.backendSyncService?.getLastUpdatedAt(),
-            builder: (context, snapshot) => ListTile(
-              title: Text("Last Updated At"),
-              subtitle: Text(
-                snapshot.data?.toString() ?? "Not Updated yet",
-              ),
-            ),
           ),
       ],
     );

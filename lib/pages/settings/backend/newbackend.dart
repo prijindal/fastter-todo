@@ -8,7 +8,8 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import '../../../db/backend_sync_configuration.dart';
 import '../../../helpers/logger.dart';
 
-const allowedProtocols = kIsWeb ? ["https", "http"] : ["grpc"];
+const allowedProtocols =
+    kIsWeb ? ["https", "http", "ws", "wss"] : ["https", "http", "ws", "wss"];
 
 class BackendTokenConfiguraion {
   String url;
@@ -34,11 +35,10 @@ class NewBackendConfig extends StatelessWidget {
       if (_formKey.currentState?.saveAndValidate() == true) {
         final config = _formKey.currentState!.value;
 
-        final backendConfig = await BackendSyncConfigurationService.login(
-          url: config["url"] as String,
-          clientId: config["client_id"] as String,
-          tls: config["tls"] as bool,
-          allowInsecure: config["allowInsecure"] as bool,
+        final backendConfig = await BackendSyncConfigurationService.newBackend(
+          syncUrl: config["syncUrl"] as String,
+          authToken: config["authToken"] as String,
+          syncIntervalSeconds: 60,
         );
         // ignore: use_build_context_synchronously
         Navigator.of(context).pop<BackendSyncConfiguration>(
@@ -70,7 +70,7 @@ class NewBackendConfig extends StatelessWidget {
               child: ListView(
                 children: [
                   FormBuilderTextField(
-                    name: "url",
+                    name: "syncUrl",
                     autofocus: true,
                     autofillHints: [AutofillHints.url],
                     decoration: InputDecoration(
@@ -86,30 +86,12 @@ class NewBackendConfig extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   FormBuilderTextField(
-                    name: "client_id",
+                    name: "authToken",
                     autofocus: false,
-                    decoration: InputDecoration(labelText: 'Client ID'),
+                    decoration: InputDecoration(labelText: 'Auth Token'),
                     validator: FormBuilderValidators.compose([
                       FormBuilderValidators.required(),
                     ]),
-                  ),
-                  SizedBox(height: 10),
-                  FormBuilderCheckbox(
-                    initialValue: false,
-                    enabled: !kIsWeb,
-                    name: "tls",
-                    title: Text("TLS Enabled"),
-                    decoration: InputDecoration(labelText: 'TLS is enabled'),
-                  ),
-                  SizedBox(height: 10),
-                  FormBuilderCheckbox(
-                    initialValue: false,
-                    enabled: !kIsWeb,
-                    name: "allowInsecure",
-                    title: Text("Allow Insecure"),
-                    decoration: InputDecoration(
-                      labelText: 'Allow Insecure Connection',
-                    ),
                   ),
                   SizedBox(height: 10),
                   ElevatedButton(

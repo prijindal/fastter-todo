@@ -3,10 +3,9 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
+import 'package:drift_libsql/drift_libsql.dart';
 import 'package:uuid/uuid.dart';
 
-import '../helpers/constants.dart';
 import 'string_list.dart';
 
 // assuming that your file is called filename.dart. This will give an error at
@@ -94,13 +93,20 @@ class SharedDatabase extends _$SharedDatabase {
   // open an in-memory database only.
   SharedDatabase(super.e);
 
-  SharedDatabase.local()
-      : super(driftDatabase(
-          name: dbName,
-          web: DriftWebOptions(
-            sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-            driftWorker: Uri.parse('drift_worker.dart.js'),
-          ),
+  SharedDatabase.local(String dbFilePath)
+      : super(DriftLibsqlDatabase(
+          dbFilePath,
+        ));
+
+  SharedDatabase.remote(String dbFilePath,
+      {required String authToken,
+      required String syncUrl,
+      required int syncIntervalSeconds})
+      : super(DriftLibsqlDatabase(
+          dbFilePath,
+          authToken: authToken,
+          syncUrl: syncUrl,
+          syncIntervalSeconds: syncIntervalSeconds,
         ));
 
   @override

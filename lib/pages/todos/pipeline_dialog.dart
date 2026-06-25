@@ -207,7 +207,7 @@ class _PipelinesInputState extends State<PipelinesInputDialog> {
               ),
             Expanded(
               child: ReorderableListView.builder(
-                onReorder: _onReorderPipeline,
+                onReorderItem: _onReorderPipeline,
                 itemCount: _selectedPipelines.length,
                 itemBuilder: (context, index) {
                   final pipeline = _selectedPipelines[index];
