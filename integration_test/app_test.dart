@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:fastter_todo/db/backend_sync_configuration.dart';
 import 'package:fastter_todo/db/db_crud_operations.dart';
 import 'package:fastter_todo/helpers/dbio.dart';
 import 'package:fastter_todo/models/core.dart';
@@ -38,6 +39,8 @@ void main() {
       GetIt.I.registerSingleton<LocalDbState>(
         LocalDbState(),
       );
+      GetIt.I.registerSingleton<BackendSyncConfigurationService>(
+          await BackendSyncConfigurationService.init());
       GetIt.I.registerSingleton<AppRouter>(AppRouter());
       GetIt.I.registerSingleton<DbCrudOperations>(
         DbCrudOperations(),
