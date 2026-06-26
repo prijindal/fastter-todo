@@ -181,6 +181,7 @@ class BackendSyncService {
               (u as dynamic).id.equals(entity.id) as drift.Expression<bool>))
           .write(payload);
     } else {
+      print(ProtoConversion.structToMap(entity.payload));
       final payload = manager.insertable(
         ProtoConversion.structToMap(entity.payload),
       );
