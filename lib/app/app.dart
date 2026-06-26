@@ -5,7 +5,6 @@ import 'package:watch_it/watch_it.dart';
 
 import '../db/backend_sync_configuration.dart';
 import '../db/db_crud_operations.dart';
-import '../db/db_loader.dart';
 import '../helpers/breakpoints.dart';
 import '../helpers/dbio.dart';
 import '../helpers/logger.dart';
@@ -19,25 +18,25 @@ import '../pages/loading/index.dart';
 import '../router/app_router.dart';
 
 void registerAllServices() {
-  GetIt.I.registerSingletonAsync<SharedDatabase>(
-      () => SharedDatabaseLoader.loadDatabase());
+  GetIt.I.registerSingleton<SharedDatabase>(SharedDatabase.local());
   GetIt.I.registerSingletonAsync<SettingsStorageNotifier>(
       () => SettingsStorageNotifier.initialize());
   GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier(
     todosView: isDesktop ? TodosView.grid : TodosView.list,
   ));
-  GetIt.I.registerSingletonAsync<LocalDbState>(() async => LocalDbState(),
-      dependsOn: [SharedDatabase]);
+  GetIt.I.registerSingleton<LocalDbState>(
+    LocalDbState(),
+  );
   GetIt.I.registerSingletonAsync<BackendSyncConfigurationService>(
       () => BackendSyncConfigurationService.init());
   GetIt.I.registerSingleton<AppRouter>(AppRouter());
   GetIt.I.registerSingletonAsync<DbCrudOperations>(
     () async => DbCrudOperations(),
-    dependsOn: [SharedDatabase],
+    dependsOn: [BackendSyncConfigurationService],
   );
   GetIt.I.registerSingletonAsync<DatabaseIO>(
     () async => DatabaseIO(),
-    dependsOn: [DbCrudOperations, SharedDatabase],
+    dependsOn: [DbCrudOperations],
   );
 }
 

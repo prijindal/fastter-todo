@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fastter_todo/db/db_crud_operations.dart';
-import 'package:fastter_todo/db/db_loader.dart';
 import 'package:fastter_todo/helpers/dbio.dart';
 import 'package:fastter_todo/models/core.dart';
 import 'package:fastter_todo/models/local_db_state.dart';
@@ -31,10 +30,8 @@ void main() {
         return null;
       });
       when(() => mockStackRouter.currentUrl).thenReturn('/todos');
-      String localPath = await SharedDatabaseLoader.dbFilePath();
       // Load app widget.
-      GetIt.I
-          .registerSingleton<SharedDatabase>(SharedDatabase.local(localPath));
+      GetIt.I.registerSingleton<SharedDatabase>(SharedDatabase.local());
       GetIt.I.registerSingleton<SettingsStorageNotifier>(
           SettingsStorageNotifier());
       GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier());

@@ -104,8 +104,7 @@ class BackendImplementationTile extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backendConnector =
-        GetIt.I<BackendSyncConfigurationService>().backendSyncConfiguration;
+    final backendConnector = GetIt.I<DbCrudOperations>().backendConnector;
     return Column(
       children: [
         ListTile(
@@ -114,11 +113,27 @@ class BackendImplementationTile extends WatchingWidget {
         ),
         if (backendConnector != null)
           ListTile(
+            title: Text("Backend connected"),
+            subtitle: Text(backendConnector.isConnected.toString()),
+          ),
+        if (backendConnector != null)
+          ListTile(
             title: Text("Backend url"),
-            subtitle: Text(backendConnector.syncUrl),
+            subtitle: Text(backendConnector.server.url),
             onTap: () {
-              Clipboard.setData(ClipboardData(text: backendConnector.syncUrl));
+              Clipboard.setData(
+                  ClipboardData(text: backendConnector.server.url));
             },
+          ),
+        if (backendConnector != null)
+          FutureBuilder(
+            future: backendConnector.backendSyncService?.getLastUpdatedAt(),
+            builder: (context, snapshot) => ListTile(
+              title: Text("Last Updated At"),
+              subtitle: Text(
+                snapshot.data?.toString() ?? "Not Updated yet",
+              ),
+            ),
           ),
       ],
     );
