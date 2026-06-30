@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../grpc_client/api_from_server.dart';
 import '../schemaless_proto/types/v1/openid.pb.dart';
-import 'openid_authorize.dart';
+import './openid_authorize/main.dart';
 
 final backendSyncSettingsKey = "backendSyncSettings";
 
