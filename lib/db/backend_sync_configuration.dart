@@ -131,6 +131,8 @@ class BackendSyncConfigurationService extends ChangeNotifier {
       refreshToken: refreshToken,
       tokenEndpoint: tokenEndpoint,
       expiresAt: expiresAt,
+      tls: tls,
+      allowInsecure: allowInsecure,
     );
   }
 

@@ -335,6 +335,7 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FASTTER_TODO_PRIJINDAL }}'
           channelId: live
           projectId: fastter-todo-prijindal
+          force: true
           
   linux:
     runs-on: ubuntu-latest
