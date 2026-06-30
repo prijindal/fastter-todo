@@ -94,7 +94,8 @@ class BackendSyncConfigurationService extends ChangeNotifier {
     required bool allowInsecure,
     required String clientId,
   }) async {
-    final configApi = getConfigApiFromUrl(url);
+    final configApi =
+        getConfigApiFromUrl(url, tls: tls, allowInsecure: allowInsecure);
 
     final openIdConfiguration = await configApi.getOpenIdConfiguration(
       GetOpenIdConfigurationRequest(),
