@@ -117,7 +117,7 @@ jobs:
       - run: flutter --version
       - run: flutter pub get
       - run: flutter analyze
-      # - run: flutter test --coverage
+      - run: flutter test --coverage
       - name: Run Integration Tests
         uses: coactions/setup-xvfb@v1
         with:
