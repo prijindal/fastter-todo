@@ -1,24 +1,14 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:openid_client/openid_client.dart' as openid;
-import 'package:openid_client/openid_client_io.dart';
+import 'package:flutter/foundation.dart';
+import 'package:openid_client/openid_client_io.dart' as openid;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../grpc_client/api_from_server.dart';
 import '../schemaless_proto/types/v1/openid.pb.dart';
+import 'openid_authorize.dart';
 
 final backendSyncSettingsKey = "backendSyncSettings";
-
-Future<void> urlLauncher(String url) async {
-  final uri = Uri.parse(url);
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
-  } else {
-    throw 'Could not launch $url';
-  }
-}
 
 class BackendSyncConfiguration {
   String url;
@@ -107,14 +97,11 @@ class BackendSyncConfigurationService extends ChangeNotifier {
     final tokenEndpoint = openIdConfiguration.tokenEndpoint;
     var client = openid.Client(issuer, clientId);
 
-    var authenticator = Authenticator(client,
-        port: 4000, urlLancher: urlLauncher, scopes: ["offline_access"]);
-
-    var c = await authenticator.authorize();
+    openid.Credential credential = await openidAuthorize(client);
 
     // close the webview when finished
     // await closeInAppWebView();
-    final tokenResponse = await c.getTokenResponse();
+    final tokenResponse = await credential.getTokenResponse();
 
     final expiresAt = tokenResponse.expiresAt;
     final accessToken = tokenResponse.accessToken;
