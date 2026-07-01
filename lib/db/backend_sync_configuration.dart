@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:openid_client/openid_client_io.dart' as openid;
+import 'package:openid_client/openid_client_io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../grpc_client/api_from_server.dart';
@@ -83,6 +83,7 @@ class BackendSyncConfigurationService extends ChangeNotifier {
     required bool tls,
     required bool allowInsecure,
     required String clientId,
+    String? clientSecret,
   }) async {
     final configApi =
         getConfigApiFromUrl(url, tls: tls, allowInsecure: allowInsecure);
@@ -91,13 +92,21 @@ class BackendSyncConfigurationService extends ChangeNotifier {
       GetOpenIdConfigurationRequest(),
     );
 
-    var issuer = await openid.Issuer.discover(
+    var issuer = await Issuer.discover(
       Uri.parse((openIdConfiguration.issuer)),
     );
     final tokenEndpoint = openIdConfiguration.tokenEndpoint;
-    var client = openid.Client(issuer, clientId);
+    var client = Client(
+      issuer,
+      clientId,
+      clientSecret: clientSecret,
+    );
 
-    openid.Credential credential = await openidAuthorize(client);
+    Credential? credential = await openidAuthorize(client);
+
+    if (credential == null) {
+      throw "Credentials not found";
+    }
 
     // close the webview when finished
     // await closeInAppWebView();
@@ -108,7 +117,7 @@ class BackendSyncConfigurationService extends ChangeNotifier {
     final refreshToken = tokenResponse.refreshToken;
 
     if (expiresAt == null || accessToken == null || refreshToken == null) {
-      throw Error();
+      throw "ExpiresAt, accessToken or refreshToken are null";
     }
 
     return BackendSyncConfiguration(

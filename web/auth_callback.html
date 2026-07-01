@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Authenticating...</title>
+</head>
+<body>
+    <p>Authentication complete. Closing window...</p>
+    <script>
+        // Send the complete current URL containing authorization codes/tokens to the parent window
+        if (window.opener) {
+            window.opener.postMessage(window.location.href, window.location.origin);
+            window.close();
+        } else {
+            // Fallback if not opened via popup
+            document.body.innerText = "Error: No parent window found.";
+        }
+    </script>
+</body>
+</html>
