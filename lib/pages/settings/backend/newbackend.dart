@@ -39,7 +39,6 @@ class NewBackendConfig extends StatelessWidget {
           clientId: config["client_id"] as String,
           tls: config["tls"] as bool,
           allowInsecure: config["allowInsecure"] as bool,
-          clientSecret: config["client_secret"] as String?,
         );
         // ignore: use_build_context_synchronously
         Navigator.of(context).pop<BackendSyncConfiguration>(
@@ -94,18 +93,6 @@ class NewBackendConfig extends StatelessWidget {
                       FormBuilderValidators.required(),
                     ]),
                   ),
-                  SizedBox(height: 10),
-                  if (kIsWeb)
-                    FormBuilderTextField(
-                      name: "client_secret",
-                      autofocus: false,
-                      enabled: kIsWeb,
-                      obscureText: true,
-                      decoration: InputDecoration(labelText: 'Client Secret'),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(),
-                      ]),
-                    ),
                   SizedBox(height: 10),
                   FormBuilderCheckbox(
                     initialValue: false,

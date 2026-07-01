@@ -83,7 +83,6 @@ class BackendSyncConfigurationService extends ChangeNotifier {
     required bool tls,
     required bool allowInsecure,
     required String clientId,
-    String? clientSecret,
   }) async {
     final configApi =
         getConfigApiFromUrl(url, tls: tls, allowInsecure: allowInsecure);
@@ -99,7 +98,6 @@ class BackendSyncConfigurationService extends ChangeNotifier {
     var client = Client(
       issuer,
       clientId,
-      clientSecret: clientSecret,
     );
 
     Credential? credential = await openidAuthorize(client);
