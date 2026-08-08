@@ -70,6 +70,8 @@ class BackendSyncService {
     AppLogger.instance.i("Sending actions to server ${queue.length}");
     final List<EntityActionRequest> actions =
         queue.map<EntityActionRequest>((a) {
+      AppLogger.instance.i(
+          "Sending action ${a.action} with entity id: ${a.id}, and request id: ${a.requestId}");
       if (a.action == "CREATE") {
         return EntityActionRequest(
           entityName: a.name,
@@ -128,21 +130,23 @@ class BackendSyncService {
 
   Future<void> listenOnEntityHistory() async {
     final lastUpdatedAt = await getLastUpdatedAt();
+    final hostId = await getHostId();
+    AppLogger.instance.i("Fetching entries after $lastUpdatedAt");
     const entityNames = ["todo", "project", "comment", "reminder"];
     for (final entityName in entityNames) {
       final stream = _server.entityClient.streamEntityHistory(
         StreamEntityHistoryRequest(
           entityName: entityName,
-          params: [
-            EntityHistoryRequestParam(
-              field_1: "created_at",
-              dataParams: EntityHistoryRequestDateParam(
-                gte: lastUpdatedAt == null
-                    ? null
-                    : Timestamp.fromDateTime(lastUpdatedAt),
-              ),
+          params: EntityHistoryRequestParam(
+            createdAt: EntityHistoryRequestDateParam(
+              gte: lastUpdatedAt == null
+                  ? null
+                  : Timestamp.fromDateTime(lastUpdatedAt),
             ),
-          ],
+            hostId: EntityHistoryRequestStringParam(
+              neq: hostId,
+            ),
+          ),
           order: [
             EntityHistoryRequestOrder(
               field_1: "updated_at",
@@ -157,32 +161,20 @@ class BackendSyncService {
   }
 
   Future<void> _consumeHistory(StreamEntityHistoryResponse resp) async {
-    final entity = resp.entity;
-    final manager = getManager(entity.entityName);
-    AppLogger.instance.i("Fetched ${entity.id} entry for ${entity.entityName}");
+    final entityHistory = resp.entityHistory;
+    final manager = getManager(entityHistory.entityName);
+    AppLogger.instance.i(
+        "Fetched ${entityHistory.entityId} entry with request id:${entityHistory.requestId} for ${entityHistory.entityName}");
 
-    final existingEntry =
-        (await manager.getById(entity.id)) as drift.DataClass?;
-    if (entity.deletedAt.hasRequiredFields()) {
+    if (entityHistory.action == EntityAction.ENTITY_ACTION_DELETE) {
       await (_database
               .delete(manager.table as drift.TableInfo<drift.Table, dynamic>)
-            ..where((u) =>
-                (u as dynamic).id.equals(entity.id) as drift.Expression<bool>))
+            ..where((u) => (u as dynamic).id.equals(entityHistory.entityId)
+                as drift.Expression<bool>))
           .go();
-    } else if (existingEntry != null) {
-      final existing = existingEntry.toJson();
-      existing.addAll(
-        ProtoConversion.structToMap(entity.payload),
-      );
-      final payload = manager.insertable(existing);
-      (_database.update(
-        manager.table as drift.TableInfo<drift.Table, dynamic>,
-      )..where((u) =>
-              (u as dynamic).id.equals(entity.id) as drift.Expression<bool>))
-          .write(payload);
-    } else {
+    } else if (entityHistory.action == EntityAction.ENTITY_ACTION_CREATE) {
       final payload = manager.insertable(
-        ProtoConversion.structToMap(entity.payload),
+        ProtoConversion.structToMap(entityHistory.payload),
       );
       await _database
           .into(manager.table as drift.TableInfo<drift.Table, dynamic>)
@@ -190,9 +182,27 @@ class BackendSyncService {
             payload,
             onConflict: drift.DoNothing(),
           );
+    } else if (entityHistory.action == EntityAction.ENTITY_ACTION_UPDATE) {
+      final existingEntry =
+          (await manager.getById(entityHistory.entityId)) as drift.DataClass?;
+      if (existingEntry != null) {
+        final existing = existingEntry.toJson();
+        existing.addAll(
+          ProtoConversion.structToMap(entityHistory.payload),
+        );
+        final payload = manager.insertable(existing);
+        (_database.update(
+          manager.table as drift.TableInfo<drift.Table, dynamic>,
+        )..where((u) => (u as dynamic).id.equals(entityHistory.entityId)
+                as drift.Expression<bool>))
+            .write(payload);
+      }
     }
 
-    await SharedPreferencesAsync().setInt(
-        "lastUpdatedAt", entity.createdAt.toDateTime().millisecondsSinceEpoch);
+    var lastUpdatedAt = DateTime.now();
+
+    await SharedPreferencesAsync()
+        .setInt("lastUpdatedAt", lastUpdatedAt.millisecondsSinceEpoch);
+    AppLogger.instance.i("Updated lastUpdated to $lastUpdatedAt");
   }
 }

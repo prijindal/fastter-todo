@@ -336,18 +336,14 @@ class EntityHistoryRequestStringParam extends $pb.GeneratedMessage {
   $pb.PbList<$core.String> get in_3 => $_getList(2);
 }
 
-enum EntityHistoryRequestParam_Params { stringParams, dataParams, notSet }
-
 class EntityHistoryRequestParam extends $pb.GeneratedMessage {
   factory EntityHistoryRequestParam({
-    $core.String? field_1,
-    EntityHistoryRequestStringParam? stringParams,
-    EntityHistoryRequestDateParam? dataParams,
+    EntityHistoryRequestStringParam? hostId,
+    EntityHistoryRequestDateParam? createdAt,
   }) {
     final result = create();
-    if (field_1 != null) result.field_1 = field_1;
-    if (stringParams != null) result.stringParams = stringParams;
-    if (dataParams != null) result.dataParams = dataParams;
+    if (hostId != null) result.hostId = hostId;
+    if (createdAt != null) result.createdAt = createdAt;
     return result;
   }
 
@@ -360,23 +356,15 @@ class EntityHistoryRequestParam extends $pb.GeneratedMessage {
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromJson(json, registry);
 
-  static const $core.Map<$core.int, EntityHistoryRequestParam_Params>
-      _EntityHistoryRequestParam_ParamsByTag = {
-    2: EntityHistoryRequestParam_Params.stringParams,
-    3: EntityHistoryRequestParam_Params.dataParams,
-    0: EntityHistoryRequestParam_Params.notSet
-  };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       _omitMessageNames ? '' : 'EntityHistoryRequestParam',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'application_services.v1'),
       createEmptyInstance: create)
-    ..oo(0, [2, 3])
-    ..aOS(1, _omitFieldNames ? '' : 'field')
-    ..aOM<EntityHistoryRequestStringParam>(
-        2, _omitFieldNames ? '' : 'stringParams',
-        subBuilder: EntityHistoryRequestStringParam.create)
-    ..aOM<EntityHistoryRequestDateParam>(3, _omitFieldNames ? '' : 'dataParams',
+    ..aOM<EntityHistoryRequestStringParam>(1, _omitFieldNames ? '' : 'hostId',
+        protoName: 'hostId', subBuilder: EntityHistoryRequestStringParam.create)
+    ..aOM<EntityHistoryRequestDateParam>(2, _omitFieldNames ? '' : 'createdAt',
+        protoName: 'createdAt',
         subBuilder: EntityHistoryRequestDateParam.create)
     ..hasRequiredFields = false;
 
@@ -400,56 +388,38 @@ class EntityHistoryRequestParam extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<EntityHistoryRequestParam>(create);
   static EntityHistoryRequestParam? _defaultInstance;
 
-  @$pb.TagNumber(2)
-  @$pb.TagNumber(3)
-  EntityHistoryRequestParam_Params whichParams() =>
-      _EntityHistoryRequestParam_ParamsByTag[$_whichOneof(0)]!;
-  @$pb.TagNumber(2)
-  @$pb.TagNumber(3)
-  void clearParams() => $_clearField($_whichOneof(0));
-
   @$pb.TagNumber(1)
-  $core.String get field_1 => $_getSZ(0);
+  EntityHistoryRequestStringParam get hostId => $_getN(0);
   @$pb.TagNumber(1)
-  set field_1($core.String value) => $_setString(0, value);
+  set hostId(EntityHistoryRequestStringParam value) => $_setField(1, value);
   @$pb.TagNumber(1)
-  $core.bool hasField_1() => $_has(0);
+  $core.bool hasHostId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearField_1() => $_clearField(1);
+  void clearHostId() => $_clearField(1);
+  @$pb.TagNumber(1)
+  EntityHistoryRequestStringParam ensureHostId() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  EntityHistoryRequestStringParam get stringParams => $_getN(1);
+  EntityHistoryRequestDateParam get createdAt => $_getN(1);
   @$pb.TagNumber(2)
-  set stringParams(EntityHistoryRequestStringParam value) =>
-      $_setField(2, value);
+  set createdAt(EntityHistoryRequestDateParam value) => $_setField(2, value);
   @$pb.TagNumber(2)
-  $core.bool hasStringParams() => $_has(1);
+  $core.bool hasCreatedAt() => $_has(1);
   @$pb.TagNumber(2)
-  void clearStringParams() => $_clearField(2);
+  void clearCreatedAt() => $_clearField(2);
   @$pb.TagNumber(2)
-  EntityHistoryRequestStringParam ensureStringParams() => $_ensure(1);
-
-  @$pb.TagNumber(3)
-  EntityHistoryRequestDateParam get dataParams => $_getN(2);
-  @$pb.TagNumber(3)
-  set dataParams(EntityHistoryRequestDateParam value) => $_setField(3, value);
-  @$pb.TagNumber(3)
-  $core.bool hasDataParams() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearDataParams() => $_clearField(3);
-  @$pb.TagNumber(3)
-  EntityHistoryRequestDateParam ensureDataParams() => $_ensure(2);
+  EntityHistoryRequestDateParam ensureCreatedAt() => $_ensure(1);
 }
 
 class StreamEntityHistoryRequest extends $pb.GeneratedMessage {
   factory StreamEntityHistoryRequest({
     $core.String? entityName,
-    $core.Iterable<EntityHistoryRequestParam>? params,
+    EntityHistoryRequestParam? params,
     $core.Iterable<EntityHistoryRequestOrder>? order,
   }) {
     final result = create();
     if (entityName != null) result.entityName = entityName;
-    if (params != null) result.params.addAll(params);
+    if (params != null) result.params = params;
     if (order != null) result.order.addAll(order);
     return result;
   }
@@ -469,7 +439,7 @@ class StreamEntityHistoryRequest extends $pb.GeneratedMessage {
           _omitMessageNames ? '' : 'application_services.v1'),
       createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'entityName')
-    ..pPM<EntityHistoryRequestParam>(2, _omitFieldNames ? '' : 'params',
+    ..aOM<EntityHistoryRequestParam>(2, _omitFieldNames ? '' : 'params',
         subBuilder: EntityHistoryRequestParam.create)
     ..pPM<EntityHistoryRequestOrder>(3, _omitFieldNames ? '' : 'order',
         subBuilder: EntityHistoryRequestOrder.create)
@@ -506,24 +476,36 @@ class StreamEntityHistoryRequest extends $pb.GeneratedMessage {
   void clearEntityName() => $_clearField(1);
 
   @$pb.TagNumber(2)
-  $pb.PbList<EntityHistoryRequestParam> get params => $_getList(1);
+  EntityHistoryRequestParam get params => $_getN(1);
+  @$pb.TagNumber(2)
+  set params(EntityHistoryRequestParam value) => $_setField(2, value);
+  @$pb.TagNumber(2)
+  $core.bool hasParams() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearParams() => $_clearField(2);
+  @$pb.TagNumber(2)
+  EntityHistoryRequestParam ensureParams() => $_ensure(1);
 
   @$pb.TagNumber(3)
   $pb.PbList<EntityHistoryRequestOrder> get order => $_getList(2);
 }
 
-class Entity extends $pb.GeneratedMessage {
-  factory Entity({
-    $core.String? id,
+class EntityHistory extends $pb.GeneratedMessage {
+  factory EntityHistory({
+    $core.String? requestId,
     $core.String? entityName,
+    $core.String? entityId,
+    EntityAction? action,
     $0.Timestamp? createdAt,
     $0.Timestamp? updatedAt,
     $0.Timestamp? deletedAt,
     $1.Struct? payload,
   }) {
     final result = create();
-    if (id != null) result.id = id;
+    if (requestId != null) result.requestId = requestId;
     if (entityName != null) result.entityName = entityName;
+    if (entityId != null) result.entityId = entityId;
+    if (action != null) result.action = action;
     if (createdAt != null) result.createdAt = createdAt;
     if (updatedAt != null) result.updatedAt = updatedAt;
     if (deletedAt != null) result.deletedAt = deletedAt;
@@ -531,58 +513,62 @@ class Entity extends $pb.GeneratedMessage {
     return result;
   }
 
-  Entity._();
+  EntityHistory._();
 
-  factory Entity.fromBuffer($core.List<$core.int> data,
+  factory EntityHistory.fromBuffer($core.List<$core.int> data,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(data, registry);
-  factory Entity.fromJson($core.String json,
+  factory EntityHistory.fromJson($core.String json,
           [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromJson(json, registry);
 
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
-      _omitMessageNames ? '' : 'Entity',
+      _omitMessageNames ? '' : 'EntityHistory',
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'application_services.v1'),
       createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'id')
+    ..aOS(1, _omitFieldNames ? '' : 'requestId')
     ..aOS(2, _omitFieldNames ? '' : 'entityName')
-    ..aOM<$0.Timestamp>(3, _omitFieldNames ? '' : 'createdAt',
+    ..aOS(3, _omitFieldNames ? '' : 'entityId')
+    ..aE<EntityAction>(4, _omitFieldNames ? '' : 'action',
+        enumValues: EntityAction.values)
+    ..aOM<$0.Timestamp>(5, _omitFieldNames ? '' : 'createdAt',
         subBuilder: $0.Timestamp.create)
-    ..aOM<$0.Timestamp>(4, _omitFieldNames ? '' : 'updatedAt',
+    ..aOM<$0.Timestamp>(6, _omitFieldNames ? '' : 'updatedAt',
         subBuilder: $0.Timestamp.create)
-    ..aOM<$0.Timestamp>(5, _omitFieldNames ? '' : 'deletedAt',
+    ..aOM<$0.Timestamp>(7, _omitFieldNames ? '' : 'deletedAt',
         subBuilder: $0.Timestamp.create)
-    ..aOM<$1.Struct>(6, _omitFieldNames ? '' : 'payload',
+    ..aOM<$1.Struct>(8, _omitFieldNames ? '' : 'payload',
         subBuilder: $1.Struct.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Entity clone() => deepCopy();
+  EntityHistory clone() => deepCopy();
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
-  Entity copyWith(void Function(Entity) updates) =>
-      super.copyWith((message) => updates(message as Entity)) as Entity;
+  EntityHistory copyWith(void Function(EntityHistory) updates) =>
+      super.copyWith((message) => updates(message as EntityHistory))
+          as EntityHistory;
 
   @$core.override
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static Entity create() => Entity._();
+  static EntityHistory create() => EntityHistory._();
   @$core.override
-  Entity createEmptyInstance() => create();
+  EntityHistory createEmptyInstance() => create();
   @$core.pragma('dart2js:noInline')
-  static Entity getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Entity>(create);
-  static Entity? _defaultInstance;
+  static EntityHistory getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<EntityHistory>(create);
+  static EntityHistory? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get id => $_getSZ(0);
+  $core.String get requestId => $_getSZ(0);
   @$pb.TagNumber(1)
-  set id($core.String value) => $_setString(0, value);
+  set requestId($core.String value) => $_setString(0, value);
   @$pb.TagNumber(1)
-  $core.bool hasId() => $_has(0);
+  $core.bool hasRequestId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => $_clearField(1);
+  void clearRequestId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get entityName => $_getSZ(1);
@@ -594,56 +580,74 @@ class Entity extends $pb.GeneratedMessage {
   void clearEntityName() => $_clearField(2);
 
   @$pb.TagNumber(3)
-  $0.Timestamp get createdAt => $_getN(2);
+  $core.String get entityId => $_getSZ(2);
   @$pb.TagNumber(3)
-  set createdAt($0.Timestamp value) => $_setField(3, value);
+  set entityId($core.String value) => $_setString(2, value);
   @$pb.TagNumber(3)
-  $core.bool hasCreatedAt() => $_has(2);
+  $core.bool hasEntityId() => $_has(2);
   @$pb.TagNumber(3)
-  void clearCreatedAt() => $_clearField(3);
-  @$pb.TagNumber(3)
-  $0.Timestamp ensureCreatedAt() => $_ensure(2);
+  void clearEntityId() => $_clearField(3);
 
   @$pb.TagNumber(4)
-  $0.Timestamp get updatedAt => $_getN(3);
+  EntityAction get action => $_getN(3);
   @$pb.TagNumber(4)
-  set updatedAt($0.Timestamp value) => $_setField(4, value);
+  set action(EntityAction value) => $_setField(4, value);
   @$pb.TagNumber(4)
-  $core.bool hasUpdatedAt() => $_has(3);
+  $core.bool hasAction() => $_has(3);
   @$pb.TagNumber(4)
-  void clearUpdatedAt() => $_clearField(4);
-  @$pb.TagNumber(4)
-  $0.Timestamp ensureUpdatedAt() => $_ensure(3);
+  void clearAction() => $_clearField(4);
 
   @$pb.TagNumber(5)
-  $0.Timestamp get deletedAt => $_getN(4);
+  $0.Timestamp get createdAt => $_getN(4);
   @$pb.TagNumber(5)
-  set deletedAt($0.Timestamp value) => $_setField(5, value);
+  set createdAt($0.Timestamp value) => $_setField(5, value);
   @$pb.TagNumber(5)
-  $core.bool hasDeletedAt() => $_has(4);
+  $core.bool hasCreatedAt() => $_has(4);
   @$pb.TagNumber(5)
-  void clearDeletedAt() => $_clearField(5);
+  void clearCreatedAt() => $_clearField(5);
   @$pb.TagNumber(5)
-  $0.Timestamp ensureDeletedAt() => $_ensure(4);
+  $0.Timestamp ensureCreatedAt() => $_ensure(4);
 
   @$pb.TagNumber(6)
-  $1.Struct get payload => $_getN(5);
+  $0.Timestamp get updatedAt => $_getN(5);
   @$pb.TagNumber(6)
-  set payload($1.Struct value) => $_setField(6, value);
+  set updatedAt($0.Timestamp value) => $_setField(6, value);
   @$pb.TagNumber(6)
-  $core.bool hasPayload() => $_has(5);
+  $core.bool hasUpdatedAt() => $_has(5);
   @$pb.TagNumber(6)
-  void clearPayload() => $_clearField(6);
+  void clearUpdatedAt() => $_clearField(6);
   @$pb.TagNumber(6)
-  $1.Struct ensurePayload() => $_ensure(5);
+  $0.Timestamp ensureUpdatedAt() => $_ensure(5);
+
+  @$pb.TagNumber(7)
+  $0.Timestamp get deletedAt => $_getN(6);
+  @$pb.TagNumber(7)
+  set deletedAt($0.Timestamp value) => $_setField(7, value);
+  @$pb.TagNumber(7)
+  $core.bool hasDeletedAt() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearDeletedAt() => $_clearField(7);
+  @$pb.TagNumber(7)
+  $0.Timestamp ensureDeletedAt() => $_ensure(6);
+
+  @$pb.TagNumber(8)
+  $1.Struct get payload => $_getN(7);
+  @$pb.TagNumber(8)
+  set payload($1.Struct value) => $_setField(8, value);
+  @$pb.TagNumber(8)
+  $core.bool hasPayload() => $_has(7);
+  @$pb.TagNumber(8)
+  void clearPayload() => $_clearField(8);
+  @$pb.TagNumber(8)
+  $1.Struct ensurePayload() => $_ensure(7);
 }
 
 class StreamEntityHistoryResponse extends $pb.GeneratedMessage {
   factory StreamEntityHistoryResponse({
-    Entity? entity,
+    EntityHistory? entityHistory,
   }) {
     final result = create();
-    if (entity != null) result.entity = entity;
+    if (entityHistory != null) result.entityHistory = entityHistory;
     return result;
   }
 
@@ -661,7 +665,8 @@ class StreamEntityHistoryResponse extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'application_services.v1'),
       createEmptyInstance: create)
-    ..aOM<Entity>(1, _omitFieldNames ? '' : 'entity', subBuilder: Entity.create)
+    ..aOM<EntityHistory>(1, _omitFieldNames ? '' : 'entityHistory',
+        protoName: 'entityHistory', subBuilder: EntityHistory.create)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -687,15 +692,15 @@ class StreamEntityHistoryResponse extends $pb.GeneratedMessage {
   static StreamEntityHistoryResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  Entity get entity => $_getN(0);
+  EntityHistory get entityHistory => $_getN(0);
   @$pb.TagNumber(1)
-  set entity(Entity value) => $_setField(1, value);
+  set entityHistory(EntityHistory value) => $_setField(1, value);
   @$pb.TagNumber(1)
-  $core.bool hasEntity() => $_has(0);
+  $core.bool hasEntityHistory() => $_has(0);
   @$pb.TagNumber(1)
-  void clearEntity() => $_clearField(1);
+  void clearEntityHistory() => $_clearField(1);
   @$pb.TagNumber(1)
-  Entity ensureEntity() => $_ensure(0);
+  EntityHistory ensureEntityHistory() => $_ensure(0);
 }
 
 /// EntityActionRequest
