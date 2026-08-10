@@ -10,6 +10,10 @@ import '../../../helpers/logger.dart';
 
 const allowedProtocols = kIsWeb ? ["https", "http"] : ["grpc"];
 
+const grpcInitialAddress = kIsWeb
+    ? "https://fastter.prijindal.click"
+    : "grpc://fastter.prijindal.click:443";
+
 class BackendTokenConfiguraion {
   String url;
   String jwtToken;
@@ -72,6 +76,7 @@ class NewBackendConfig extends StatelessWidget {
                   FormBuilderTextField(
                     name: "url",
                     autofocus: true,
+                    initialValue: grpcInitialAddress,
                     autofillHints: [AutofillHints.url],
                     decoration: InputDecoration(
                       labelText: 'URL, starts with $allowedProtocols',
@@ -88,6 +93,7 @@ class NewBackendConfig extends StatelessWidget {
                   FormBuilderTextField(
                     name: "client_id",
                     autofocus: false,
+                    initialValue: "frontend-client",
                     decoration: InputDecoration(labelText: 'Client ID'),
                     validator: FormBuilderValidators.compose([
                       FormBuilderValidators.required(),
@@ -95,7 +101,7 @@ class NewBackendConfig extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   FormBuilderCheckbox(
-                    initialValue: false,
+                    initialValue: true,
                     enabled: !kIsWeb,
                     name: "tls",
                     title: Text("TLS Enabled"),
