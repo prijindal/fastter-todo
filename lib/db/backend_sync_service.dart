@@ -108,6 +108,9 @@ class BackendSyncService {
         .filter((f) => f.requestId.isIn(queue.map((a) => a.requestId).toList()))
         .delete();
     _performingActions = false;
+    var lastUpdatedAt = DateTime.now();
+    await SharedPreferencesAsync()
+        .setInt("lastUpdatedAt", lastUpdatedAt.millisecondsSinceEpoch);
   }
 
   Future<String> getHostId() async {

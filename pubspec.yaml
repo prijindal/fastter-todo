@@ -38,7 +38,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_file_dialog: ^3.0.2
-  flutter_form_builder: ^10.0.1
+  flutter_form_builder: ^11.0.0
   flutter_keyboard_visibility: ^6.0.0
   flutter_local_notifications: ^22.0.0-dev.3
   form_builder_validators: ^11.1.1

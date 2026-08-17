@@ -41,3 +41,10 @@ analyzer:
     - lib/models/core.g.dart
     - lib/router/app_router.gr.dart
     - lib/schemaless_proto/*
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
