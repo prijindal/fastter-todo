@@ -52,14 +52,14 @@ void downloadContent(BuildContext context) async {
 }
 
 void uploadContent(BuildContext context) async {
-  FilePickerResult? result = await FilePicker.pickFiles();
-  if (result != null) {
+  List<PlatformFile> result = await FilePicker.pickFiles();
+  if (result.isNotEmpty) {
     String? jsonEncoded;
-    final bytes = await result.files.single.readAsBytes();
+    final bytes = await result.single.readAsBytes();
     if (bytes.isNotEmpty) {
       jsonEncoded = utf8.decode(bytes);
-    } else if (result.files.single.path != null) {
-      jsonEncoded = await File(result.files.single.path!).readAsString();
+    } else if (result.single.path != null) {
+      jsonEncoded = await File(result.single.path!).readAsString();
     }
     if (jsonEncoded != null && context.mounted) {
       try {
