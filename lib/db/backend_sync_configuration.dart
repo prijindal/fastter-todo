@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:openid_client/openid_client_io.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../grpc_client/api_from_server.dart';
 import '../schemaless_proto/types/v1/openid.pb.dart';
 import './openid_authorize/main.dart';
+import 'local_settings.dart';
 
-final backendSyncSettingsKey = "backendSyncSettings";
+const defaultBackendSyncSettingsKey = "backendSyncSettings";
 
 class BackendSyncConfiguration {
   String url;
@@ -60,21 +60,25 @@ class BackendSyncConfiguration {
 
 class BackendSyncConfigurationService extends ChangeNotifier {
   BackendSyncConfiguration? _backendSyncConfiguration;
-
-  BackendSyncConfigurationService(this._backendSyncConfiguration);
+  final LocalSettings _localSettings;
+  BackendSyncConfigurationService(
+    this._backendSyncConfiguration,
+    this._localSettings,
+  );
 
   BackendSyncConfiguration? get backendSyncConfiguration =>
       _backendSyncConfiguration;
 
-  static Future<BackendSyncConfigurationService> init() async {
-    final backendSyncSettings =
-        await SharedPreferencesAsync().getString(backendSyncSettingsKey);
+  static Future<BackendSyncConfigurationService> init(
+      LocalSettings localSettings) async {
+    final backendSyncSettings = await localSettings.sharedPreferences
+        .getString(defaultBackendSyncSettingsKey);
     if (backendSyncSettings == null) {
-      return BackendSyncConfigurationService(null);
+      return BackendSyncConfigurationService(null, localSettings);
     } else {
       final config = BackendSyncConfiguration.fromJson(
           jsonDecode(backendSyncSettings) as Map<String, dynamic>);
-      return BackendSyncConfigurationService(config);
+      return BackendSyncConfigurationService(config, localSettings);
     }
   }
 
@@ -133,8 +137,8 @@ class BackendSyncConfigurationService extends ChangeNotifier {
   Future<void> setRemote(BackendSyncConfiguration config) async {
     _backendSyncConfiguration = config;
     // TODO: Check if remote is valid by doing a health check
-    await SharedPreferencesAsync().setString(
-      backendSyncSettingsKey,
+    await _localSettings.sharedPreferences.setString(
+      defaultBackendSyncSettingsKey,
       jsonEncode(_backendSyncConfiguration!.toJson()),
     );
     notifyListeners();
@@ -142,7 +146,8 @@ class BackendSyncConfigurationService extends ChangeNotifier {
 
   Future<void> clearRemote() async {
     _backendSyncConfiguration = null;
-    await SharedPreferencesAsync().remove(backendSyncSettingsKey);
+    await _localSettings.sharedPreferences
+        .remove(defaultBackendSyncSettingsKey);
     notifyListeners();
   }
 }

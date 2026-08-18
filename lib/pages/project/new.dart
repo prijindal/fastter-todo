@@ -19,6 +19,7 @@ class NewProjectScreen extends StatelessWidget {
     BuildContext context, {
     String? title,
     Color? color,
+    bool? archive,
     List<String>? pipelines,
   }) async {
     if (title == null || color == null) {
@@ -28,6 +29,7 @@ class NewProjectScreen extends StatelessWidget {
           ProjectCompanion(
             color: drift.Value(color.hex),
             title: drift.Value(title),
+            archive: drift.Value(archive ?? false),
             pipelines: drift.Value(pipelines ?? [defaultPipeline]),
           ),
         );
@@ -42,10 +44,11 @@ class NewProjectScreen extends StatelessWidget {
           title: const Text('Add new project'),
         ),
         body: ProjectForm(
-          onSave: ({title, color, pipelines}) => _onSave(
+          onSave: ({title, color, archive, pipelines}) => _onSave(
             context,
             title: title,
             color: color,
+            archive: archive,
             pipelines: pipelines,
           ),
         ),

@@ -13,16 +13,19 @@ class ProjectForm extends StatefulWidget {
     required this.onSave,
     this.title,
     this.color,
+    this.archive,
     this.pipelines,
   });
 
   final void Function({
     String? title,
     Color? color,
+    bool? archive,
     List<String>? pipelines,
   }) onSave;
   final String? title;
   final String? color;
+  final bool? archive;
   final List<String>? pipelines;
 
   @override
@@ -37,6 +40,7 @@ class _ProjectFormState extends State<ProjectForm> {
       widget.onSave(
         title: project["title"] as String,
         color: project["color"] as Color?,
+        archive: project["archive"] as bool?,
         pipelines: project["pipelines"] as List<String>?,
       );
     }
@@ -69,6 +73,14 @@ class _ProjectFormState extends State<ProjectForm> {
               labelText: 'Pipelines',
             ),
             validator: FormBuilderValidators.minLength(1),
+          ),
+          FormBuilderCheckbox(
+            name: "archive",
+            initialValue: widget.archive ?? false,
+            title: Text("Archive"),
+            decoration: InputDecoration(
+              labelText: 'Archive',
+            ),
           ),
           FormColorPicker(
             name: "color",

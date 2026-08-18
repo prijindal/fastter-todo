@@ -40,6 +40,7 @@ class _EditProjectScreen extends StatelessWidget {
     BuildContext context, {
     String? title,
     Color? color,
+    bool? archive,
     List<String>? pipelines,
   }) async {
     await GetIt.I<DbCrudOperations>().project.update(
@@ -47,6 +48,7 @@ class _EditProjectScreen extends StatelessWidget {
         ProjectCompanion(
           color: drift.Value(color?.hex ?? project.color),
           title: drift.Value(title ?? project.title),
+          archive: drift.Value(archive ?? project.archive),
           pipelines: drift.Value(pipelines ?? project.pipelines),
         ));
     // ignore: use_build_context_synchronously
@@ -61,10 +63,12 @@ class _EditProjectScreen extends StatelessWidget {
         body: ProjectForm(
           title: project.title,
           color: project.color,
+          archive: project.archive,
           pipelines: project.pipelines,
-          onSave: ({title, color, pipelines}) => _onSave(
+          onSave: ({title, color, archive, pipelines}) => _onSave(
             context,
             title: title,
+            archive: archive,
             color: color,
             pipelines: pipelines,
           ),

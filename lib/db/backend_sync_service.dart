@@ -2,33 +2,33 @@ import 'dart:async';
 
 import 'package:drift/drift.dart' as drift;
 import 'package:protobuf/well_known_types/google/protobuf/timestamp.pb.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'package:watch_it/watch_it.dart';
 
 import '../grpc_client/api_from_server.dart';
 import '../helpers/logger.dart';
 import '../models/core.dart';
 import '../schemaless_proto/application_services/v1/entity.pb.dart';
 import 'db_crud_operations.dart';
+import 'local_settings.dart';
 import 'proto_conversion.dart';
 
 class BackendSyncService {
+  final LocalSettings _localSettings;
   final ApiFromServerInfo _server;
   StreamSubscription<StreamEntityHistoryResponse>? _subscription;
   bool get isConnected => _subscription != null;
 
-  SharedDatabase get _database => GetIt.I<SharedDatabase>();
-  DbCrudOperations get dbCrudOperations => GetIt.I<DbCrudOperations>();
+  final SharedDatabase _database;
+  final DbCrudOperations _dbCrudOperations;
   Timer? _timer;
 
   bool _performingActions = false;
 
   late final managers = [
-    dbCrudOperations.todo,
-    dbCrudOperations.project,
-    dbCrudOperations.comment,
-    dbCrudOperations.reminder,
+    _dbCrudOperations.todo,
+    _dbCrudOperations.project,
+    _dbCrudOperations.comment,
+    _dbCrudOperations.reminder,
   ];
 
   Iterable<String> get entities {
@@ -41,7 +41,15 @@ class BackendSyncService {
     return operation;
   }
 
-  BackendSyncService({required ApiFromServerInfo server}) : _server = server {
+  BackendSyncService({
+    required LocalSettings localSettings,
+    required SharedDatabase database,
+    required DbCrudOperations dbCrudOperations,
+    required ApiFromServerInfo server,
+  })  : _localSettings = localSettings,
+        _database = database,
+        _dbCrudOperations = dbCrudOperations,
+        _server = server {
     init();
   }
 
@@ -109,23 +117,24 @@ class BackendSyncService {
         .delete();
     _performingActions = false;
     var lastUpdatedAt = DateTime.now();
-    await SharedPreferencesAsync()
+    await _localSettings.sharedPreferences
         .setInt("lastUpdatedAt", lastUpdatedAt.millisecondsSinceEpoch);
   }
 
   Future<String> getHostId() async {
-    final existingHostId = await SharedPreferencesAsync().getString("hostId");
+    final existingHostId =
+        await _localSettings.sharedPreferences.getString("hostId");
     if (existingHostId != null) {
       return existingHostId;
     }
     final hostId = Uuid().v4();
-    await SharedPreferencesAsync().setString("hostId", hostId);
+    await _localSettings.sharedPreferences.setString("hostId", hostId);
     return hostId;
   }
 
   Future<DateTime?> getLastUpdatedAt() async {
     final lastUpdatedAt =
-        await SharedPreferencesAsync().getInt("lastUpdatedAt");
+        await _localSettings.sharedPreferences.getInt("lastUpdatedAt");
     return lastUpdatedAt == null
         ? null
         : DateTime.fromMillisecondsSinceEpoch(lastUpdatedAt);
@@ -204,7 +213,7 @@ class BackendSyncService {
 
     var lastUpdatedAt = DateTime.now();
 
-    await SharedPreferencesAsync()
+    await _localSettings.sharedPreferences
         .setInt("lastUpdatedAt", lastUpdatedAt.millisecondsSinceEpoch);
     AppLogger.instance.i("Updated lastUpdated to $lastUpdatedAt");
   }

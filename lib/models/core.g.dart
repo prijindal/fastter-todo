@@ -530,6 +530,16 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
   late final GeneratedColumn<String> color = GeneratedColumn<String>(
       'color', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _archiveMeta =
+      const VerificationMeta('archive');
+  @override
+  late final GeneratedColumn<bool> archive = GeneratedColumn<bool>(
+      'archive', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("archive" IN (0, 1))'),
+      clientDefault: () => false);
   @override
   late final GeneratedColumnWithTypeConverter<List<String>, String> pipelines =
       GeneratedColumn<String>('pipelines', aliasedName, false,
@@ -538,7 +548,7 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
               clientDefault: () => jsonEncode([defaultPipeline]))
           .withConverter<List<String>>($ProjectTable.$converterpipelines);
   @override
-  List<GeneratedColumn> get $columns => [id, title, color, pipelines];
+  List<GeneratedColumn> get $columns => [id, title, color, archive, pipelines];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -564,6 +574,10 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
     } else if (isInserting) {
       context.missing(_colorMeta);
     }
+    if (data.containsKey('archive')) {
+      context.handle(_archiveMeta,
+          archive.isAcceptableOrUnknown(data['archive']!, _archiveMeta));
+    }
     return context;
   }
 
@@ -579,6 +593,8 @@ class $ProjectTable extends Project with TableInfo<$ProjectTable, ProjectData> {
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       color: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}color'])!,
+      archive: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}archive'])!,
       pipelines: $ProjectTable.$converterpipelines.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}pipelines'])!),
@@ -598,11 +614,13 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
   final String id;
   final String title;
   final String color;
+  final bool archive;
   final List<String> pipelines;
   const ProjectData(
       {required this.id,
       required this.title,
       required this.color,
+      required this.archive,
       required this.pipelines});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -610,6 +628,7 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
     map['id'] = Variable<String>(id);
     map['title'] = Variable<String>(title);
     map['color'] = Variable<String>(color);
+    map['archive'] = Variable<bool>(archive);
     {
       map['pipelines'] =
           Variable<String>($ProjectTable.$converterpipelines.toSql(pipelines));
@@ -622,6 +641,7 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
       id: Value(id),
       title: Value(title),
       color: Value(color),
+      archive: Value(archive),
       pipelines: Value(pipelines),
     );
   }
@@ -633,6 +653,7 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
       id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       color: serializer.fromJson<String>(json['color']),
+      archive: serializer.fromJson<bool>(json['archive']),
       pipelines: $ProjectTable.$converterpipelines
           .fromJson(serializer.fromJson<String>(json['pipelines'])),
     );
@@ -644,6 +665,7 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
       'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
       'color': serializer.toJson<String>(color),
+      'archive': serializer.toJson<bool>(archive),
       'pipelines': serializer
           .toJson<String>($ProjectTable.$converterpipelines.toJson(pipelines)),
     };
@@ -653,11 +675,13 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
           {String? id,
           String? title,
           String? color,
+          bool? archive,
           List<String>? pipelines}) =>
       ProjectData(
         id: id ?? this.id,
         title: title ?? this.title,
         color: color ?? this.color,
+        archive: archive ?? this.archive,
         pipelines: pipelines ?? this.pipelines,
       );
   ProjectData copyWithCompanion(ProjectCompanion data) {
@@ -665,6 +689,7 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
       id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
       color: data.color.present ? data.color.value : this.color,
+      archive: data.archive.present ? data.archive.value : this.archive,
       pipelines: data.pipelines.present ? data.pipelines.value : this.pipelines,
     );
   }
@@ -675,13 +700,14 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('color: $color, ')
+          ..write('archive: $archive, ')
           ..write('pipelines: $pipelines')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, title, color, pipelines);
+  int get hashCode => Object.hash(id, title, color, archive, pipelines);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -689,6 +715,7 @@ class ProjectData extends DataClass implements Insertable<ProjectData> {
           other.id == this.id &&
           other.title == this.title &&
           other.color == this.color &&
+          other.archive == this.archive &&
           other.pipelines == this.pipelines);
 }
 
@@ -696,12 +723,14 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
   final Value<String> id;
   final Value<String> title;
   final Value<String> color;
+  final Value<bool> archive;
   final Value<List<String>> pipelines;
   final Value<int> rowid;
   const ProjectCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.color = const Value.absent(),
+    this.archive = const Value.absent(),
     this.pipelines = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -709,6 +738,7 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
     this.id = const Value.absent(),
     required String title,
     required String color,
+    this.archive = const Value.absent(),
     this.pipelines = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : title = Value(title),
@@ -717,6 +747,7 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
     Expression<String>? id,
     Expression<String>? title,
     Expression<String>? color,
+    Expression<bool>? archive,
     Expression<String>? pipelines,
     Expression<int>? rowid,
   }) {
@@ -724,6 +755,7 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
       if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (color != null) 'color': color,
+      if (archive != null) 'archive': archive,
       if (pipelines != null) 'pipelines': pipelines,
       if (rowid != null) 'rowid': rowid,
     });
@@ -733,12 +765,14 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
       {Value<String>? id,
       Value<String>? title,
       Value<String>? color,
+      Value<bool>? archive,
       Value<List<String>>? pipelines,
       Value<int>? rowid}) {
     return ProjectCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
       color: color ?? this.color,
+      archive: archive ?? this.archive,
       pipelines: pipelines ?? this.pipelines,
       rowid: rowid ?? this.rowid,
     );
@@ -756,6 +790,9 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
     if (color.present) {
       map['color'] = Variable<String>(color.value);
     }
+    if (archive.present) {
+      map['archive'] = Variable<bool>(archive.value);
+    }
     if (pipelines.present) {
       map['pipelines'] = Variable<String>(
           $ProjectTable.$converterpipelines.toSql(pipelines.value));
@@ -772,6 +809,7 @@ class ProjectCompanion extends UpdateCompanion<ProjectData> {
           ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('color: $color, ')
+          ..write('archive: $archive, ')
           ..write('pipelines: $pipelines, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -1967,6 +2005,7 @@ typedef $$ProjectTableCreateCompanionBuilder = ProjectCompanion Function({
   Value<String> id,
   required String title,
   required String color,
+  Value<bool> archive,
   Value<List<String>> pipelines,
   Value<int> rowid,
 });
@@ -1974,6 +2013,7 @@ typedef $$ProjectTableUpdateCompanionBuilder = ProjectCompanion Function({
   Value<String> id,
   Value<String> title,
   Value<String> color,
+  Value<bool> archive,
   Value<List<String>> pipelines,
   Value<int> rowid,
 });
@@ -1995,6 +2035,9 @@ class $$ProjectTableFilterComposer
 
   ColumnFilters<String> get color => $composableBuilder(
       column: $table.color, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get archive => $composableBuilder(
+      column: $table.archive, builder: (column) => ColumnFilters(column));
 
   ColumnWithTypeConverterFilters<List<String>, List<String>, String>
       get pipelines => $composableBuilder(
@@ -2020,6 +2063,9 @@ class $$ProjectTableOrderingComposer
   ColumnOrderings<String> get color => $composableBuilder(
       column: $table.color, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<bool> get archive => $composableBuilder(
+      column: $table.archive, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get pipelines => $composableBuilder(
       column: $table.pipelines, builder: (column) => ColumnOrderings(column));
 }
@@ -2041,6 +2087,9 @@ class $$ProjectTableAnnotationComposer
 
   GeneratedColumn<String> get color =>
       $composableBuilder(column: $table.color, builder: (column) => column);
+
+  GeneratedColumn<bool> get archive =>
+      $composableBuilder(column: $table.archive, builder: (column) => column);
 
   GeneratedColumnWithTypeConverter<List<String>, String> get pipelines =>
       $composableBuilder(column: $table.pipelines, builder: (column) => column);
@@ -2072,6 +2121,7 @@ class $$ProjectTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<String> color = const Value.absent(),
+            Value<bool> archive = const Value.absent(),
             Value<List<String>> pipelines = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -2079,6 +2129,7 @@ class $$ProjectTableTableManager extends RootTableManager<
             id: id,
             title: title,
             color: color,
+            archive: archive,
             pipelines: pipelines,
             rowid: rowid,
           ),
@@ -2086,6 +2137,7 @@ class $$ProjectTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             required String title,
             required String color,
+            Value<bool> archive = const Value.absent(),
             Value<List<String>> pipelines = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -2093,6 +2145,7 @@ class $$ProjectTableTableManager extends RootTableManager<
             id: id,
             title: title,
             color: color,
+            archive: archive,
             pipelines: pipelines,
             rowid: rowid,
           ),

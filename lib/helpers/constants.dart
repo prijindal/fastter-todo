@@ -2,7 +2,7 @@ const appThemeMode = "APP_THEME_MODE";
 const appColorSeed = "APP_COLOR_SEED";
 const appDefaultRoute = "APP_DEFAULT_ROUTE";
 
-const dbName = "fastter_todo";
+const defaultDbName = "fastter_todo";
 const dbExportJsonName = "fastter_todo.db.json";
 const dbExportArchiveName = "fastter_todo.db.zip";
 const dbLastUpdatedName = "fastter_todo.last_updated_date.txt";

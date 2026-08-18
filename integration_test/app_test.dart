@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:fastter_todo/db/backend_sync_configuration.dart';
 import 'package:fastter_todo/db/db_crud_operations.dart';
+import 'package:fastter_todo/db/local_settings.dart';
 import 'package:fastter_todo/helpers/dbio.dart';
 import 'package:fastter_todo/models/core.dart';
 import 'package:fastter_todo/models/local_db_state.dart';
@@ -32,18 +33,27 @@ void main() {
       });
       when(() => mockStackRouter.currentUrl).thenReturn('/todos');
       // Load app widget.
-      GetIt.I.registerSingleton<SharedDatabase>(SharedDatabase.local());
+      final database = SharedDatabase.local();
+      final localSettings = await LocalSettings.init();
+      GetIt.I.registerSingleton<LocalSettings>(localSettings);
+      GetIt.I.registerSingleton<SharedDatabase>(database);
       GetIt.I.registerSingleton<SettingsStorageNotifier>(
-          SettingsStorageNotifier());
+          SettingsStorageNotifier(localSettings: localSettings));
       GetIt.I.registerSingleton<LocalStateNotifier>(LocalStateNotifier());
       GetIt.I.registerSingleton<LocalDbState>(
         LocalDbState(),
       );
+      final backendSyncConfigurationService =
+          await BackendSyncConfigurationService.init(localSettings);
       GetIt.I.registerSingleton<BackendSyncConfigurationService>(
-          await BackendSyncConfigurationService.init());
+        backendSyncConfigurationService,
+      );
       GetIt.I.registerSingleton<AppRouter>(AppRouter());
       GetIt.I.registerSingleton<DbCrudOperations>(
-        DbCrudOperations(),
+        DbCrudOperations(
+            database: database,
+            backendSyncConfigurationService: backendSyncConfigurationService,
+            localSettings: localSettings),
       );
       GetIt.I.registerSingleton<DatabaseIO>(
         DatabaseIO(),

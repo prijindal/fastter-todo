@@ -49,8 +49,8 @@ class ProjectsScreen extends WatchingWidget {
         onPressed: () {
           AutoRouter.of(context).pushPath("/newproject");
         },
-        tooltip: 'New Journal',
-        key: Key("New Journal"),
+        tooltip: 'New Project',
+        key: Key("New Project"),
         child: const Icon(Icons.add),
       ),
     );
@@ -74,7 +74,14 @@ class ProjectListTile extends StatelessWidget {
         Icons.group_work,
         color: HexColor(project.color),
       ),
-      title: Text(project.title),
+      title: Text(
+        project.title,
+        style: project.archive
+            ? TextStyle(
+                decoration: TextDecoration.lineThrough,
+              )
+            : null,
+      ),
       onTap: onTap,
     );
   }

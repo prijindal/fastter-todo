@@ -123,7 +123,8 @@ class ProjectExpansionTile extends WatchingWidget {
 
   @override
   Widget build(BuildContext context) {
-    final projects = watchPropertyValue((LocalDbState state) => state.projects);
+    final projects = watchPropertyValue((LocalDbState state) =>
+        state.projects.where((p) => !p.archive).toList());
     final children = <Widget>[];
     if (projects.isNotEmpty) {
       children.addAll(projects

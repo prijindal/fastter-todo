@@ -6,6 +6,7 @@ import '../models/core.dart';
 import '../models/local_db_state.dart';
 import '../models/local_state.dart';
 import '../pages/todos/app_bars/app_bar_with_actions.dart';
+import '../pages/todos/projectarchivedialog.dart';
 import '../pages/todos/projectdeletiondialog.dart';
 
 class AppBarActions {
@@ -56,6 +57,21 @@ class AppBarActions {
           // ignore: use_build_context_synchronously
           AutoRouter.of(context).navigatePath("/todos");
         }
+      },
+    );
+  }
+
+  static AppBarAction archiveProject(String projectId) {
+    return AppBarAction(
+      icon: Icon(Icons.archive),
+      title: "Archive Project",
+      onPressed: (context) async {
+        await showProjectArchiveDialog(
+          context,
+          GetIt.I<LocalDbState>()
+              .projects
+              .singleWhere((f) => f.id == projectId),
+        );
       },
     );
   }
@@ -165,6 +181,7 @@ class TodosFilters {
     actions.add(AppBarActions.search());
     if (projectFilter != null && projectFilter != "inbox") {
       actions.add(AppBarActions.editProject(projectFilter!));
+      actions.add(AppBarActions.archiveProject(projectFilter!));
       actions.add(AppBarActions.deleteProject(projectFilter!));
     }
     actions.add(AppBarActions.toggleView());

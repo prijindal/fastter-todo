@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
@@ -21,6 +22,7 @@ class Project extends Table {
   late final id = text().clientDefault(() => _uuid.v4())();
   late final title = text()();
   late final color = text()();
+  late final archive = boolean().clientDefault(() => false)();
   late final pipelines = text()
       .map(const StringListConverter())
       .clientDefault(() => jsonEncode([defaultPipeline]))();
@@ -90,6 +92,8 @@ class EntityActionsQueue extends Table {
 // tables we just defined. We'll see how to use that database class in a moment.
 @DriftDatabase(tables: [Todo, Project, Comment, Reminder, EntityActionsQueue])
 class SharedDatabase extends _$SharedDatabase {
+  static String dbName = Platform.environment['DB_NAME'] ??
+      String.fromEnvironment('DB_NAME', defaultValue: defaultDbName);
   // Keeping a custom constructor is useful for unit tests which may want to
   // open an in-memory database only.
   SharedDatabase(super.e);

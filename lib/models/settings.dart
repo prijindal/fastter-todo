@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'
-    show SharedPreferencesAsync;
 
+import '../db/local_settings.dart';
 import '../helpers/constants.dart';
 import '../helpers/logger.dart';
 
@@ -25,19 +24,23 @@ class SettingsStorageNotifier with ChangeNotifier {
   ColorSeed _baseColor;
   ThemeMode _themeMode;
   String _defaultRoute;
+  final LocalSettings _localSettings;
 
   SettingsStorageNotifier({
     ThemeMode themeMode = ThemeMode.system,
     ColorSeed baseColor = ColorSeed.baseColor,
     String defaultRoute = "",
+    required LocalSettings localSettings,
   })  : _baseColor = baseColor,
         _themeMode = themeMode,
-        _defaultRoute = defaultRoute;
+        _defaultRoute = defaultRoute,
+        _localSettings = localSettings;
 
-  static Future<SettingsStorageNotifier> initialize() async {
-    final theme = await _readSetting(appThemeMode);
-    final color = await _readSetting(appColorSeed);
-    final defaultRoute = await _readSetting(appDefaultRoute);
+  static Future<SettingsStorageNotifier> initialize(
+      LocalSettings localSettings) async {
+    final theme = await _readSetting(localSettings, appThemeMode);
+    final color = await _readSetting(localSettings, appColorSeed);
+    final defaultRoute = await _readSetting(localSettings, appDefaultRoute);
     return SettingsStorageNotifier(
       themeMode: theme == null
           ? ThemeMode.system
@@ -46,12 +49,14 @@ class SettingsStorageNotifier with ChangeNotifier {
           ? ColorSeed.baseColor
           : ColorSeed.values.asNameMap()[color] ?? ColorSeed.baseColor,
       defaultRoute: defaultRoute ?? "",
+      localSettings: localSettings,
     );
   }
 
-  static Future<String?> _readSetting(String key) async {
+  static Future<String?> _readSetting(
+      LocalSettings localSettings, String key) async {
     AppLogger.instance.d("Reading $key from shared_preferences");
-    final preference = await SharedPreferencesAsync().getString(key);
+    final preference = await localSettings.sharedPreferences.getString(key);
     AppLogger.instance.d("Read $key as $preference from shared_preferences");
     return preference;
   }
@@ -64,7 +69,7 @@ class SettingsStorageNotifier with ChangeNotifier {
 
   Future<void> _setSetting(String key, String newSetting) async {
     AppLogger.instance.d("Writting newSetting as $key to shared_preferences");
-    await SharedPreferencesAsync().setString(
+    await _localSettings.sharedPreferences.setString(
       key,
       newSetting,
     );

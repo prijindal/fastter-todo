@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:drift/drift.dart' as drift;
-import 'package:watch_it/watch_it.dart';
 
 import '../helpers/logger.dart';
 import '../models/core.dart';
 import 'backend_connector.dart';
 import 'backend_sync_configuration.dart';
+import 'local_settings.dart';
 
 enum TableName {
   project,
@@ -16,37 +16,50 @@ enum TableName {
 }
 
 class DbCrudOperations {
-  final _database = GetIt.I<SharedDatabase>();
-  final _backendSyncConfig = GetIt.I<BackendSyncConfigurationService>();
+  final SharedDatabase _database;
+  final BackendSyncConfigurationService _backendSyncConfig;
   BackendConnector? _backendConneector;
 
   BackendConnector? get backendConnector => _backendConneector;
 
   late final project = TableCrudOperation(
+    _database,
     _database.project,
     (json) => ProjectData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
   late final todo = TableCrudOperation(
+    _database,
     _database.todo,
     (json) => TodoData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
   late final comment = TableCrudOperation(
+    _database,
     _database.comment,
     (json) => CommentData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
   late final reminder = TableCrudOperation(
+    _database,
     _database.reminder,
     (json) => ReminderData.fromJson(json).toCompanion(true),
     _database.managers.entityActionsQueue,
   );
 
-  DbCrudOperations() {
+  DbCrudOperations({
+    required SharedDatabase database,
+    required BackendSyncConfigurationService backendSyncConfigurationService,
+    required LocalSettings localSettings,
+  })  : _database = database,
+        _backendSyncConfig = backendSyncConfigurationService {
     if (_backendSyncConfig.backendSyncConfiguration != null) {
-      BackendConnector.init(_backendSyncConfig.backendSyncConfiguration!)
-          .then((value) {
+      BackendConnector.init(
+        database: _database,
+        dbCrudOperations: this,
+        config: _backendSyncConfig.backendSyncConfiguration!,
+        localSettings: localSettings,
+      ).then((value) {
         _backendConneector = value;
       });
     }
@@ -87,13 +100,14 @@ class DbCrudOperations {
 
 class TableCrudOperation<$Table extends drift.Table,
     $Dataclass extends drift.DataClass> {
-  final database = GetIt.I<SharedDatabase>();
+  final SharedDatabase database;
 
   final $$EntityActionsQueueTableTableManager queueTableManager;
   final drift.TableInfo<$Table, $Dataclass> table;
   drift.Insertable<$Dataclass> Function(Map<String, dynamic>) insertable;
 
   TableCrudOperation(
+    this.database,
     this.table,
     this.insertable,
     this.queueTableManager,
