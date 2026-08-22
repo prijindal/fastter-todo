@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../db/local_settings.dart';
 import '../helpers/constants.dart';

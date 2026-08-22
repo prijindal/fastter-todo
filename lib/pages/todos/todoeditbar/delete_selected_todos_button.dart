@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../db/db_crud_operations.dart';
 import '../../../models/local_state.dart';
