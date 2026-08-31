@@ -21,7 +21,7 @@ kotlin {
 
 android {
     namespace = "com.prijindal.fastter_todo"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
